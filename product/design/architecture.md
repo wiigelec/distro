@@ -13,13 +13,19 @@ while communicating through explicit contracts.
 
 ### Build
 
-Build is the package builder.
+Build is the package builder and package-production authority.
 
-Its responsibility is to turn source inputs and a package recipe into one or
-more package artifacts suitable for consumption by Manage.
+At the individual package level, its responsibility is to turn source inputs
+and a package recipe into one or more package artifacts suitable for
+consumption by Manage.
 
-Build owns build-time concerns. It does not own the installed state of a
-machine.
+At the distro level, Build is responsible for reconciling the declared package
+set against recipe state, upstream state, and produced package state according
+to package-specific automation policy. It may autonomously schedule package
+work and escalate changes or failures that cannot be resolved safely.
+
+Build owns build-time and package-production state. It does not own the
+installed state of a machine.
 
 ### Manage
 
@@ -89,7 +95,7 @@ not transfer package-building responsibility to Manage.
 
 The following boundaries are part of the initial design:
 
-1. Build owns package creation.
+1. Build owns package creation and distro package-production reconciliation.
 2. Manage owns installed package state.
 3. Install owns installation orchestration.
 4. Package installation logic belongs to Manage and is reused by Install.
@@ -104,6 +110,9 @@ The following boundaries are part of the initial design:
    shared implementation assumptions.
 9. A repository or distribution service may connect package production and
    consumption without becoming a primary component in this baseline.
+10. The declared package-set policy is desired state; machine-maintained Build
+    history and reconciliation state must not silently redefine that desired
+    state.
 
 ## Undecided areas
 

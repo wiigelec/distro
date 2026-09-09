@@ -65,6 +65,29 @@ expected eventually to represent categories such as:
 The Package Manifest describes desired package membership and policy. It is not
 the installed-package database owned by Manage.
 
+The Package Manifest is desired-state authority. Machine-maintained Build state
+must not silently redefine package membership, automation policy, or other
+maintainer-declared intent. If Build is ever permitted to propose or perform
+changes to desired-state policy, that behavior must be explicitly designed and
+governed rather than implied by reconciliation.
+
+## Desired and observed state authority
+
+Build reconciles desired state against observed and historical state, but those
+categories have different authorities:
+
+```text
+Package Manifest
+    maintainer-declared desired package-set policy
+
+Recipe Manifest and runtime state
+    machine-maintained observed and historical package-production state
+```
+
+Observed or historical state may inform reconciliation, revision allocation,
+validation, publication, and escalation. It must not by itself change the
+desired package-set policy expressed by the Package Manifest.
+
 ## Recipe Manifest
 
 The Recipe Manifest is machine-maintained state used by Build to track recipe
@@ -185,6 +208,42 @@ policy permits.
 The exact upstream discovery mechanisms, polling intervals, release-selection
 rules, and automatic recipe-editing mechanisms remain undecided.
 
+## Package-production state transitions
+
+A successful build and a published package are different states.
+
+Conceptually, package-production work may progress through states such as:
+
+```text
+detected
+   |
+   v
+prepared
+   |
+   v
+built
+   |
+   v
+validated
+   |
+   v
+publishable
+   |
+   v
+published
+```
+
+These names are conceptual rather than a final persisted state machine, but the
+design requires publication to remain a distinct transition from build success
+and validation success.
+
+Automation policy may permit different packages to stop at different points.
+For example, an assisted package may reach a validated or publishable state and
+require human approval before publication.
+
+The exact state machine, approval semantics, and publication transaction model
+remain undecided.
+
 ## Automation classes
 
 Packages must be classifiable according to the level of automation Build is
@@ -267,9 +326,10 @@ reconciliation.
 
 This state is distinct from Manage's authoritative installed-package state.
 
-Build's package-production state may include the Package Manifest, Recipe
-Manifest, observed upstream state, build results, and publication state as later
-design specifies.
+Build's package-production state may include the Recipe Manifest, observed
+upstream state, build results, validation state, and publication state as later
+design specifies. Build consumes the Package Manifest as desired-state authority;
+the manifest is not merely machine-maintained runtime history.
 
 Manage remains authoritative only for package state installed on a target
 filesystem.
@@ -291,4 +351,6 @@ This design intentionally does not yet decide:
 - artifact publication mechanism;
 - package repository implementation;
 - dependency-driven rebuild policy;
-- validation depth required before autonomous publication.
+- validation depth required before autonomous publication;
+- exact package-production state machine and persisted state names;
+- rules, if any, for Build proposing or mutating desired-state policy.
