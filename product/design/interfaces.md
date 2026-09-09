@@ -14,11 +14,16 @@ Build produces package artifacts.
 
 Manage consumes package artifacts.
 
-The package artifact contract will eventually need to define at least:
+Package identity is defined by the [Package Model](package-model.md) as:
 
-- package identity;
-- package version information;
-- target architecture or compatibility information;
+```text
+name + version + architecture + revision
+```
+
+The package artifact contract will eventually need to carry at least:
+
+- the complete package identity;
+- the machine-resolvable effective recipe identity bound to that revision;
 - installable filesystem payload;
 - runtime package relationships;
 - integrity information;
