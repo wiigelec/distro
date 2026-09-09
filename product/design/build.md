@@ -2,11 +2,16 @@
 
 ## Role
 
-Build is the distro's package builder.
+Build is the distro's package builder and package-production authority.
 
-Its input is source material plus a package recipe or equivalent build
-description. Its output is one or more package artifacts conforming to the
-package contract consumed by Manage.
+At the individual package level, its input is source material plus a package
+recipe or equivalent build description. Its output is one or more package
+artifacts conforming to the package contract consumed by Manage.
+
+At the distro level, Build is expected to operate as an autonomous reconciler
+that maintains the declared package set according to package-specific
+automation policy. That runtime model is defined by
+[Autonomous Build Runtime](autonomous-build.md).
 
 ## Responsibilities
 

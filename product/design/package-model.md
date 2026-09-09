@@ -159,7 +159,13 @@ Build must:
 - avoid creating a new revision merely for another build attempt of the same
   effective recipe.
 
-How Build discovers or assigns the next revision is not yet specified.
+Build's revision authority is provided conceptually by the machine-maintained
+Recipe Manifest defined by [Autonomous Build Runtime](autonomous-build.md).
+That manifest preserves the mapping between package revisions and effective
+recipe identities.
+
+The exact mechanism by which Build allocates the next revision remains
+undecided.
 
 ## Consequences for Manage
 
