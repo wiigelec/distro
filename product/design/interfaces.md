@@ -36,9 +36,25 @@ The contract must preserve Manage as the authority for:
 - applying package payloads;
 - maintaining package records;
 - checking package relationships and conflicts;
-- executing any package lifecycle behavior that later design permits.
+- executing any package-local lifecycle behavior that later design permits.
 
-Install remains responsible for the surrounding installation workflow.
+Install remains responsible for the surrounding installation workflow and
+installation-wide machine policy and configuration.
+
+## Build to Manage: optional build-environment service
+
+Later design may allow Build to use Manage to populate an alternate root or
+other controlled build environment with packages needed for a build.
+
+If that relationship is adopted:
+
+- Build owns build dependency intent and the build process;
+- Manage owns package-state changes inside the requested build environment;
+- Manage does not interpret recipes or execute package builds;
+- use of Manage by Build does not change the package artifact contract between
+  them.
+
+Whether this interface is actually used remains undecided.
 
 ## Recipe versus package metadata
 
@@ -55,19 +71,37 @@ The exact schemas remain undecided.
 
 ## Repository interface
 
-A repository or distribution service may later sit between Build and Manage:
+A repository or distribution service may sit between Build and Manage:
 
 ```text
 Build --> package artifacts --> repository --> Manage
 ```
+
+In this baseline, repository is an interface or distribution domain, not a
+fourth primary component.
 
 The presence of a repository does not change ownership:
 
 - Build still owns package creation.
 - Manage still owns package installation state.
 - Install still uses Manage for package operations.
+- Install may select or configure package sources for an installation without
+  becoming responsible for repository consumption mechanics.
 
-Repository metadata and transport are future design topics.
+Repository metadata, publication, discovery, authentication, and transport are
+future design topics.
+
+## Configuration ownership
+
+Package-local lifecycle behavior and installation-wide configuration are
+different responsibilities.
+
+Manage owns lifecycle consequences intrinsic to applying package-state changes.
+Install owns machine-level choices and policy made as part of creating the
+installed system.
+
+The exact lifecycle mechanism and exact installation configuration model remain
+undecided.
 
 ## Compatibility principle
 

@@ -42,7 +42,7 @@ Install does not implement a second package installation mechanism.
 
 ## Dependency direction
 
-The intended dependency direction is:
+The intended package-production and installation relationships are:
 
 ```text
 source + recipe
@@ -54,20 +54,36 @@ source + recipe
  package artifacts
       |
       v
-    Manage <----- Install
+ Repository
       |
       v
-installed package state
+    Manage <--------- Install
+      |                  |
+      v                  v
+ package state      system configuration
+      \                  /
+       \                /
+        v              v
+          target system
 ```
+
+The repository in this diagram is an interface or distribution domain between
+package production and package consumption. It is not established here as a
+fourth primary component or executable.
 
 Build and Manage meet at the package artifact contract.
 
-Install depends on Manage as the mechanism for populating and changing package
-state in the target system.
+Install orchestrates creation of a target system and depends on Manage as the
+mechanism for populating and changing package state in that target. Install does
+not sit in the package-production data path.
 
 Manage does not depend on Install.
 
 Manage does not depend on Build in order to install an already-created package.
+
+Build may later use Manage as a package-state service when preparing an isolated
+or alternate build environment. If it does, that operational dependency does
+not transfer package-building responsibility to Manage.
 
 ## Design boundaries
 
@@ -77,11 +93,17 @@ The following boundaries are part of the initial design:
 2. Manage owns installed package state.
 3. Install owns installation orchestration.
 4. Package installation logic belongs to Manage and is reused by Install.
-5. Build-time information and installed-package information may overlap, but
+5. Build may use Manage to populate a build environment without making Manage
+   responsible for executing or defining builds.
+6. Package-local lifecycle consequences belong to package management, while
+   installation-wide machine policy and configuration belong to Install.
+7. Build-time information and installed-package information may overlap, but
    neither component may assume that the other's internal representation is its
    own.
-6. Cross-component behavior is defined through explicit interfaces rather than
+8. Cross-component behavior is defined through explicit interfaces rather than
    shared implementation assumptions.
+9. A repository or distribution service may connect package production and
+   consumption without becoming a primary component in this baseline.
 
 ## Undecided areas
 

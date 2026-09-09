@@ -30,9 +30,14 @@ state of the host or target system.
 A package emitted by Build must be consumable by Manage without requiring
 Manage to reproduce the build.
 
-Build may require packages or other tools in order to perform a build, but that
-does not make build dependency handling part of Manage's package-creation
-responsibility.
+Build may require packages or other tools in order to perform a build. Build may
+later use Manage to populate a build root or other controlled build environment.
+If it does, Manage remains responsible only for package-state operations in that
+environment; Build remains responsible for dependency intent, build execution,
+staging, and package creation.
+
+This baseline does not yet decide whether Build will use Manage for build
+environment provisioning.
 
 ## Boundary with Install
 
@@ -64,6 +69,7 @@ format are not yet specified.
 - What is the recipe format?
 - What source verification is mandatory?
 - How are build dependencies declared and supplied?
+- Does Build use Manage to provision build roots?
 - What level of build isolation is required?
 - Can one recipe produce multiple packages?
 - What reproducibility guarantees are required?

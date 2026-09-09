@@ -40,7 +40,7 @@ installation choices
         |
         +---- target preparation
         |
-        +----> Manage --target <root>
+        +----> Manage against target root
         |          |
         |          v
         |    installed package state
@@ -55,15 +55,24 @@ The diagram describes responsibility, not a final CLI.
 
 ## Boundary with Build
 
-Install operates on package artifacts or package sources made available through
-the package distribution system. It does not need to compile packages during a
-normal installation.
+Install operates on package artifacts made available locally or through the
+package distribution system.
+
+Build owns transformation of source material and recipes into package artifacts.
+Install does not compile packages during a normal installation.
 
 ## Boundary with Manage
 
-Install determines installation workflow and target configuration.
+Install determines installation workflow, package selection, and
+installation-wide target configuration.
 
-Manage determines how package state is changed inside the target.
+Manage determines how package state is changed inside the target and owns any
+package-local lifecycle consequences defined by the package-management model.
+
+Install owns machine-level policy and configuration selected as part of the
+installation, such as categories including machine identity, users, locale,
+networking policy, and boot configuration. The exact supported settings remain
+open design questions.
 
 ## Open design questions
 
