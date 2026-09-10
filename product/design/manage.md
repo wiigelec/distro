@@ -204,9 +204,10 @@ upgrade selection because the Package Database explicitly designates `current`.
 An installed package that has no `current` identity in the refreshed Package
 Database is not automatically removed by `upgrade`.
 
-A held package is excluded from normal synchronization to `current`. Its
-installed identity is retained during ordinary upgrade unless the user performs
-an explicit package operation that changes it or removes the hold.
+A held package is immutable package state until it is explicitly unheld.
+Normal synchronization, dependency resolution, orphan cleanup, reinstall,
+replacement, explicit version selection, and removal must not change or remove
+a held package.
 
 Version comparison semantics may still be required later for dependency
 constraints, explicit non-current version selection, downgrade validation, or
@@ -231,8 +232,8 @@ Explicit installation or downgrade to a non-current published identity does
 not implicitly create a hold. Unless the package is separately held, a later
 normal `upgrade` synchronizes it back to Package Database `current`.
 
-Final dependency, confirmation, and safety behavior for explicit downgrade
-remains to be refined with dependency semantics.
+Explicit downgrade participates in the same dependency and hold constraints as
+other package-changing transactions.
 
 ## Reinstall and same-identity replacement
 
@@ -256,6 +257,8 @@ operation sufficiently to determine at least:
 - packages to replace;
 - selected published identities;
 - required dependency changes;
+- provider selections;
+- held-package constraints;
 - package relationship conflicts;
 - package-owned file conflicts detectable before application;
 - required artifacts and expected checksums.
@@ -287,6 +290,10 @@ update installed-package database
 
 A transaction that cannot be resolved or validated must fail before ordinary
 payload application begins.
+
+Before application, Manage should be able to present the resolved transaction
+plan including explicit changes and dependency-induced installs, removals,
+replacements, provider changes, and requested orphan cleanup.
 
 Stronger guarantees such as rollback after partial filesystem mutation or
 interruption remain undecided.
@@ -370,6 +377,9 @@ upgrade --clean
     -> include those orphan removals in the same transaction
 ```
 
+Held packages are excluded from the removable orphan closure. If a held package
+would otherwise be orphaned, it remains installed.
+
 The exact CLI spelling remains undecided. The semantic requirement is that normal
 upgrade does not silently remove orphaned dependencies, while cleanup can be
 requested explicitly either as a separate operation or as part of an
@@ -379,27 +389,46 @@ upgrade-and-clean transaction.
 
 Manage supports a simple per-package hold state.
 
-A held package retains its installed package identity during normal `upgrade`
-instead of being synchronized to Package Database `current`.
+A hold is a hard local constraint: Manage must not change or remove a held
+package until the hold is explicitly removed.
 
 Conceptually:
 
 ```text
 not held
-    -> normal upgrade follows repo current
+    -> package may participate normally in resolved transactions
 
 held
-    -> normal upgrade retains installed identity
+    -> retain installed identity
+    -> do not reinstall or replace
+    -> do not remove
+    -> exclude from orphan cleanup
 ```
 
 A hold does not alter Package Database state, package identity, artifact
-identity, or install reason. It is local Manage policy attached to the installed
+identity, or install reason. It is local Manage policy attached to installed
 package state.
 
-Explicit package operations remain allowed against held packages. For example,
-the user may explicitly install another published identity, reinstall the held
-identity, remove the package, or remove the hold. The exact confirmation policy
-for explicit operations on held packages remains a CLI/interaction decision.
+If satisfying a requested transaction would require changing or removing a held
+package, dependency resolution fails before filesystem mutation. The error should
+identify the held package as a blocking constraint.
+
+For example:
+
+```text
+foo current requires libbar >= 3
+
+installed:
+    libbar 2.5 held
+
+upgrade:
+    -> no valid solution while preserving hold
+    -> dependency-resolution error
+    -> no filesystem mutation
+```
+
+A held package can be made mutable only by explicitly removing its hold first.
+There is no implicit or explicit-operation bypass of an active hold.
 
 Installing an explicit non-current version does not automatically create a hold,
 and creating a hold does not itself select or install another version.
@@ -414,6 +443,136 @@ list holds
 
 The exact CLI spelling remains undecided. A broader pinning or preference system
 is outside this initial model.
+
+## Dependency relationships
+
+The initial dependency model intentionally stays small.
+
+Package metadata may express:
+
+```text
+depends
+conflicts
+provides
+```
+
+`depends` declares a required package name or provided capability, optionally
+with a version constraint.
+
+`conflicts` declares package names or provided capabilities that must not coexist
+in the resulting installed state.
+
+`provides` declares additional capability names that an installed package can
+satisfy for dependency resolution.
+
+Optional or suggested dependencies are outside the initial dependency model and
+may be added later without changing the meaning of required dependencies.
+
+## Dependency version constraints
+
+The initial constraint language supports comparisons equivalent to:
+
+```text
+=
+>
+>=
+<
+<=
+```
+
+An unconstrained dependency requires only that some acceptable package or
+provider satisfying the named requirement be present.
+
+The exact package-version ordering algorithm remains to be defined. Whatever
+ordering is chosen must be deterministic and used consistently for dependency
+constraints and explicit version comparisons. Package revision remains part of
+package identity; whether dependency expressions may constrain revision
+separately remains undecided.
+
+## Solver invariants
+
+Manage resolves package-changing requests against the complete planned resulting
+installed state before ordinary filesystem mutation.
+
+The solver must simultaneously satisfy:
+
+```text
+explicit user request
+Package Database selections
+held installed-package constraints
+required dependencies
+version constraints
+conflicts
+provider choices
+removal safety
+```
+
+A transaction has no valid solution if any required dependency would be
+unsatisfied, any conflict would remain, or satisfying the request would require
+changing or removing a held package.
+
+An unresolvable transaction fails before ordinary filesystem mutation and should
+report the constraints that prevented a solution.
+
+The solver must not silently override a hold, leave an unsatisfied dependency, or
+ignore a declared conflict merely to complete a requested operation.
+
+## Provider selection and stability
+
+A dependency may be satisfied by the named package itself or by a package whose
+metadata declares a matching `provides` capability.
+
+When multiple valid providers exist, Manage should prefer an already-installed
+valid provider rather than switching providers without a reason.
+
+Conceptually:
+
+```text
+app depends on ssl-provider
+
+installed:
+    openssl provides ssl-provider
+
+available:
+    openssl provides ssl-provider
+    libressl provides ssl-provider
+
+normal resolution:
+    -> retain openssl if it still satisfies all constraints
+```
+
+Provider replacement is allowed when required by the explicit request,
+dependency constraints, conflicts, repository state, or another hard solver
+constraint.
+
+If multiple equally valid provider choices remain after preserving installed
+state where possible, the exact deterministic tie-break rule remains to be
+defined. Solver behavior must not depend on incidental iteration order.
+
+## Removal safety
+
+Removing a package must be resolved against the complete resulting dependency
+graph.
+
+A requested removal fails if an installed package would have an unsatisfied
+required dependency afterward, unless the same transaction explicitly removes
+or replaces the dependent package or otherwise provides a valid dependency
+solution.
+
+Conceptually:
+
+```text
+A depends on B
+
+remove B
+    -> fail while A remains and no replacement satisfies B
+
+remove A + B
+    -> may resolve successfully
+```
+
+Held packages remain immutable during removal resolution. If a valid removal
+transaction would require changing or removing a held package, resolution fails.
 
 ## Target root
 
@@ -478,12 +637,14 @@ orphan removal
 ## Open design questions
 
 - exact installed package database serialization and storage layout;
-- dependency expression language and solver behavior;
+- exact deterministic provider tie-break rule when installed-state preservation
+  does not select a unique provider;
 - transaction guarantees after filesystem mutation begins;
 - mutable configuration-file behavior during upgrades;
 - intentional shared-file and path-replacement semantics;
 - package-local lifecycle representation and constraints;
 - repository transport on the home network;
 - downloaded-artifact cache policy;
-- version-comparison semantics needed for dependency constraints;
+- exact version-ordering algorithm used by dependency constraints and explicit
+  version comparison;
 - rollback or recovery after interruption.
