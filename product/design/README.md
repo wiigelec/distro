@@ -13,8 +13,9 @@ components:
 See [Architecture](architecture.md) for the component boundaries,
 [Interfaces](interfaces.md) for the contracts between them,
 [Package Model](package-model.md) for package identity and revision
-semantics, and [Autonomous Build Runtime](autonomous-build.md) for package-set
-reconciliation and automation policy.
+semantics, [Autonomous Build Runtime](autonomous-build.md) for package-set
+reconciliation and automation policy, and [Package Database](package-database.md)
+for published architecture-specific package availability.
 
 These documents establish the initial design baseline. Details not explicitly
 decided here remain open design questions and should be resolved by later

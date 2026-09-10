@@ -178,8 +178,18 @@ name + version + architecture + revision
 Manage must be able to distinguish different revisions of the same package
 name, version, and architecture.
 
-Version ordering, revision ordering during upgrades, architecture compatibility,
-and coexistence rules are not yet specified.
+For normal upgrade detection, Manage does not infer the newest package by sorting
+versions and revisions. It compares installed identity with the explicit
+`current` package identity published in the architecture-scoped
+[Package Database](package-database.md).
+
+The Package Database exposes only the highest published revision for a given
+`name + version + architecture`, while Build history may retain superseded
+revisions.
+
+Version comparison semantics may still be required for dependency relationships,
+explicit version selection, or downgrade policy. Architecture compatibility and
+coexistence rules are also not yet specified.
 
 ## Undecided areas
 

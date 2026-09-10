@@ -23,6 +23,16 @@ categories of behavior as they are designed:
 Repository access and dependency resolution may become Manage responsibilities,
 but their detailed behavior is not yet specified by this baseline.
 
+Manage consumes the architecture-scoped published Package Database defined by
+[Package Database](package-database.md). For ordinary upgrade detection, Manage
+compares an installed package identity with the explicit `current` identity in
+that database. A different identity indicates an available package change.
+
+The Package Database may also expose older published upstream versions for
+explicit downgrade or version-selection operations. Superseded revisions of the
+same upstream version are not normal downgrade targets because only the highest
+published revision of each version is exposed.
+
 ## Target root
 
 Manage must be designed so that package operations are not inherently tied to

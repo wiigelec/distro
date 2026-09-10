@@ -46,30 +46,27 @@ every package can be updated with the same level of automation.
 
 ## Package Manifest
 
-The Package Manifest is the authoritative declaration of packages that belong to
+The Package Manifest is Build's maintainer-declared upstream-tracking input for
 the distro package set.
 
-At the semantic level, it must be able to associate a package with the policy
-needed by Build to maintain it.
+At minimum, it identifies the package names Build is expected to track and the
+upstream location or discovery information needed to query and download source.
+It may also carry package-specific automation policy and other upstream-tracking
+configuration as later design requires.
 
-The exact fields and serialization remain undecided, but the manifest is
-expected eventually to represent categories such as:
+Conceptually, it answers:
 
-- package name or package-set identity;
-- recipe reference;
-- supported architecture scope;
-- upstream discovery policy;
-- package automation policy;
-- package state required for autonomous reconciliation.
+```text
+What packages do we track, and where does Build look upstream for them?
+```
 
-The Package Manifest describes desired package membership and policy. It is not
-the installed-package database owned by Manage.
+The exact fields and serialization remain undecided.
 
-The Package Manifest is desired-state authority. Machine-maintained Build state
-must not silently redefine package membership, automation policy, or other
-maintainer-declared intent. If Build is ever permitted to propose or perform
-changes to desired-state policy, that behavior must be explicitly designed and
-governed rather than implied by reconciliation.
+The Package Manifest is desired-state authority for upstream package tracking.
+Machine-maintained Build state must not silently add or remove tracked packages,
+rewrite upstream locations, or change maintainer-declared automation policy.
+If Build is ever permitted to propose or perform such changes, that behavior must
+be explicitly designed and governed rather than implied by reconciliation.
 
 ## Desired and observed state authority
 
@@ -78,15 +75,21 @@ categories have different authorities:
 
 ```text
 Package Manifest
-    maintainer-declared desired package-set policy
+    maintainer-declared upstream tracking configuration
 
 Recipe Manifest and runtime state
     machine-maintained observed and historical package-production state
+
+Package Database
+    published architecture-scoped distro package catalog
 ```
 
 Observed or historical state may inform reconciliation, revision allocation,
 validation, publication, and escalation. It must not by itself change the
-desired package-set policy expressed by the Package Manifest.
+upstream tracking configuration expressed by the Package Manifest.
+
+Successful publication updates the Package Database rather than turning Build
+history itself into the package catalog consumed by Manage.
 
 ## Recipe Manifest
 
@@ -326,10 +329,11 @@ reconciliation.
 
 This state is distinct from Manage's authoritative installed-package state.
 
-Build's package-production state may include the Recipe Manifest, observed
-upstream state, build results, validation state, and publication state as later
-design specifies. Build consumes the Package Manifest as desired-state authority;
-the manifest is not merely machine-maintained runtime history.
+Build's package-production state may include the Recipe Manifest, package history,
+observed upstream state, build results, validation state, and publication state as
+later design specifies. Build consumes the Package Manifest as maintainer-declared
+upstream tracking input and publishes eligible package identities into the
+architecture-scoped Package Database.
 
 Manage remains authoritative only for package state installed on a target
 filesystem.
