@@ -1,0 +1,199 @@
+# Component Interfaces
+
+## Purpose
+
+Build, Manage, and Install are separate components. Their integration is
+defined through explicit contracts rather than by exposing each component's
+internal implementation to the others.
+
+This document records the initial contracts that later design work must refine.
+
+## Build to Manage: package artifact contract
+
+Build produces package artifacts.
+
+Manage consumes package artifacts.
+
+Package identity is defined by the [Package Model](package-model.md) as:
+
+```text
+name + version + architecture + revision
+```
+
+The package artifact contract needs to carry:
+
+- the complete package identity;
+- installable filesystem payload.
+
+For repository-backed transactions, runtime relationships, ownership metadata,
+and other package-management metadata come from the authoritative Package
+Database generation rather than being duplicated into the artifact.
+
+The whole-artifact integrity checksum is associated with the published artifact
+through Package Database or repository metadata external to the artifact bytes
+being verified. This avoids making the artifact contain the checksum of itself.
+
+This baseline does not choose the serialization or archive format.
+
+## Install to Manage: target package-operation contract
+
+Install must be able to request package operations against an installation
+target rather than only against the currently running root filesystem.
+
+The contract must preserve Manage as the authority for:
+
+- applying package payloads;
+- maintaining package records;
+- checking package relationships and conflicts;
+- executing any package-local lifecycle behavior that later design permits.
+
+Install remains responsible for the surrounding installation workflow and
+installation-wide machine policy and configuration.
+
+## Build to Manage: optional build-environment service
+
+Later design may allow Build to use Manage to populate an alternate root or
+other controlled build environment with packages needed for a build.
+
+If that relationship is adopted:
+
+- Build owns build dependency intent and the build process;
+- Manage owns package-state changes inside the requested build environment;
+- Manage does not interpret recipes or execute package builds;
+- use of Manage by Build does not change the package artifact contract between
+  them.
+
+Whether this interface is actually used remains undecided.
+
+## Recipe versus package metadata
+
+Build-time description and installed-package description are separate concepts.
+
+A recipe may require information that is irrelevant after a package has been
+built, such as source locations, source checksums, patches, build dependencies,
+and build commands.
+
+A repository package artifact needs only its concrete identity and installable
+payload. Package-management metadata needed for resolution, ownership planning,
+and installed-state projection belongs to the Package Database generation.
+
+Artifact integrity is verified by comparing the obtained artifact bytes against
+the externally supplied checksum associated with the selected published package
+identity. The checksum is not part of package identity or revision allocation.
+
+The logical runtime package schema is defined by [Package Metadata](package-metadata.md). The physical serialization and checksum algorithm remain undecided.
+
+## Package Database and repository interface
+
+The Package Database and package repository serve different semantic roles even
+if a later implementation stores or distributes them together.
+
+The repository-generation [Package Database](package-database.md) is the
+authoritative published metadata snapshot. It contains the repository-global
+requirement registry plus architecture-scoped catalogs used by Manage to
+discover package identities, the explicit `current` identity, runtime package
+metadata, and other published versions that remain available.
+
+The repository or distribution interface provides access to the package
+artifact corresponding to a selected published identity.
+
+Conceptually:
+
+```text
+                     Package Database
+                     /              \
+                    / selection      \ artifact reference
+                   v                  v
+                Manage ----------> Repository
+                                      |
+                                      v
+                               package artifact
+```
+
+Build publishes eligible identities into the Package Database and makes their
+corresponding artifacts available through the repository or distribution
+interface.
+
+Manage first resolves a published package identity through the Package Database,
+then obtains the corresponding package artifact through the repository
+interface. The exact number of requests, caching model, and physical metadata
+layout are implementation details rather than semantic requirements.
+
+In this baseline, repository is an interface or distribution domain, not a
+fourth primary component. The Package Database likewise does not establish a
+fourth primary component; it is authoritative published package state.
+
+The presence of these distribution interfaces does not change ownership:
+
+- Build still owns package creation and publication decisions.
+- Manage still owns installed package state.
+- Install still uses Manage for package operations.
+- Install may select or configure package sources for an installation without
+  becoming responsible for repository consumption mechanics.
+
+In the initial deployment model, the Package Database and repository are
+expected to be served by the same authoritative home-network Build server. They
+may still be physically combined or represented separately.
+
+Public mirror selection, repository federation, and decentralized publication
+are outside the initial scope. Cache representation, transport, authentication,
+integrity details, and any future signature model remain later design topics.
+
+### Snapshot consistency
+
+Manage refreshes and resolves against one complete Package Database generation.
+It uses the global requirement registry and its selected architecture catalog
+from that same generation; it must not combine global semantic state from one
+generation with an architecture catalog from another.
+
+Artifact references selected from that generation are immutable and remain
+valid for as long as the generation is retained by the repository.
+
+Build must make all newly referenced artifacts available before atomically
+publishing a generation as current. Repository garbage collection must not
+remove an artifact while any retained generation still references it.
+
+This generation contract prevents metadata/artifact publication races without
+requiring Manage to combine state from multiple repository snapshots.
+
+## Manage installed-state contract
+
+Manage's local installed-package state must retain the complete package identity
+and the verified checksum of the exact artifact that was applied. Package
+identity drives ordinary package-selection and upgrade semantics; the installed
+artifact checksum provides exact artifact traceability and verification.
+
+Manage also records package-owned files, install reason, hold state, and package
+metadata needed for dependency and removal operations. Build-only recipe and
+upstream tracking state does not cross this boundary merely because it may
+describe the same package.
+
+Published package metadata exposes one repository-global persistent requirement
+registry. Each requirement entry records its permanent `package` or `capability`
+kind and its persistent ordered version list.
+
+Requirement entries and established version ordering remain available even when
+the corresponding package version or all capability providers are no longer
+installable. These semantics are defined by the Package Database and Package
+Metadata designs rather than repeated as separate interface state.
+
+## Configuration ownership
+
+Package-local lifecycle behavior and installation-wide configuration are
+different responsibilities.
+
+Manage owns lifecycle consequences intrinsic to applying package-state changes.
+Install owns machine-level choices and policy made as part of creating the
+installed system.
+
+The exact lifecycle mechanism and exact installation configuration model remain
+undecided.
+
+## Compatibility principle
+
+The interfaces should permit each component to evolve independently as long as
+the published contracts remain satisfied.
+
+No component should require another component's private in-memory objects,
+private database implementation, or build internals merely to perform its own
+role.

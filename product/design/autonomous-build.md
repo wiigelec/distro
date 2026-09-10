@@ -1,0 +1,372 @@
+# Autonomous Build Runtime
+
+## Purpose
+
+Build is not limited to executing a single package recipe on demand.
+
+The distro design expects Build to evolve into an autonomous package-production
+runtime that maintains packages according to maintainer-declared upstream
+tracking configuration by reconciling package policy, recipe state, upstream
+observations, package-production history, and published package state.
+
+This document defines that architectural direction without choosing the runtime
+implementation, scheduler, polling mechanism, manifest serialization, or alert
+transport.
+
+## Reconciliation model
+
+At the architectural level, Build operates as a reconciler:
+
+```text
+upstream tracking configuration
+      |
+      v
+Package Manifest
+      |
+      v
+ Build Runtime <--------- upstream observations
+      |
+      +----> Build State
+      |
+      +----> build scheduling
+      |
+      +----> package production
+      |
+      +----> validation
+      |
+      +----> publication state
+      |
+      +----> Package Database
+      |
+      +----> escalation when automation cannot proceed safely
+```
+
+The runtime compares maintainer-declared upstream tracking configuration with
+observed and historical package-production state and performs the work needed to
+keep published distro packages reconciled with that configuration and policy.
+
+Autonomy is policy-driven and package-specific. The design does not assume that
+every package can be updated with the same level of automation.
+
+## Package Manifest
+
+The Package Manifest is Build's maintainer-declared upstream-tracking input for
+the distro package set.
+
+At minimum, it identifies the package names Build is expected to track and the
+upstream location or discovery information needed to query and download source.
+It may also carry package-specific automation policy and other upstream-tracking
+configuration as later design requires.
+
+Conceptually, it answers:
+
+```text
+What packages do we track, and where does Build look upstream for them?
+```
+
+The exact fields and serialization remain undecided.
+
+The Package Manifest is desired-state authority for upstream package tracking.
+Machine-maintained Build state must not silently add or remove tracked packages,
+rewrite upstream locations, or change maintainer-declared automation policy.
+If Build is ever permitted to propose or perform such changes, that behavior must
+be explicitly designed and governed rather than implied by reconciliation.
+
+## Desired and observed state authority
+
+Build reconciles desired state against observed and historical state, but those
+categories have different authorities:
+
+```text
+Package Manifest
+    maintainer-declared upstream tracking configuration
+
+Build State
+    machine-maintained recipe acceptance and revision state
+    upstream observations and version-assessment decisions
+    build, validation, publication, and escalation facts
+
+Package Database
+    published repository generation with architecture catalogs
+```
+
+Observed or historical state may inform reconciliation, revision allocation,
+validation, publication, and escalation. It must not by itself change the
+upstream tracking configuration expressed by the Package Manifest.
+
+Successful publication updates the Package Database rather than turning Build
+history itself into the package catalog consumed by Manage.
+
+## Recipe acceptance state
+
+Recipe acceptance is a logical part of Build State. It stores the currently
+accepted recipe-file SHA and current revision for a package version and
+architecture.
+
+```text
+name + version + architecture
+    |
+    +---- accepted recipe SHA
+    |
+    +---- current revision
+```
+
+The accepted SHA is the comparison baseline used to detect recipe-file changes.
+It does not autonomously determine revision.
+
+Git preserves prior recipe and recipe-acceptance changes, so Build State does
+not need a second audit-history structure for recipe contents.
+
+The exact physical Build State representation remains undecided.
+
+## Upstream observation state
+
+Upstream observations and version-assessment decisions are another logical part
+of Build State, distinct from recipe revision state.
+
+It exists so that autonomous reconciliation does not need to rediscover or
+silently reinterpret prior upstream-version decisions on every run.
+
+Conceptually, upstream observation state may preserve information such as:
+
+```text
+package: example
+
+observed upstream versions:
+    1.8
+    1.9
+    1.10
+    2.0rc1
+
+accepted package versions:
+    1.8
+    1.9
+    1.10
+
+version assessment:
+    automatic / package-specific / manual
+```
+
+A package whose upstream version scheme cannot be interpreted safely may be
+flagged for package-specific or manual determination. The resulting decision
+must be preservable as Build state so later reconciliation can use the prior
+decision rather than guessing again.
+
+Build State does not define what is currently published. Publication authority
+belongs to the Package Database generation.
+
+The exact observation retention policy remains undecided.
+
+## Recipe change review
+
+Build detects recipe-file changes by comparing the current recipe SHA with the
+accepted SHA in Build State.
+
+```text
+accepted SHA == current SHA
+    -> no review required
+
+accepted SHA != current SHA
+    -> human review required
+```
+
+A mismatch must not be resolved by an autonomous semantic classifier.
+Publication for the affected package version and architecture remains blocked
+until human review resolves it.
+
+Human review has exactly three outcomes:
+
+```text
+accept same revision
+    -> allowed only if runtime package metadata is unchanged
+    -> keep revision
+    -> replace accepted SHA with current SHA
+
+accept with revision bump
+    -> allocate next revision
+    -> replace accepted SHA with current SHA
+
+reject change
+    -> restore prior recipe file from Git
+    -> keep prior accepted SHA and revision
+```
+
+Runtime package metadata means the Package Metadata fields used by Manage:
+`depends`, `conflicts`, `provides`, `owned_paths`, and any later package-local
+lifecycle metadata. If any of those fields changes for an already accepted
+`name + version + architecture`, review must choose `accept with revision bump`
+or reject the change. Same-revision acceptance is reserved for recipe changes
+that leave those package-management semantics unchanged.
+
+Git provides the historical record of recipe contents and Build State acceptance
+changes. The review interface itself remains undecided.
+
+## Upstream reconciliation
+
+Build is expected to monitor upstream sources for package updates according to
+package-specific policy.
+
+An upstream software update and a local recipe change are different events:
+
+```text
+new accepted upstream version
+    -> new package version
+    -> create Build State recipe-acceptance entry for name + version + architecture
+    -> accepted recipe SHA = current recipe SHA
+    -> revision = r1
+
+recipe SHA changes for an existing accepted software version
+    -> mandatory human review
+    -> keep revision only when runtime package metadata is unchanged
+    -> otherwise bump revision or reject change
+```
+
+Creating the initial recipe-acceptance entry for a newly accepted upstream
+version is not itself treated as a recipe-SHA mismatch. The three-way
+recipe-change review applies only when an accepted SHA already exists for that
+same `name + version + architecture`.
+
+The runtime may eventually perform source discovery, recipe adaptation, build
+execution, validation, and package publication automatically where package
+policy permits.
+
+The exact upstream discovery mechanisms, polling intervals, release-selection
+rules, version-assessment algorithms, package-specific comparison mechanisms,
+and automatic recipe-editing mechanisms remain undecided.
+
+## Package-production state transitions
+
+A successful build and a published package are different states.
+
+Conceptually, package-production work may progress through states such as:
+
+```text
+detected
+   |
+   v
+prepared
+   |
+   v
+built
+   |
+   v
+validated
+   |
+   v
+publishable
+   |
+   v
+published
+```
+
+These names are derived status labels, not a required persisted state variable.
+Build should persist the facts that establish them, such as observations, build
+results, validation results, approvals, and publication records. The design
+requires publication to remain distinct from build and validation success.
+
+Automation policy may permit different packages to stop at different points.
+For example, an assisted package may reach a validated or publishable state and
+require human approval before publication.
+
+The exact state machine, approval semantics, and publication transaction model
+remain undecided.
+
+## Automation classes
+
+Packages must be classifiable according to the level of automation Build is
+permitted or expected to perform.
+
+The initial semantic classes are:
+
+### auto
+
+The package is expected to support an automated path through upstream detection,
+required package-definition updates, build, validation, and publication where
+the runtime can resolve the change safely.
+
+Human intervention is exceptional.
+
+### assisted
+
+Build may detect upstream or recipe changes and perform safe portions of the
+update workflow, including candidate preparation, build, or validation, but
+some transitions may require explicit human review or approval.
+
+### manual
+
+Build may monitor and report changes, but package-definition modification or
+publication is not expected to proceed autonomously.
+
+Human intervention is part of the normal update path.
+
+These classes express policy, not implementation capability guarantees.
+
+The exact class names and serialized values may be refined later, but the design
+requires package-specific automation policy rather than universal autonomy.
+
+Stage-specific automation overrides are intentionally deferred. The initial
+design uses only the `auto`, `assisted`, and `manual` package-level classes so
+Build has one automation-policy mechanism rather than overlapping policy layers.
+
+## Escalation
+
+Autonomous operation must have an explicit escalation path.
+
+When Build encounters a condition it cannot resolve safely, it must preserve the
+failure or ambiguity as actionable state and make it possible to alert a human
+operator.
+
+Examples include categories such as:
+
+- an upstream change that cannot be interpreted;
+- a recipe SHA mismatch awaiting mandatory human review;
+- an update that requires non-mechanical recipe work;
+- repeated or unresolvable build failure;
+- validation failure;
+- publication preconditions that cannot be satisfied safely.
+
+Escalation is a normal outcome of the reconciliation model, not an exceptional
+violation of it.
+
+The alert transport, severity model, retry policy, acknowledgement mechanism,
+and operator workflow remain future design topics.
+
+## Build-state authority
+
+Build owns package-production state required to perform autonomous
+reconciliation.
+
+This state is distinct from Manage's authoritative installed-package state.
+
+Build State is the one logical machine-maintained package-production state
+domain. It may contain recipe acceptance, upstream observations and version
+decisions, build results, validation facts, publication records, and escalation
+state. These remain logical sections of one Build-owned state domain rather than
+requiring independent persistence mechanisms.
+
+Build consumes the Package Manifest as maintainer-declared upstream tracking
+input and publishes eligible package identities into the Package Database
+generation.
+
+Manage remains authoritative only for package state installed on a target
+filesystem.
+
+## Undecided areas
+
+This design intentionally does not yet decide:
+
+- Package Manifest and Build State file formats or schemas;
+- scheduler or worker architecture;
+- polling intervals;
+- upstream service integrations;
+- automatic recipe-editing strategy;
+- recipe-review user interface or command;
+- retry and backoff policy;
+- alert or notification transport;
+- operator approval interface;
+- artifact publication mechanism;
+- package repository implementation;
+- dependency-driven rebuild policy;
+- validation depth required before autonomous publication;
+- exact derivation and presentation of package-production status;
+- rules, if any, for Build proposing or mutating desired-state policy.
