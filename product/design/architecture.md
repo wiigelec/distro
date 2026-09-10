@@ -126,9 +126,9 @@ The following boundaries are part of the initial design:
 10. The Package Manifest is desired-state authority for upstream package
     tracking; machine-maintained Build history and reconciliation state must not
     silently redefine that maintainer-declared configuration.
-11. The architecture-scoped Package Database is the authoritative catalog of
-    published distro package identities available to Manage; Build history is
-    not a substitute for that published catalog.
+11. The repository-wide Package Database generation is authoritative published
+    package state; its architecture catalogs define package identities available
+    to Manage, and Build history is not a substitute for that published state.
 
 ## Undecided areas
 

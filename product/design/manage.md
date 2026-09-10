@@ -517,26 +517,25 @@ capability. A conflict naming an actual package matches that package directly.
 satisfy for dependency resolution.
 
 Package names and capability names share one global persistent requirement
-namespace, but the same name must not be both a package name and a capability
-name. Published metadata that would create such a collision is invalid and must
-not participate in resolution.
+registry. Each entry records one permanent kind, `package` or `capability`, and
+its ordered version list. Published metadata that would require the same name to
+have both kinds is invalid and must not participate in resolution.
 
-Manage interprets dependency and conflict names using the requirement namespace
+Manage interprets dependency and conflict names using the requirement registry
 from the same Package Database generation as the architecture catalog being
-resolved. Namespace entries remain authoritative even when the named package or
-all providers of a capability are no longer available.
+resolved. Requirement entries remain authoritative even when the named package
+or all providers of a capability are no longer available.
 
-This invariant makes every dependency or conflict name unambiguous before
-provider selection or version comparison: package-name requirements use the
-package's ordered version registry, while capability-name requirements use the
-capability's ordered version registry.
+This makes every dependency or conflict name unambiguous before provider
+selection or version comparison, and the same lookup supplies any version-order
+information needed by the constraint.
 
 A provided capability may be unversioned or may advertise an explicit capability
 version. Capability version is independent of the provider package's own upstream
 version.
 
-Each versioned capability uses a persistent ordered capability-version registry
-scoped to capability name.
+Each versioned capability uses the persistent ordered version list stored in
+that capability's global requirement entry.
 
 An unversioned provide satisfies only an unversioned dependency on that
 capability. A versioned dependency on a capability requires a provider that
@@ -561,19 +560,15 @@ The initial constraint language supports comparisons equivalent to:
 An unconstrained dependency requires only that some acceptable package or
 provider satisfying the named requirement be present.
 
-Package-version ordering uses the Package Model's persistent ordered version
-registry. Manage must not parse or heuristically order the opaque upstream
-`version` string.
+Package-version ordering uses the persistent ordered version list in the
+package's global requirement entry. Manage must not parse or heuristically order
+the opaque upstream `version` string.
 
-For package-name dependencies, the comparison target must be an established
-version entry in that package's registry. If the dependency names a comparison
-version that is absent from the registry, the package metadata is invalid for
-resolution and the transaction fails before filesystem mutation. Manage must not
-guess where an unknown version belongs by parsing its string.
-
-The same rule applies to versioned capability dependencies: the comparison
-capability version must already exist in that capability's persistent ordered
-registry.
+For any versioned dependency, the comparison target must be an established
+entry in the named requirement's ordered version list. If the comparison version
+is absent, the package metadata is invalid for resolution and the transaction
+fails before filesystem mutation. Manage must not guess where an unknown version
+belongs by parsing its string.
 
 The operators have these semantics:
 

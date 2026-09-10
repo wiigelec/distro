@@ -20,13 +20,14 @@ Package identity is defined by the [Package Model](package-model.md) as:
 name + version + architecture + revision
 ```
 
-The package artifact contract will eventually need to carry at least:
+The package artifact contract needs to carry:
 
 - the complete package identity;
-- installable filesystem payload;
-- runtime package relationships, including any package/capability comparison
-  metadata required to evaluate version constraints;
-- package lifecycle metadata required for safe installation and removal.
+- installable filesystem payload.
+
+For repository-backed transactions, runtime relationships, ownership metadata,
+and other package-management metadata come from the authoritative Package
+Database generation rather than being duplicated into the artifact.
 
 The whole-artifact integrity checksum is associated with the published artifact
 through Package Database or repository metadata external to the artifact bytes
@@ -72,8 +73,9 @@ A recipe may require information that is irrelevant after a package has been
 built, such as source locations, source checksums, patches, build dependencies,
 and build commands.
 
-A package artifact needs only the information required for distribution,
-validation, installation, package-state management, and later inspection.
+A repository package artifact needs only its concrete identity and installable
+payload. Package-management metadata needed for resolution, ownership planning,
+and installed-state projection belongs to the Package Database generation.
 
 Artifact integrity is verified by comparing the obtained artifact bytes against
 the externally supplied checksum associated with the selected published package
@@ -87,10 +89,10 @@ The Package Database and package repository serve different semantic roles even
 if a later implementation stores or distributes them together.
 
 The repository-generation [Package Database](package-database.md) is the
-authoritative published metadata snapshot. It contains repository-global
-comparison registries plus architecture-scoped catalogs used by Manage to
-discover package identities, the explicit `current` identity, and other
-published versions that remain available.
+authoritative published metadata snapshot. It contains the repository-global
+requirement registry plus architecture-scoped catalogs used by Manage to
+discover package identities, the explicit `current` identity, runtime package
+metadata, and other published versions that remain available.
 
 The repository or distribution interface provides access to the package
 artifact corresponding to a selected published identity.
@@ -140,10 +142,9 @@ integrity details, and any future signature model remain later design topics.
 ### Snapshot consistency
 
 Manage refreshes and resolves against one complete Package Database generation.
-It uses the global requirement namespace, global comparison registries, and its
-selected architecture catalog from that same generation; it must not combine
-global semantic state from one generation with an architecture catalog from
-another.
+It uses the global requirement registry and its selected architecture catalog
+from that same generation; it must not combine global semantic state from one
+generation with an architecture catalog from another.
 
 Artifact references selected from that generation are immutable and remain
 valid for as long as the generation is retained by the repository.
@@ -167,21 +168,14 @@ metadata needed for dependency and removal operations. Build-only recipe and
 upstream tracking state does not cross this boundary merely because it may
 describe the same package.
 
-Published package metadata must expose the repository-global persistent
-package-scoped ordered version registries needed for dependency comparison.
-Versioned provided capabilities likewise use repository-global persistent
-capability-scoped ordered registries.
+Published package metadata exposes one repository-global persistent requirement
+registry. Each requirement entry records its permanent `package` or `capability`
+kind and its persistent ordered version list.
 
-These registries are comparison metadata and are not part of concrete package
-identity. Their entries remain available as ordering anchors even when the
-corresponding package or capability version is no longer installable.
-
-Package and capability names share one persistent non-colliding global
-requirement namespace. Once published, a namespace entry remains available and
-its `package` or `capability` kind must not change, even when the corresponding
-package or all capability providers are no longer available. Each requirement
-therefore retains one stable meaning and selects exactly one corresponding
-registry kind.
+Requirement entries and established version ordering remain available even when
+the corresponding package version or all capability providers are no longer
+installable. These semantics are defined by the Package Database and Package
+Metadata designs rather than repeated as separate interface state.
 
 ## Configuration ownership
 

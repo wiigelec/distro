@@ -62,7 +62,7 @@ version?
 ```
 
 Package names and provided capability names share one global requirement
-namespace, but a name has exactly one semantic kind.
+registry, and a name has exactly one semantic kind.
 
 ```text
 name
@@ -73,7 +73,7 @@ never both
 ```
 
 Requirement-name kind is persistent published state. Once a name has been
-established as `package` or `capability`, that namespace entry must not be
+established as `package` or `capability`, that requirement entry must not be
 deleted or changed to the other kind merely because the corresponding package or
 all providers are no longer available.
 
@@ -83,10 +83,10 @@ name, no package may be published with that name. Build must reject publication
 that would create such a collision.
 
 A dependency `name` therefore resolves unambiguously through the persistent
-requirement namespace: a package-name requirement
-is satisfied by that package, while a capability-name requirement is satisfied
-by a package that provides that capability. The requirement kind also determines
-which persistent ordered version registry is used for a version constraint.
+requirement registry: a package-name requirement is satisfied by that package,
+while a capability-name requirement is satisfied by a package that provides that
+capability. The same requirement entry supplies the persistent ordered version
+registry used for a version constraint.
 
 An unconstrained dependency contains only `name`.
 
@@ -105,9 +105,9 @@ operator: >=
 version: 2
 ```
 
-The comparison version must already exist in the appropriate persistent ordered
-package or capability version registry. Manage never infers registry placement
-from the version string.
+The comparison version must already exist in the requirement's persistent
+ordered `versions` registry. Manage never infers registry placement from the
+version string.
 
 ## Conflict record
 
@@ -117,9 +117,9 @@ The initial conflict record contains only:
 name
 ```
 
-The conflict name resolves through the same non-colliding global requirement
-namespace as a dependency. A package-name conflict matches that package directly;
-a capability-name conflict matches any package that provides that capability.
+The conflict name resolves through the same global requirement registry as a
+dependency. A package-name conflict matches that package directly; a
+capability-name conflict matches any package that provides that capability.
 
 Version-constrained conflicts are outside the initial schema.
 
@@ -135,8 +135,9 @@ version?
 Without `version`, the provide satisfies only an unversioned dependency on that
 capability.
 
-With `version`, the value must already exist in the persistent ordered registry
-for that capability and may satisfy compatible versioned dependencies.
+With `version`, the value must already exist in that capability requirement's
+persistent ordered `versions` registry and may satisfy compatible versioned
+dependencies.
 
 Capability version is independent of the provider package's own upstream
 version.
@@ -157,17 +158,19 @@ topics.
 
 ## Publication consistency
 
-The Package Database publishes the same logical identity and relationship
-metadata that Build associated with the selected package artifact.
+For repository-backed transactions, the Package Database is the sole authority
+for runtime package metadata used by resolution, ownership planning, and
+installed-state projection.
 
-Manage must resolve against published Package Database metadata before fetching
-or applying package payloads. When applying an artifact, Manage must verify that
-its embedded package identity and runtime relationship metadata agree with the
-selected published record.
+The selected package artifact needs to carry only its concrete package identity
+and installable payload. Manage must verify that the artifact's embedded identity
+matches the selected published identity and must verify the whole-artifact
+checksum before applying it.
 
-The exact mechanism for encoding or comparing the embedded metadata remains a
-serialization decision; the semantic requirement is that Package Database
-solver metadata and artifact metadata must not describe different packages.
+Dependencies, conflicts, provides, and owned paths are not duplicated into the
+artifact merely to compare two copies of the same metadata. A future standalone
+artifact-install path, if desired, must define how equivalent authoritative
+metadata is supplied rather than changing repository-backed semantics.
 
 ## Installed-state projection
 

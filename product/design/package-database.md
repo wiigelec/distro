@@ -26,10 +26,10 @@ containing global requirement/comparison state plus architecture-scoped catalogs
 
 ```text
 Package Database generation
-    global requirement/comparison state
-        requirement namespace
-        package version registries
-        capability version registries
+    global requirements
+        name
+            kind: package | capability
+            versions[]
 
     catalogs
         x86_64
@@ -76,9 +76,9 @@ zlib
 The exact schema and retention depth for older published versions are not yet
 specified.
 
-The Package Database must carry or reference the Package Model's persistent
-package-scoped ordered version registry. The same upstream version has the same
-registry position across architectures.
+The Package Database stores each package's persistent ordered version registry
+in that package name's global requirement entry. The same upstream version has
+the same registry position across architectures.
 
 The registry is retained independently of the `available` set so that historical
 versions used as dependency comparison anchors remain comparable even after their
@@ -103,14 +103,10 @@ package_database
     schema_version
     generation
 
-    requirement_namespace
-        name -> package | capability
-
-    package_version_registries
-        package_name -> ordered version[]
-
-    capability_version_registries
-        capability_name -> ordered version[]
+    requirements
+        name
+            kind: package | capability
+            versions[]
 
     catalogs
         architecture
@@ -135,15 +131,19 @@ package_database
 `generation` identifies one coherent published snapshot shared by every
 architecture catalog in that snapshot.
 
-`requirement_namespace` is global semantic authority for requirement-name kind.
-Once a name appears there as `package` or `capability`, that entry is permanent
-and its kind is immutable. It remains present even when no current architecture
-catalog exposes the package or any provider for the capability.
+`requirements` is the single global authority for requirement semantics. Each
+entry permanently records whether the name is a `package` or `capability` and
+contains that requirement's persistent ordered `versions` registry.
 
-The two version-registry tables are global comparison authority. A package
-version has the same registry position regardless of architecture, and a
-versioned capability uses the same capability registry regardless of which
-architecture provides it.
+Once a requirement name appears, the entry is permanent and its kind is
+immutable. Its version entries retain their established relative ordering. The
+entry remains present even when no architecture catalog exposes the package or
+any provider for the capability.
+
+A package version therefore has the same registry position regardless of
+architecture, and a capability version has the same position regardless of which
+architecture provides it. An unversioned capability is represented naturally by
+a capability requirement whose `versions` list is empty.
 
 Each architecture catalog contains only architecture-dependent published state:
 available identities and explicit `current` selection.
@@ -370,14 +370,14 @@ prepare generation N+1
 
 The switch that makes a new Package Database generation current must be atomic
 from Manage's point of view. A client sees either the complete prior generation
-or the complete new generation, including one coherent global registry state and
+or the complete new generation, including one coherent global requirement state and
 all architecture catalogs belonging to that generation, never a partially
 updated database.
 
-A change to global comparison state therefore creates a new repository generation
+A change to global requirement state therefore creates a new repository generation
 even when package artifacts changed for only one architecture. An architecture
 client selects its own catalog but always evaluates it against the global
-registries from that same generation.
+requirements from that same generation.
 
 Artifact references are immutable: once a generation associates an artifact
 reference and checksum with a package identity, the bytes at that reference must
@@ -427,7 +427,7 @@ Package Manifest
           v
 Package Database generation
           |
-          +----> global comparison registries
+          +----> global requirements
           |
           +----> architecture-scoped published identity selection
           |

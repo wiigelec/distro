@@ -26,9 +26,7 @@ Package Manifest
       v
  Build Runtime <--------- upstream observations
       |
-      +----> Recipe Manifest
-      |
-      +----> Package History
+      +----> Build State
       |
       +----> build scheduling
       |
@@ -83,17 +81,13 @@ categories have different authorities:
 Package Manifest
     maintainer-declared upstream tracking configuration
 
-Recipe Manifest
-    machine-maintained accepted recipe SHA and revision state
-
-Package History
-    machine-maintained upstream observations and version-assessment decisions
-
-Other runtime state
-    machine-maintained build, validation, publication, and escalation state
+Build State
+    machine-maintained recipe acceptance and revision state
+    upstream observations and version-assessment decisions
+    build, validation, publication, and escalation facts
 
 Package Database
-    published architecture-scoped distro package catalog
+    published repository generation with architecture catalogs
 ```
 
 Observed or historical state may inform reconciliation, revision allocation,
@@ -103,10 +97,11 @@ upstream tracking configuration expressed by the Package Manifest.
 Successful publication updates the Package Database rather than turning Build
 history itself into the package catalog consumed by Manage.
 
-## Recipe Manifest
+## Recipe acceptance state
 
-The Recipe Manifest stores the currently accepted recipe-file SHA and current
-revision for a package version and architecture.
+Recipe acceptance is a logical part of Build State. It stores the currently
+accepted recipe-file SHA and current revision for a package version and
+architecture.
 
 ```text
 name + version + architecture
@@ -119,16 +114,15 @@ name + version + architecture
 The accepted SHA is the comparison baseline used to detect recipe-file changes.
 It does not autonomously determine revision.
 
-Git preserves prior recipe and Recipe Manifest states, so the live manifest does
-not need a separate audit-history structure.
+Git preserves prior recipe and recipe-acceptance changes, so Build State does
+not need a second audit-history structure for recipe contents.
 
-The exact storage format and publication model remain undecided.
+The exact physical Build State representation remains undecided.
 
-## Package History
+## Upstream observation state
 
-Package History is machine-maintained Build state used to preserve upstream
-observations and version-assessment decisions that are distinct from recipe
-revision history.
+Upstream observations and version-assessment decisions are another logical part
+of Build State, distinct from recipe revision state.
 
 It exists so that autonomous reconciliation does not need to rediscover or
 silently reinterpret prior upstream-version decisions on every run.
@@ -158,16 +152,15 @@ flagged for package-specific or manual determination. The resulting decision
 must be preservable as Build state so later reconciliation can use the prior
 decision rather than guessing again.
 
-Package History does not define what is currently published. Publication
-authority belongs to the architecture-scoped Package Database.
+Build State does not define what is currently published. Publication authority
+belongs to the Package Database generation.
 
-The exact Package History schema, retention policy, and relationship to raw
-upstream observations remain undecided.
+The exact observation retention policy remains undecided.
 
 ## Recipe change review
 
 Build detects recipe-file changes by comparing the current recipe SHA with the
-accepted SHA in the Recipe Manifest.
+accepted SHA in Build State.
 
 ```text
 accepted SHA == current SHA
@@ -210,7 +203,7 @@ An upstream software update and a local recipe change are different events:
 ```text
 new accepted upstream version
     -> new package version
-    -> create Recipe Manifest entry for name + version + architecture
+    -> create Build State recipe-acceptance entry for name + version + architecture
     -> accepted recipe SHA = current recipe SHA
     -> revision = r1
 
@@ -219,10 +212,10 @@ recipe SHA changes for an existing accepted software version
     -> keep revision, bump revision, or reject change
 ```
 
-Creating the initial Recipe Manifest entry for a newly accepted upstream version
-is not itself treated as a recipe-SHA mismatch. The three-way recipe-change
-review applies only when an accepted SHA already exists for that same
-`name + version + architecture`.
+Creating the initial recipe-acceptance entry for a newly accepted upstream
+version is not itself treated as a recipe-SHA mismatch. The three-way
+recipe-change review applies only when an accepted SHA already exists for that
+same `name + version + architecture`.
 
 The runtime may eventually perform source discovery, recipe adaptation, build
 execution, validation, and package publication automatically where package
@@ -257,9 +250,10 @@ publishable
 published
 ```
 
-These names are conceptual rather than a final persisted state machine, but the
-design requires publication to remain a distinct transition from build success
-and validation success.
+These names are derived status labels, not a required persisted state variable.
+Build should persist the facts that establish them, such as observations, build
+results, validation results, approvals, and publication records. The design
+requires publication to remain distinct from build and validation success.
 
 Automation policy may permit different packages to stop at different points.
 For example, an assisted package may reach a validated or publishable state and
@@ -301,24 +295,9 @@ These classes express policy, not implementation capability guarantees.
 The exact class names and serialized values may be refined later, but the design
 requires package-specific automation policy rather than universal autonomy.
 
-## Capability detail
-
-Automation class is a high-level policy.
-
-Later design may additionally describe which individual stages are automated for
-a package, such as:
-
-- upstream discovery;
-- source update;
-- recipe update;
-- build;
-- validation;
-- publication.
-
-This allows a package to be highly automated without requiring every stage to
-share the same automation behavior.
-
-The capability representation is not yet specified.
+Stage-specific automation overrides are intentionally deferred. The initial
+design uses only the `auto`, `assisted`, and `manual` package-level classes so
+Build has one automation-policy mechanism rather than overlapping policy layers.
 
 ## Escalation
 
@@ -350,11 +329,15 @@ reconciliation.
 
 This state is distinct from Manage's authoritative installed-package state.
 
-Build's package-production state may include the Recipe Manifest, Package
-History, observed upstream state, build results, validation state, publication
-state, and escalation state as later design specifies. Build consumes the
-Package Manifest as maintainer-declared upstream tracking input and publishes
-eligible package identities into the architecture-scoped Package Database.
+Build State is the one logical machine-maintained package-production state
+domain. It may contain recipe acceptance, upstream observations and version
+decisions, build results, validation facts, publication records, and escalation
+state. These remain logical sections of one Build-owned state domain rather than
+requiring independent persistence mechanisms.
+
+Build consumes the Package Manifest as maintainer-declared upstream tracking
+input and publishes eligible package identities into the Package Database
+generation.
 
 Manage remains authoritative only for package state installed on a target
 filesystem.
@@ -363,7 +346,7 @@ filesystem.
 
 This design intentionally does not yet decide:
 
-- Package Manifest, Recipe Manifest, and Package History file formats or schemas;
+- Package Manifest and Build State file formats or schemas;
 - scheduler or worker architecture;
 - polling intervals;
 - upstream service integrations;
@@ -376,5 +359,5 @@ This design intentionally does not yet decide:
 - package repository implementation;
 - dependency-driven rebuild policy;
 - validation depth required before autonomous publication;
-- exact package-production state machine and persisted state names;
+- exact derivation and presentation of package-production status;
 - rules, if any, for Build proposing or mutating desired-state policy.
