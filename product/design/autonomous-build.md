@@ -127,7 +127,7 @@ of Build State, distinct from recipe revision state.
 It exists so that autonomous reconciliation does not need to rediscover or
 silently reinterpret prior upstream-version decisions on every run.
 
-Conceptually, Package History may preserve information such as:
+Conceptually, upstream observation state may preserve information such as:
 
 ```text
 package: example
@@ -178,6 +178,7 @@ Human review has exactly three outcomes:
 
 ```text
 accept same revision
+    -> allowed only if runtime package metadata is unchanged
     -> keep revision
     -> replace accepted SHA with current SHA
 
@@ -190,8 +191,15 @@ reject change
     -> keep prior accepted SHA and revision
 ```
 
-Git provides the historical record of recipe contents and manifest changes.
-The review interface itself remains undecided.
+Runtime package metadata means the Package Metadata fields used by Manage:
+`depends`, `conflicts`, `provides`, `owned_paths`, and any later package-local
+lifecycle metadata. If any of those fields changes for an already accepted
+`name + version + architecture`, review must choose `accept with revision bump`
+or reject the change. Same-revision acceptance is reserved for recipe changes
+that leave those package-management semantics unchanged.
+
+Git provides the historical record of recipe contents and Build State acceptance
+changes. The review interface itself remains undecided.
 
 ## Upstream reconciliation
 
@@ -209,7 +217,8 @@ new accepted upstream version
 
 recipe SHA changes for an existing accepted software version
     -> mandatory human review
-    -> keep revision, bump revision, or reject change
+    -> keep revision only when runtime package metadata is unchanged
+    -> otherwise bump revision or reject change
 ```
 
 Creating the initial recipe-acceptance entry for a newly accepted upstream

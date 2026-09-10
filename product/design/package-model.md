@@ -95,10 +95,16 @@ human review determines that a replacement revision is required.
 
 A recipe-file SHA change does not itself determine revision.
 
-## Recipe Manifest binding
+However, runtime package metadata is part of the package-management semantics of
+a concrete identity. If a reviewed recipe change alters `depends`, `conflicts`,
+`provides`, `owned_paths`, or later package-local lifecycle metadata for an
+already accepted `name + version + architecture`, publication requires a new
+revision.
 
-For each `name + version + architecture`, the Recipe Manifest stores the
-currently accepted recipe-file SHA and current revision:
+## Build State recipe binding
+
+For each `name + version + architecture`, Build State stores the currently
+accepted recipe-file SHA and current revision:
 
 ```text
 name + version + architecture
@@ -111,13 +117,12 @@ name + version + architecture
 The accepted SHA is a change detector and review anchor. It is not part of
 package identity and does not autonomously determine revision.
 
-Git history preserves previous recipe and Recipe Manifest states, so the live
-Recipe Manifest does not need a separate audit-history structure.
+Git history preserves previous recipe and recipe-acceptance states, so Build
+State does not need a second audit-history structure for recipe contents.
 
 ## Recipe change review
 
-Build compares the current recipe-file SHA to the accepted SHA in the Recipe
-Manifest.
+Build compares the current recipe-file SHA to the accepted SHA in Build State.
 
 ```text
 stored SHA == current SHA
@@ -132,6 +137,7 @@ architecture until a human chooses exactly one outcome:
 
 ```text
 accept same revision
+    -> allowed only if runtime package metadata is unchanged
     -> keep revision
     -> store new SHA
 
@@ -143,6 +149,10 @@ reject change
     -> restore prior recipe file from Git
     -> keep prior SHA and revision
 ```
+
+If runtime package metadata differs from the metadata of the already accepted
+identity, `accept same revision` is not a valid outcome. Review must either bump
+the revision or reject the recipe change.
 
 After either acceptance outcome, the newly accepted SHA becomes the baseline for
 future comparisons.
@@ -180,12 +190,14 @@ Build must:
 
 - determine `name`, `version`, `architecture`, and `revision`;
 - start every newly accepted upstream version at `r1` per architecture;
-- compare current recipe SHA with the accepted Recipe Manifest SHA;
+- compare current recipe SHA with the accepted SHA recorded in Build State;
 - require human review on SHA mismatch;
-- support exactly three outcomes: same revision, revision bump, or reject and
-  restore;
+- support exactly three review outcomes: same revision, revision bump, or reject
+  and restore;
+- permit same-revision acceptance only when runtime package metadata is unchanged;
+- require a revision bump before publishing changed runtime package metadata;
 - store the new SHA after either acceptance outcome;
-- allocate the next revision only when review requires it;
+- allocate the next revision when review requires it;
 - avoid revision changes merely for repeated build attempts;
 - produce an integrity checksum for each published artifact.
 

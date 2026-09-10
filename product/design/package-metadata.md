@@ -172,6 +172,18 @@ artifact merely to compare two copies of the same metadata. A future standalone
 artifact-install path, if desired, must define how equivalent authoritative
 metadata is supplied rather than changing repository-backed semantics.
 
+## Identity stability
+
+For a published `name + version + architecture + revision`, runtime package
+metadata is stable package-management semantics. A later recipe change must not
+republish that same identity with different `depends`, `conflicts`, `provides`,
+`owned_paths`, or package-local lifecycle metadata if such metadata is added.
+
+Changing any of those fields requires a new revision for the same upstream
+version and architecture before publication. Artifact bytes may still differ at
+the same identity when human review explicitly accepts a recipe change that does
+not alter runtime package metadata.
+
 ## Installed-state projection
 
 After successful application, Manage stores the package identity, runtime

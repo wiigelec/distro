@@ -71,8 +71,8 @@ format are not yet specified.
 
 Package identity and revision semantics are defined by the
 [Package Model](package-model.md). Build is responsible for following the
-Recipe Manifest's accepted recipe SHA and human-review decision when determining
-the revision emitted for a package version and architecture.
+accepted recipe SHA and human-review decision recorded in Build State when
+determining the revision emitted for a package version and architecture.
 
 ## Open design questions
 

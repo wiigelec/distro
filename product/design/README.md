@@ -16,8 +16,8 @@ See [Architecture](architecture.md) for the component boundaries,
 semantics, [Package Metadata](package-metadata.md) for the logical runtime package
 record, [Autonomous Build Runtime](autonomous-build.md) for package-set
 reconciliation and automation policy, and [Package Database](package-database.md)
-for published architecture-specific package availability and repository
-generation consistency.
+for repository-wide published package state, architecture-specific availability,
+and generation consistency.
 
 These documents establish the initial design baseline. Details not explicitly
 decided here remain open design questions and should be resolved by later

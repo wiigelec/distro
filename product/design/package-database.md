@@ -9,10 +9,9 @@ It is distinct from:
 
 - the Package Manifest, which tells Build which upstream packages to track and
   where to discover or download their source;
-- the Recipe Manifest, which records the accepted recipe SHA and current
-  revision for each accepted package version and architecture;
-- Package History, which retains upstream observations and version-assessment
-  decisions;
+- Build State, which records recipe acceptance, revision state, upstream
+  observations, version decisions, build results, and other package-production
+  facts;
 - Manage's local installed-package database, which records what is installed on
   a target filesystem.
 
@@ -53,8 +52,8 @@ A package that was detected, prepared, built, or validated but has not been
 published must not become available to Manage merely because Build knows about
 it.
 
-Build and Recipe history may therefore contain package identities or build
-attempts that are absent from the Package Database.
+Build State may therefore contain package identities or build attempts that are
+absent from the Package Database.
 
 ## Available versions
 
@@ -405,8 +404,7 @@ Once a package identity is published into the Package Database, it becomes part
 of the package catalog available to Manage.
 
 The Package Database therefore represents published distro package state, while
-the Recipe Manifest and Build runtime state represent richer package-production
-history.
+Build State represents richer package-production and reconciliation state.
 
 Conceptually:
 
@@ -417,9 +415,9 @@ Package Manifest
           v
         Build
           |
-          +----> Recipe Manifest / Build history
+          +----> Build State
           |
-          +----> build and validation state
+          +----> build and validation facts
           |
           v
       publication
