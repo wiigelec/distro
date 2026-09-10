@@ -79,7 +79,7 @@ Artifact integrity is verified by comparing the obtained artifact bytes against
 the externally supplied checksum associated with the selected published package
 identity. The checksum is not part of package identity or revision allocation.
 
-The exact schemas and checksum algorithm remain undecided.
+The logical runtime package schema is defined by [Package Metadata](package-metadata.md). The physical serialization and checksum algorithm remain undecided.
 
 ## Package Database and repository interface
 
@@ -135,6 +135,19 @@ may still be physically combined or represented separately.
 Public mirror selection, repository federation, and decentralized publication
 are outside the initial scope. Cache representation, transport, authentication,
 integrity details, and any future signature model remain later design topics.
+
+### Snapshot consistency
+
+Manage refreshes and resolves against one complete Package Database generation.
+Artifact references selected from that generation are immutable and remain
+valid for as long as the generation is retained by the repository.
+
+Build must make all newly referenced artifacts available before atomically
+publishing a generation as current. Repository garbage collection must not
+remove an artifact while any retained generation still references it.
+
+This generation contract prevents metadata/artifact publication races without
+requiring Manage to combine state from multiple repository snapshots.
 
 ## Manage installed-state contract
 

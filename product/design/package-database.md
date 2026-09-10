@@ -85,6 +85,58 @@ Registry ordering does not select `current`; it exists for dependency
 constraints, explicit version comparison, and classifying user-directed movement
 between published versions.
 
+## Logical database schema
+
+The Package Database is published as a complete architecture-scoped generation.
+Its logical structure is:
+
+```text
+package_database
+    schema_version
+    generation
+    architecture
+
+    capability_version_registries
+        capability_name -> ordered version[]
+
+    packages
+        package_name
+            version_registry[]
+            current
+                version
+                revision
+
+            available[]
+                version
+                revision
+                artifact_reference
+                artifact_checksum
+                metadata
+                    depends[]
+                    conflicts[]
+                    provides[]
+                    owned_paths[]
+```
+
+`generation` identifies one coherent published snapshot. `architecture` applies
+to all concrete package identities in that database generation.
+
+`version_registry` is the persistent ordered package-version registry. The
+capability registry table performs the same function for versioned provided
+capabilities.
+
+`current` identifies exactly one member of `available` when the package has any
+available identity.
+
+Each `available` entry is one concrete package identity for the database
+architecture. It contains the artifact location, whole-artifact checksum, and
+the solver/install metadata defined by [Package Metadata](package-metadata.md).
+
+The schema intentionally does not duplicate `name` or `architecture` inside
+every nested field when those values are already supplied by the containing
+package record and architecture-scoped database. A physical serialization may
+denormalize fields for convenience without changing the logical model.
+
 ## Highest revision per version
 
 For a given `name + version + architecture`, the Package Database exposes only
@@ -274,6 +326,47 @@ Repository
     how the selected package artifact is obtained
 ```
 
+## Repository generations and publication consistency
+
+Package Database publication and artifact availability use coherent generations
+so Manage cannot observe newly published metadata that refers to artifacts that
+were not yet made available.
+
+Each published Package Database snapshot has a monotonically increasing
+`generation` value within an architecture catalog.
+
+Publication follows this order:
+
+```text
+prepare generation N+1
+    -> finalize all metadata
+    -> make every newly referenced immutable artifact available
+    -> verify every artifact reference and checksum
+    -> publish generation N+1 as the current database generation
+```
+
+The switch that makes a new Package Database generation current must be atomic
+from Manage's point of view. A client sees either the complete prior generation
+or the complete new generation, never a partially updated database.
+
+Artifact references are immutable: once a generation associates an artifact
+reference and checksum with a package identity, the bytes at that reference must
+not change.
+
+Every artifact referenced by a retained Package Database generation must remain
+available for the lifetime of that retained generation.
+
+A generation may be retired only as a complete metadata snapshot. Artifacts may
+be garbage-collected only when no retained generation references them.
+
+If Manage has a stale generation whose server-side snapshot has already been
+retired before required artifacts are obtained, the transaction must fail
+before payload mutation and refresh rather than silently substituting artifacts
+from another generation.
+
+The exact number or age of retained generations remains policy rather than a
+schema requirement.
+
 ## Build publication relationship
 
 Build owns package production and publication decisions.
@@ -320,7 +413,7 @@ Package Database (architecture scoped)
 
 This design intentionally does not yet decide:
 
-- Package Database file format or serialization;
+- physical Package Database serialization and indexing;
 - whether architecture catalogs are separate files or logical partitions;
 - repository transport or synchronization protocol;
 - signature model and artifact-checksum algorithm;

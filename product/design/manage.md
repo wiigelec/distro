@@ -72,6 +72,54 @@ Build-only information such as recipe SHA, source locations, upstream
 observations, and package-production history does not belong in Manage's
 installed-package database.
 
+## Installed database schema
+
+Manage's installed database is target-root-local authoritative package state.
+
+Its logical top-level structure is:
+
+```text
+installed_database
+    schema_version
+    packages[]
+```
+
+Each installed package record contains:
+
+```text
+identity
+    name
+    version
+    architecture
+    revision
+
+artifact_checksum
+install_reason       explicit | dependency
+held                 true | false
+
+depends[]
+conflicts[]
+provides[]
+owned_paths[]
+```
+
+The relationship and path fields are the installed-state projection of the
+logical [Package Metadata](package-metadata.md) record used when the package was
+applied. Keeping them locally allows dependency resolution, removal, ownership
+queries, and orphan analysis without requiring the package to remain available
+from the repository.
+
+`artifact_checksum`, `install_reason`, and `held` are Manage state and are not
+part of package identity.
+
+The initial installed-state model permits at most one installed identity for a
+given package name in a target root. Replacement, upgrade, downgrade, and
+reinstall therefore update that package's installed record rather than creating
+side-by-side versions of the same package name.
+
+The physical database format, indexing strategy, locking mechanism, and
+crash-recovery representation remain implementation decisions.
+
 ## Install reason
 
 Manage records whether a package was installed because it was directly requested
