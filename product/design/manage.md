@@ -142,42 +142,80 @@ reinstall, repair, or later policy.
 
 ## Upgrade behavior
 
-A normal system upgrade operates from the refreshed Package Database:
+A normal system upgrade is an authoritative synchronization operation.
+
+`upgrade` first refreshes Manage's local Package Database view, then synchronizes
+installed packages to the refreshed Package Database's explicit `current`
+identities.
+
+Conceptually:
 
 ```text
-installed package identities
-        |
-        v
-compare with explicit Package Database current identities
-        |
-        v
+upgrade
+    |
+    v
+refresh local Package Database view
+    |
+    v
+compare installed packages with explicit current identities
+    |
+    v
 resolve required dependency changes
-        |
-        v
+    |
+    v
 prepare transaction
-        |
-        v
+    |
+    v
 apply transaction
 ```
+
+If an installed package has a different identity from the refreshed `current`
+identity, normal upgrade selects that `current` identity regardless of numerical
+or lexical upstream-version direction.
+
+For example:
+
+```text
+installed:
+    foo 2.0-r1
+
+current:
+    foo 1.9-r4
+
+upgrade:
+    foo 2.0-r1 -> foo 1.9-r4
+```
+
+This is a normal synchronization to distro `current`, not an explicit downgrade
+operation.
 
 Manage does not need to infer the newest upstream release to perform ordinary
 upgrade selection because the Package Database explicitly designates `current`.
 
+An installed package that has no `current` identity in the refreshed Package
+Database is not automatically removed by `upgrade`.
+
 Version comparison semantics may still be required later for dependency
-constraints, explicit version selection, downgrade validation, or other package
-operations.
+constraints, explicit non-current version selection, downgrade validation, or
+other package operations.
 
 ## Explicit version selection and downgrade
 
 A user may explicitly request another available identity from the Package
-Database. Moving to an older available upstream version is an explicit downgrade.
+Database.
+
+An explicit downgrade is a user-directed selection of a published non-current
+identity that represents an older upstream version than the selected installed
+or current package state. It is distinct from normal `upgrade`, which always
+synchronizes to the Package Database's explicit `current` identity even when that
+moves the installed upstream version downward.
 
 Manage must not select superseded revisions of the same upstream version because
 the Package Database exposes only the highest published revision of each
 available version.
 
-Final dependency, confirmation, and safety behavior for downgrade remains to be
-refined with dependency semantics.
+Final dependency, confirmation, and safety behavior for explicit downgrade
+remains to be refined with dependency semantics.
 
 ## Reinstall and same-identity replacement
 
@@ -259,14 +297,46 @@ that can be determined before applying conflicting payloads.
 Intentional shared files, directory ownership, mutable configuration files, and
 filesystem drift remain undecided.
 
-## Orphans
+## Orphans and obsolete dependency cleanup
 
 A dependency-installed package is an orphan when no installed package currently
 requires it under the dependency model.
 
-Manage should be able to query and report orphaned packages.
+Manage must be able to query and report orphaned packages.
 
-Orphan status alone does not cause automatic removal.
+A package recorded with install reason `explicit` is not considered an orphan
+merely because no installed package depends on it.
+
+Orphan status alone does not cause automatic removal during a normal `upgrade`.
+
+Manage must provide an explicit orphan-cleanup operation that removes currently
+orphaned dependency-installed packages through the normal transaction model.
+
+Conceptually:
+
+```text
+orphans
+    -> report currently orphaned dependency-installed packages
+
+remove-orphans
+    -> resolve and remove currently orphaned dependency-installed packages
+```
+
+Manage may also provide a combined upgrade-and-clean operation, conceptually:
+
+```text
+upgrade --clean
+    -> refresh Package Database
+    -> synchronize installed packages to current
+    -> recompute dependency requirements
+    -> identify resulting orphans
+    -> include orphan removals in the same resolved transaction
+```
+
+The exact CLI spelling remains undecided. The semantic requirement is that normal
+upgrade does not silently remove orphaned dependencies, while cleanup can be
+requested explicitly either as a separate operation or as part of an
+upgrade-and-clean transaction.
 
 ## Target root
 
@@ -315,6 +385,7 @@ refresh
 install
 remove
 upgrade
+upgrade with orphan cleanup
 search
 info
 list/query
@@ -322,6 +393,7 @@ verify
 reinstall
 explicit version selection / downgrade
 orphan query
+orphan removal
 ```
 
 ## Open design questions

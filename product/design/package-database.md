@@ -162,9 +162,9 @@ design.
 
 ## Manage upgrade behavior
 
-For ordinary upgrade detection, Manage compares the installed package identity
-with the Package Database's explicit `current` identity for the applicable
-package and architecture.
+For ordinary upgrade behavior, Manage first refreshes its local Package Database
+view and then synchronizes installed packages to the Package Database's explicit
+`current` identity for the applicable package and architecture.
 
 Conceptually:
 
@@ -176,20 +176,40 @@ current:
     zlib 1.3.1 x86_64 r3
 ```
 
-The identities differ, so a package change is available.
+The identities differ, so normal upgrade selects `1.3.1-r3`.
+
+The same rule applies when `current` moves to an upstream version that compares
+lower than the installed version:
+
+```text
+installed:
+    foo 2.0-r1
+
+current:
+    foo 1.9-r4
+```
+
+Normal upgrade selects `1.9-r4` because `current` is authoritative distro state.
+This synchronization is not classified as an explicit downgrade.
 
 Manage does not need to independently assess upstream release ordering in order
-to answer the ordinary question "is this installed package current?"
+to answer the ordinary question "is this installed package current?" or to
+select the normal upgrade target.
+
+Packages installed locally but lacking a published `current` identity are not
+automatically removed by normal upgrade.
 
 Manage may still require version comparison semantics later for dependency
-constraints, explicit version selection, downgrade policy, or other package
-operations. Those semantics remain separate from normal current-package
-detection.
+constraints, explicit non-current version selection, downgrade policy, or other
+package operations. Those semantics remain separate from normal current-package
+selection.
 
 ## Explicit downgrade behavior
 
-An explicit downgrade selects another published package version from the
-architecture-scoped Package Database.
+An explicit downgrade is a user-directed selection of another published
+non-current package version from the architecture-scoped Package Database. It is
+separate from normal upgrade synchronization to `current`, even when normal
+synchronization moves to a numerically or lexically lower upstream version.
 
 Because only the highest revision of each version is exposed, an explicit
 downgrade moves between published upstream versions rather than to a superseded
