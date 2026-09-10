@@ -20,13 +20,18 @@ categories of behavior as they are designed:
 - validating package artifacts before applying them;
 - maintaining the local package database or equivalent state store.
 
-Repository access and dependency resolution may become Manage responsibilities,
-but their detailed behavior is not yet specified by this baseline.
+Repository consumption and dependency resolution may become Manage
+responsibilities, but their detailed behavior is not yet specified by this
+baseline.
 
 Manage consumes the architecture-scoped published Package Database defined by
-[Package Database](package-database.md). For ordinary upgrade detection, Manage
-compares an installed package identity with the explicit `current` identity in
-that database. A different identity indicates an available package change.
+[Package Database](package-database.md). It uses that catalog to select a
+published package identity and uses the repository or distribution interface to
+obtain the corresponding package artifact.
+
+For ordinary upgrade detection, Manage compares an installed package identity
+with the explicit `current` identity in the Package Database. A different
+identity indicates an available package change.
 
 The Package Database may also expose older published upstream versions for
 explicit downgrade or version-selection operations. Superseded revisions of the
@@ -85,14 +90,17 @@ installation-wide machine policy and configuration.
 At the architectural level:
 
 ```text
-package artifact(s)
-       |
-       v
-     Manage
-       |
-       +----> installed files
-       |
-       +----> authoritative package state
+Package Database ----> package selection
+                            |
+                            v
+Repository ----------> package artifact
+                            |
+                            v
+                          Manage
+                            |
+                            +----> installed files
+                            |
+                            +----> authoritative installed package state
 ```
 
 The package format, transaction model, dependency solver, repository protocol,

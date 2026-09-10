@@ -74,27 +74,57 @@ validation, installation, package-state management, and later inspection.
 
 The exact schemas remain undecided.
 
-## Repository interface
+## Package Database and repository interface
 
-A repository or distribution service may sit between Build and Manage:
+The Package Database and package repository serve different semantic roles even
+if a later implementation stores or distributes them together.
+
+The architecture-scoped [Package Database](package-database.md) is the
+authoritative published catalog used by Manage to discover package identities,
+the explicit `current` identity, and other published versions that remain
+available.
+
+The repository or distribution interface provides access to the package
+artifact corresponding to a selected published identity.
+
+Conceptually:
 
 ```text
-Build --> package artifacts --> repository --> Manage
+                     Package Database
+                     /              \
+                    / selection      \ artifact reference
+                   v                  v
+                Manage ----------> Repository
+                                      |
+                                      v
+                               package artifact
 ```
 
+Build publishes eligible identities into the Package Database and makes their
+corresponding artifacts available through the repository or distribution
+interface.
+
+Manage first resolves a published package identity through the Package Database,
+then obtains the corresponding package artifact through the repository
+interface. The exact number of requests, caching model, and physical metadata
+layout are implementation details rather than semantic requirements.
+
 In this baseline, repository is an interface or distribution domain, not a
-fourth primary component.
+fourth primary component. The Package Database likewise does not establish a
+fourth primary component; it is authoritative published package state.
 
-The presence of a repository does not change ownership:
+The presence of these distribution interfaces does not change ownership:
 
-- Build still owns package creation.
-- Manage still owns package installation state.
+- Build still owns package creation and publication decisions.
+- Manage still owns installed package state.
 - Install still uses Manage for package operations.
 - Install may select or configure package sources for an installation without
   becoming responsible for repository consumption mechanics.
 
-Repository metadata, publication, discovery, authentication, and transport are
-future design topics.
+Whether Package Database metadata is physically embedded in repository metadata,
+served separately, mirrored, cached, signed, or synchronized by another
+mechanism remains undecided. Authentication, transport, and integrity details
+also remain future design topics.
 
 ## Configuration ownership
 

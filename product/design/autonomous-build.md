@@ -5,8 +5,9 @@
 Build is not limited to executing a single package recipe on demand.
 
 The distro design expects Build to evolve into an autonomous package-production
-runtime that maintains the distro's declared package set by reconciling package
-policy, recipe state, upstream state, and produced package artifacts.
+runtime that maintains packages according to maintainer-declared upstream
+tracking configuration by reconciling package policy, recipe state, upstream
+observations, package-production history, and published package state.
 
 This document defines that architectural direction without choosing the runtime
 implementation, scheduler, polling mechanism, manifest serialization, or alert
@@ -17,15 +18,17 @@ transport.
 At the architectural level, Build operates as a reconciler:
 
 ```text
-desired package set
+upstream tracking configuration
       |
       v
 Package Manifest
       |
       v
- Build Runtime <--------- upstream state
+ Build Runtime <--------- upstream observations
       |
-      +----> recipe state
+      +----> Recipe Manifest
+      |
+      +----> Package History
       |
       +----> build scheduling
       |
@@ -35,11 +38,14 @@ Package Manifest
       |
       +----> publication state
       |
+      +----> Package Database
+      |
       +----> escalation when automation cannot proceed safely
 ```
 
-The runtime compares desired and observed state and performs package-production
-work required to bring the distro package set toward the declared desired state.
+The runtime compares maintainer-declared upstream tracking configuration with
+observed and historical package-production state and performs the work needed to
+keep published distro packages reconciled with that configuration and policy.
 
 Autonomy is policy-driven and package-specific. The design does not assume that
 every package can be updated with the same level of automation.
@@ -77,8 +83,14 @@ categories have different authorities:
 Package Manifest
     maintainer-declared upstream tracking configuration
 
-Recipe Manifest and runtime state
-    machine-maintained observed and historical package-production state
+Recipe Manifest
+    machine-maintained effective-recipe and revision history
+
+Package History
+    machine-maintained upstream observations and version-assessment decisions
+
+Other runtime state
+    machine-maintained build, validation, publication, and escalation state
 
 Package Database
     published architecture-scoped distro package catalog
@@ -115,6 +127,46 @@ mapping needed by Build's package identity rules.
 
 The exact storage format, retention policy, and publication model are not yet
 specified.
+
+## Package History
+
+Package History is machine-maintained Build state used to preserve upstream
+observations and version-assessment decisions that are distinct from recipe
+revision history.
+
+It exists so that autonomous reconciliation does not need to rediscover or
+silently reinterpret prior upstream-version decisions on every run.
+
+Conceptually, Package History may preserve information such as:
+
+```text
+package: example
+
+observed upstream versions:
+    1.8
+    1.9
+    1.10
+    2.0rc1
+
+accepted package versions:
+    1.8
+    1.9
+    1.10
+
+version assessment:
+    automatic / package-specific / manual
+```
+
+A package whose upstream version scheme cannot be interpreted safely may be
+flagged for package-specific or manual determination. The resulting decision
+must be preservable as Build state so later reconciliation can use the prior
+decision rather than guessing again.
+
+Package History does not define what is currently published. Publication
+authority belongs to the architecture-scoped Package Database.
+
+The exact Package History schema, retention policy, and relationship to raw
+upstream observations remain undecided.
 
 ## Recipe change detection
 
@@ -209,7 +261,8 @@ execution, validation, and package publication automatically where package
 policy permits.
 
 The exact upstream discovery mechanisms, polling intervals, release-selection
-rules, and automatic recipe-editing mechanisms remain undecided.
+rules, version-assessment algorithms, package-specific comparison mechanisms,
+and automatic recipe-editing mechanisms remain undecided.
 
 ## Package-production state transitions
 
@@ -329,11 +382,11 @@ reconciliation.
 
 This state is distinct from Manage's authoritative installed-package state.
 
-Build's package-production state may include the Recipe Manifest, package history,
-observed upstream state, build results, validation state, and publication state as
-later design specifies. Build consumes the Package Manifest as maintainer-declared
-upstream tracking input and publishes eligible package identities into the
-architecture-scoped Package Database.
+Build's package-production state may include the Recipe Manifest, Package
+History, observed upstream state, build results, validation state, publication
+state, and escalation state as later design specifies. Build consumes the
+Package Manifest as maintainer-declared upstream tracking input and publishes
+eligible package identities into the architecture-scoped Package Database.
 
 Manage remains authoritative only for package state installed on a target
 filesystem.
@@ -342,7 +395,7 @@ filesystem.
 
 This design intentionally does not yet decide:
 
-- manifest file formats or schemas;
+- Package Manifest, Recipe Manifest, and Package History file formats or schemas;
 - scheduler or worker architecture;
 - polling intervals;
 - upstream service integrations;

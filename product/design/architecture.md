@@ -19,10 +19,12 @@ At the individual package level, its responsibility is to turn source inputs
 and a package recipe into one or more package artifacts suitable for
 consumption by Manage.
 
-At the distro level, Build is responsible for reconciling the declared package
-set against recipe state, upstream state, and produced package state according
-to package-specific automation policy. It may autonomously schedule package
-work and escalate changes or failures that cannot be resolved safely.
+At the distro level, Build is responsible for reconciling the Package
+Manifest's maintainer-declared upstream-tracking configuration against recipe
+state, upstream observations, package-production history, and published package
+state according to package-specific automation policy. It may autonomously
+schedule package work and escalate changes or failures that cannot be resolved
+safely.
 
 Build owns build-time and package-production state. It does not own the
 installed state of a machine.
@@ -110,9 +112,12 @@ The following boundaries are part of the initial design:
    shared implementation assumptions.
 9. A repository or distribution service may connect package production and
    consumption without becoming a primary component in this baseline.
-10. The declared package-set policy is desired state; machine-maintained Build
-    history and reconciliation state must not silently redefine that desired
-    state.
+10. The Package Manifest is desired-state authority for upstream package
+    tracking; machine-maintained Build history and reconciliation state must not
+    silently redefine that maintainer-declared configuration.
+11. The architecture-scoped Package Database is the authoritative catalog of
+    published distro package identities available to Manage; Build history is
+    not a substitute for that published catalog.
 
 ## Undecided areas
 

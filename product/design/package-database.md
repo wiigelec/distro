@@ -9,8 +9,9 @@ It is distinct from:
 
 - the Package Manifest, which tells Build which upstream packages to track and
   where to discover or download their source;
-- the Recipe Manifest and other Build history, which retain machine-maintained
-  package-production history;
+- the Recipe Manifest, which retains effective-recipe and revision history;
+- Package History, which retains upstream observations and version-assessment
+  decisions;
 - Manage's local installed-package database, which records what is installed on
   a target filesystem.
 
@@ -95,8 +96,12 @@ package definition for the same upstream version and architecture.
 
 ## Current package identity
 
-For each package in an architecture-scoped Package Database, one published
-package identity may be designated as `current`.
+For each package and architecture that has one or more published available
+package identities, exactly one of those identities must be designated as
+`current`.
+
+The `current` identity must be a member of the package's published `available`
+set for that architecture.
 
 `current` is an explicit publication decision. It must not be inferred merely by
 choosing the numerically or lexically greatest available version.
@@ -114,7 +119,13 @@ current:
 
 is valid if distro publication policy intentionally keeps `1.9-r4` as current.
 
-The exact mechanism used to select or change `current` remains future design.
+A package with no published identity for an architecture has no `current`
+identity for that architecture. Withdrawal, staged publication, or other future
+states must be modeled explicitly rather than represented accidentally by an
+incomplete published catalog.
+
+The exact mechanism used to select, change, or withdraw `current` remains future
+design.
 
 ## Manage upgrade behavior
 
@@ -165,6 +176,27 @@ may be a valid downgrade if both identities remain published.
 Whether dependency resolution, confirmation, or additional safety policy is
 required for downgrade remains undecided.
 
+## Repository relationship
+
+The Package Database is the metadata authority for published package selection;
+the repository or distribution interface provides access to the package artifact
+corresponding to a selected published identity.
+
+The Package Database may carry or reference enough information for Manage to
+locate that artifact, but the exact representation is not yet specified.
+
+The Package Database and repository metadata may eventually be physically
+combined, distributed together, or served separately. That implementation
+choice must not blur their semantic distinction:
+
+```text
+Package Database
+    which published identity is selected or available
+
+Repository
+    how the selected package artifact is obtained
+```
+
 ## Build publication relationship
 
 Build owns package production and publication decisions.
@@ -195,8 +227,16 @@ Package Manifest
           v
 Package Database (architecture scoped)
           |
+          +----> published identity selection
+          |
           v
         Manage
+          |
+          v
+ Repository / distribution interface
+          |
+          v
+   selected package artifact
 ```
 
 ## Undecided areas
@@ -208,7 +248,7 @@ This design intentionally does not yet decide:
 - repository transport or synchronization protocol;
 - signature and integrity model;
 - retention depth for older published upstream versions;
-- how `current` is selected, approved, or changed;
+- how `current` is selected, approved, changed, or withdrawn;
 - whether testing or staged publication channels exist;
 - exact downgrade transaction behavior;
 - dependency constraints involving non-current versions;
