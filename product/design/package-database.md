@@ -76,6 +76,11 @@ The registry is retained independently of the `available` set so that historical
 versions used as dependency comparison anchors remain comparable even after their
 artifacts are no longer installable.
 
+Once an entry has appeared in published package metadata, it must remain in the
+registry permanently and must retain its relative order with every other
+established entry. New entries may be inserted without changing established
+relative ordering.
+
 Registry ordering does not select `current`; it exists for dependency
 constraints, explicit version comparison, and classifying user-directed movement
 between published versions.

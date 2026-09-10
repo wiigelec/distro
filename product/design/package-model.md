@@ -49,6 +49,18 @@ its correct position in the package's ordered registry. Existing entries keep
 their relative order. Ambiguous or non-monotonic upstream version schemes must be
 resolved before publication; an ambiguous placement escalates for human review.
 
+Once a registry entry has appeared in published package metadata, it is a
+permanent ordering anchor:
+
+```text
+published registry entry
+    -> must not be deleted
+    -> must not move across another established entry
+```
+
+New entries may be inserted before, after, or between established entries, but
+the relative order of established entries is immutable.
+
 Registry entries are persistent ordering anchors. They are not removed merely
 because the corresponding package artifact is no longer available from the
 Package Database.

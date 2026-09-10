@@ -502,8 +502,15 @@ Package-version ordering uses the Package Model's persistent ordered version
 registry. Manage must not parse or heuristically order the opaque upstream
 `version` string.
 
-For package-name dependencies, the comparison target is an established version
-entry in that package's registry.
+For package-name dependencies, the comparison target must be an established
+version entry in that package's registry. If the dependency names a comparison
+version that is absent from the registry, the package metadata is invalid for
+resolution and the transaction fails before filesystem mutation. Manage must not
+guess where an unknown version belongs by parsing its string.
+
+The same rule applies to versioned capability dependencies: the comparison
+capability version must already exist in that capability's persistent ordered
+registry.
 
 The operators have these semantics:
 
@@ -579,9 +586,22 @@ Provider replacement is allowed when required by the explicit request,
 dependency constraints, conflicts, repository state, or another hard solver
 constraint.
 
-If multiple equally valid provider choices remain after preserving installed
-state where possible, the exact deterministic tie-break rule remains to be
-defined. Solver behavior must not depend on incidental iteration order.
+When multiple valid providers remain, Manage selects deterministically in this
+order:
+
+```text
+1. retain an already-installed satisfying provider
+2. otherwise prefer a satisfying provider whose package identity is Package
+   Database current
+3. otherwise choose the lexically smallest package name
+```
+
+If more than one candidate remains for the same package name after those rules,
+the solver uses the selected published package identity required by the
+transaction and Package Database state rather than incidental iteration order.
+
+Provider selection must therefore be deterministic and must not depend on
+repository traversal order or internal collection ordering.
 
 Dependency cycles are not inherently invalid. A cycle such as `A depends B` and
 `B depends A` may resolve successfully when the complete planned resulting state
