@@ -54,6 +54,7 @@ architecture
 revision
 artifact checksum
 install reason
+hold state
 owned files
 package metadata required for dependency and removal operations
 ```
@@ -85,6 +86,14 @@ dependency
 
 This distinction supports identifying dependency-installed packages that are no
 longer required by any installed package.
+
+If a package already recorded as `dependency` is explicitly requested by the
+user, Manage promotes its install reason to `explicit` even when no package
+payload change is required.
+
+Manage must also permit an explicit administrative operation that changes an
+installed package's reason from `explicit` back to `dependency`. That operation
+changes package-management state; it does not itself remove the package.
 
 Being an orphan does not itself authorize automatic removal.
 
@@ -195,6 +204,10 @@ upgrade selection because the Package Database explicitly designates `current`.
 An installed package that has no `current` identity in the refreshed Package
 Database is not automatically removed by `upgrade`.
 
+A held package is excluded from normal synchronization to `current`. Its
+installed identity is retained during ordinary upgrade unless the user performs
+an explicit package operation that changes it or removes the hold.
+
 Version comparison semantics may still be required later for dependency
 constraints, explicit non-current version selection, downgrade validation, or
 other package operations.
@@ -213,6 +226,10 @@ moves the installed upstream version downward.
 Manage must not select superseded revisions of the same upstream version because
 the Package Database exposes only the highest published revision of each
 available version.
+
+Explicit installation or downgrade to a non-current published identity does
+not implicitly create a hold. Unless the package is separately held, a later
+normal `upgrade` synchronizes it back to Package Database `current`.
 
 Final dependency, confirmation, and safety behavior for explicit downgrade
 remains to be refined with dependency semantics.
@@ -309,8 +326,26 @@ merely because no installed package depends on it.
 
 Orphan status alone does not cause automatic removal during a normal `upgrade`.
 
-Manage must provide an explicit orphan-cleanup operation that removes currently
-orphaned dependency-installed packages through the normal transaction model.
+Manage must provide an explicit orphan-cleanup operation through the normal
+transaction model.
+
+Orphan cleanup is resolved as a closure against the planned resulting installed
+state rather than as a one-pass removal of only the packages that are orphaned
+before the transaction begins.
+
+For example:
+
+```text
+A explicit
+└── B dependency
+    └── C dependency
+
+A no longer requires B
+
+B becomes orphaned
+removing B means C is no longer required
+cleanup transaction removes B and C
+```
 
 Conceptually:
 
@@ -319,24 +354,66 @@ orphans
     -> report currently orphaned dependency-installed packages
 
 remove-orphans
-    -> resolve and remove currently orphaned dependency-installed packages
+    -> resolve full removable orphan closure
+    -> remove that closure in one transaction
 ```
 
-Manage may also provide a combined upgrade-and-clean operation, conceptually:
+A combined upgrade-and-clean operation computes cleanup against the planned
+post-upgrade dependency graph:
 
 ```text
 upgrade --clean
     -> refresh Package Database
-    -> synchronize installed packages to current
-    -> recompute dependency requirements
-    -> identify resulting orphans
-    -> include orphan removals in the same resolved transaction
+    -> synchronize non-held installed packages to current
+    -> resolve the planned post-upgrade installed state
+    -> compute the full orphan closure in that resulting state
+    -> include those orphan removals in the same transaction
 ```
 
 The exact CLI spelling remains undecided. The semantic requirement is that normal
 upgrade does not silently remove orphaned dependencies, while cleanup can be
 requested explicitly either as a separate operation or as part of an
 upgrade-and-clean transaction.
+
+## Holds
+
+Manage supports a simple per-package hold state.
+
+A held package retains its installed package identity during normal `upgrade`
+instead of being synchronized to Package Database `current`.
+
+Conceptually:
+
+```text
+not held
+    -> normal upgrade follows repo current
+
+held
+    -> normal upgrade retains installed identity
+```
+
+A hold does not alter Package Database state, package identity, artifact
+identity, or install reason. It is local Manage policy attached to the installed
+package state.
+
+Explicit package operations remain allowed against held packages. For example,
+the user may explicitly install another published identity, reinstall the held
+identity, remove the package, or remove the hold. The exact confirmation policy
+for explicit operations on held packages remains a CLI/interaction decision.
+
+Installing an explicit non-current version does not automatically create a hold,
+and creating a hold does not itself select or install another version.
+
+Manage must support operations equivalent to:
+
+```text
+hold
+unhold
+list holds
+```
+
+The exact CLI spelling remains undecided. A broader pinning or preference system
+is outside this initial model.
 
 ## Target root
 
@@ -392,6 +469,8 @@ list/query
 verify
 reinstall
 explicit version selection / downgrade
+hold / unhold / hold query
+install-reason change
 orphan query
 orphan removal
 ```
@@ -406,6 +485,5 @@ orphan removal
 - package-local lifecycle representation and constraints;
 - repository transport on the home network;
 - downloaded-artifact cache policy;
-- whether package holds or pins are part of the initial feature set;
 - version-comparison semantics needed for dependency constraints;
 - rollback or recovery after interruption.
