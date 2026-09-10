@@ -29,7 +29,8 @@ The upstream `version` string is treated as an opaque package-identity value.
 Manage does not infer ordering by parsing that string.
 
 Each package name has a persistent distro-controlled ordered version registry
-shared across architectures.
+shared across architectures. It is global comparison state for the repository,
+not independent architecture-local state.
 
 Conceptually:
 
@@ -78,6 +79,11 @@ name + version + architecture + revision
 The explicit Package Database `current` identity is also independent of registry
 ordering: distro policy may intentionally select an earlier registry entry as
 `current`.
+
+A Package Database generation must expose one coherent copy of this global
+comparison state to every architecture catalog in that generation. Architectures
+may differ in package availability and `current` identity, but not in the
+relative ordering of established package versions.
 
 ### Revision
 

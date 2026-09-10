@@ -61,8 +61,26 @@ operator?   one of = > >= < <=
 version?
 ```
 
-The initial model uses one requirement namespace. `name` may be satisfied by the
-actual package of that name or by a package that provides the same capability.
+Package names and provided capability names share one global requirement
+namespace, but a name has exactly one semantic kind.
+
+```text
+name
+    -> package name
+or
+    -> capability name
+never both
+```
+
+Once a name is established as a package name, no package may publish a
+`provides` entry with that same name. Once a name is established as a capability
+name, no package may be published with that name. Build must reject publication
+that would create such a collision.
+
+A dependency `name` therefore resolves unambiguously: a package-name requirement
+is satisfied by that package, while a capability-name requirement is satisfied
+by a package that provides that capability. The requirement kind also determines
+which persistent ordered version registry is used for a version constraint.
 
 An unconstrained dependency contains only `name`.
 
@@ -93,8 +111,9 @@ The initial conflict record contains only:
 name
 ```
 
-A matching actual package or provided capability makes the planned resulting
-state invalid.
+The conflict name resolves through the same non-colliding global requirement
+namespace as a dependency. A package-name conflict matches that package directly;
+a capability-name conflict matches any package that provides that capability.
 
 Version-constrained conflicts are outside the initial schema.
 

@@ -516,6 +516,16 @@ capability. A conflict naming an actual package matches that package directly.
 `provides` declares additional capability names that an installed package can
 satisfy for dependency resolution.
 
+Package names and capability names share one global requirement namespace, but
+the same name must not be both a package name and a capability name. Published
+metadata that would create such a collision is invalid and must not participate
+in resolution.
+
+This invariant makes every dependency or conflict name unambiguous before
+provider selection or version comparison: package-name requirements use the
+package's ordered version registry, while capability-name requirements use the
+capability's ordered version registry.
+
 A provided capability may be unversioned or may advertise an explicit capability
 version. Capability version is independent of the provider package's own upstream
 version.
@@ -608,8 +618,10 @@ ignore a declared conflict merely to complete a requested operation.
 
 ## Provider selection and stability
 
-A dependency may be satisfied by the named package itself or by a package whose
-metadata declares a matching `provides` capability.
+A package-name dependency is satisfied by the named package itself. A
+capability-name dependency is satisfied by a package whose metadata declares a
+matching `provides` capability. The global non-collision invariant prevents one
+requirement name from having both interpretations.
 
 When multiple valid providers exist, Manage should prefer an already-installed
 valid provider rather than switching providers without a reason.

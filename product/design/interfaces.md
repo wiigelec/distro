@@ -86,10 +86,11 @@ The logical runtime package schema is defined by [Package Metadata](package-meta
 The Package Database and package repository serve different semantic roles even
 if a later implementation stores or distributes them together.
 
-The architecture-scoped [Package Database](package-database.md) is the
-authoritative published catalog used by Manage to discover package identities,
-the explicit `current` identity, and other published versions that remain
-available.
+The repository-generation [Package Database](package-database.md) is the
+authoritative published metadata snapshot. It contains repository-global
+comparison registries plus architecture-scoped catalogs used by Manage to
+discover package identities, the explicit `current` identity, and other
+published versions that remain available.
 
 The repository or distribution interface provides access to the package
 artifact corresponding to a selected published identity.
@@ -139,6 +140,10 @@ integrity details, and any future signature model remain later design topics.
 ### Snapshot consistency
 
 Manage refreshes and resolves against one complete Package Database generation.
+It uses the global comparison registries and its selected architecture catalog
+from that same generation; it must not combine a registry snapshot from one
+generation with an architecture catalog from another.
+
 Artifact references selected from that generation are immutable and remain
 valid for as long as the generation is retained by the repository.
 
@@ -161,13 +166,16 @@ metadata needed for dependency and removal operations. Build-only recipe and
 upstream tracking state does not cross this boundary merely because it may
 describe the same package.
 
-Published package metadata must expose or reference the persistent package-scoped
-ordered version registry needed for dependency comparison. Versioned provided
-capabilities likewise use persistent capability-scoped ordered registries.
+Published package metadata must expose the repository-global persistent
+package-scoped ordered version registries needed for dependency comparison.
+Versioned provided capabilities likewise use repository-global persistent
+capability-scoped ordered registries.
 
 These registries are comparison metadata and are not part of concrete package
 identity. Their entries remain available as ordering anchors even when the
-corresponding package or capability version is no longer installable.
+corresponding package or capability version is no longer installable. Package and
+capability names share one non-colliding global requirement namespace so each
+requirement selects exactly one corresponding registry kind.
 
 ## Configuration ownership
 

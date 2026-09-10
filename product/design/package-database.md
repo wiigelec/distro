@@ -18,20 +18,27 @@ It is distinct from:
 
 ## Architecture scope
 
-Package Database state is architecture-dependent.
+Package availability and `current` selection are architecture-dependent, while
+version-comparison registries are repository-global.
 
-Conceptually, each supported architecture has an independent published catalog:
+The Package Database therefore publishes one coherent repository generation
+containing global comparison state plus architecture-scoped catalogs:
 
 ```text
-Package Database
-    x86_64
-    aarch64
-    ...
+Package Database generation
+    global comparison state
+        package version registries
+        capability version registries
+
+    catalogs
+        x86_64
+        aarch64
+        ...
 ```
 
-The exact physical representation may use separate databases, partitions, or an
-equivalent architecture-scoped structure. The representation is not yet
-specified.
+The exact physical representation may use one file, several files, partitions,
+or an equivalent structure. Regardless of representation, all parts belonging
+to a generation form one atomic published snapshot.
 
 Architecture remains part of concrete package identity as defined by the
 [Package Model](package-model.md).
@@ -87,55 +94,62 @@ between published versions.
 
 ## Logical database schema
 
-The Package Database is published as a complete architecture-scoped generation.
-Its logical structure is:
+The Package Database is published as a complete repository-wide generation. Its
+logical structure is:
 
 ```text
 package_database
     schema_version
     generation
-    architecture
+
+    package_version_registries
+        package_name -> ordered version[]
 
     capability_version_registries
         capability_name -> ordered version[]
 
-    packages
-        package_name
-            version_registry[]
-            current
-                version
-                revision
+    catalogs
+        architecture
+            packages
+                package_name
+                    current
+                        version
+                        revision
 
-            available[]
-                version
-                revision
-                artifact_reference
-                artifact_checksum
-                metadata
-                    depends[]
-                    conflicts[]
-                    provides[]
-                    owned_paths[]
+                    available[]
+                        version
+                        revision
+                        artifact_reference
+                        artifact_checksum
+                        metadata
+                            depends[]
+                            conflicts[]
+                            provides[]
+                            owned_paths[]
 ```
 
-`generation` identifies one coherent published snapshot. `architecture` applies
-to all concrete package identities in that database generation.
+`generation` identifies one coherent published snapshot shared by every
+architecture catalog in that snapshot.
 
-`version_registry` is the persistent ordered package-version registry. The
-capability registry table performs the same function for versioned provided
-capabilities.
+The two registry tables are global comparison authority. A package version has
+the same registry position regardless of architecture, and a versioned
+capability uses the same capability registry regardless of which architecture
+provides it.
+
+Each architecture catalog contains only architecture-dependent published state:
+available identities and explicit `current` selection.
 
 `current` identifies exactly one member of `available` when the package has any
-available identity.
+available identity for that architecture.
 
-Each `available` entry is one concrete package identity for the database
+Each `available` entry is one concrete package identity for its containing
 architecture. It contains the artifact location, whole-artifact checksum, and
 the solver/install metadata defined by [Package Metadata](package-metadata.md).
 
-The schema intentionally does not duplicate `name` or `architecture` inside
+The schema intentionally does not duplicate package name or architecture inside
 every nested field when those values are already supplied by the containing
-package record and architecture-scoped database. A physical serialization may
-denormalize fields for convenience without changing the logical model.
+records. A physical serialization may denormalize fields for convenience without
+changing the logical model.
 
 ## Highest revision per version
 
@@ -332,8 +346,8 @@ Package Database publication and artifact availability use coherent generations
 so Manage cannot observe newly published metadata that refers to artifacts that
 were not yet made available.
 
-Each published Package Database snapshot has a monotonically increasing
-`generation` value within an architecture catalog.
+Each published Package Database snapshot has one repository-wide monotonically
+increasing `generation` value.
 
 Publication follows this order:
 
@@ -347,7 +361,14 @@ prepare generation N+1
 
 The switch that makes a new Package Database generation current must be atomic
 from Manage's point of view. A client sees either the complete prior generation
-or the complete new generation, never a partially updated database.
+or the complete new generation, including one coherent global registry state and
+all architecture catalogs belonging to that generation, never a partially
+updated database.
+
+A change to global comparison state therefore creates a new repository generation
+even when package artifacts changed for only one architecture. An architecture
+client selects its own catalog but always evaluates it against the global
+registries from that same generation.
 
 Artifact references are immutable: once a generation associates an artifact
 reference and checksum with a package identity, the bytes at that reference must
@@ -395,9 +416,11 @@ Package Manifest
       publication
           |
           v
-Package Database (architecture scoped)
+Package Database generation
           |
-          +----> published identity selection
+          +----> global comparison registries
+          |
+          +----> architecture-scoped published identity selection
           |
           v
         Manage
