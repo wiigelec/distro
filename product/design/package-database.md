@@ -182,8 +182,11 @@ The Package Database is the metadata authority for published package selection;
 the repository or distribution interface provides access to the package artifact
 corresponding to a selected published identity.
 
-The Package Database may carry or reference enough information for Manage to
-locate that artifact, but the exact representation is not yet specified.
+The Package Database must carry or reference enough information for Manage to
+locate the selected artifact and obtain the integrity checksum associated with
+that published artifact.
+
+The exact representation and checksum algorithm are not yet specified.
 
 The Package Database and repository metadata may eventually be physically
 combined, distributed together, or served separately. That implementation
@@ -246,7 +249,7 @@ This design intentionally does not yet decide:
 - Package Database file format or serialization;
 - whether architecture catalogs are separate files or logical partitions;
 - repository transport or synchronization protocol;
-- signature and integrity model;
+- signature model and artifact-checksum algorithm;
 - retention depth for older published upstream versions;
 - how `current` is selected, approved, changed, or withdrawn;
 - whether testing or staged publication channels exist;

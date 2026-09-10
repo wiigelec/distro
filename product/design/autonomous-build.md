@@ -84,7 +84,7 @@ Package Manifest
     maintainer-declared upstream tracking configuration
 
 Recipe Manifest
-    machine-maintained effective-recipe and revision history
+    machine-maintained accepted recipe SHA and revision state
 
 Package History
     machine-maintained upstream observations and version-assessment decisions
@@ -105,28 +105,24 @@ history itself into the package catalog consumed by Manage.
 
 ## Recipe Manifest
 
-The Recipe Manifest is machine-maintained state used by Build to track recipe
-definitions and their relationship to package versions and revisions.
-
-It must preserve enough history for Build to determine whether a current recipe
-definition corresponds to an already-known package revision or requires a new
-revision.
-
-Conceptually:
+The Recipe Manifest stores the currently accepted recipe-file SHA and current
+revision for a package version and architecture.
 
 ```text
 name + version + architecture
     |
-    +---- r1 -> recipe_id A
-    +---- r2 -> recipe_id B
-    +---- r3 -> recipe_id C
+    +---- accepted recipe SHA
+    |
+    +---- current revision
 ```
 
-The Recipe Manifest therefore provides the authoritative revision-to-recipe
-mapping needed by Build's package identity rules.
+The accepted SHA is the comparison baseline used to detect recipe-file changes.
+It does not autonomously determine revision.
 
-The exact storage format, retention policy, and publication model are not yet
-specified.
+Git preserves prior recipe and Recipe Manifest states, so the live manifest does
+not need a separate audit-history structure.
+
+The exact storage format and publication model remain undecided.
 
 ## Package History
 
@@ -168,78 +164,41 @@ authority belongs to the architecture-scoped Package Database.
 The exact Package History schema, retention policy, and relationship to raw
 upstream observations remain undecided.
 
-## Recipe change detection
+## Recipe change review
 
-Build must be able to detect recipe-file changes mechanically.
-
-A stored recipe-file or recipe-definition hash may be used as the first-level
-change detector:
+Build detects recipe-file changes by comparing the current recipe SHA with the
+accepted SHA in the Recipe Manifest.
 
 ```text
-recorded hash == current hash
-    -> no detected recipe-file change
+accepted SHA == current SHA
+    -> no review required
 
-recorded hash != current hash
-    -> inspect and classify the change
+accepted SHA != current SHA
+    -> human review required
 ```
 
-A changed raw file hash does not by itself require a package revision change.
+A mismatch must not be resolved by an autonomous semantic classifier.
+Publication for the affected package version and architecture remains blocked
+until human review resolves it.
 
-The runtime may compare the changed recipe with its previously recorded form in
-order to classify whether the modification is consequential to package
-definition or output.
-
-Examples of changes that may be non-consequential include comments or explicitly
-non-effective metadata.
-
-Examples of changes that are expected to be consequential include categories
-such as:
-
-- source declarations;
-- patches;
-- build commands;
-- configure or build options;
-- declared dependencies;
-- recipe-controlled build settings.
-
-If the runtime can determine that the effective recipe changed, the package
-revision must change according to the Package Model.
-
-If the runtime can determine that only non-effective content changed, it may
-update its recorded recipe-file state without allocating a new package
-revision.
-
-If the runtime cannot safely classify a recipe change, it must escalate rather
-than silently treating the change as consequential or non-consequential.
-
-The diff and classification mechanism is intentionally not specified here.
-
-## Recipe identity and revision authority
-
-`recipe_id` identifies the effective recipe definition and remains distinct from
-the human-facing package revision.
-
-The package revision itself must not participate in the effective-recipe
-content used to derive `recipe_id`; otherwise the revision would become part of
-the definition it is intended to identify.
-
-Conceptually:
+Human review has exactly three outcomes:
 
 ```text
-effective recipe definition
-          |
-          v
-       recipe_id
-          |
-          v
-Recipe Manifest mapping
-          |
-          v
-       revision
+accept same revision
+    -> keep revision
+    -> replace accepted SHA with current SHA
+
+accept with revision bump
+    -> allocate next revision
+    -> replace accepted SHA with current SHA
+
+reject change
+    -> restore prior recipe file from Git
+    -> keep prior accepted SHA and revision
 ```
 
-The exact canonical effective-recipe representation and recipe identity
-algorithm remain undecided.
+Git provides the historical record of recipe contents and manifest changes.
+The review interface itself remains undecided.
 
 ## Upstream reconciliation
 
@@ -249,11 +208,13 @@ package-specific policy.
 An upstream software update and a local recipe change are different events:
 
 ```text
-upstream software changes
-    -> may require a new package version
+new accepted upstream version
+    -> new package version
+    -> revision begins at r1
 
-effective recipe changes for the same software version
-    -> requires a new package revision
+recipe SHA changes for the same software version
+    -> mandatory human review
+    -> keep revision, bump revision, or reject change
 ```
 
 The runtime may eventually perform source discovery, recipe adaptation, build
@@ -363,7 +324,7 @@ operator.
 Examples include categories such as:
 
 - an upstream change that cannot be interpreted;
-- a recipe change that cannot be classified safely;
+- a recipe SHA mismatch awaiting mandatory human review;
 - an update that requires non-mechanical recipe work;
 - repeated or unresolvable build failure;
 - validation failure;
@@ -400,8 +361,7 @@ This design intentionally does not yet decide:
 - polling intervals;
 - upstream service integrations;
 - automatic recipe-editing strategy;
-- recipe diff implementation;
-- recipe-change classifier implementation;
+- recipe-review user interface or command;
 - retry and backoff policy;
 - alert or notification transport;
 - operator approval interface;

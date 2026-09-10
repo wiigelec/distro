@@ -2,208 +2,155 @@
 
 ## Purpose
 
-This document defines the semantic identity of a package before choosing a
-physical package archive format, metadata serialization, or recipe syntax.
+This document defines package identity and revision semantics before choosing a
+physical archive format, metadata serialization, or recipe syntax.
 
 ## Package identity
 
-A concrete package is uniquely identified by four values:
+A concrete package is uniquely identified by:
 
 ```text
 name + version + architecture + revision
 ```
-
-Each value is part of package identity.
-
-For example, these are distinct package identities:
-
-```text
-zlib 1.3.1 x86_64 r1
-zlib 1.3.1 x86_64 r2
-zlib 1.3.1 aarch64 r1
-zlib 1.3.2 x86_64 r1
-```
-
-### Name
-
-`name` identifies the packaged software or package unit.
-
-The exact naming grammar and namespace rules are not yet specified.
 
 ### Version
 
-`version` identifies the software version represented by the package.
+`version` identifies the upstream software version represented by the package.
 
-The exact version grammar and ordering rules are not yet specified.
+Each newly accepted upstream version begins at `r1` for each architecture:
 
-### Architecture
+```text
+foo 1.2 x86_64 r3
+upstream -> 1.3
+foo 1.3 x86_64 r1
+```
 
-`architecture` identifies the target architecture of the package and
-participates in package identity.
-
-The supported architecture vocabulary and compatibility rules are not yet
-specified.
+The exact version grammar and ordering rules remain undecided.
 
 ### Revision
 
-`revision` distinguishes distro package definitions for the same package name,
-version, and architecture.
+`revision` identifies a corrected replacement build for the same
+`name + version + architecture`.
 
-Revision is intentionally simple enough for human differentiation while still
-being machine-resolvable. A human-facing representation uses an ordered integer
-form such as:
+Revision numbering is scoped to that tuple and increases monotonically when
+human review determines that a replacement revision is required.
 
-```text
-r1
-r2
-r3
-```
+A recipe-file SHA change does not itself determine revision.
 
-Within a given `name + version + architecture`, revisions increase
-monotonically as the effective recipe changes.
+## Recipe Manifest binding
 
-The exact storage type and formatting rules are not yet specified beyond this
-semantic requirement.
-
-## Recipe binding
-
-A package revision is bound to one exact effective recipe identity.
-
-Conceptually:
+For each `name + version + architecture`, the Recipe Manifest stores the
+currently accepted recipe-file SHA and current revision:
 
 ```text
-name + version + architecture + revision
-                         |
-                         v
-                    recipe_id
+name + version + architecture
+    |
+    +---- accepted recipe SHA
+    |
+    +---- current revision
 ```
 
-`recipe_id` is a machine-resolvable identifier for the effective recipe used to
-define that package revision.
+The accepted SHA is a change detector and review anchor. It is not part of
+package identity and does not autonomously determine revision.
 
-For a given `name + version + architecture + revision`, a different effective
-recipe must not be accepted as the same package identity.
+Git history preserves previous recipe and Recipe Manifest states, so the live
+Recipe Manifest does not need a separate audit-history structure.
 
-If the effective recipe changes, the package revision must change.
+## Recipe change review
 
-If the effective recipe does not change, rebuilding it does not by itself
-create a new package revision.
-
-## Effective recipe
-
-The effective recipe is the recipe meaning that can affect the resulting
-package definition or output.
-
-It includes recipe-controlled inputs and behavior such as categories including:
-
-- source declarations;
-- patches;
-- build commands;
-- build or configure options;
-- declared dependencies;
-- recipe-controlled environment or build settings;
-- included recipe fragments that affect recipe meaning.
-
-A change that alters the effective recipe requires a new revision.
-
-Changes that do not alter recipe meaning, such as comments or purely cosmetic
-formatting, must not require a new package revision.
-
-The exact rules for canonicalizing an effective recipe are not yet specified.
-
-## Recipe identity
-
-The recipe identity must be deterministic and machine-resolvable from the
-effective recipe definition.
-
-A content-derived identifier, such as a cryptographic hash of a canonical
-effective recipe representation, is an expected implementation direction, but
-the hashing algorithm, canonical representation, and encoded form are not yet
-specified by this design.
-
-The human-facing revision and the machine-facing recipe identity serve
-different purposes:
+Build compares the current recipe-file SHA to the accepted SHA in the Recipe
+Manifest.
 
 ```text
-revision
-    human differentiation and package ordering
+stored SHA == current SHA
+    -> no recipe review required
 
-recipe_id
-    exact machine binding to the effective recipe definition
+stored SHA != current SHA
+    -> human review required
 ```
 
-The revision therefore must not be treated as an unverified manual label. Build
-must be able to establish that the revision being produced corresponds to the
-effective recipe identity associated with that package definition.
+A mismatch blocks autonomous publication for the affected package version and
+architecture until a human chooses exactly one outcome:
+
+```text
+accept same revision
+    -> keep revision
+    -> store new SHA
+
+accept with revision bump
+    -> allocate next revision
+    -> store new SHA
+
+reject change
+    -> restore prior recipe file from Git
+    -> keep prior SHA and revision
+```
+
+After either acceptance outcome, the newly accepted SHA becomes the baseline for
+future comparisons.
 
 ## Build attempts and artifacts
 
-Repeated build attempts using the same effective recipe do not create a new
-package revision merely because they are separate build executions.
+Repeated build attempts do not create a new revision merely because they are
+separate executions.
 
-Build-specific provenance such as timestamps, builder identity, logs, output
-checksums, or other artifact-level details may distinguish build artifacts
-without changing package identity.
+Build provenance such as timestamps, builder identity, and logs may distinguish
+build attempts without changing package identity.
 
-The exact provenance model and reproducibility requirements remain future
-design topics.
+## Artifact integrity
+
+Each published package artifact must have an integrity checksum.
+
+The checksum verifies that the artifact obtained by Manage is the artifact
+published for the selected package identity.
+
+```text
+package identity
+    name + version + architecture + revision
+
+artifact integrity
+    checksum(package artifact)
+```
+
+The artifact checksum does not determine revision.
+
+The checksum algorithm and representation remain undecided.
 
 ## Consequences for Build
 
 Build must:
 
-- determine the package's `name`, `version`, `architecture`, and `revision`;
-- determine the machine-resolvable identity of the effective recipe;
-- bind the emitted package identity to that recipe identity;
-- reject reuse of a package revision for a different effective recipe;
-- avoid creating a new revision merely for another build attempt of the same
-  effective recipe.
-
-Build's revision authority is provided conceptually by the machine-maintained
-Recipe Manifest defined by [Autonomous Build Runtime](autonomous-build.md).
-That manifest preserves the mapping between package revisions and effective
-recipe identities.
-
-The exact mechanism by which Build allocates the next revision remains
-undecided.
+- determine `name`, `version`, `architecture`, and `revision`;
+- start every newly accepted upstream version at `r1` per architecture;
+- compare current recipe SHA with the accepted Recipe Manifest SHA;
+- require human review on SHA mismatch;
+- support exactly three outcomes: same revision, revision bump, or reject and
+  restore;
+- store the new SHA after either acceptance outcome;
+- allocate the next revision only when review requires it;
+- avoid revision changes merely for repeated build attempts;
+- produce an integrity checksum for each published artifact.
 
 ## Consequences for Manage
 
-Manage consumes the full package identity:
-
-```text
-name + version + architecture + revision
-```
-
-Manage must be able to distinguish different revisions of the same package
-name, version, and architecture.
-
-For normal upgrade detection, Manage does not infer the newest package by sorting
-versions and revisions. It compares installed identity with the explicit
-`current` package identity published in the architecture-scoped
-[Package Database](package-database.md).
+Manage consumes the full package identity and compares installed identity with
+the Package Database's explicit `current` identity for normal upgrade detection.
 
 The Package Database exposes only the highest published revision for a given
-`name + version + architecture`, while Build history may retain superseded
-revisions.
+`name + version + architecture`.
 
-Version comparison semantics may still be required for dependency relationships,
-explicit version selection, or downgrade policy. Architecture compatibility and
-coexistence rules are also not yet specified.
+Manage must verify the published artifact checksum before applying the artifact,
+subject to later integrity-policy design.
 
 ## Undecided areas
 
-This package model intentionally does not yet decide:
-
-- package archive format;
-- package filename format;
+- package archive and filename formats;
 - recipe syntax or serialization;
-- version grammar or comparison rules;
-- architecture vocabulary or compatibility rules;
-- how the next revision is assigned or published;
+- version grammar and comparison rules;
+- architecture vocabulary and compatibility rules;
+- exact revision allocation storage;
 - whether revision numbering may contain gaps;
-- canonical effective-recipe representation;
-- recipe identity hash algorithm or encoding;
+- artifact checksum algorithm and encoding;
 - artifact provenance format;
 - reproducibility guarantees;
 - dependency relationship semantics.

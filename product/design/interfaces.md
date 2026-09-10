@@ -23,10 +23,9 @@ name + version + architecture + revision
 The package artifact contract will eventually need to carry at least:
 
 - the complete package identity;
-- the machine-resolvable effective recipe identity bound to that revision;
 - installable filesystem payload;
 - runtime package relationships;
-- integrity information;
+- an integrity checksum for the published package artifact;
 - package lifecycle metadata required for safe installation and removal.
 
 This baseline does not choose the serialization or archive format.
@@ -70,9 +69,13 @@ built, such as source locations, source checksums, patches, build dependencies,
 and build commands.
 
 A package artifact needs only the information required for distribution,
-validation, installation, package-state management, and later inspection.
+validation, installation, package-state management, integrity verification, and
+later inspection.
 
-The exact schemas remain undecided.
+The artifact checksum verifies published artifact integrity and is not part of
+package identity or revision allocation.
+
+The exact schemas and checksum algorithm remain undecided.
 
 ## Package Database and repository interface
 
