@@ -209,9 +209,9 @@ Normal synchronization, dependency resolution, orphan cleanup, reinstall,
 replacement, explicit version selection, and removal must not change or remove
 a held package.
 
-Version comparison semantics may still be required later for dependency
-constraints, explicit non-current version selection, downgrade validation, or
-other package operations.
+Version ordering does not participate in normal synchronization to Package
+Database `current`. It is used only where explicit comparison is required,
+including dependency constraints and explicit version selection.
 
 ## Explicit version selection and downgrade
 
