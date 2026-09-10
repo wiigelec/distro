@@ -225,9 +225,10 @@ metadata or in repository metadata referenced by the Package Database.
 
 The exact representation and checksum algorithm are not yet specified.
 
-The Package Database and repository metadata may eventually be physically
-combined, distributed together, or served separately. That implementation
-choice must not blur their semantic distinction:
+In the initial trusted-home-network deployment, the Package Database and
+repository are expected to be hosted by the same authoritative Build server.
+They may be physically combined or served as separate resources. That
+implementation choice must not blur their semantic distinction:
 
 ```text
 Package Database

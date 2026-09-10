@@ -48,6 +48,17 @@ system-level configuration required for installation.
 
 Install does not implement a second package installation mechanism.
 
+## Initial deployment model
+
+The initial distro deployment target is a trusted home network.
+
+One authoritative network server is expected to act as both the Build machine
+and the host of the Package Database and package repository. Client systems use
+Manage to consume the package state and artifacts published by that server.
+
+Public mirrors, mirror ranking, repository federation, and decentralized package
+publication are outside the initial design scope.
+
 ## Dependency direction
 
 The intended package-production and installation relationships are:

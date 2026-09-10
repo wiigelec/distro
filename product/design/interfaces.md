@@ -127,10 +127,25 @@ The presence of these distribution interfaces does not change ownership:
 - Install may select or configure package sources for an installation without
   becoming responsible for repository consumption mechanics.
 
-Whether Package Database metadata is physically embedded in repository metadata,
-served separately, mirrored, cached, signed, or synchronized by another
-mechanism remains undecided. Authentication, transport, and integrity details
-also remain future design topics.
+In the initial deployment model, the Package Database and repository are
+expected to be served by the same authoritative home-network Build server. They
+may still be physically combined or represented separately.
+
+Public mirror selection, repository federation, and decentralized publication
+are outside the initial scope. Cache representation, transport, authentication,
+integrity details, and any future signature model remain later design topics.
+
+## Manage installed-state contract
+
+Manage's local installed-package state must retain the complete package identity
+and the verified checksum of the exact artifact that was applied. Package
+identity drives ordinary package-selection and upgrade semantics; the installed
+artifact checksum provides exact artifact traceability and verification.
+
+Manage also records package-owned files, install reason, and package metadata
+needed for dependency and removal operations. Build-only recipe and upstream
+tracking state does not cross this boundary merely because it may describe the
+same package.
 
 ## Configuration ownership
 

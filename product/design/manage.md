@@ -2,117 +2,338 @@
 
 ## Role
 
-Manage is the distro's package manager.
+Manage is the distro's package manager and the authority for package state on a
+target filesystem.
 
-It is the authority for package state on a target filesystem.
+Its operational model should be simple and transactional in the same general
+spirit as pacman: one package-management component handles installation,
+removal, upgrades, repository refresh, queries, dependency resolution, package
+verification, and package-state recording. This is a design influence, not a
+requirement to copy pacman's CLI, database format, version semantics, or
+implementation.
+
+## Deployment context
+
+The initial distro deployment model is a trusted home network with one
+authoritative server that is both the Build machine and the host of the Package
+Database and package repository.
+
+Manage clients consume package metadata and artifacts from that server. Public
+mirrors, mirror ranking, repository federation, and decentralized package
+publication are outside the initial design scope.
+
+The Package Database and repository remain semantically distinct even though
+they are expected to be colocated on the same server.
 
 ## Responsibilities
 
-Manage is responsible for package-state operations, including the following
-categories of behavior as they are designed:
+Manage is responsible for:
+- refreshing its local view of the authoritative Package Database;
+- resolving requested package operations;
+- installing, removing, upgrading, replacing, downgrading, and reinstalling
+  package artifacts;
+- querying installed and published package state;
+- tracking package-owned files and installed metadata;
+- recording why a package is installed;
+- resolving runtime package relationships and conflicts;
+- verifying package artifact integrity before applying an artifact;
+- planning and applying package transactions;
+- maintaining the authoritative installed-package database for the target root.
 
-- installing package artifacts;
-- removing installed packages;
-- upgrading or replacing installed packages;
-- querying installed package state;
-- tracking package-owned files and metadata;
-- enforcing package relationships and conflicts;
-- validating package artifacts before applying them;
-- maintaining the local package database or equivalent state store.
+## Installed package state
 
-Repository consumption and dependency resolution may become Manage
-responsibilities, but their detailed behavior is not yet specified by this
-baseline.
+For each installed package, Manage records enough state to identify both the
+logical package release and the exact artifact that was applied.
 
-Manage consumes the architecture-scoped published Package Database defined by
-[Package Database](package-database.md). It uses that catalog to select a
-published package identity and uses the repository or distribution interface to
-obtain the corresponding package artifact.
+At minimum, the installed record conceptually includes:
 
-For ordinary upgrade detection, Manage compares an installed package identity
-with the explicit `current` identity in the Package Database. A different
-identity indicates an available package change.
+```text
+name
+version
+architecture
+revision
+artifact checksum
+install reason
+owned files
+package metadata required for dependency and removal operations
+```
 
-The Package Database may also expose older published upstream versions for
-explicit downgrade or version-selection operations. Superseded revisions of the
-same upstream version are not normal downgrade targets because only the highest
-published revision of each version is exposed.
+The complete package identity remains:
+
+```text
+name + version + architecture + revision
+```
+
+The artifact checksum is not part of package identity. It records which exact
+published artifact bytes were installed.
+
+Build-only information such as recipe SHA, source locations, upstream
+observations, and package-production history does not belong in Manage's
+installed-package database.
+
+## Install reason
+
+Manage records whether a package was installed because it was directly requested
+or because it was needed as a dependency.
+
+The initial semantic values are:
+
+```text
+explicit
+dependency
+```
+
+This distinction supports identifying dependency-installed packages that are no
+longer required by any installed package.
+
+Being an orphan does not itself authorize automatic removal.
+
+## Package Database refresh
+
+Refreshing package metadata and changing installed packages are separate
+operations.
+
+```text
+refresh
+    -> obtain current authoritative Package Database state
+    -> update Manage's local metadata view
+    -> do not modify installed package state
+```
+
+The exact refresh command, transport, cache format, and stale-data policy remain
+undecided.
+
+## Package-state comparison
+
+For ordinary current-package detection, Manage compares the installed package
+identity with the Package Database's explicit `current` identity.
+
+```text
+installed identity == current identity
+    -> current package identity
+
+installed identity != current identity
+    -> package identity change available
+```
+
+Manage should additionally classify useful special cases without requiring
+upstream-version ordering merely to answer whether a package is current:
+
+```text
+same version, different revision
+    -> replacement revision available
+
+different upstream version
+    -> different published version selected as current
+
+installed identity absent from Package Database
+    -> installed package unavailable from current published catalog
+
+same identity, installed checksum differs from published checksum
+    -> same package identity, different artifact
+```
+
+An installed package absent from the current Package Database is not
+automatically removed.
+
+A same-identity checksum difference is not an upgrade because package identity
+has not changed. It is reportable state that may be resolved by an explicit
+reinstall, repair, or later policy.
+
+## Upgrade behavior
+
+A normal system upgrade operates from the refreshed Package Database:
+
+```text
+installed package identities
+        |
+        v
+compare with explicit Package Database current identities
+        |
+        v
+resolve required dependency changes
+        |
+        v
+prepare transaction
+        |
+        v
+apply transaction
+```
+
+Manage does not need to infer the newest upstream release to perform ordinary
+upgrade selection because the Package Database explicitly designates `current`.
+
+Version comparison semantics may still be required later for dependency
+constraints, explicit version selection, downgrade validation, or other package
+operations.
+
+## Explicit version selection and downgrade
+
+A user may explicitly request another available identity from the Package
+Database. Moving to an older available upstream version is an explicit downgrade.
+
+Manage must not select superseded revisions of the same upstream version because
+the Package Database exposes only the highest published revision of each
+available version.
+
+Final dependency, confirmation, and safety behavior for downgrade remains to be
+refined with dependency semantics.
+
+## Reinstall and same-identity replacement
+
+Manage must support explicitly reapplying the artifact associated with a selected
+published identity even when that identity is already installed.
+
+Typical reasons include repairing damaged package-owned files or replacing an
+installed artifact whose recorded checksum differs from the currently published
+artifact for the same identity.
+
+A reinstall does not create a new package identity.
+
+## Transaction model
+
+Package-changing operations are transaction-oriented.
+
+Before modifying the target filesystem, Manage must resolve the complete planned
+operation sufficiently to determine at least:
+- packages to install;
+- packages to remove;
+- packages to replace;
+- selected published identities;
+- required dependency changes;
+- package relationship conflicts;
+- package-owned file conflicts detectable before application;
+- required artifacts and expected checksums.
+
+```text
+request
+   |
+   v
+resolve
+   |
+   v
+transaction plan
+   |
+   +---- installs
+   +---- removals
+   +---- replacements
+   +---- dependency consequences
+   +---- conflicts
+   |
+   v
+validate
+   |
+   v
+apply
+   |
+   v
+update installed-package database
+```
+
+A transaction that cannot be resolved or validated must fail before ordinary
+payload application begins.
+
+Stronger guarantees such as rollback after partial filesystem mutation or
+interruption remain undecided.
+
+## Artifact verification
+
+Before applying a repository artifact, Manage verifies its whole-artifact
+checksum against the checksum supplied by authoritative Package Database or
+repository metadata.
+
+The installed package record stores the verified artifact checksum.
+
+Checksum verification establishes artifact integrity, not independent
+authenticity of an untrusted publisher. The initial trusted-LAN deployment does
+not require a public-distribution signature hierarchy.
+
+## File ownership and conflicts
+
+Manage owns the record of files installed by packages.
+
+Package installation, removal, replacement, and verification must use this
+ownership information. A transaction must detect package-owned path conflicts
+that can be determined before applying conflicting payloads.
+
+Intentional shared files, directory ownership, mutable configuration files, and
+filesystem drift remain undecided.
+
+## Orphans
+
+A dependency-installed package is an orphan when no installed package currently
+requires it under the dependency model.
+
+Manage should be able to query and report orphaned packages.
+
+Orphan status alone does not cause automatic removal.
 
 ## Target root
 
-Manage must be designed so that package operations are not inherently tied to
-the currently booted root filesystem.
+Manage must not be inherently tied to the currently booted root filesystem.
 
-This allows Install to populate a mounted target system using the same package
-installation mechanism used for a running system. It may also allow Build to use
-Manage when preparing a controlled build environment if later design chooses
-that architecture.
-
-The exact command-line spelling and target-root safety model are not yet
-specified.
+The same transaction and installed-state model must work against an explicitly
+selected target root. This allows Install to populate a mounted target system
+using Manage and may later allow Build to provision controlled build roots.
 
 ## Package-local lifecycle boundary
 
-If package lifecycle behavior is later supported, Manage owns package-local
-consequences of installing, upgrading, or removing a package.
-
-Examples of the category include actions required to keep package-owned or
-package-derived state coherent. The exact lifecycle model and permitted actions
-are not yet specified.
+If package lifecycle behavior is supported, Manage owns package-local
+consequences of installing, replacing, or removing a package.
 
 Manage does not own installation-wide policy such as machine identity, user
-choices, locale, networking policy, or other system configuration selected by
-Install.
+choices, locale, networking policy, or boot configuration selected by Install.
+
+Lifecycle execution must participate in the package transaction model rather
+than become a separate package installation mechanism.
 
 ## Boundary with Build
 
-Manage consumes package artifacts. It does not need package source or a build
-recipe to install an already-created package.
+Manage consumes published package identities and artifacts. It does not need
+package source or recipes to install an already-built package.
 
-Manage does not compile packages as part of normal package installation.
-
-If Build later uses Manage to populate a build environment, that does not make
-Manage responsible for dependency intent, build commands, compilation, staging,
-or package creation.
+If Build later uses Manage to provision a controlled build environment, Manage
+remains responsible only for package-state changes in that target.
 
 ## Boundary with Install
 
 Install uses Manage to create package state in the target system.
 
-Install may decide *which* packages belong in an installation, but Manage owns
-the mechanics and records of installing those packages.
+Install may decide which packages belong in an installation, but Manage owns the
+transaction mechanics, artifact verification, file ownership, and installed
+records.
 
-Manage owns package-local lifecycle consequences; Install owns
-installation-wide machine policy and configuration.
+## Initial command model
 
-## Initial interface concept
+The exact CLI remains undecided, but the design favors explicit operation names
+rather than requiring pacman-compatible flag syntax.
 
-At the architectural level:
+Conceptually, Manage should support operations equivalent to:
 
 ```text
-Package Database ----> package selection
-                            |
-                            v
-Repository ----------> package artifact
-                            |
-                            v
-                          Manage
-                            |
-                            +----> installed files
-                            |
-                            +----> authoritative installed package state
+refresh
+install
+remove
+upgrade
+search
+info
+list/query
+verify
+reinstall
+explicit version selection / downgrade
+orphan query
 ```
-
-The package format, transaction model, dependency solver, repository protocol,
-and package database implementation remain open design questions.
 
 ## Open design questions
 
-- What is the installed package database model?
-- Are operations transactional, and what does transactionality guarantee?
-- How are dependencies represented and solved?
-- How are file conflicts handled?
-- How are package hooks or lifecycle actions represented and constrained?
-- How are repositories represented and authenticated?
-- What integrity and signature checks are mandatory?
-- What rollback or recovery behavior is required?
+- exact installed package database serialization and storage layout;
+- dependency expression language and solver behavior;
+- transaction guarantees after filesystem mutation begins;
+- mutable configuration-file behavior during upgrades;
+- intentional shared-file and path-replacement semantics;
+- package-local lifecycle representation and constraints;
+- repository transport on the home network;
+- downloaded-artifact cache policy;
+- whether package holds or pins are part of the initial feature set;
+- version-comparison semantics needed for dependency constraints;
+- rollback or recovery after interruption.
