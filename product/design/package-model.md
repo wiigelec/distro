@@ -28,62 +28,44 @@ foo 1.3 x86_64 r1
 The upstream `version` string is treated as an opaque package-identity value.
 Manage does not infer ordering by parsing that string.
 
-Each accepted upstream version is assigned a distro-controlled `version_order`
-key scoped to package name and shared across architectures.
+Each package name has a persistent distro-controlled ordered version registry
+shared across architectures.
 
-The key is an exact rational number represented canonically as:
-
-```text
-numerator / denominator
-```
-
-where numerator is an arbitrary-precision signed integer, denominator is a
-positive arbitrary-precision integer, and the fraction is reduced to lowest
-terms.
-
-For two versions of the same package, ordering is determined only by their
-`version_order` values. Given `a/b` and `c/d` with positive denominators:
+Conceptually:
 
 ```text
-a/b < c/d  iff  a*d < c*b
-a/b = c/d  iff  a*d = c*b
-a/b > c/d  iff  a*d > c*b
+foo:
+    1.2
+    1.3
+    1.5
+    2.0
 ```
 
-No floating-point conversion is permitted for version comparison.
+The registry defines upstream-version ordering for that package. Manage does not
+derive order from the upstream version string.
 
-The first accepted version of a package receives `0/1`. A version known to be
-newer than every established version receives one greater than the greatest key.
-A version known to be older than every established version receives one less
-than the least key.
+When Build accepts a newly observed upstream version, it inserts that version at
+its correct position in the package's ordered registry. Existing entries keep
+their relative order. Ambiguous or non-monotonic upstream version schemes must be
+resolved before publication; an ambiguous placement escalates for human review.
 
-A version inserted between established versions `a/b < c/d` receives their
-mediant:
+Registry entries are persistent ordering anchors. They are not removed merely
+because the corresponding package artifact is no longer available from the
+Package Database.
 
-```text
-(a + c) / (b + d)
-```
+This allows published dependency metadata such as `foo >= 1.3` to retain its
+meaning even after `foo 1.3` is no longer installable.
 
-reduced to lowest terms. With positive denominators this key is strictly between
-the two established keys, allowing insertion without renumbering existing
-versions.
-
-The pairwise ordering assigned to a published upstream version is immutable.
-Ambiguous or non-monotonic upstream version schemes must therefore be resolved
-before publication. Build may automatically place an ordinary clearly newer
-upstream release after the greatest known version; an ambiguous ordering must
-escalate for human review.
-
-`version_order` is comparison metadata, not part of package identity. The
+The ordered registry is comparison authority, not part of package identity. The
 identity remains:
 
 ```text
 name + version + architecture + revision
 ```
 
-The explicit Package Database `current` identity is also independent of
-`version_order`: distro policy may intentionally select a lower-ordered version
-as `current`.
+The explicit Package Database `current` identity is also independent of registry
+ordering: distro policy may intentionally select an earlier registry entry as
+`current`.
 
 ### Revision
 

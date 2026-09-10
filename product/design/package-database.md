@@ -68,13 +68,17 @@ zlib
 The exact schema and retention depth for older published versions are not yet
 specified.
 
-Each available upstream version must carry or reference the Package Model's
-package-scoped exact rational `version_order` key. The same upstream version uses
-the same ordering key across architectures.
+The Package Database must carry or reference the Package Model's persistent
+package-scoped ordered version registry. The same upstream version has the same
+registry position across architectures.
 
-`version_order` does not select `current`; it exists for dependency constraints,
-explicit version comparison, and classifying user-directed movement between
-published versions.
+The registry is retained independently of the `available` set so that historical
+versions used as dependency comparison anchors remain comparable even after their
+artifacts are no longer installable.
+
+Registry ordering does not select `current`; it exists for dependency
+constraints, explicit version comparison, and classifying user-directed movement
+between published versions.
 
 ## Highest revision per version
 
@@ -208,7 +212,7 @@ Packages installed locally but lacking a published `current` identity are not
 automatically removed by normal upgrade.
 
 For dependency constraints and explicit version comparison, Manage uses the
-published `version_order` metadata defined by the Package Model. Those ordering
+persistent ordered version registry defined by the Package Model. Those ordering
 semantics remain separate from normal `current` selection.
 
 ## Explicit downgrade behavior

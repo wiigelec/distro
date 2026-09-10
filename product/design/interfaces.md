@@ -148,10 +148,13 @@ metadata needed for dependency and removal operations. Build-only recipe and
 upstream tracking state does not cross this boundary merely because it may
 describe the same package.
 
-Published package metadata must expose the package-scoped `version_order` needed
-for exact dependency comparison. Versioned provided capabilities likewise carry
-their capability-scoped comparison metadata. These ordering keys are comparison
-metadata and are not part of concrete package identity.
+Published package metadata must expose or reference the persistent package-scoped
+ordered version registry needed for dependency comparison. Versioned provided
+capabilities likewise use persistent capability-scoped ordered registries.
+
+These registries are comparison metadata and are not part of concrete package
+identity. Their entries remain available as ordering anchors even when the
+corresponding package or capability version is no longer installable.
 
 ## Configuration ownership
 

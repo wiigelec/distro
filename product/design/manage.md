@@ -472,13 +472,13 @@ A provided capability may be unversioned or may advertise an explicit capability
 version. Capability version is independent of the provider package's own upstream
 version.
 
-A versioned capability carries its own exact rational `capability_order` key,
-scoped to capability name and assigned using the same ordering rules as package
-`version_order`.
+Each versioned capability uses a persistent ordered capability-version registry
+scoped to capability name.
 
 An unversioned provide satisfies only an unversioned dependency on that
 capability. A versioned dependency on a capability requires a provider that
-advertises a capability version and compatible `capability_order`.
+advertises a capability version whose position in the capability registry
+satisfies the requested constraint.
 
 Optional or suggested dependencies are outside the initial dependency model and
 may be added later without changing the meaning of required dependencies.
@@ -498,29 +498,30 @@ The initial constraint language supports comparisons equivalent to:
 An unconstrained dependency requires only that some acceptable package or
 provider satisfying the named requirement be present.
 
-Package-version ordering uses the Package Model's exact `version_order`
-rational key. Manage must not parse or heuristically order the opaque upstream
+Package-version ordering uses the Package Model's persistent ordered version
+registry. Manage must not parse or heuristically order the opaque upstream
 `version` string.
 
-For package-name dependencies, the comparison target identifies an established
-upstream version and therefore its package-scoped `version_order`.
+For package-name dependencies, the comparison target is an established version
+entry in that package's registry.
 
 The operators have these semantics:
 
 ```text
 =   exact upstream version match
->   provider/package version_order greater than target version_order
->=  exact version match or greater version_order
-<   provider/package version_order less than target version_order
-<=  exact version match or less version_order
+>   registry position after target version
+>=  exact version match or registry position after target
+<   registry position before target version
+<=  exact version match or registry position before target
 ```
 
 Revision is not independently constrained by the initial dependency language.
 For an available upstream version, Manage uses the Package Database's exposed
 highest published revision for that version.
 
-All ordering comparisons use exact rational arithmetic by cross-multiplying the
-integer numerator and denominator. Floating-point conversion is forbidden.
+A dependency bound remains comparable even when its target version is no longer
+installable because registry entries persist independently of repository
+availability.
 
 ## Solver invariants
 
