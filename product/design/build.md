@@ -69,10 +69,10 @@ source inputs + package recipe
 The exact command-line interface, recipe schema, build environment, and artifact
 format are not yet specified.
 
-Package identity and recipe-bound revision semantics are defined by the
-[Package Model](package-model.md). Build is responsible for establishing that
-the package revision it emits is bound to the effective recipe identity used
-for that build definition.
+Package identity and revision semantics are defined by the
+[Package Model](package-model.md). Build is responsible for following the
+Recipe Manifest's accepted recipe SHA and human-review decision when determining
+the revision emitted for a package version and architecture.
 
 ## Open design questions
 

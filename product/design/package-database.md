@@ -9,7 +9,8 @@ It is distinct from:
 
 - the Package Manifest, which tells Build which upstream packages to track and
   where to discover or download their source;
-- the Recipe Manifest, which retains effective-recipe and revision history;
+- the Recipe Manifest, which records the accepted recipe SHA and current
+  revision for each accepted package version and architecture;
 - Package History, which retains upstream observations and version-assessment
   decisions;
 - Manage's local installed-package database, which records what is installed on
@@ -91,6 +92,34 @@ and does not normally expose `r1` or `r2` as selectable package identities.
 Superseded revisions remain Build/history information rather than normal
 published downgrade targets.
 
+Publishing a higher revision for an already-published
+`name + version + architecture` atomically replaces the previously exposed
+revision for that version in `available`.
+
+If the superseded identity was the package's `current` identity, `current` must
+move atomically to the newly published higher revision. This preserves the
+invariant that `current` is always a member of `available`.
+
+Conceptually:
+
+```text
+available:
+    1.2-r3
+current:
+    1.2-r3
+
+publish 1.2-r4
+
+available:
+    1.2-r4
+current:
+    1.2-r4
+```
+
+This automatic current movement applies only to a higher revision of the same
+upstream version that is already current. Publishing a different upstream
+version does not by itself make that version current.
+
 This rule reflects the meaning of revision as the distro's corrected or revised
 package definition for the same upstream version and architecture.
 
@@ -104,7 +133,11 @@ The `current` identity must be a member of the package's published `available`
 set for that architecture.
 
 `current` is an explicit publication decision. It must not be inferred merely by
-choosing the numerically or lexically greatest available version.
+choosing the numerically or lexically greatest available upstream version.
+
+The exception is publication of a higher revision of the upstream version that
+is already `current`: because the new revision replaces the superseded exposed
+revision, `current` moves atomically to that replacement identity.
 
 Conceptually:
 
@@ -185,6 +218,10 @@ corresponding to a selected published identity.
 The Package Database must carry or reference enough information for Manage to
 locate the selected artifact and obtain the integrity checksum associated with
 that published artifact.
+
+The checksum used to verify the whole artifact is metadata external to the
+artifact bytes being verified. It may live directly in Package Database
+metadata or in repository metadata referenced by the Package Database.
 
 The exact representation and checksum algorithm are not yet specified.
 

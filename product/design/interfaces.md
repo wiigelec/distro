@@ -25,8 +25,11 @@ The package artifact contract will eventually need to carry at least:
 - the complete package identity;
 - installable filesystem payload;
 - runtime package relationships;
-- an integrity checksum for the published package artifact;
 - package lifecycle metadata required for safe installation and removal.
+
+The whole-artifact integrity checksum is associated with the published artifact
+through Package Database or repository metadata external to the artifact bytes
+being verified. This avoids making the artifact contain the checksum of itself.
 
 This baseline does not choose the serialization or archive format.
 
@@ -69,11 +72,11 @@ built, such as source locations, source checksums, patches, build dependencies,
 and build commands.
 
 A package artifact needs only the information required for distribution,
-validation, installation, package-state management, integrity verification, and
-later inspection.
+validation, installation, package-state management, and later inspection.
 
-The artifact checksum verifies published artifact integrity and is not part of
-package identity or revision allocation.
+Artifact integrity is verified by comparing the obtained artifact bytes against
+the externally supplied checksum associated with the selected published package
+identity. The checksum is not part of package identity or revision allocation.
 
 The exact schemas and checksum algorithm remain undecided.
 

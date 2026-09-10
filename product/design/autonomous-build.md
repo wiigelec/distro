@@ -210,12 +210,19 @@ An upstream software update and a local recipe change are different events:
 ```text
 new accepted upstream version
     -> new package version
-    -> revision begins at r1
+    -> create Recipe Manifest entry for name + version + architecture
+    -> accepted recipe SHA = current recipe SHA
+    -> revision = r1
 
-recipe SHA changes for the same software version
+recipe SHA changes for an existing accepted software version
     -> mandatory human review
     -> keep revision, bump revision, or reject change
 ```
+
+Creating the initial Recipe Manifest entry for a newly accepted upstream version
+is not itself treated as a recipe-SHA mismatch. The three-way recipe-change
+review applies only when an accepted SHA already exists for that same
+`name + version + architecture`.
 
 The runtime may eventually perform source discovery, recipe adaptation, build
 execution, validation, and package publication automatically where package
