@@ -68,6 +68,14 @@ zlib
 The exact schema and retention depth for older published versions are not yet
 specified.
 
+Each available upstream version must carry or reference the Package Model's
+package-scoped exact rational `version_order` key. The same upstream version uses
+the same ordering key across architectures.
+
+`version_order` does not select `current`; it exists for dependency constraints,
+explicit version comparison, and classifying user-directed movement between
+published versions.
+
 ## Highest revision per version
 
 For a given `name + version + architecture`, the Package Database exposes only
@@ -199,10 +207,9 @@ select the normal upgrade target.
 Packages installed locally but lacking a published `current` identity are not
 automatically removed by normal upgrade.
 
-Manage may still require version comparison semantics later for dependency
-constraints, explicit non-current version selection, downgrade policy, or other
-package operations. Those semantics remain separate from normal current-package
-selection.
+For dependency constraints and explicit version comparison, Manage uses the
+published `version_order` metadata defined by the Package Model. Those ordering
+semantics remain separate from normal `current` selection.
 
 ## Explicit downgrade behavior
 
@@ -226,8 +233,8 @@ For example:
 
 may be a valid downgrade if both identities remain published.
 
-Whether dependency resolution, confirmation, or additional safety policy is
-required for downgrade remains undecided.
+Explicit downgrade participates in normal dependency resolution and hold
+constraints. The exact user-confirmation policy remains undecided.
 
 ## Repository relationship
 
@@ -311,6 +318,5 @@ This design intentionally does not yet decide:
 - retention depth for older published upstream versions;
 - how `current` is selected, approved, changed, or withdrawn;
 - whether testing or staged publication channels exist;
-- exact downgrade transaction behavior;
-- dependency constraints involving non-current versions;
+- exact downgrade user-confirmation behavior;
 - cache and refresh behavior in Manage.

@@ -462,8 +462,23 @@ with a version constraint.
 `conflicts` declares package names or provided capabilities that must not coexist
 in the resulting installed state.
 
+A conflict naming a capability matches any package that provides that
+capability. A conflict naming an actual package matches that package directly.
+
 `provides` declares additional capability names that an installed package can
 satisfy for dependency resolution.
+
+A provided capability may be unversioned or may advertise an explicit capability
+version. Capability version is independent of the provider package's own upstream
+version.
+
+A versioned capability carries its own exact rational `capability_order` key,
+scoped to capability name and assigned using the same ordering rules as package
+`version_order`.
+
+An unversioned provide satisfies only an unversioned dependency on that
+capability. A versioned dependency on a capability requires a provider that
+advertises a capability version and compatible `capability_order`.
 
 Optional or suggested dependencies are outside the initial dependency model and
 may be added later without changing the meaning of required dependencies.
@@ -483,11 +498,29 @@ The initial constraint language supports comparisons equivalent to:
 An unconstrained dependency requires only that some acceptable package or
 provider satisfying the named requirement be present.
 
-The exact package-version ordering algorithm remains to be defined. Whatever
-ordering is chosen must be deterministic and used consistently for dependency
-constraints and explicit version comparisons. Package revision remains part of
-package identity; whether dependency expressions may constrain revision
-separately remains undecided.
+Package-version ordering uses the Package Model's exact `version_order`
+rational key. Manage must not parse or heuristically order the opaque upstream
+`version` string.
+
+For package-name dependencies, the comparison target identifies an established
+upstream version and therefore its package-scoped `version_order`.
+
+The operators have these semantics:
+
+```text
+=   exact upstream version match
+>   provider/package version_order greater than target version_order
+>=  exact version match or greater version_order
+<   provider/package version_order less than target version_order
+<=  exact version match or less version_order
+```
+
+Revision is not independently constrained by the initial dependency language.
+For an available upstream version, Manage uses the Package Database's exposed
+highest published revision for that version.
+
+All ordering comparisons use exact rational arithmetic by cross-multiplying the
+integer numerator and denominator. Floating-point conversion is forbidden.
 
 ## Solver invariants
 
@@ -548,6 +581,12 @@ constraint.
 If multiple equally valid provider choices remain after preserving installed
 state where possible, the exact deterministic tie-break rule remains to be
 defined. Solver behavior must not depend on incidental iteration order.
+
+Dependency cycles are not inherently invalid. A cycle such as `A depends B` and
+`B depends A` may resolve successfully when the complete planned resulting state
+satisfies every dependency, conflict, provider, and hold constraint. Manage must
+resolve the complete set rather than require dependencies to become valid one
+package at a time during planning.
 
 ## Removal safety
 
@@ -645,6 +684,4 @@ orphan removal
 - package-local lifecycle representation and constraints;
 - repository transport on the home network;
 - downloaded-artifact cache policy;
-- exact version-ordering algorithm used by dependency constraints and explicit
-  version comparison;
 - rollback or recovery after interruption.

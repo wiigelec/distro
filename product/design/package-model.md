@@ -25,7 +25,65 @@ upstream -> 1.3
 foo 1.3 x86_64 r1
 ```
 
-The exact version grammar and ordering rules remain undecided.
+The upstream `version` string is treated as an opaque package-identity value.
+Manage does not infer ordering by parsing that string.
+
+Each accepted upstream version is assigned a distro-controlled `version_order`
+key scoped to package name and shared across architectures.
+
+The key is an exact rational number represented canonically as:
+
+```text
+numerator / denominator
+```
+
+where numerator is an arbitrary-precision signed integer, denominator is a
+positive arbitrary-precision integer, and the fraction is reduced to lowest
+terms.
+
+For two versions of the same package, ordering is determined only by their
+`version_order` values. Given `a/b` and `c/d` with positive denominators:
+
+```text
+a/b < c/d  iff  a*d < c*b
+a/b = c/d  iff  a*d = c*b
+a/b > c/d  iff  a*d > c*b
+```
+
+No floating-point conversion is permitted for version comparison.
+
+The first accepted version of a package receives `0/1`. A version known to be
+newer than every established version receives one greater than the greatest key.
+A version known to be older than every established version receives one less
+than the least key.
+
+A version inserted between established versions `a/b < c/d` receives their
+mediant:
+
+```text
+(a + c) / (b + d)
+```
+
+reduced to lowest terms. With positive denominators this key is strictly between
+the two established keys, allowing insertion without renumbering existing
+versions.
+
+The pairwise ordering assigned to a published upstream version is immutable.
+Ambiguous or non-monotonic upstream version schemes must therefore be resolved
+before publication. Build may automatically place an ordinary clearly newer
+upstream release after the greatest known version; an ambiguous ordering must
+escalate for human review.
+
+`version_order` is comparison metadata, not part of package identity. The
+identity remains:
+
+```text
+name + version + architecture + revision
+```
+
+The explicit Package Database `current` identity is also independent of
+`version_order`: distro policy may intentionally select a lower-ordered version
+as `current`.
 
 ### Revision
 
@@ -146,11 +204,11 @@ subject to later integrity-policy design.
 
 - package archive and filename formats;
 - recipe syntax or serialization;
-- version grammar and comparison rules;
+- exact allowed character grammar for opaque upstream version strings;
 - architecture vocabulary and compatibility rules;
 - exact revision allocation storage;
 - whether revision numbering may contain gaps;
 - artifact checksum algorithm and encoding;
 - artifact provenance format;
 - reproducibility guarantees;
-- dependency relationship semantics.
+- dependency metadata serialization.

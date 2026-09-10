@@ -24,7 +24,8 @@ The package artifact contract will eventually need to carry at least:
 
 - the complete package identity;
 - installable filesystem payload;
-- runtime package relationships;
+- runtime package relationships, including any package/capability comparison
+  metadata required to evaluate version constraints;
 - package lifecycle metadata required for safe installation and removal.
 
 The whole-artifact integrity checksum is associated with the published artifact
@@ -142,10 +143,15 @@ and the verified checksum of the exact artifact that was applied. Package
 identity drives ordinary package-selection and upgrade semantics; the installed
 artifact checksum provides exact artifact traceability and verification.
 
-Manage also records package-owned files, install reason, and package metadata
-needed for dependency and removal operations. Build-only recipe and upstream
-tracking state does not cross this boundary merely because it may describe the
-same package.
+Manage also records package-owned files, install reason, hold state, and package
+metadata needed for dependency and removal operations. Build-only recipe and
+upstream tracking state does not cross this boundary merely because it may
+describe the same package.
+
+Published package metadata must expose the package-scoped `version_order` needed
+for exact dependency comparison. Versioned provided capabilities likewise carry
+their capability-scoped comparison metadata. These ordering keys are comparison
+metadata and are not part of concrete package identity.
 
 ## Configuration ownership
 
