@@ -19,14 +19,15 @@ It is distinct from:
 ## Architecture scope
 
 Package availability and `current` selection are architecture-dependent, while
-version-comparison registries are repository-global.
+requirement-name kind and version-comparison registries are repository-global.
 
 The Package Database therefore publishes one coherent repository generation
-containing global comparison state plus architecture-scoped catalogs:
+containing global requirement/comparison state plus architecture-scoped catalogs:
 
 ```text
 Package Database generation
-    global comparison state
+    global requirement/comparison state
+        requirement namespace
         package version registries
         capability version registries
 
@@ -102,6 +103,9 @@ package_database
     schema_version
     generation
 
+    requirement_namespace
+        name -> package | capability
+
     package_version_registries
         package_name -> ordered version[]
 
@@ -131,10 +135,15 @@ package_database
 `generation` identifies one coherent published snapshot shared by every
 architecture catalog in that snapshot.
 
-The two registry tables are global comparison authority. A package version has
-the same registry position regardless of architecture, and a versioned
-capability uses the same capability registry regardless of which architecture
-provides it.
+`requirement_namespace` is global semantic authority for requirement-name kind.
+Once a name appears there as `package` or `capability`, that entry is permanent
+and its kind is immutable. It remains present even when no current architecture
+catalog exposes the package or any provider for the capability.
+
+The two version-registry tables are global comparison authority. A package
+version has the same registry position regardless of architecture, and a
+versioned capability uses the same capability registry regardless of which
+architecture provides it.
 
 Each architecture catalog contains only architecture-dependent published state:
 available identities and explicit `current` selection.

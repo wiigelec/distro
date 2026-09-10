@@ -140,9 +140,10 @@ integrity details, and any future signature model remain later design topics.
 ### Snapshot consistency
 
 Manage refreshes and resolves against one complete Package Database generation.
-It uses the global comparison registries and its selected architecture catalog
-from that same generation; it must not combine a registry snapshot from one
-generation with an architecture catalog from another.
+It uses the global requirement namespace, global comparison registries, and its
+selected architecture catalog from that same generation; it must not combine
+global semantic state from one generation with an architecture catalog from
+another.
 
 Artifact references selected from that generation are immutable and remain
 valid for as long as the generation is retained by the repository.
@@ -173,9 +174,14 @@ capability-scoped ordered registries.
 
 These registries are comparison metadata and are not part of concrete package
 identity. Their entries remain available as ordering anchors even when the
-corresponding package or capability version is no longer installable. Package and
-capability names share one non-colliding global requirement namespace so each
-requirement selects exactly one corresponding registry kind.
+corresponding package or capability version is no longer installable.
+
+Package and capability names share one persistent non-colliding global
+requirement namespace. Once published, a namespace entry remains available and
+its `package` or `capability` kind must not change, even when the corresponding
+package or all capability providers are no longer available. Each requirement
+therefore retains one stable meaning and selects exactly one corresponding
+registry kind.
 
 ## Configuration ownership
 

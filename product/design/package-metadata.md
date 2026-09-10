@@ -72,12 +72,18 @@ or
 never both
 ```
 
+Requirement-name kind is persistent published state. Once a name has been
+established as `package` or `capability`, that namespace entry must not be
+deleted or changed to the other kind merely because the corresponding package or
+all providers are no longer available.
+
 Once a name is established as a package name, no package may publish a
 `provides` entry with that same name. Once a name is established as a capability
 name, no package may be published with that name. Build must reject publication
 that would create such a collision.
 
-A dependency `name` therefore resolves unambiguously: a package-name requirement
+A dependency `name` therefore resolves unambiguously through the persistent
+requirement namespace: a package-name requirement
 is satisfied by that package, while a capability-name requirement is satisfied
 by a package that provides that capability. The requirement kind also determines
 which persistent ordered version registry is used for a version constraint.

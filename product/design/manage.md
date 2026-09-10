@@ -516,10 +516,15 @@ capability. A conflict naming an actual package matches that package directly.
 `provides` declares additional capability names that an installed package can
 satisfy for dependency resolution.
 
-Package names and capability names share one global requirement namespace, but
-the same name must not be both a package name and a capability name. Published
-metadata that would create such a collision is invalid and must not participate
-in resolution.
+Package names and capability names share one global persistent requirement
+namespace, but the same name must not be both a package name and a capability
+name. Published metadata that would create such a collision is invalid and must
+not participate in resolution.
+
+Manage interprets dependency and conflict names using the requirement namespace
+from the same Package Database generation as the architecture catalog being
+resolved. Namespace entries remain authoritative even when the named package or
+all providers of a capability are no longer available.
 
 This invariant makes every dependency or conflict name unambiguous before
 provider selection or version comparison: package-name requirements use the
