@@ -3,6 +3,7 @@
 import argparse
 import json
 import re
+import shlex
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -10,6 +11,29 @@ from pathlib import Path, PurePosixPath
 
 USER_AGENT = "distro-builder-prototype/0"
 DOC_NAMES = ("BUILD", "INSTALL", "README", "CONTRIBUTING", "HACKING")
+
+BUILD_HEADING_RE = re.compile(
+    r"\b(build|building|compile|compiling|configure|configuring|"
+    r"install|installation|source|development|developer)\b",
+    re.I,
+)
+
+COMMAND_START_RE = re.compile(
+    r"^(?:"
+    r"\./(?:configure|autogen\.sh|buildconf)|"
+    r"autoreconf(?:\s|$)|"
+    r"cmake(?:\s|$)|"
+    r"meson(?:\s|$)|"
+    r"ninja(?:\s|$)|"
+    r"make(?:\s|$)|"
+    r"cargo(?:\s|$)|"
+    r"go(?:\s|$)|"
+    r"python(?:3)?(?:\s|$)|"
+    r"pip(?:3)?(?:\s|$)"
+    r")"
+)
+
+PHASE_ORDER = ("bootstrap", "configure", "build", "test", "install")
 
 
 def github_json(url):
@@ -110,52 +134,257 @@ def documentation_paths(paths):
     return [path for _, _, path in ranked[:20]]
 
 
-def extract_commands(path, text):
-    heading = ""
-    relevant = False
-    in_fence = False
+def authoritative_build_document(path):
+    base = PurePosixPath(path).name.upper()
+    return base.startswith(("BUILD", "INSTALL"))
+
+
+def document_system_hint(path):
+    base = PurePosixPath(path).name.upper()
+    if "CMAKE" in base:
+        return "cmake"
+    if "MESON" in base:
+        return "meson"
+    return None
+
+
+def normalize_command(line):
+    command = line.strip()
+    if command.startswith("$ "):
+        command = command[2:].lstrip()
+    return command
+
+
+def is_command_line(raw_line, in_fence, relevant_context):
+    if not relevant_context:
+        return False
+
+    stripped = raw_line.strip()
+    if not stripped:
+        return False
+
+    explicit_shell_form = (
+        in_fence
+        or raw_line.startswith(("    ", "\t"))
+        or stripped.startswith("$ ")
+    )
+    if not explicit_shell_form:
+        return False
+
+    command = normalize_command(raw_line)
+    return bool(COMMAND_START_RE.match(command))
+
+
+def join_continuations(lines, start):
+    command = normalize_command(lines[start])
+    index = start
+
+    while command.rstrip().endswith("\\") and index + 1 < len(lines):
+        index += 1
+        next_part = lines[index].strip()
+        if next_part.startswith("$ "):
+            next_part = next_part[2:].lstrip()
+        command = command.rstrip()[:-1].rstrip() + " " + next_part
+
+    return command, index
+
+
+def classify_phase(command):
+    lowered = command.lower()
+
+    if lowered.startswith(("./autogen.sh", "./buildconf", "autoreconf ")):
+        return "bootstrap"
+    if lowered.startswith("./configure"):
+        return "configure"
+    if lowered.startswith("cmake "):
+        if " --install " in f" {lowered} ":
+            return "install"
+        if " --build " in f" {lowered} ":
+            return "build"
+        return "configure"
+    if lowered.startswith("meson setup"):
+        return "configure"
+    if lowered.startswith("meson compile"):
+        return "build"
+    if lowered.startswith("meson install"):
+        return "install"
+    if lowered.startswith(("make test", "make check", "ninja test")):
+        return "test"
+    if lowered.startswith("make"):
+        return "install" if re.search(r"\binstall\b", lowered) else "build"
+    if lowered.startswith(("cargo build", "go build")):
+        return "build"
+    if lowered.startswith(("pip install", "pip3 install", "python -m pip install", "python3 -m pip install")):
+        return "install"
+
+    return "build"
+
+
+def classify_system(command, path_hint=None, current_system=None):
+    lowered = command.lower()
+
+    if lowered.startswith("cmake "):
+        return "cmake"
+    if lowered.startswith(("meson ", "ninja ")):
+        return "meson"
+    if lowered.startswith(("./configure", "./autogen.sh", "./buildconf", "autoreconf ")):
+        return "autotools"
+    if lowered.startswith("cargo "):
+        return "cargo"
+    if lowered.startswith("go "):
+        return "go"
+    if lowered.startswith(("python ", "python3 ", "pip ", "pip3 ")):
+        return "python"
+    if lowered.startswith("make"):
+        return current_system or path_hint or "make"
+
+    return current_system or path_hint
+
+
+def command_tool(command):
+    try:
+        words = shlex.split(command)
+    except ValueError:
+        return None
+
+    if not words:
+        return None
+
+    first = words[0]
+    if first in {"cmake", "meson", "ninja", "make", "cargo", "go", "python", "python3", "pip", "pip3"}:
+        return first
+    if first in {"autoreconf"}:
+        return first
+    return None
+
+
+def extract_document_commands(path, text):
+    authoritative = authoritative_build_document(path)
+    path_hint = document_system_hint(path)
+
+    lines = text.splitlines()
     commands = []
+    heading = ""
+    heading_relevant = authoritative
+    in_fence = False
+    fence_relevant = False
+    current_system = path_hint
+    index = 0
 
-    heading_re = re.compile(
-        r"\b(build|building|compile|compiling|install|installation|source|development)\b",
-        re.I,
-    )
+    while index < len(lines):
+        raw_line = lines[index]
 
-    command_re = re.compile(
-        r"^\s*(?:\$ )?(?:"
-        r"\./(?:configure|autogen\.sh|buildconf)|"
-        r"autoreconf\b|cmake\b|meson\b|ninja\b|make\b|"
-        r"cargo\b|go\b|python(?:3)?\b|pip(?:3)?\b"
-        r")"
-    )
-
-    for raw in text.splitlines():
-        line = raw.rstrip()
-
-        match = re.match(r"^\s{0,3}#{1,6}\s+(.+)$", line)
-        if match and not in_fence:
-            heading = match.group(1)
-            relevant = bool(heading_re.search(heading))
+        heading_match = re.match(r"^\s{0,3}#{1,6}\s+(.+?)\s*$", raw_line)
+        if heading_match and not in_fence:
+            heading = heading_match.group(1)
+            heading_relevant = authoritative or bool(BUILD_HEADING_RE.search(heading))
+            index += 1
             continue
 
-        if line.lstrip().startswith("```"):
-            in_fence = not in_fence
+        if raw_line.lstrip().startswith("```"):
+            if in_fence:
+                in_fence = False
+                fence_relevant = False
+            else:
+                in_fence = True
+                fence_relevant = heading_relevant
+            index += 1
             continue
 
-        if not relevant:
-            continue
+        relevant_context = heading_relevant or fence_relevant
 
-        if command_re.match(line):
-            command = line.strip()
-            if command.startswith("$ "):
-                command = command[2:]
+        if is_command_line(raw_line, in_fence, relevant_context):
+            command, end_index = join_continuations(lines, index)
+            system = classify_system(command, path_hint, current_system)
+            if system:
+                current_system = system
 
             commands.append({
+                "system": system,
+                "phase": classify_phase(command),
                 "command": command,
-                "source": f"{path}#{heading or 'document'}"
+                "source": f"{path}#{heading or 'document'}",
             })
+            index = end_index + 1
+            continue
+
+        index += 1
 
     return commands
+
+
+def select_configure_command(records):
+    if not records:
+        return None
+
+    if records[0]["system"] == "cmake":
+        out_of_tree = [
+            item for item in records
+            if re.search(r"\b-B\s+(?!\.)\S+", item["command"])
+        ]
+        if out_of_tree:
+            return out_of_tree[0]
+
+    return records[0]
+
+
+def build_methods(commands):
+    by_system = {}
+
+    for item in commands:
+        system = item.get("system")
+        if not system:
+            continue
+        by_system.setdefault(system, []).append(item)
+
+    methods = []
+
+    for system, items in by_system.items():
+        selected = []
+
+        for phase in PHASE_ORDER:
+            phase_items = [item for item in items if item["phase"] == phase]
+            if not phase_items:
+                continue
+
+            if phase == "configure":
+                chosen = select_configure_command(phase_items)
+            else:
+                chosen = phase_items[0]
+
+            if chosen:
+                selected.append(chosen)
+
+        if not selected:
+            continue
+
+        tools = []
+        for item in selected:
+            tool = command_tool(item["command"])
+            if tool and tool not in tools:
+                tools.append(tool)
+
+        sources = []
+        for item in selected:
+            if item["source"] not in sources:
+                sources.append(item["source"])
+
+        methods.append({
+            "system": system,
+            "required_tools": tools,
+            "commands": [
+                {
+                    "phase": item["phase"],
+                    "command": item["command"],
+                    "source": item["source"],
+                }
+                for item in selected
+            ],
+            "sources": sources,
+        })
+
+    methods.sort(key=lambda item: item["system"])
+    return methods
 
 
 def documented_discovery(owner, repo, ref, paths):
@@ -173,24 +402,17 @@ def documented_discovery(owner, repo, ref, paths):
             })
             continue
 
-        found = extract_commands(path, text)
+        found = extract_document_commands(path, text)
         if found:
             commands.extend(found)
             evidence.append({
                 "kind": "documentation",
                 "source": path,
-                "detail": f"found {len(found)} build command(s)"
+                "detail": f"found {len(found)} shell command(s)"
             })
 
-    unique = []
-    seen = set()
-    for command in commands:
-        key = command["command"]
-        if key not in seen:
-            seen.add(key)
-            unique.append(command)
-
-    return unique, evidence
+    methods = build_methods(commands)
+    return methods, evidence
 
 
 def infer_build(paths):
@@ -202,9 +424,9 @@ def infer_build(paths):
             {"CMakeLists.txt"},
             ["cmake", "cc"],
             [
-                "cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/usr",
-                "cmake --build build",
-                'DESTDIR="$DESTDIR" cmake --install build'
+                ("configure", "cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/usr"),
+                ("build", "cmake --build build"),
+                ("install", 'DESTDIR="$DESTDIR" cmake --install build')
             ]
         ),
         (
@@ -212,9 +434,9 @@ def infer_build(paths):
             {"meson.build"},
             ["meson", "ninja", "cc"],
             [
-                "meson setup build --prefix=/usr",
-                "meson compile -C build",
-                'DESTDIR="$DESTDIR" meson install -C build'
+                ("configure", "meson setup build --prefix=/usr"),
+                ("build", "meson compile -C build"),
+                ("install", 'DESTDIR="$DESTDIR" meson install -C build')
             ]
         ),
         (
@@ -222,29 +444,32 @@ def infer_build(paths):
             {"configure.ac", "configure.in"},
             ["autoconf", "automake", "make", "cc"],
             [
-                "autoreconf -fi",
-                "./configure --prefix=/usr",
-                "make",
-                'make DESTDIR="$DESTDIR" install'
+                ("bootstrap", "autoreconf -fi"),
+                ("configure", "./configure --prefix=/usr"),
+                ("build", "make"),
+                ("install", 'make DESTDIR="$DESTDIR" install')
             ]
         ),
         (
             "cargo",
             {"Cargo.toml"},
             ["cargo", "rustc"],
-            ["cargo build --release"]
+            [("build", "cargo build --release")]
         ),
         (
             "go",
             {"go.mod"},
             ["go"],
-            ["go build ./..."]
+            [("build", "go build ./...")]
         ),
         (
             "make",
             {"Makefile", "GNUmakefile", "makefile"},
             ["make", "cc"],
-            ["make", 'make DESTDIR="$DESTDIR" install']
+            [
+                ("build", "make"),
+                ("install", 'make DESTDIR="$DESTDIR" install')
+            ]
         )
     ]
 
@@ -254,12 +479,19 @@ def infer_build(paths):
             return {
                 "source": "inferred",
                 "status": "partial",
-                "system": system,
-                "required_tools": tools,
-                "commands": [
-                    {"command": command, "source": "structural-fallback"}
-                    for command in commands
-                ],
+                "methods": [{
+                    "system": system,
+                    "required_tools": tools,
+                    "commands": [
+                        {
+                            "phase": phase,
+                            "command": command,
+                            "source": "structural-fallback"
+                        }
+                        for phase, command in commands
+                    ],
+                    "sources": ["structural-fallback"],
+                }],
                 "evidence": [
                     {
                         "kind": "source-tree",
@@ -273,9 +505,7 @@ def infer_build(paths):
     return {
         "source": "unknown",
         "status": "needs-review",
-        "system": None,
-        "required_tools": [],
-        "commands": [],
+        "methods": [],
         "evidence": []
     }
 
@@ -285,18 +515,18 @@ def discover(package):
     version = latest_version(owner, repo)
     paths = repository_tree(owner, repo, version["ref"])
 
-    commands, evidence = documented_discovery(
+    methods, evidence = documented_discovery(
         owner,
         repo,
         version["ref"],
         paths
     )
 
-    if commands:
+    if methods:
         build = {
             "source": "documentation",
             "status": "success",
-            "commands": commands
+            "methods": methods
         }
     else:
         build = infer_build(paths)
