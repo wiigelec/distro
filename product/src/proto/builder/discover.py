@@ -189,6 +189,26 @@ def join_continuations(lines, start):
     return command, index
 
 
+def normalize_documented_command(command):
+    normalized = command.strip()
+    optional = False
+    alternatives = []
+
+    optional_match = re.search(r"\s*\(optional\)\s*$", normalized, re.I)
+    if optional_match:
+        normalized = normalized[:optional_match.start()].rstrip()
+        optional = True
+
+    bracket_match = re.search(r"\s+\[([^\]]+)\]\s*$", normalized)
+    if bracket_match:
+        tokens = bracket_match.group(1).split()
+        if tokens and all(token.startswith("--") for token in tokens):
+            alternatives = tokens
+            normalized = normalized[:bracket_match.start()].rstrip()
+
+    return normalized, optional, alternatives
+
+
 def classify_phase(command):
     lowered = command.lower()
 
@@ -294,17 +314,24 @@ def extract_document_commands(path, text):
         relevant_context = heading_relevant or fence_relevant
 
         if is_command_line(raw_line, in_fence, relevant_context):
-            command, end_index = join_continuations(lines, index)
+            raw_command, end_index = join_continuations(lines, index)
+            command, optional, alternatives = normalize_documented_command(raw_command)
             system = classify_system(command, path_hint, current_system)
             if system:
                 current_system = system
 
-            commands.append({
+            record = {
                 "system": system,
                 "phase": classify_phase(command),
                 "command": command,
                 "source": f"{path}#{heading or 'document'}",
-            })
+            }
+            if optional:
+                record["optional"] = True
+            if alternatives:
+                record["alternatives"] = alternatives
+
+            commands.append(record)
             index = end_index + 1
             continue
 
@@ -313,14 +340,55 @@ def extract_document_commands(path, text):
     return commands
 
 
-def select_configure_command(records):
+def cmake_directory(command, option):
+    try:
+        words = shlex.split(command)
+    except ValueError:
+        return None
+
+    if option == "-B":
+        for index, word in enumerate(words):
+            if word == "-B" and index + 1 < len(words):
+                return words[index + 1]
+            if word.startswith("-B") and len(word) > 2:
+                return word[2:]
+        return None
+
+    if option in {"--build", "--install"}:
+        try:
+            index = words.index(option)
+        except ValueError:
+            return None
+        return words[index + 1] if index + 1 < len(words) else None
+
+    return None
+
+
+def select_configure_command(records, method_items):
     if not records:
         return None
 
     if records[0]["system"] == "cmake":
+        target_directories = []
+        for item in method_items:
+            if item["phase"] == "build":
+                directory = cmake_directory(item["command"], "--build")
+            elif item["phase"] == "install":
+                directory = cmake_directory(item["command"], "--install")
+            else:
+                directory = None
+
+            if directory and directory not in target_directories:
+                target_directories.append(directory)
+
+        for directory in target_directories:
+            for item in records:
+                if cmake_directory(item["command"], "-B") == directory:
+                    return item
+
         out_of_tree = [
             item for item in records
-            if re.search(r"\b-B\s+(?!\.)\S+", item["command"])
+            if (cmake_directory(item["command"], "-B") or ".") not in {".", "./"}
         ]
         if out_of_tree:
             return out_of_tree[0]
@@ -348,7 +416,7 @@ def build_methods(commands):
                 continue
 
             if phase == "configure":
-                chosen = select_configure_command(phase_items)
+                chosen = select_configure_command(phase_items, items)
             else:
                 chosen = phase_items[0]
 
@@ -369,17 +437,23 @@ def build_methods(commands):
             if item["source"] not in sources:
                 sources.append(item["source"])
 
+        command_records = []
+        for item in selected:
+            command_record = {
+                "phase": item["phase"],
+                "command": item["command"],
+                "source": item["source"],
+            }
+            if item.get("optional"):
+                command_record["optional"] = True
+            if item.get("alternatives"):
+                command_record["alternatives"] = item["alternatives"]
+            command_records.append(command_record)
+
         methods.append({
             "system": system,
-            "required_tools": tools,
-            "commands": [
-                {
-                    "phase": item["phase"],
-                    "command": item["command"],
-                    "source": item["source"],
-                }
-                for item in selected
-            ],
+            "documented_tools": tools,
+            "commands": command_records,
             "sources": sources,
         })
 
@@ -481,7 +555,7 @@ def infer_build(paths):
                 "status": "partial",
                 "methods": [{
                     "system": system,
-                    "required_tools": tools,
+                    "inferred_tools": tools,
                     "commands": [
                         {
                             "phase": phase,
