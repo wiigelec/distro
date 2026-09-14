@@ -17,6 +17,7 @@ from pathlib import Path
 
 from discover import discover, load_manifest
 from recipe import generate_recipe
+from verify import verify_artifact
 
 
 USER_AGENT = "distro-builder-prototype/0"
@@ -220,6 +221,11 @@ def run_package(package, output_root):
         recipe_sha256,
     )
     artifact_sha256 = sha256_file(artifact)
+    verification = verify_artifact(
+        artifact,
+        expected_metadata=metadata,
+        expected_sha256=artifact_sha256,
+    )
 
     result = {
         "schema_version": 1,
@@ -236,6 +242,7 @@ def run_package(package, output_root):
         "artifact": str(artifact),
         "artifact_sha256": artifact_sha256,
         "metadata": metadata,
+        "verification": verification,
         "build_log": str(log_path),
         "started_unix": started,
         "finished_unix": int(time.time()),
