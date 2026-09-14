@@ -17,6 +17,7 @@ from pathlib import Path
 
 MUSL_VERSION = "1.2.3"
 BUSYBOX_VERSION = "1.37.0"
+BASE_FILES_VERSION = "1.0.0"
 IMAGE = "debian:12-slim"
 USER_AGENT = "distro-system-fixture/0"
 
@@ -147,6 +148,16 @@ readelf -l /work/busybox-stage/bin/busybox | grep -F '/lib/ld-musl-x86_64.so.1'
     }
 
 
+def stage_base_files(workspace):
+    stage = workspace / "base-files-stage"
+    (stage / "etc").mkdir(parents=True)
+    (stage / "etc/profile").write_text(
+        "PATH=/bin:/usr/bin\n"
+        "export PATH\n"
+    )
+    return stage
+
+
 def payload_paths(stage):
     paths = []
     for path in sorted(stage.rglob("*")):
@@ -208,6 +219,10 @@ def main():
     musl = create_artifact(
         output, "musl", MUSL_VERSION, workspace / "musl-stage"
     )
+    base_files_stage = stage_base_files(workspace)
+    base_files = create_artifact(
+        output, "base-files", BASE_FILES_VERSION, base_files_stage
+    )
     busybox = create_artifact(
         output, "busybox", BUSYBOX_VERSION, workspace / "busybox-stage"
     )
@@ -224,8 +239,14 @@ def main():
                 "provides": [{"name": "libc"}],
             },
             {
+                **base_files,
+                "depends": [],
+                "conflicts": [],
+                "provides": [],
+            },
+            {
                 **busybox,
-                "depends": [{"name": "musl"}],
+                "depends": [{"name": "musl"}, {"name": "base-files"}],
                 "conflicts": [],
                 "provides": [],
             },
@@ -243,6 +264,11 @@ def main():
                 "artifact": str(output / musl["artifact"]),
                 "artifact_sha256": musl["artifact_sha256"],
                 "owned_path_count": len(musl["owned_paths"]),
+            },
+            "base-files": {
+                "artifact": str(output / base_files["artifact"]),
+                "artifact_sha256": base_files["artifact_sha256"],
+                "owned_path_count": len(base_files["owned_paths"]),
             },
             "busybox": {
                 "artifact": str(output / busybox["artifact"]),

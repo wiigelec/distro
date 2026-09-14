@@ -23,12 +23,14 @@ def main():
         for record in database["packages"]
     }
 
-    if set(records) != {"musl", "busybox"}:
+    if set(records) != {"musl", "base-files", "busybox"}:
         raise RuntimeError(
-            f"expected musl and busybox installed, found {sorted(records)}"
+            f"expected musl, base-files, and busybox installed, found {sorted(records)}"
         )
     if records["musl"]["install_reason"] != "dependency":
         raise RuntimeError("musl should be installed as a dependency")
+    if records["base-files"]["install_reason"] != "dependency":
+        raise RuntimeError("base-files should be installed as a dependency")
     if records["busybox"]["install_reason"] != "explicit":
         raise RuntimeError("busybox should be installed explicitly")
 
@@ -38,6 +40,7 @@ def main():
         root / "bin/busybox",
         root / "bin/sh",
         root / "bin/ls",
+        root / "etc/profile",
     ]
     missing = [
         str(path)
@@ -49,6 +52,10 @@ def main():
 
     if not os.access(root / "bin/busybox", os.X_OK):
         raise RuntimeError("/bin/busybox is not executable")
+
+    profile = (root / "etc/profile").read_text()
+    if "PATH=/bin:/usr/bin" not in profile or "export PATH" not in profile:
+        raise RuntimeError("/etc/profile does not initialize the prototype PATH")
 
     print(json.dumps({
         "schema_version": 1,
@@ -65,7 +72,7 @@ def main():
             str(path.relative_to(root))
             for path in required
         ],
-        "next": f"sudo chroot {root} /bin/sh",
+        "next": f"sudo chroot {root} /bin/sh -l",
     }, indent=2, sort_keys=True))
 
 

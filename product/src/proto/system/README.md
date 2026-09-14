@@ -6,6 +6,7 @@ The milestone is:
 
 ```text
 Build musl
+Build base-files
 Build BusyBox dynamically against musl
     |
     v
@@ -16,11 +17,12 @@ prototype repository
     v
 Manage install busybox --root ROOT
     |
-    +-> resolve busybox -> musl
+    +-> resolve busybox -> musl + base-files
     +-> verify artifact SHA-256
     +-> verify embedded identity
     +-> validate owned-path inventory/conflicts
     +-> install musl as dependency
+    +-> install base-files as dependency
     +-> install busybox as explicit
     `-> write ROOT/var/lib/distro/manage/installed.json
     |
@@ -31,7 +33,7 @@ chroot ROOT /bin/sh
 ls /
 ```
 
-The fixture is x86_64-only and pins musl 1.2.3 and BusyBox 1.37.0.
+The fixture is x86_64-only and pins musl 1.2.3, base-files 1.0.0, and BusyBox 1.37.0.
 The build environment is `debian:12-slim`. BusyBox is dynamically linked with
 Debian's `musl-gcc`; the musl package itself is built from matching upstream
 1.2.3 source.
@@ -57,8 +59,8 @@ python3 product/src/proto/manager/manage.py install \
   busybox
 ```
 
-Manage resolves `busybox -> musl`, verifies both artifacts before payload
-application, preflights owned-path conflicts, applies the dependency first, and
+Manage resolves `busybox -> musl + base-files`, verifies all artifacts before
+payload application, preflights owned-path conflicts, applies dependencies first, and
 writes target-root-local installed state.
 
 ## Verify the root
@@ -71,14 +73,15 @@ python3 product/src/proto/system/acceptance.py \
 Expected reasons:
 
 ```text
-busybox  explicit
-musl     dependency
+busybox     explicit
+base-files  dependency
+musl        dependency
 ```
 
 ## Chroot smoke test
 
 ```sh
-sudo chroot /tmp/distro-root /bin/sh
+sudo chroot /tmp/distro-root /bin/sh -l
 ```
 
 Inside:
@@ -88,8 +91,9 @@ ls /
 exit
 ```
 
-Success means `/bin/sh` starts under the installed musl runtime and BusyBox
-provides `ls` from the filesystem assembled by Manage.
+Success means `/bin/sh` starts as a login shell under the installed musl runtime,
+`base-files` initializes `PATH` through `/etc/profile`, and BusyBox provides `ls`
+from the filesystem assembled by Manage.
 
 ## Prototype limits
 
