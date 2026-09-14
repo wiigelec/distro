@@ -73,7 +73,7 @@ def build_sources(workspace):
 set -eux
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get install -y --no-install-recommends build-essential musl-tools linux-musl-dev bzip2 ca-certificates
+apt-get install -y --no-install-recommends build-essential musl-tools linux-libc-dev bzip2 ca-certificates
 
 mkdir -p /work/src /work/musl-stage /work/busybox-stage
 
@@ -84,6 +84,13 @@ make -j"$(nproc)"
 DESTDIR=/work/musl-stage make install
 test -L /work/musl-stage/lib/ld-musl-x86_64.so.1
 test -e /work/musl-stage/usr/lib/libc.so
+
+# Debian's musl-gcc searches the musl include root, while linux-libc-dev
+# installs the kernel UAPI trees in the native include root. Stage only
+# those libc-independent UAPI trees into the musl include root.
+cp -a /usr/include/linux /usr/include/x86_64-linux-musl/
+cp -a /usr/include/asm-generic /usr/include/x86_64-linux-musl/
+cp -a /usr/include/x86_64-linux-gnu/asm /usr/include/x86_64-linux-musl/
 
 tar -xjf /work/busybox-{BUSYBOX_VERSION}.tar.bz2 -C /work/src
 cd /work/src/busybox-{BUSYBOX_VERSION}
