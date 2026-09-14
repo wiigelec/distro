@@ -7,6 +7,7 @@ import argparse
 import json
 import os
 import shutil
+import shlex
 import subprocess
 import tempfile
 from pathlib import Path
@@ -75,65 +76,106 @@ def audit_managed_root(root):
     }
 
 
-def mount_bind(source, target, readonly=False, recursive=False):
-    target.mkdir(parents=True, exist_ok=True)
-    flag = "--rbind" if recursive else "--bind"
-    run(["mount", flag, str(source), str(target)])
+def mounts_under(path):
+    """Return host mountpoints at or below path without mutating them."""
+    path = path.resolve()
+    mountinfo = Path("/proc/self/mountinfo")
+    if not mountinfo.is_file():
+        return []
 
-    if recursive:
-        # Prevent mount events in the chroot from propagating back into the
-        # host tree and make nested /dev/pts teardown deterministic.
-        run(["mount", "--make-rslave", str(target)])
+    prefix = str(path) + "/"
+    result = []
+    for line in mountinfo.read_text().splitlines():
+        fields = line.split()
+        if len(fields) < 5:
+            continue
+        mountpoint = fields[4].replace("\\040", " ")
+        if mountpoint == str(path) or mountpoint.startswith(prefix):
+            result.append(mountpoint)
+    return sorted(set(result))
 
-    if readonly:
-        run(["mount", "-o", "remount,bind,ro", str(target)])
 
-
-def unmount(target):
-    result = subprocess.run(
-        ["umount", "-R", str(target)],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
-    if result.returncode != 0:
-        subprocess.run(
-            ["umount", "-R", "-l", str(target)],
-            check=False,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+def require_clean_output_tree(output):
+    """Refuse stale host mounts instead of attempting dangerous cleanup."""
+    stale = mounts_under(output)
+    if stale:
+        raise RuntimeError(
+            "refusing to touch output tree because host mounts remain below it: "
+            + ", ".join(stale[:20])
+            + ". Reboot the host to clear mounts left by the older prototype."
         )
+
+
+def shell_quote(value):
+    return shlex.quote(str(value))
 
 
 def run_in_build_root(root, args, binds):
-    mounted = []
-    try:
-        for source, destination, readonly, recursive in binds:
-            target = root / destination.lstrip("/")
-            mount_bind(source, target, readonly=readonly, recursive=recursive)
-            mounted.append(target)
+    """Run the chroot inside a private mount namespace.
 
-        for pseudo in ("proc", "sys", "dev"):
-            source = Path("/") / pseudo
-            target = root / pseudo
-            mount_bind(source, target, readonly=False, recursive=(pseudo == "dev"))
-            mounted.append(target)
+    All bind mounts, /dev, /proc, and /sys exist only in the unshare child.
+    Namespace destruction performs cleanup; this function never calls umount.
+    """
+    resolver = root / "etc/resolv.conf"
+    if not resolver.is_file():
+        raise RuntimeError(
+            "closed build root has no package-owned /etc/resolv.conf"
+        )
 
-        env = os.environ.copy()
-        env["PYTHONDONTWRITEBYTECODE"] = "1"
+    commands = [
+        "set -euo pipefail",
+        "mount --make-rprivate /",
+    ]
 
-        resolver = root / "etc/resolv.conf"
-        if not resolver.is_file():
-            raise RuntimeError(
-                "closed build root has no package-owned /etc/resolv.conf"
+    for source, destination, readonly, recursive in binds:
+        target = root / destination.lstrip("/")
+        target.mkdir(parents=True, exist_ok=True)
+        flag = "--rbind" if recursive else "--bind"
+        commands.append(
+            f"mount {flag} {shell_quote(source)} {shell_quote(target)}"
+        )
+        if readonly:
+            commands.append(
+                f"mount -o remount,bind,ro {shell_quote(target)}"
             )
 
-        run(
-            ["chroot", str(root), *args],
-            env=env,
+    for pseudo in ("proc", "sys"):
+        source = Path("/") / pseudo
+        target = root / pseudo
+        target.mkdir(parents=True, exist_ok=True)
+        commands.append(
+            f"mount --bind {shell_quote(source)} {shell_quote(target)}"
         )
-    finally:
-        for target in reversed(mounted):
-            unmount(target)
+
+    dev_target = root / "dev"
+    dev_target.mkdir(parents=True, exist_ok=True)
+    commands.append(
+        f"mount --rbind /dev {shell_quote(dev_target)}"
+    )
+
+    chroot_command = [
+        "chroot",
+        str(root),
+        *args,
+    ]
+    commands.append(" ".join(shell_quote(part) for part in chroot_command))
+
+    env = os.environ.copy()
+    env["PYTHONDONTWRITEBYTECODE"] = "1"
+
+    run(
+        [
+            "unshare",
+            "--mount",
+            "--propagation",
+            "private",
+            "--fork",
+            "/bin/bash",
+            "-c",
+            "\n".join(commands),
+        ],
+        env=env,
+    )
 
 
 def pipeline(seed_repository, output, iso):
@@ -144,6 +186,7 @@ def pipeline(seed_repository, output, iso):
         raise RuntimeError(f"invalid seed repository: {seed_repository}")
 
     output = output.resolve()
+    require_clean_output_tree(output)
     if output.exists():
         shutil.rmtree(output)
     output.mkdir(parents=True)
