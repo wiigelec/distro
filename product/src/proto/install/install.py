@@ -32,13 +32,14 @@ def require_tools():
 
 def find_mbr():
     for path in (
+        Path("/usr/lib/syslinux/bios/mbr.bin"),
         Path("/usr/lib/syslinux/mbr/mbr.bin"),
         Path("/usr/lib/SYSLINUX/mbr.bin"),
         Path("/usr/lib/EXTLINUX/mbr.bin"),
     ):
         if path.exists():
             return path
-    raise RuntimeError("unable to locate Syslinux MBR boot code; install syslinux-common")
+    raise RuntimeError("unable to locate Syslinux MBR boot code; install the host Syslinux package")
 
 
 def partition_path(loop_device):

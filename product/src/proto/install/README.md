@@ -44,8 +44,17 @@ extlinux
 qemu-system-x86_64
 ```
 
-On Debian-family hosts these are provided by packages such as `util-linux`,
+On Arch Linux:
+
+```sh
+sudo pacman -S util-linux e2fsprogs syslinux qemu-system-x86
+```
+
+On Debian-family hosts the equivalent packages include `util-linux`,
 `e2fsprogs`, `extlinux`, `syslinux-common`, and `qemu-system-x86`.
+
+Install v0 recognizes both Arch's Syslinux BIOS layout
+(`/usr/lib/syslinux/bios/mbr.bin`) and common Debian-family MBR locations.
 
 ## Build the repository
 
