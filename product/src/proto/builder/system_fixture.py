@@ -89,7 +89,7 @@ tar -xjf /work/busybox-{BUSYBOX_VERSION}.tar.bz2 -C /work/src
 cd /work/src/busybox-{BUSYBOX_VERSION}
 make defconfig
 sed -i 's/^CONFIG_TC=y/# CONFIG_TC is not set/' .config
-make olddefconfig
+yes '' | make oldconfig
 make CC=musl-gcc -j"$(nproc)"
 make CC=musl-gcc CONFIG_PREFIX=/work/busybox-stage install
 test -x /work/busybox-stage/bin/busybox
