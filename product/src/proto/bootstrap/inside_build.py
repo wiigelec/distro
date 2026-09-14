@@ -318,6 +318,10 @@ def stage_installer_control(stage):
     (stage / "opt/distro").mkdir(parents=True, exist_ok=True)
     (stage / "usr/local/bin").mkdir(parents=True, exist_ok=True)
 
+    temporary = stage / "tmp"
+    temporary.mkdir(parents=True, exist_ok=True)
+    temporary.chmod(0o1777)
+
     shutil.copy2(
         "/opt/distro/proto/manager/manage.py",
         stage / "opt/distro/manage.py",
@@ -335,6 +339,8 @@ def stage_installer_control(stage):
         "export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin\n"
         "export PS1='distro-installer# '\n"
         "mkdir -p /dev /proc /sys /run /tmp\n"
+        "chmod 1777 /tmp\n"
+        "test -d /tmp -a -w /tmp || { echo 'installer /tmp is unusable'; exec /bin/bash --noprofile --norc; }\n"
         "mount -t devtmpfs devtmpfs /dev 2>/dev/null || true\n"
         "mount -t proc proc /proc 2>/dev/null || true\n"
         "mount -t sysfs sysfs /sys 2>/dev/null || true\n"
@@ -378,7 +384,7 @@ def build_installer_repository(seed_repository, target_repository, output):
         control_stage.mkdir()
         stage_installer_control(control_stage)
         control = create_artifact(
-            output, "installer-control", "1.0.0", control_stage
+            output, "installer-control", "1.0.1", control_stage
         )
 
         repository_stage = temporary / "repository"
