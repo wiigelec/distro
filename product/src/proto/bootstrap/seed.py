@@ -181,6 +181,60 @@ def create_empty_artifact(repository, name, version):
         )
 
 
+def capture_resolver_config(stage):
+    """Package a usable resolver configuration into the Stage-0 root."""
+    candidates = (
+        Path("/run/systemd/resolve/resolv.conf"),
+        Path("/run/NetworkManager/resolv.conf"),
+        Path("/etc/resolv.conf"),
+    )
+
+    selected = None
+    selected_text = None
+    for candidate in candidates:
+        try:
+            text = candidate.read_text()
+        except (OSError, UnicodeError):
+            continue
+
+        nameservers = [
+            line.split(None, 1)[1].strip()
+            for line in text.splitlines()
+            if line.strip().startswith("nameserver ")
+            and len(line.split(None, 1)) == 2
+        ]
+        if not nameservers:
+            continue
+        if all(
+            address.startswith("127.")
+            or address == "::1"
+            or address.startswith("::ffff:127.")
+            for address in nameservers
+        ):
+            continue
+
+        selected = candidate
+        selected_text = text
+        break
+
+    if selected_text is None:
+        selected = Path("<generated-public-resolvers>")
+        selected_text = (
+            "# Stage-0 generated resolver fallback\n"
+            "nameserver 1.1.1.1\n"
+            "nameserver 8.8.8.8\n"
+            "options timeout:2 attempts:2\n"
+        )
+
+    destination = stage / "etc/resolv.conf"
+    if destination.exists() or destination.is_symlink():
+        destination.unlink()
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text(selected_text)
+    destination.chmod(0o644)
+    return str(selected)
+
+
 def build_seed(output):
     require_root()
     pacstrap = require_tool("pacstrap")
@@ -207,6 +261,8 @@ def build_seed(output):
             if log.is_file():
                 log.unlink()
 
+        resolver_source = capture_resolver_config(stage)
+
         # The prototype implementation itself becomes package-owned at the
         # Stage-0 boundary. Nothing is copied from the host into later roots.
         proto_destination = stage / "opt/distro/proto"
@@ -227,6 +283,7 @@ def build_seed(output):
                 "stage0": True,
                 "stage0_origin": "arch-pacstrap",
                 "stage0_packages": list(BOOTSTRAP_PACKAGES),
+                "resolver_source": resolver_source,
             },
         )
 
@@ -260,6 +317,7 @@ def build_seed(output):
         "stage0": True,
         "repository": str(output),
         "bootstrap_packages": list(BOOTSTRAP_PACKAGES),
+        "resolver_source": resolver_source,
         "artifact": str(output / bootstrap["artifact"]),
         "artifact_sha256": bootstrap["artifact_sha256"],
         "owned_path_count": len(bootstrap["owned_paths"]),

@@ -79,12 +79,29 @@ def mount_bind(source, target, readonly=False, recursive=False):
     target.mkdir(parents=True, exist_ok=True)
     flag = "--rbind" if recursive else "--bind"
     run(["mount", flag, str(source), str(target)])
+
+    if recursive:
+        # Prevent mount events in the chroot from propagating back into the
+        # host tree and make nested /dev/pts teardown deterministic.
+        run(["mount", "--make-rslave", str(target)])
+
     if readonly:
         run(["mount", "-o", "remount,bind,ro", str(target)])
 
 
 def unmount(target):
-    subprocess.run(["umount", "-R", str(target)], check=False)
+    result = subprocess.run(
+        ["umount", "-R", str(target)],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    if result.returncode != 0:
+        subprocess.run(
+            ["umount", "-R", "-l", str(target)],
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
 
 
 def run_in_build_root(root, args, binds):
@@ -103,6 +120,13 @@ def run_in_build_root(root, args, binds):
 
         env = os.environ.copy()
         env["PYTHONDONTWRITEBYTECODE"] = "1"
+
+        resolver = root / "etc/resolv.conf"
+        if not resolver.is_file():
+            raise RuntimeError(
+                "closed build root has no package-owned /etc/resolv.conf"
+            )
+
         run(
             ["chroot", str(root), *args],
             env=env,
