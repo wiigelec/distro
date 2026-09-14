@@ -73,7 +73,7 @@ def build_sources(workspace):
 set -eux
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get install -y --no-install-recommends build-essential musl-tools bzip2 ca-certificates
+apt-get install -y --no-install-recommends build-essential musl-tools linux-musl-dev bzip2 ca-certificates
 
 mkdir -p /work/src /work/musl-stage /work/busybox-stage
 
