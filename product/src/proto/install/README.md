@@ -1,93 +1,104 @@
-# Install v0 virtual-machine prototype
+# Install prototype
 
-This prototype exercises the Install -> Manage boundary with a complete virtual
-disk image.
-
-Install v0 owns machine-level preparation:
-
-- create a raw disk image;
-- create a DOS/MBR partition table;
-- create one bootable Linux partition;
-- format the root partition as ext4;
-- mount the target root;
-- invoke Manage to install the `system` profile;
-- install EXTLINUX and MBR boot code;
-- write kernel boot configuration;
-- cleanly unmount and detach the image.
-
-Install does not unpack package artifacts itself. The `system` profile is a
-prototype meta-package resolved by Manage:
+The primary Install prototype is now a bootable installer ISO.
 
 ```text
-system
-|- kernel
-`- busybox
-   |- musl
-   `- base-files
+Build package repository
+        |
+        v
+build_iso.py
+        |
+        v
+bootable Archiso installer
+        |
+        v
+install-distro TARGET
+        |
+        +-> partition target
+        +-> create ext4 root
+        +-> invoke Manage install system
+        +-> install EXTLINUX
+        `-> write boot configuration
 ```
 
-The kernel package is produced by the fixture from Debian bookworm's cloud
-kernel plus its generated initramfs. `base-files` supplies `/sbin/init`, which
-starts a BusyBox login shell and reads `/etc/profile`.
+The live ISO is only the installation environment. Target package payloads are
+still installed exclusively through Manage.
 
-## Host prerequisites
-
-The prototype requires these host commands:
-
-```text
-sfdisk
-losetup
-mkfs.ext4
-mount
-umount
-extlinux
-qemu-system-x86_64
-```
-
-On Arch Linux:
+## Arch host prerequisites
 
 ```sh
-sudo pacman -S util-linux e2fsprogs syslinux qemu-system-x86
+sudo pacman -S archiso syslinux qemu-system-x86
 ```
 
-On Debian-family hosts the equivalent packages include `util-linux`,
-`e2fsprogs`, `extlinux`, `syslinux-common`, and `qemu-system-x86`.
-
-Install v0 recognizes both Arch's Syslinux BIOS layout
-(`/usr/lib/syslinux/bios/mbr.bin`) and common Debian-family MBR locations.
-
-## Build the repository
+## Build the package repository
 
 ```sh
 python3 product/src/proto/builder/system_fixture.py \
   --output /tmp/distro-system-repo
 ```
 
-## Install a bootable raw disk image
-
-The image path is replaced if it already exists.
+## Build the installer ISO
 
 ```sh
-sudo python3 product/src/proto/install/install.py \
+python3 product/src/proto/install/build_iso.py \
   --repository /tmp/distro-system-repo \
-  --image /tmp/distro.img \
-  --size-mib 1024
+  --output /tmp/distro-installer.iso
 ```
 
-## Boot and verify BusyBox `ls`
+The ISO bundles the prototype repository, `manage.py`, and the command
+`/usr/local/bin/install-distro`.
+
+## Boot the installer in QEMU
 
 ```sh
-python3 product/src/proto/install/vm_acceptance.py \
-  --image /tmp/distro.img
+truncate -s 1G /tmp/distro-target.img
+
+qemu-system-x86_64 \
+  -m 1G \
+  -cdrom /tmp/distro-installer.iso \
+  -drive file=/tmp/distro-target.img,format=raw,if=virtio \
+  -boot d
 ```
 
-The acceptance runner boots QEMU with the image as a virtio disk, waits for the
-BusyBox shell, sends `ls -al /` over the serial console, and succeeds only when
-the expected root directories appear.
+At the live root shell:
+
+```sh
+install-distro /dev/vda
+```
+
+The command is destructive to the selected target. It refuses non-block-device
+targets and targets that already contain mounted filesystems.
+
+For this prototype it creates a DOS/MBR partition table, one active Linux
+partition, an ext4 filesystem labeled `distro-root`, invokes Manage to install
+the `system` profile, and installs EXTLINUX. The installed boot configuration
+uses `root=LABEL=distro-root`.
+
+After installation reports `"status": "success"`, shut down the VM and boot the
+target disk without the ISO:
+
+```sh
+qemu-system-x86_64 \
+  -m 256 \
+  -drive file=/tmp/distro-target.img,format=raw,if=virtio \
+  -serial mon:stdio
+```
+
+The installed system should enter the BusyBox login shell and support:
+
+```sh
+ls -al /
+```
+
+## Earlier host-side install path
+
+`install.py` and `vm_acceptance.py` remain as the previous milestone's direct
+host-side install path for regression testing.
 
 ## Prototype limits
 
-This slice is x86_64, BIOS, DOS/MBR, one ext4 root filesystem, raw images, and
-EXTLINUX only. It deliberately does not yet cover GPT/UEFI, encryption, swap,
-LVM/RAID, separate `/boot`, networking, users, locale, timezone, hostname,
-recovery, or install resume.
+This milestone remains x86_64 with a BIOS-installed target, DOS/MBR, one ext4
+root filesystem, and EXTLINUX. The installer medium itself is built with
+Archiso. GPT/UEFI target installation, encryption, swap, LVM/RAID, separate
+`/boot`, networking configuration, users, locale, timezone, hostname,
+recovery, and install resume remain outside this slice.
