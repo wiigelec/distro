@@ -83,15 +83,24 @@ def build_in_container(workspace, recipe, log_path):
     packages = " ".join(shell_quote(item) for item in recipe["environment"]["packages"])
     commands = [item["command"] for item in recipe["build"]["commands"]]
 
-    shell = "\n".join([
+    shell_lines = [
         "set -eux",
         "export DEBIAN_FRONTEND=noninteractive",
         "apt-get update",
         f"apt-get install -y --no-install-recommends {packages}",
         *commands,
         "test -x /work/stage/usr/bin/curl",
-        "chown -R \"$HOST_UID:$HOST_GID\" /work",
-    ])
+    ]
+
+    # Rootless Podman maps container root to the invoking host user. Chowning
+    # /work to the numeric host UID from inside that user namespace instead
+    # maps ownership to a subordinate host UID and makes the workspace
+    # inaccessible after the container exits. Rootful Docker needs the
+    # explicit ownership handoff.
+    if backend_name == "docker":
+        shell_lines.append('chown -R "$HOST_UID:$HOST_GID" /work')
+
+    shell = "\n".join(shell_lines)
 
     volume = f"{workspace.resolve()}:/work"
     if backend_name == "podman":
@@ -101,14 +110,20 @@ def build_in_container(workspace, recipe, log_path):
         backend,
         "run",
         "--rm",
-        "--env", f"HOST_UID={os.getuid()}",
-        "--env", f"HOST_GID={os.getgid()}",
+    ]
+    if backend_name == "docker":
+        command.extend([
+            "--env", f"HOST_UID={os.getuid()}",
+            "--env", f"HOST_GID={os.getgid()}",
+        ])
+
+    command.extend([
         "--volume", volume,
         recipe["environment"]["image"],
         "/bin/sh",
         "-c",
         shell,
-    ]
+    ])
 
     with log_path.open("w") as log:
         process = subprocess.run(
