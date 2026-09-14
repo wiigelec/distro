@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-\"\"\"Build a minimal musl + BusyBox prototype repository.\"\"\"
+"""Build a minimal musl + BusyBox prototype repository."""
 
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ USER_AGENT = "distro-system-fixture/0"
 
 
 def write_json(path, value):
-    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\\n")
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
 
 
 def sha256_file(path):

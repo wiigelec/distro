@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-\"\"\"Check a Manage v0 root before the chroot smoke test.\"\"\"
+"""Check a Manage v0 root before the chroot smoke test."""
 
 from __future__ import annotations
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-\"\"\"Manage v0: install prototype repository packages into a target root.\"\"\"
+"""Manage v0: install prototype repository packages into a target root."""
 
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ def sha256_file(path):
 def write_json(path, value):
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(json.dumps(value, indent=2, sort_keys=True) + "\\n")
+    temporary.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
     os.replace(temporary, path)
 
 
