@@ -18,6 +18,7 @@ from pathlib import Path
 MUSL_VERSION = "1.2.3"
 BUSYBOX_VERSION = "1.37.0"
 BASE_FILES_VERSION = "1.0.0"
+SYSTEM_VERSION = "0.1.0"
 IMAGE = "debian:12-slim"
 USER_AGENT = "distro-system-fixture/0"
 
@@ -74,9 +75,17 @@ def build_sources(workspace):
 set -eux
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get install -y --no-install-recommends build-essential musl-tools linux-libc-dev bzip2 ca-certificates
+apt-get install -y --no-install-recommends build-essential musl-tools linux-libc-dev bzip2 ca-certificates linux-image-cloud-amd64
 
-mkdir -p /work/src /work/musl-stage /work/busybox-stage
+mkdir -p /work/src /work/musl-stage /work/busybox-stage /work/kernel-stage/boot
+
+kernel_image="$(ls -1 /boot/vmlinuz-* | sort | tail -n 1)"
+kernel_version="${{kernel_image#/boot/vmlinuz-}}"
+test -e "/boot/initrd.img-${{kernel_version}}"
+cp "${{kernel_image}}" /work/kernel-stage/boot/vmlinuz
+cp "/boot/initrd.img-${{kernel_version}}" /work/kernel-stage/boot/initrd.img
+printf '%s\n' "${{kernel_version}}" > /work/kernel-version.txt
+
 
 tar -xzf /work/musl-{MUSL_VERSION}.tar.gz -C /work/src
 cd /work/src/musl-{MUSL_VERSION}
@@ -139,11 +148,16 @@ readelf -l /work/busybox-stage/bin/busybox | grep -F '/lib/ld-musl-x86_64.so.1'
             f"{process.returncode}; see {log_path}"
         )
 
+    kernel_version = (workspace / "kernel-version.txt").read_text().strip()
+    if not kernel_version:
+        raise RuntimeError("kernel build did not report a version")
+
     return {
         "backend": backend_name,
         "image": IMAGE,
         "musl_source_sha256": sha256_file(musl_archive),
         "busybox_source_sha256": sha256_file(busybox_archive),
+        "kernel_version": kernel_version,
         "build_log": str(log_path),
     }
 
@@ -155,6 +169,19 @@ def stage_base_files(workspace):
         "PATH=/bin:/usr/bin\n"
         "export PATH\n"
     )
+    (stage / "sbin").mkdir(parents=True)
+    init = stage / "sbin/init"
+    init.write_text(
+        "#!/bin/sh\n"
+        "exec /bin/sh -l\n"
+    )
+    init.chmod(0o755)
+    return stage
+
+
+def stage_system_meta(workspace):
+    stage = workspace / "system-stage"
+    stage.mkdir()
     return stage
 
 
@@ -219,12 +246,19 @@ def main():
     musl = create_artifact(
         output, "musl", MUSL_VERSION, workspace / "musl-stage"
     )
+    kernel = create_artifact(
+        output, "kernel", build_info["kernel_version"], workspace / "kernel-stage"
+    )
     base_files_stage = stage_base_files(workspace)
     base_files = create_artifact(
         output, "base-files", BASE_FILES_VERSION, base_files_stage
     )
     busybox = create_artifact(
         output, "busybox", BUSYBOX_VERSION, workspace / "busybox-stage"
+    )
+    system_stage = stage_system_meta(workspace)
+    system = create_artifact(
+        output, "system", SYSTEM_VERSION, system_stage
     )
 
     database = {
@@ -245,10 +279,22 @@ def main():
                 "provides": [],
             },
             {
+                **kernel,
+                "depends": [],
+                "conflicts": [],
+                "provides": [{"name": "kernel"}],
+            },
+            {
                 **busybox,
                 "depends": [{"name": "musl"}, {"name": "base-files"}],
                 "conflicts": [],
                 "provides": [],
+            },
+            {
+                **system,
+                "depends": [{"name": "busybox"}, {"name": "kernel"}],
+                "conflicts": [],
+                "provides": [{"name": "system"}],
             },
         ],
     }
@@ -274,6 +320,16 @@ def main():
                 "artifact": str(output / busybox["artifact"]),
                 "artifact_sha256": busybox["artifact_sha256"],
                 "owned_path_count": len(busybox["owned_paths"]),
+            },
+            "kernel": {
+                "artifact": str(output / kernel["artifact"]),
+                "artifact_sha256": kernel["artifact_sha256"],
+                "owned_path_count": len(kernel["owned_paths"]),
+            },
+            "system": {
+                "artifact": str(output / system["artifact"]),
+                "artifact_sha256": system["artifact_sha256"],
+                "owned_path_count": len(system["owned_paths"]),
             },
         },
         "build": build_info,
