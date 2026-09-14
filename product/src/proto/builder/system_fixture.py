@@ -164,12 +164,29 @@ readelf -l /work/busybox-stage/bin/busybox | grep -F '/lib/ld-musl-x86_64.so.1'
 
 def stage_base_files(workspace):
     stage = workspace / "base-files-stage"
-    (stage / "etc").mkdir(parents=True)
+
+    # These directories are part of the base filesystem skeleton. In
+    # particular, initramfs-tools needs /dev, /proc, /sys, and /run to exist
+    # in the real root so it can move its pseudo-filesystem mounts across
+    # before executing the target init process.
+    for directory in (
+        "dev",
+        "proc",
+        "sys",
+        "run",
+        "tmp",
+        "root",
+        "mnt",
+        "etc",
+        "sbin",
+    ):
+        (stage / directory).mkdir(parents=True, exist_ok=True)
+
+    (stage / "tmp").chmod(0o1777)
     (stage / "etc/profile").write_text(
         "PATH=/bin:/usr/bin\n"
         "export PATH\n"
     )
-    (stage / "sbin").mkdir(parents=True)
     init = stage / "sbin/init"
     init.write_text(
         "#!/bin/sh\n"
