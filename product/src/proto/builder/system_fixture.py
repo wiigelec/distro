@@ -94,8 +94,16 @@ cp -a /usr/include/x86_64-linux-gnu/asm /usr/include/x86_64-linux-musl/
 
 tar -xjf /work/busybox-{BUSYBOX_VERSION}.tar.bz2 -C /work/src
 cd /work/src/busybox-{BUSYBOX_VERSION}
-make defconfig
-sed -i 's/^CONFIG_TC=y/# CONFIG_TC is not set/' .config
+
+# The milestone needs only a shell and ls. Starting from defconfig enables
+# hundreds of unrelated applets and drags in irrelevant build dependencies.
+make allnoconfig
+sed -i 's/^# CONFIG_LS is not set/CONFIG_LS=y/' .config
+sed -i 's/^# CONFIG_ASH is not set/CONFIG_ASH=y/' .config
+sed -i 's/^# CONFIG_SH_IS_ASH is not set/CONFIG_SH_IS_ASH=y/' .config
+sed -i 's/^CONFIG_SH_IS_NONE=y/# CONFIG_SH_IS_NONE is not set/' .config
+sed -i 's/^# CONFIG_INSTALL_APPLET_SYMLINKS is not set/CONFIG_INSTALL_APPLET_SYMLINKS=y/' .config
+sed -i 's/^CONFIG_INSTALL_APPLET_DONT=y/# CONFIG_INSTALL_APPLET_DONT is not set/' .config
 yes '' | make oldconfig
 make CC=musl-gcc -j"$(nproc)"
 make CC=musl-gcc CONFIG_PREFIX=/work/busybox-stage install
