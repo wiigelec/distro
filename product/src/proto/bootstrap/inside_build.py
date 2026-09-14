@@ -339,8 +339,10 @@ def stage_installer_control(stage):
         "export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin\n"
         "export PS1='distro-installer# '\n"
         "mkdir -p /dev /proc /sys /run /tmp\n"
+        "mount -t tmpfs -o mode=1777,size=256m tmpfs /tmp || { echo 'failed to mount installer tmpfs'; exec /bin/bash --noprofile --norc; }\n"
         "chmod 1777 /tmp\n"
-        "test -d /tmp -a -w /tmp || { echo 'installer /tmp is unusable'; exec /bin/bash --noprofile --norc; }\n"
+        "touch /tmp/.distro-write-test || { echo 'installer /tmp is not writable'; exec /bin/bash --noprofile --norc; }\n"
+        "rm -f /tmp/.distro-write-test\n"
         "mount -t devtmpfs devtmpfs /dev 2>/dev/null || true\n"
         "mount -t proc proc /proc 2>/dev/null || true\n"
         "mount -t sysfs sysfs /sys 2>/dev/null || true\n"
@@ -384,7 +386,7 @@ def build_installer_repository(seed_repository, target_repository, output):
         control_stage.mkdir()
         stage_installer_control(control_stage)
         control = create_artifact(
-            output, "installer-control", "1.0.1", control_stage
+            output, "installer-control", "1.0.2", control_stage
         )
 
         repository_stage = temporary / "repository"
