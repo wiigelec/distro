@@ -237,15 +237,57 @@ def build_target_repository(output):
         init.chmod(0o755)
 
         kernel_image = Path("/boot/vmlinuz-linux")
-        initramfs = Path("/boot/initramfs-linux.img")
-        if not kernel_image.is_file() or not initramfs.is_file():
+        mkinitcpio = Path("/usr/bin/mkinitcpio")
+        modules_root = Path("/usr/lib/modules")
+
+        if not kernel_image.is_file():
             raise RuntimeError(
-                "bootstrap-tools must provide /boot/vmlinuz-linux and "
-                "/boot/initramfs-linux.img"
+                "bootstrap-tools must provide /boot/vmlinuz-linux"
             )
+        if not mkinitcpio.is_file():
+            raise RuntimeError(
+                "bootstrap-tools must provide /usr/bin/mkinitcpio"
+            )
+
+        module_candidates = []
+        if modules_root.is_dir():
+            for candidate in sorted(modules_root.iterdir()):
+                if not candidate.is_dir():
+                    continue
+                pkgbase = candidate / "pkgbase"
+                if pkgbase.is_file() and pkgbase.read_text().strip() == "linux":
+                    module_candidates.append(candidate)
+
+        if len(module_candidates) != 1:
+            raise RuntimeError(
+                "expected exactly one packaged linux module tree, found "
+                f"{[path.name for path in module_candidates]}"
+            )
+
+        kernel_version = module_candidates[0].name
         (kernel_stage / "boot").mkdir(parents=True)
         shutil.copy2(kernel_image, kernel_stage / "boot/vmlinuz")
-        shutil.copy2(initramfs, kernel_stage / "boot/initrd.img")
+
+        initramfs_config = work / "mkinitcpio-distro.conf"
+        initramfs_config.write_text(
+            "MODULES=(virtio virtio_pci virtio_blk ext4)\n"
+            "BINARIES=()\n"
+            "FILES=()\n"
+            "HOOKS=(base udev modconf block filesystems)\n"
+            'COMPRESSION="gzip"\n'
+        )
+        generated_initramfs = kernel_stage / "boot/initrd.img"
+        subprocess.run(
+            [
+                str(mkinitcpio),
+                "-c", str(initramfs_config),
+                "-k", kernel_version,
+                "-g", str(generated_initramfs),
+            ],
+            check=True,
+        )
+        if not generated_initramfs.is_file():
+            raise RuntimeError("mkinitcpio did not produce target initramfs")
 
         musl = create_artifact(
             output, "musl", MUSL_VERSION, musl_stage,
@@ -257,8 +299,28 @@ def build_target_repository(output):
         )
         base_files = create_artifact(output, "base-files", "1.1.0", base_stage)
         kernel = create_artifact(
-            output, "kernel", "bootstrap-linux", kernel_stage,
-            {"source": "package:bootstrap-tools:/boot/vmlinuz-linux"},
+            output,
+            "kernel",
+            "bootstrap-linux",
+            kernel_stage,
+            {
+                "source": "package:bootstrap-tools:/boot/vmlinuz-linux",
+                "initramfs": "generated:mkinitcpio",
+                "initramfs_kernel_version": kernel_version,
+                "initramfs_modules": [
+                    "virtio",
+                    "virtio_pci",
+                    "virtio_blk",
+                    "ext4",
+                ],
+                "initramfs_hooks": [
+                    "base",
+                    "udev",
+                    "modconf",
+                    "block",
+                    "filesystems",
+                ],
+            },
         )
         system = empty_package(output, "system", SYSTEM_VERSION)
 
