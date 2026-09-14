@@ -44,6 +44,18 @@ BOOTSTRAP_PACKAGES = (
     "ca-certificates",
 )
 
+INSTALLER_PACKAGES = (
+    "filesystem",
+    "bash",
+    "coreutils",
+    "python",
+    "util-linux",
+    "e2fsprogs",
+    "syslinux",
+    "linux",
+    "kmod",
+)
+
 
 def write_json(path, value):
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
@@ -246,9 +258,10 @@ def build_seed(output):
     (output / "packages").mkdir(parents=True)
 
     with tempfile.TemporaryDirectory(prefix="distro-stage0-") as temporary:
-        stage = Path(temporary) / "root"
-        stage.mkdir()
+        temporary = Path(temporary)
 
+        stage = temporary / "build-root"
+        stage.mkdir()
         subprocess.run(
             [pacstrap, "-c", str(stage), *BOOTSTRAP_PACKAGES],
             check=True,
@@ -287,6 +300,37 @@ def build_seed(output):
             },
         )
 
+        installer_stage = temporary / "installer-root"
+        installer_stage.mkdir()
+        subprocess.run(
+            [pacstrap, "-c", str(installer_stage), *INSTALLER_PACKAGES],
+            check=True,
+        )
+        shutil.rmtree(
+            installer_stage / "var/cache/pacman/pkg",
+            ignore_errors=True,
+        )
+        (installer_stage / "var/cache/pacman/pkg").mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+        for log in (installer_stage / "var/log").glob("*"):
+            if log.is_file():
+                log.unlink()
+
+        installer_seed = create_artifact(
+            output,
+            "installer-seed",
+            BOOTSTRAP_VERSION,
+            installer_stage,
+            {
+                "stage0": True,
+                "stage0_origin": "arch-pacstrap",
+                "stage0_packages": list(INSTALLER_PACKAGES),
+                "purpose": "minimal installer runtime substrate",
+            },
+        )
+
     build_system = create_empty_artifact(output, "build-system", "1.0.0")
 
     database = {
@@ -300,6 +344,12 @@ def build_seed(output):
                 "depends": [],
                 "conflicts": [],
                 "provides": [{"name": "bootstrap-tools"}],
+            },
+            {
+                **installer_seed,
+                "depends": [],
+                "conflicts": [],
+                "provides": [{"name": "installer-seed"}],
             },
             {
                 **build_system,
@@ -317,10 +367,14 @@ def build_seed(output):
         "stage0": True,
         "repository": str(output),
         "bootstrap_packages": list(BOOTSTRAP_PACKAGES),
+        "installer_packages": list(INSTALLER_PACKAGES),
         "resolver_source": resolver_source,
         "artifact": str(output / bootstrap["artifact"]),
         "artifact_sha256": bootstrap["artifact_sha256"],
         "owned_path_count": len(bootstrap["owned_paths"]),
+        "installer_artifact": str(output / installer_seed["artifact"]),
+        "installer_artifact_sha256": installer_seed["artifact_sha256"],
+        "installer_owned_path_count": len(installer_seed["owned_paths"]),
         "trust_boundary": (
             "Host package content is permitted only in this Stage-0 seed. "
             "Accepted build and ISO roots below this boundary are assembled "

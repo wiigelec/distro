@@ -362,13 +362,13 @@ def build_installer_repository(seed_repository, target_repository, output):
     (output / "packages").mkdir()
 
     seed_database = json.loads((seed_repository / "database.json").read_text())
-    bootstrap_entry = next(
+    installer_seed_entry = next(
         package
         for package in seed_database["packages"]
-        if package["identity"]["name"] == "bootstrap-tools"
+        if package["identity"]["name"] == "installer-seed"
     )
-    bootstrap = copy_package_entry(
-        seed_repository, output, bootstrap_entry
+    installer_seed = copy_package_entry(
+        seed_repository, output, installer_seed_entry
     )
 
     with tempfile.TemporaryDirectory(prefix="distro-installer-packages-") as temporary:
@@ -399,7 +399,7 @@ def build_installer_repository(seed_repository, target_repository, output):
         "architecture": architecture(),
         "closed_build": True,
         "packages": [
-            bootstrap,
+            installer_seed,
             {
                 **control,
                 "depends": [],
@@ -415,7 +415,7 @@ def build_installer_repository(seed_repository, target_repository, output):
             {
                 **runtime,
                 "depends": [
-                    {"name": "bootstrap-tools"},
+                    {"name": "installer-seed"},
                     {"name": "installer-control"},
                     {"name": "installer-target-repository"},
                 ],
@@ -424,13 +424,13 @@ def build_installer_repository(seed_repository, target_repository, output):
             },
         ],
     }
-    # Bootstrap entry already contains dependency/provides fields from seed DB.
+    # The copied Stage-0 installer seed carries its package relationships.
     if "depends" not in database["packages"][0]:
         database["packages"][0]["depends"] = []
     if "conflicts" not in database["packages"][0]:
         database["packages"][0]["conflicts"] = []
     if "provides" not in database["packages"][0]:
-        database["packages"][0]["provides"] = [{"name": "bootstrap-tools"}]
+        database["packages"][0]["provides"] = [{"name": "installer-seed"}]
 
     write_json(output / "database.json", database)
     return database
