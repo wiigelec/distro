@@ -16,6 +16,7 @@ import urllib.request
 from pathlib import Path
 
 from discover import discover, load_manifest
+from dependency import discover_dependencies
 from recipe import generate_recipe
 from verify import verify_artifact
 
@@ -191,7 +192,22 @@ def run_package(package, output_root):
     discovery = discover(package)
     write_json(package_root / "discovery.json", discovery)
 
-    recipe = generate_recipe(discovery)
+    # Method selection stays in recipe synthesis; dependency discovery uses
+    # the same prototype preference so the build-system toolchain and feature
+    # capabilities can be resolved before recipe creation.
+    method_systems = {
+        method["system"]
+        for method in discovery["build"].get("methods", [])
+    }
+    selected_system = next(
+        system
+        for system in ("cmake", "meson", "autotools", "make", "cargo", "go", "python")
+        if system in method_systems
+    )
+    dependencies = discover_dependencies(discovery, selected_system)
+    write_json(package_root / "dependencies.json", dependencies)
+
+    recipe = generate_recipe(discovery, dependencies)
     recipe_path = package_root / "recipe.json"
     write_json(recipe_path, recipe)
 
@@ -235,6 +251,9 @@ def run_package(package, output_root):
         "environment": {
             "backend": backend,
             "image": recipe["environment"]["image"],
+            "dependency_source": recipe["environment"]["dependency_source"],
+            "capabilities": recipe["environment"]["capabilities"],
+            "resolver": recipe["environment"]["resolver"],
             "packages": recipe["environment"]["packages"],
         },
         "source_sha256": source_sha256,

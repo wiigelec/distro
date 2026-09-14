@@ -11,7 +11,9 @@ The end-to-end slice currently uses curl as the fixture:
 
 ```text
 manifest
-  -> discovery
+  -> build-method discovery
+  -> dependency capability discovery
+  -> distro dependency resolution
   -> candidate recipe
   -> clean OCI build environment
   -> source fetch + SHA-256
@@ -23,11 +25,14 @@ manifest
   -> artifact SHA-256 + result/provenance
 ```
 
-Prototype policy is kept explicit. Discovery can report multiple upstream build
-methods; recipe generation currently prefers CMake and supports end-to-end
-execution only for curl. The clean build environment is `debian:12-slim` with a
-declared bootstrap package set. That bootstrap set is prototype policy, not
-dependency discovery.
+Dependency discovery deliberately separates upstream capability evidence from
+distribution package names. For curl, release documentation is scanned for
+feature/dependency signals such as OpenSSL, zlib, libpsl, Brotli, zstd, nghttp2,
+libidn2, and libssh2. A Debian resolver then maps discovered capabilities plus
+the selected build system to concrete packages for the clean build environment.
+
+This is still prototype policy: the capability vocabulary and Debian resolver
+table are code, not yet distro package metadata or a finalized recipe schema.
 
 Run discovery only:
 
@@ -51,6 +56,7 @@ A successful run writes approximately:
 ├── result.json
 └── curl/
     ├── discovery.json
+    ├── dependencies.json
     ├── recipe.json
     ├── source.tar.gz
     ├── src/
@@ -72,12 +78,6 @@ A completed curl build can be checked again without rebuilding:
 python3 product/src/proto/builder/acceptance.py   /tmp/distro-builder/curl/result.json
 ```
 
-Or verify an artifact directly:
-
-```sh
-python3 product/src/proto/builder/verify.py   /tmp/distro-builder/curl/packages/curl-<version>-<arch>-r1.distro.tar.gz
-```
-
-The archive format, container image, bootstrap dependencies, method preference,
+The archive format, container image, capability resolver, method preference,
 and recipe schema are deliberately prototype choices. They do not settle the
 open product-design questions for Build.

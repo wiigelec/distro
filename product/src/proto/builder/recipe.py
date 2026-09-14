@@ -9,22 +9,6 @@ import urllib.parse
 
 METHOD_PREFERENCE = ("cmake", "meson", "autotools", "make", "cargo", "go", "python")
 
-# This is prototype build-environment policy, not discovered package metadata.
-CURL_BOOTSTRAP_PACKAGES = [
-    "build-essential",
-    "ca-certificates",
-    "cmake",
-    "pkg-config",
-    "libssl-dev",
-    "zlib1g-dev",
-    "libpsl-dev",
-    "libbrotli-dev",
-    "libzstd-dev",
-    "libnghttp2-dev",
-    "libidn2-dev",
-    "libssh2-1-dev",
-]
-
 
 def normalized_architecture():
     machine = platform.machine().lower()
@@ -96,7 +80,7 @@ def cmake_execution(discovery_method):
     }
 
 
-def generate_recipe(discovery):
+def generate_recipe(discovery, dependencies):
     method = choose_method(discovery)
     if method["system"] != "cmake":
         raise ValueError(
@@ -137,8 +121,10 @@ def generate_recipe(discovery):
         "environment": {
             "backend": "oci",
             "image": "debian:12-slim",
-            "bootstrap_source": "prototype-policy",
-            "packages": list(CURL_BOOTSTRAP_PACKAGES),
+            "dependency_source": dependencies["source"],
+            "capabilities": dependencies["capabilities"],
+            "resolver": dependencies["resolution"],
+            "packages": dependencies["resolution"]["packages"],
         },
         "package": {
             "format": "prototype-distro-tar-gzip",
