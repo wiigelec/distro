@@ -1,6 +1,7 @@
 # Install prototype
 
-The primary Install prototype is now a bootable installer ISO.
+The primary Install prototype now has a package-closed ISO path. See
+`../bootstrap/README.md` for the Stage-0 trust boundary and closed pipeline.
 
 ```text
 Build package repository
@@ -98,7 +99,8 @@ host-side install path for regression testing.
 ## Prototype limits
 
 This milestone remains x86_64 with a BIOS-installed target, DOS/MBR, one ext4
-root filesystem, and EXTLINUX. The installer medium itself is built with
-Archiso. GPT/UEFI target installation, encryption, swap, LVM/RAID, separate
+root filesystem, and EXTLINUX. The historical `build_iso.py` path still uses Archiso, but the accepted
+closure path builds the installer initramfs and ISO inside a Manage-created
+Distro build root using packaged cpio/gzip/Syslinux/xorriso. GPT/UEFI target installation, encryption, swap, LVM/RAID, separate
 `/boot`, networking configuration, users, locale, timezone, hostname,
 recovery, and install resume remain outside this slice.

@@ -7,7 +7,7 @@ from pathlib import Path
 
 DEFAULT_REPOSITORY = Path("/opt/distro/repository")
 DEFAULT_MANAGER = Path("/opt/distro/manage.py")
-REQUIRED_TOOLS = ("sfdisk","blockdev","udevadm","mkfs.ext4","mount","umount","extlinux")
+REQUIRED_TOOLS = ("sfdisk","blockdev","mkfs.ext4","mount","umount","extlinux")
 
 def run(command, **kwargs):
     subprocess.run(command, check=True, **kwargs)
@@ -77,7 +77,6 @@ def install(repository, manager, target):
     print(f"install-distro: replacing partition table on {target}", flush=True)
     run(["sfdisk","--wipe","always",str(target)],input="label: dos\n,,83,*\n",text=True)
     run(["blockdev","--rereadpt",str(target)])
-    run(["udevadm","settle"])
     partition=partition_path(target); wait_for_partition(partition)
 
     print(f"install-distro: creating ext4 on {partition}", flush=True)
