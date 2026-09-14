@@ -57,10 +57,17 @@ def safe_relative_path(value):
 
 def safe_symlink_target(member_name, linkname):
     link = PurePosixPath(linkname)
+
+    # Absolute symlinks are valid package payloads: once the target filesystem
+    # is used as a process root, /usr/lib/libc.so refers to that target root.
+    # Manage never dereferences the link while applying the package.
     if link.is_absolute():
-        raise RuntimeError(
-            f"package symlink {member_name} has absolute target {linkname}"
-        )
+        if ".." in link.parts:
+            raise RuntimeError(
+                f"package symlink {member_name} has unsafe target {linkname}"
+            )
+        return
+
     depth = 0
     for part in (PurePosixPath(member_name).parent / link).parts:
         if part in {"", "."}:

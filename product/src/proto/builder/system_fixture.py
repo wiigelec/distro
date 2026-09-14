@@ -82,7 +82,7 @@ cd /work/src/musl-{MUSL_VERSION}
 ./configure --prefix=/usr
 make -j"$(nproc)"
 DESTDIR=/work/musl-stage make install
-test -e /work/musl-stage/lib/ld-musl-x86_64.so.1
+test -L /work/musl-stage/lib/ld-musl-x86_64.so.1
 test -e /work/musl-stage/usr/lib/libc.so
 
 tar -xjf /work/busybox-{BUSYBOX_VERSION}.tar.bz2 -C /work/src
