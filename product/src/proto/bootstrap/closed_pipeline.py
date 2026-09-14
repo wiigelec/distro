@@ -232,15 +232,15 @@ def pipeline(seed_repository, output, iso):
             "/opt/distro/proto/bootstrap/inside_build.py",
             "assemble-iso",
             "--iso-root", "/work/installer-root",
-            "--output", "/work/final.iso",
+            "--output", "/work/output/final.iso",
         ],
         [
-            (iso_output.parent, "/work", False, False),
             (installer_root, "/work/installer-root", True, False),
+            (iso_output.parent, "/work/output", False, False),
         ],
     )
 
-    # inside_build writes /work/final.iso; normalize to the requested path.
+    # inside_build writes /work/output/final.iso; normalize to the requested path.
     produced = iso_output.parent / "final.iso"
     if produced != iso_output:
         if iso_output.exists():
