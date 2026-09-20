@@ -86,7 +86,7 @@ def archive_candidates(package: str, links: list[str]) -> dict:
     candidates = {}
     for href in links:
         filename = urllib.parse.unquote(urllib.parse.urlparse(href).path.rsplit("/", 1)[-1])
-        candidate = candidate_from_filename(package["name"], filename)
+        candidate = candidate_from_filename(package, filename)
         if candidate is None:
             continue
         current = candidates.get(candidate["version"])
