@@ -71,6 +71,13 @@ def main() -> int:
         metavar="NAME",
         help="build only this manifest package; may be repeated",
     )
+    parser.add_argument(
+        "--force",
+        action="append",
+        default=[],
+        metavar="NAME[,NAME...]",
+        help="rebuild these selected packages even when the exact identity is published",
+    )
     args = parser.parse_args()
 
     manifest = load_manifest(args.manifest)
@@ -79,17 +86,37 @@ def main() -> int:
     manifest_packages = manifest["packages"]
     package_by_name = {package["name"]: package for package in manifest_packages}
     requested = args.packages or []
-    unknown = [name for name in requested if name not in package_by_name]
+    forced = [
+        name
+        for value in args.force
+        for name in (part.strip() for part in value.split(","))
+        if name
+    ]
+    forced = list(dict.fromkeys(forced))
+
+    unknown = [
+        name
+        for name in requested + forced
+        if name not in package_by_name
+    ]
     if unknown:
         parser.error(
             "unknown manifest package(s): " + ", ".join(sorted(set(unknown)))
         )
 
-    selected_packages = (
-        [package_by_name[name] for name in dict.fromkeys(requested)]
-        if requested
-        else manifest_packages
-    )
+    if requested:
+        selected_names = list(dict.fromkeys(requested))
+        outside_selection = [name for name in forced if name not in selected_names]
+        if outside_selection:
+            parser.error(
+                "--force package(s) must also be selected by --pkg: "
+                + ", ".join(outside_selection)
+            )
+        selected_packages = [package_by_name[name] for name in selected_names]
+    else:
+        selected_packages = manifest_packages
+
+    force_set = set(forced)
     partial = bool(requested)
 
     derived = []
@@ -107,7 +134,16 @@ def main() -> int:
         recipe_path = Path(package["recipe"])
         recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
         identity = recipe["identity"]
-        cached = find_repository_record(args.output, identity)
+        cached = (
+            None
+            if identity["name"] in force_set
+            else find_repository_record(args.output, identity)
+        )
+        if identity["name"] in force_set:
+            print(
+                f"==> {identity['name']}: forced rebuild; bypass repository cache",
+                flush=True,
+            )
         if cached is not None:
             print(
                 f"==> {identity['name']}: repository hit "
@@ -173,6 +209,7 @@ def main() -> int:
         "jobs": args.jobs,
         "selected_packages": [package["name"] for package in selected_packages],
         "partial": partial,
+        "forced_packages": forced,
         "packages": skipped + builds,
         "failed_packages": [build["name"] for build in failed],
         "runtime": runtime,
