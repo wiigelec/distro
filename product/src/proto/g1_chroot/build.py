@@ -8,7 +8,7 @@ from pathlib import Path
 
 from discover import discover_package
 from execute import execute_recipe
-from package import publish_repository
+from package import load_repository_records, publish_repository
 from recipe import derive_recipe
 from runtime import verify_runtime_closure
 
@@ -109,24 +109,35 @@ def main() -> int:
     failed = [build for build in builds if build["status"] != "success"]
     runtime = None
     repository = None
-    if not failed and not partial:
-        print("==> verify staged runtime closure", flush=True)
-        runtime = verify_runtime_closure(builds)
+    if not failed:
+        if partial:
+            providers = load_repository_records(args.output)
+            print("==> verify selected runtime closure", flush=True)
+            runtime = verify_runtime_closure(builds, providers)
+        else:
+            print("==> verify staged runtime closure", flush=True)
+            runtime = verify_runtime_closure(builds)
 
-    if (
-        not failed
-        and not partial
-        and runtime["status"] == "success"
-    ):
-        print("==> publish prototype repository", flush=True)
-        repository = publish_repository(builds, manifest, args.output)
+    if not failed and runtime["status"] == "success":
+        print(
+            "==> publish incremental repository update"
+            if partial
+            else "==> publish prototype repository",
+            flush=True,
+        )
+        repository = publish_repository(
+            builds,
+            manifest,
+            args.output,
+            incremental=partial,
+        )
 
     if failed:
         status = "build-failures"
-    elif partial:
-        status = "built-partial"
     elif runtime["status"] != "success":
         status = "runtime-closure-failures"
+    elif partial:
+        status = "published-partial"
     else:
         status = "published"
 
@@ -146,13 +157,9 @@ def main() -> int:
             "refine candidate recipes from build evidence"
             if failed
             else (
-                f"./product/scripts/build {manifest['name']}"
-                if partial
-                else (
-                    "refine recipes from runtime closure evidence"
-                    if runtime["status"] != "success"
-                    else f"./product/scripts/manage install {manifest['name']}"
-                )
+                "refine recipes from runtime closure evidence"
+                if runtime["status"] != "success"
+                else f"./product/scripts/manage install {manifest['name']}"
             )
         ),
     }

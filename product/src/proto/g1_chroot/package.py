@@ -78,52 +78,113 @@ def write_artifact(
                 )
 
 
+def load_repository_records(output_root: Path) -> list[dict]:
+    database_path = output_root / "repository" / "database.json"
+    if not database_path.is_file():
+        raise RuntimeError(
+            "incremental package build requires an existing published repository; "
+            "run the manifest build once without --pkg"
+        )
+    database = json.loads(database_path.read_text(encoding="utf-8"))
+    if database.get("schema_version") != 1:
+        raise RuntimeError("unsupported repository database schema")
+    return database.get("packages", [])
+
+
+def build_record(build: dict, repository: Path) -> dict:
+    stage = Path(build["stage_dir"])
+    entries = payload_entries(stage)
+    owned_paths = [
+        relative
+        for path, relative in entries
+        if path.is_file() or path.is_symlink()
+    ]
+    metadata = package_metadata(
+        name=build["name"],
+        version=build["version"],
+        depends=[],
+        owned_paths=owned_paths,
+    )
+    artifact_name = (
+        f"{build['name']}-{build['version']}-x86_64-r1.distro.tar.gz"
+    )
+    artifact = repository / artifact_name
+    write_artifact(artifact, metadata, stage)
+    return {
+        **metadata,
+        "artifact": artifact_name,
+        "artifact_sha256": sha256_file(artifact),
+    }
+
+
 def publish_repository(
     builds: list[dict],
     manifest: dict,
     output_root: Path,
+    *,
+    incremental: bool = False,
 ) -> dict:
     repository = output_root / "repository"
     repository.mkdir(parents=True, exist_ok=True)
 
-    records = []
+    selected = {build["name"] for build in builds}
+    existing_by_name = {}
+    if incremental:
+        existing_by_name = {
+            record["identity"]["name"]: record
+            for record in load_repository_records(output_root)
+            if record["identity"]["name"] != manifest["name"]
+        }
+
+    retained = {
+        name: record
+        for name, record in existing_by_name.items()
+        if name not in selected
+    }
+
     owners: dict[str, str] = {}
-
-    for build in builds:
-        stage = Path(build["stage_dir"])
-        entries = payload_entries(stage)
-        owned_paths = [
-            relative
-            for path, relative in entries
-            if path.is_file() or path.is_symlink()
-        ]
-
-        for owned in owned_paths:
+    for name, record in retained.items():
+        artifact = repository / record["artifact"]
+        if not artifact.is_file():
+            raise RuntimeError(f"published artifact missing: {artifact.name}")
+        if sha256_file(artifact) != record["artifact_sha256"]:
+            raise RuntimeError(f"published artifact checksum mismatch: {artifact.name}")
+        for owned in record.get("owned_paths", []):
             previous = owners.get(owned)
-            if previous is not None:
+            if previous is not None and previous != name:
                 raise RuntimeError(
-                    f"payload ownership collision: {owned}: "
-                    f"{previous} and {build['name']}"
+                    f"payload ownership collision: {owned}: {previous} and {name}"
                 )
-            owners[owned] = build["name"]
+            owners[owned] = name
 
-        metadata = package_metadata(
-            name=build["name"],
-            version=build["version"],
-            depends=[],
-            owned_paths=owned_paths,
-        )
-        artifact_name = (
-            f"{build['name']}-{build['version']}-x86_64-r1.distro.tar.gz"
-        )
-        artifact = repository / artifact_name
-        write_artifact(artifact, metadata, stage)
+    new_records = {}
+    for build in builds:
+        record = build_record(build, repository)
+        name = build["name"]
+        for owned in record["owned_paths"]:
+            previous = owners.get(owned)
+            if previous is not None and previous != name:
+                raise RuntimeError(
+                    f"payload ownership collision: {owned}: {previous} and {name}"
+                )
+            owners[owned] = name
+        old = existing_by_name.get(name)
+        if old is not None and old["artifact"] != record["artifact"]:
+            old_artifact = repository / old["artifact"]
+            if old_artifact.is_file():
+                old_artifact.unlink()
+        new_records[name] = record
 
-        records.append({
-            **metadata,
-            "artifact": artifact_name,
-            "artifact_sha256": sha256_file(artifact),
-        })
+    package_records = []
+    for package in manifest["packages"]:
+        name = package["name"]
+        record = new_records.get(name) or retained.get(name)
+        if record is None:
+            raise RuntimeError(
+                f"repository is missing manifest package {name}; "
+                "run a full manifest build first"
+            )
+        package_records.append(record)
 
     meta_name = manifest["name"]
     meta_metadata = package_metadata(
@@ -135,12 +196,13 @@ def publish_repository(
     meta_artifact_name = f"{meta_name}-1-x86_64-r1.distro.tar.gz"
     meta_artifact = repository / meta_artifact_name
     write_artifact(meta_artifact, meta_metadata, None)
-    records.append({
+    meta_record = {
         **meta_metadata,
         "artifact": meta_artifact_name,
         "artifact_sha256": sha256_file(meta_artifact),
-    })
+    }
 
+    records = package_records + [meta_record]
     database = {
         "schema_version": 1,
         "packages": records,
@@ -154,6 +216,8 @@ def publish_repository(
     return {
         "repository": str(repository),
         "database": str(database_path),
+        "incremental": incremental,
+        "updated_packages": sorted(selected),
         "packages": [
             {
                 "name": record["identity"]["name"],

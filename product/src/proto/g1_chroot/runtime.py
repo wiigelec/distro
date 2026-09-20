@@ -21,10 +21,22 @@ def readelf(path: Path, *args: str) -> str | None:
     return completed.stdout
 
 
-def verify_runtime_closure(builds: list[dict]) -> dict:
+def verify_runtime_closure(
+    builds: list[dict],
+    provider_records: list[dict] | None = None,
+) -> dict:
     by_basename: dict[str, set[str]] = {}
     absolute_paths: set[str] = set()
     files: list[tuple[str, Path, str]] = []
+    selected = {build["name"] for build in builds}
+
+    for record in provider_records or []:
+        package = record["identity"]["name"]
+        if package in selected:
+            continue
+        for relative in record.get("owned_paths", []):
+            absolute_paths.add("/" + relative)
+            by_basename.setdefault(Path(relative).name, set()).add(package)
 
     for build in builds:
         package = build["name"]
