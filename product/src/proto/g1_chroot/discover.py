@@ -60,10 +60,14 @@ def candidate_from_filename(package: str, filename: str):
         return None
 
     version = stem[len(prefix):]
-    if not version or any(marker in version.lower() for marker in UNSTABLE_MARKERS):
+
+    # Release archives must begin immediately with a numeric version. This
+    # excludes auxiliary archives such as bash-doc-*, readline-doc-*, and
+    # glibc-ports-* without package-specific deny lists.
+    if not version or not version[0].isdigit():
         return None
 
-    if not re.search(r"\d", version):
+    if any(marker in version.lower() for marker in UNSTABLE_MARKERS):
         return None
 
     return {
