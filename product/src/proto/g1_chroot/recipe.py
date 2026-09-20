@@ -89,7 +89,13 @@ def documentation_evidence(source: Path) -> list[str]:
 def commands_for(package: str, method: str) -> list[str]:
     if method == "autotools":
         configure = 'cd "$BUILD" && "$SRC/configure" --prefix=/usr'
-        if package == "ncurses":
+        if package == "gmp":
+            # GMP 6.3.0's compiler probe is not C23-clean. GCC 15 defaults
+            # to gnu23, so force the older GNU C dialect expected by the
+            # upstream configure test while leaving GMP's ABI/optimization
+            # selection intact.
+            configure = 'cd "$BUILD" && CC="gcc -std=gnu17" "$SRC/configure" --prefix=/usr'
+        elif package == "ncurses":
             # Learned from upstream INSTALL after runtime closure showed Bash
             # linked against libncursesw.so.6 while the default ncurses build
             # staged only static libraries.
