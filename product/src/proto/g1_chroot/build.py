@@ -3,9 +3,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 
 from discover import discover_package
+from execute import execute_recipe
 from recipe import derive_recipe
 
 HERE = Path(__file__).resolve().parent
@@ -55,37 +57,53 @@ def main() -> int:
         type=Path,
         default=Path("/tmp/distro-g1-chroot"),
     )
+    parser.add_argument(
+        "--jobs",
+        type=int,
+        default=os.cpu_count() or 1,
+    )
     args = parser.parse_args()
 
     manifest = load_manifest(args.manifest)
     args.output.mkdir(parents=True, exist_ok=True)
 
-    resolved = []
-    recipes = []
+    derived = []
     for package in manifest["packages"]:
         print(
             f"==> {package['name']}: resolve {package['management']}",
             flush=True,
         )
         selected = discover_package(package)
-        resolved.append(selected)
-        recipes.append(derive_recipe(selected, args.output))
+        derived.append(derive_recipe(selected, args.output))
 
+    builds = []
+    for package in derived:
+        recipe_path = Path(package["recipe"])
+        builds.append(execute_recipe(recipe_path, args.output, args.jobs))
+
+    failed = [build for build in builds if build["status"] != "success"]
     result = {
-        "status": "recipes-derived",
+        "status": "build-failures" if failed else "built",
         "operation": "build",
         "manifest": manifest["name"],
         "output": str(args.output),
-        "packages": recipes,
-        "next": "execute candidate recipes and refine from build evidence",
+        "jobs": args.jobs,
+        "packages": builds,
+        "failed_packages": [build["name"] for build in failed],
+        "next": (
+            "refine candidate recipes from build evidence"
+            if failed
+            else "package staged payloads and publish prototype repository"
+        ),
     }
+
     result_path = args.output / "result.json"
     result_path.write_text(
         json.dumps(result, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
     print(json.dumps(result, indent=2, sort_keys=True))
-    return 0
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":
