@@ -81,14 +81,28 @@ def write_artifact(
 def load_repository_records(output_root: Path) -> list[dict]:
     database_path = output_root / "repository" / "database.json"
     if not database_path.is_file():
-        raise RuntimeError(
-            "incremental package build requires an existing published repository; "
-            "run the manifest build once without --pkg"
-        )
+        return []
     database = json.loads(database_path.read_text(encoding="utf-8"))
     if database.get("schema_version") != 1:
         raise RuntimeError("unsupported repository database schema")
     return database.get("packages", [])
+
+
+def find_repository_record(
+    output_root: Path,
+    identity: dict,
+) -> dict | None:
+    repository = output_root / "repository"
+    for record in load_repository_records(output_root):
+        if record.get("identity") != identity:
+            continue
+        artifact = repository / record["artifact"]
+        if not artifact.is_file():
+            raise RuntimeError(f"published artifact missing: {artifact.name}")
+        if sha256_file(artifact) != record["artifact_sha256"]:
+            raise RuntimeError(f"published artifact checksum mismatch: {artifact.name}")
+        return record
+    return None
 
 
 def build_record(build: dict, repository: Path) -> dict:
@@ -176,33 +190,39 @@ def publish_repository(
         new_records[name] = record
 
     package_records = []
+    missing_packages = []
     for package in manifest["packages"]:
         name = package["name"]
         record = new_records.get(name) or retained.get(name)
         if record is None:
-            raise RuntimeError(
-                f"repository is missing manifest package {name}; "
-                "run a full manifest build first"
-            )
+            missing_packages.append(name)
+            continue
         package_records.append(record)
 
     meta_name = manifest["name"]
-    meta_metadata = package_metadata(
-        name=meta_name,
-        version="1",
-        depends=[{"name": package["name"]} for package in manifest["packages"]],
-        owned_paths=[],
-    )
     meta_artifact_name = f"{meta_name}-1-x86_64-r1.distro.tar.gz"
     meta_artifact = repository / meta_artifact_name
-    write_artifact(meta_artifact, meta_metadata, None)
-    meta_record = {
-        **meta_metadata,
-        "artifact": meta_artifact_name,
-        "artifact_sha256": sha256_file(meta_artifact),
-    }
+    meta_record = None
+    if not missing_packages:
+        meta_metadata = package_metadata(
+            name=meta_name,
+            version="1",
+            depends=[{"name": package["name"]} for package in manifest["packages"]],
+            owned_paths=[],
+        )
+        write_artifact(meta_artifact, meta_metadata, None)
+        meta_record = {
+            **meta_metadata,
+            "artifact": meta_artifact_name,
+            "artifact_sha256": sha256_file(meta_artifact),
+        }
+    elif meta_artifact.is_file():
+        # The manifest grew or otherwise became incomplete. Do not leave a
+        # stale meta-package installable while some manifest packages are
+        # absent from the repository.
+        meta_artifact.unlink()
 
-    records = package_records + [meta_record]
+    records = package_records + ([meta_record] if meta_record is not None else [])
     database = {
         "schema_version": 1,
         "packages": records,
@@ -217,6 +237,8 @@ def publish_repository(
         "repository": str(repository),
         "database": str(database_path),
         "incremental": incremental,
+        "complete": not missing_packages,
+        "missing_packages": missing_packages,
         "updated_packages": sorted(selected),
         "packages": [
             {

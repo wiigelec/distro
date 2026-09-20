@@ -8,7 +8,7 @@ from pathlib import Path
 
 from discover import discover_package
 from execute import execute_recipe
-from package import load_repository_records, publish_repository
+from package import find_repository_record, load_repository_records, publish_repository
 from recipe import derive_recipe
 from runtime import verify_runtime_closure
 
@@ -102,40 +102,64 @@ def main() -> int:
         derived.append(derive_recipe(selected, args.output))
 
     builds = []
+    skipped = []
     for package in derived:
         recipe_path = Path(package["recipe"])
+        recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
+        identity = recipe["identity"]
+        cached = find_repository_record(args.output, identity)
+        if cached is not None:
+            print(
+                f"==> {identity['name']}: repository hit "
+                f"{identity['version']}-{identity['architecture']}-{identity['revision']}; "
+                "skip build",
+                flush=True,
+            )
+            skipped.append(
+                {
+                    "name": identity["name"],
+                    "version": identity["version"],
+                    "architecture": identity["architecture"],
+                    "revision": identity["revision"],
+                    "artifact": cached["artifact"],
+                    "artifact_sha256": cached["artifact_sha256"],
+                    "reason": "exact package identity already published",
+                    "status": "skipped",
+                }
+            )
+            continue
         builds.append(execute_recipe(recipe_path, args.output, args.jobs))
 
     failed = [build for build in builds if build["status"] != "success"]
     runtime = None
     repository = None
     if not failed:
-        if partial:
+        if builds:
             providers = load_repository_records(args.output)
             print("==> verify selected runtime closure", flush=True)
             runtime = verify_runtime_closure(builds, providers)
         else:
-            print("==> verify staged runtime closure", flush=True)
-            runtime = verify_runtime_closure(builds)
+            runtime = {
+                "dependencies": {},
+                "missing": [],
+                "status": "success",
+            }
 
-    if not failed and runtime["status"] == "success":
-        print(
-            "==> publish incremental repository update"
-            if partial
-            else "==> publish prototype repository",
-            flush=True,
-        )
+    if builds and not failed and runtime["status"] == "success":
+        print("==> publish repository update", flush=True)
         repository = publish_repository(
             builds,
             manifest,
             args.output,
-            incremental=partial,
+            incremental=True,
         )
 
     if failed:
         status = "build-failures"
     elif runtime["status"] != "success":
         status = "runtime-closure-failures"
+    elif not builds:
+        status = "up-to-date"
     elif partial:
         status = "published-partial"
     else:
@@ -149,7 +173,7 @@ def main() -> int:
         "jobs": args.jobs,
         "selected_packages": [package["name"] for package in selected_packages],
         "partial": partial,
-        "packages": builds,
+        "packages": skipped + builds,
         "failed_packages": [build["name"] for build in failed],
         "runtime": runtime,
         "repository": repository,
@@ -159,7 +183,12 @@ def main() -> int:
             else (
                 "refine recipes from runtime closure evidence"
                 if runtime["status"] != "success"
-                else f"./product/scripts/manage install {manifest['name']}"
+                else (
+                    "build remaining manifest packages: "
+                    + ", ".join(repository["missing_packages"])
+                    if repository is not None and not repository["complete"]
+                    else f"./product/scripts/manage install {manifest['name']}"
+                )
             )
         ),
     }
