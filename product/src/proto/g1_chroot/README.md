@@ -1,6 +1,6 @@
 # G1 chroot prototype
 
-This prototype explores the first Generation-1 package set from a clean branch
+This prototype explores a Generation-1 package set built from a clean branch
 based on `main`.
 
 Public prototype interface:
@@ -10,45 +10,59 @@ Public prototype interface:
 ./product/scripts/manage install g1-chroot
 ```
 
-`g1-chroot` is a desired-state manifest. Each package entry contains exactly:
-
-- package name;
-- upstream discovery URL;
-- management policy: `stable`, `lts`, or `bleeding-edge`.
-
-The manifest does not pin concrete versions, checksums, build commands, or
-recipes. Build owns those decisions and generated state.
+`g1-chroot` is a desired-state manifest. Each package entry contains only a
+package name, upstream discovery URL, and management policy.
 
 For `stable` packages Build now:
 
 1. selects the newest stable source release from the upstream release index;
 2. downloads and hashes the source;
-3. safely extracts it and derives a candidate recipe from source-tree evidence;
-4. executes every candidate recipe in the Generation-0 Arch environment;
-5. stages successful installs under a package-specific `DESTDIR`;
-6. preserves each package's build log and reports all failures together.
+3. derives a candidate recipe from source-tree evidence;
+4. builds and stages the package in the Generation-0 Arch environment;
+5. packages the staged payload as a `.distro.tar.gz` artifact;
+6. publishes a prototype `database.json`;
+7. synthesizes a no-payload `g1-chroot` meta-package whose dependencies are the
+   package names in the manifest.
 
-`lts` and `bleeding-edge` are recognized manifest values but intentionally fail
-until their selection semantics are prototyped.
+The prototype repository is written to:
 
-Run:
-
-```sh
-./product/scripts/build g1-chroot
+```text
+/tmp/distro-g1-chroot/repository
 ```
 
-Use `--jobs N` to control build parallelism. Generated source archives, work
-trees, candidate recipes, build logs, staged roots, and the aggregate result are
-written below `/tmp/distro-g1-chroot` by default.
+Then Manage can resolve and install the generated closure:
 
-Candidate recipes are still prototype-generated evidence, not accepted product
-recipes. A failed package does not prevent the remaining packages from being
-attempted. The aggregate result identifies failed commands and points to the
-per-package logs so recipe derivation can be refined from actual build behavior.
+```sh
+./product/scripts/manage install g1-chroot
+```
 
-Once all five packages stage successfully, the next slice packages those staged
-roots, publishes a prototype package repository plus the generated
-`g1-chroot` meta-package, and lets Manage install that closure.
+The default managed root is:
 
-The first functional target remains a chroot containing GNU Bash and GNU
-Coreutils (`ls`) without BusyBox.
+```text
+/tmp/distro-g1-root
+```
+
+Manage verifies package checksums and embedded identity, resolves named
+dependencies, checks owned-path conflicts, installs payloads, and records
+installed state in `var/lib/distro/manage/installed.json` inside the target.
+
+At this stage the meta-package expresses the complete G1 set closure. Precise
+per-package runtime dependency discovery is intentionally still unresolved; the
+five real packages currently publish with empty dependency lists, while
+`g1-chroot` depends on all five. The generated GNU Info `usr/share/info/dir`
+index is excluded from package ownership to avoid false cross-package ownership
+collisions.
+
+`lts` and `bleeding-edge` remain recognized but unimplemented management
+policies.
+
+The immediate acceptance target is:
+
+```sh
+sudo chroot /tmp/distro-g1-root /usr/bin/bash
+/usr/bin/ls -l /
+```
+
+This intentionally uses `/usr/bin/bash` for the first closure proof. A
+distro-owned filesystem package or equivalent merged-/usr policy can add
+`/bin -> usr/bin` once the package/repository/Manage path is proven.

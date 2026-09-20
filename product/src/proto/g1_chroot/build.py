@@ -8,6 +8,7 @@ from pathlib import Path
 
 from discover import discover_package
 from execute import execute_recipe
+from package import publish_repository
 from recipe import derive_recipe
 
 HERE = Path(__file__).resolve().parent
@@ -82,18 +83,24 @@ def main() -> int:
         builds.append(execute_recipe(recipe_path, args.output, args.jobs))
 
     failed = [build for build in builds if build["status"] != "success"]
+    repository = None
+    if not failed:
+        print("==> publish prototype repository", flush=True)
+        repository = publish_repository(builds, manifest, args.output)
+
     result = {
-        "status": "build-failures" if failed else "built",
+        "status": "build-failures" if failed else "published",
         "operation": "build",
         "manifest": manifest["name"],
         "output": str(args.output),
         "jobs": args.jobs,
         "packages": builds,
         "failed_packages": [build["name"] for build in failed],
+        "repository": repository,
         "next": (
             "refine candidate recipes from build evidence"
             if failed
-            else "package staged payloads and publish prototype repository"
+            else f"./product/scripts/manage install {manifest['name']}"
         ),
     }
 
