@@ -64,13 +64,36 @@ def main() -> int:
         type=int,
         default=os.cpu_count() or 1,
     )
+    parser.add_argument(
+        "--pkg",
+        action="append",
+        dest="packages",
+        metavar="NAME",
+        help="build only this manifest package; may be repeated",
+    )
     args = parser.parse_args()
 
     manifest = load_manifest(args.manifest)
     args.output.mkdir(parents=True, exist_ok=True)
 
+    manifest_packages = manifest["packages"]
+    package_by_name = {package["name"]: package for package in manifest_packages}
+    requested = args.packages or []
+    unknown = [name for name in requested if name not in package_by_name]
+    if unknown:
+        parser.error(
+            "unknown manifest package(s): " + ", ".join(sorted(set(unknown)))
+        )
+
+    selected_packages = (
+        [package_by_name[name] for name in dict.fromkeys(requested)]
+        if requested
+        else manifest_packages
+    )
+    partial = bool(requested)
+
     derived = []
-    for package in manifest["packages"]:
+    for package in selected_packages:
         print(
             f"==> {package['name']}: resolve {package['management']}",
             flush=True,
@@ -86,19 +109,26 @@ def main() -> int:
     failed = [build for build in builds if build["status"] != "success"]
     runtime = None
     repository = None
-    if not failed:
+    if not failed and not partial:
         print("==> verify staged runtime closure", flush=True)
         runtime = verify_runtime_closure(builds)
 
-    if not failed and runtime["status"] == "success":
+    if (
+        not failed
+        and not partial
+        and runtime["status"] == "success"
+    ):
         print("==> publish prototype repository", flush=True)
         repository = publish_repository(builds, manifest, args.output)
 
-    status = "build-failures" if failed else (
-        "runtime-closure-failures"
-        if runtime["status"] != "success"
-        else "published"
-    )
+    if failed:
+        status = "build-failures"
+    elif partial:
+        status = "built-partial"
+    elif runtime["status"] != "success":
+        status = "runtime-closure-failures"
+    else:
+        status = "published"
 
     result = {
         "status": status,
@@ -106,6 +136,8 @@ def main() -> int:
         "manifest": manifest["name"],
         "output": str(args.output),
         "jobs": args.jobs,
+        "selected_packages": [package["name"] for package in selected_packages],
+        "partial": partial,
         "packages": builds,
         "failed_packages": [build["name"] for build in failed],
         "runtime": runtime,
@@ -114,9 +146,13 @@ def main() -> int:
             "refine candidate recipes from build evidence"
             if failed
             else (
-                "refine recipes from runtime closure evidence"
-                if runtime["status"] != "success"
-                else f"./product/scripts/manage install {manifest['name']}"
+                f"./product/scripts/build {manifest['name']}"
+                if partial
+                else (
+                    "refine recipes from runtime closure evidence"
+                    if runtime["status"] != "success"
+                    else f"./product/scripts/manage install {manifest['name']}"
+                )
             )
         ),
     }
@@ -127,7 +163,7 @@ def main() -> int:
         encoding="utf-8",
     )
     print(json.dumps(result, indent=2, sort_keys=True))
-    return 1 if status != "published" else 0
+    return 1 if status in {"build-failures", "runtime-closure-failures"} else 0
 
 
 if __name__ == "__main__":
