@@ -10,14 +10,29 @@ Public prototype interface:
 ./product/scripts/manage install g1-chroot
 ```
 
-`g1-chroot` is a desired-state manifest. It lists only the packages that belong
-to the set, each package's upstream location, and its management policy.
+`g1-chroot` is a desired-state manifest. Each package entry contains exactly:
+
+- package name;
+- upstream discovery URL;
+- management policy: `stable`, `lts`, or `bleeding-edge`.
 
 The manifest does not pin concrete versions, checksums, build commands, or
-recipes. Build is responsible for discovering an appropriate upstream version
-from the declared policy, deriving or locating a recipe, building package
-artifacts, and producing a `g1-chroot` meta-package whose runtime dependencies
-represent the resolved package set.
+recipes. Build owns those decisions and generated state.
 
-The first functional target is a chroot containing GNU Bash and GNU Coreutils
-(`ls`) without BusyBox.
+The first implemented Build step resolves `stable` packages by inspecting their
+upstream release indexes, excluding prerelease-looking archives, and selecting
+the newest stable version it can identify. `lts` and `bleeding-edge` are
+recognized manifest values but intentionally fail until their selection
+semantics are prototyped.
+
+Run:
+
+```sh
+./product/scripts/build g1-chroot
+```
+
+The command currently reports the concrete source version and source URL selected
+for every package. Recipe discovery and package production are the next slice.
+
+The first functional target remains a chroot containing GNU Bash and GNU
+Coreutils (`ls`) without BusyBox.

@@ -4,27 +4,27 @@
   "packages": [
     {
       "name": "glibc",
-      "url": "https://sourceware.org/git/glibc.git",
+      "url": "https://ftp.gnu.org/gnu/glibc/",
       "management": "stable"
     },
     {
       "name": "ncurses",
-      "url": "https://invisible-island.net/ncurses/",
+      "url": "https://invisible-mirror.net/archives/ncurses/",
       "management": "stable"
     },
     {
       "name": "readline",
-      "url": "https://git.savannah.gnu.org/git/readline.git",
+      "url": "https://ftp.gnu.org/gnu/readline/",
       "management": "stable"
     },
     {
       "name": "bash",
-      "url": "https://git.savannah.gnu.org/git/bash.git",
+      "url": "https://ftp.gnu.org/gnu/bash/",
       "management": "stable"
     },
     {
       "name": "coreutils",
-      "url": "https://git.savannah.gnu.org/git/coreutils.git",
+      "url": "https://ftp.gnu.org/gnu/coreutils/",
       "management": "stable"
     }
   ]
