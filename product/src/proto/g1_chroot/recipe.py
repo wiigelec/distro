@@ -94,6 +94,14 @@ def commands_for(package: str, method: str) -> list[str]:
             # linked against libncursesw.so.6 while the default ncurses build
             # staged only static libraries.
             configure += " --with-shared --with-versioned-syms --libdir=/usr/lib64"
+        elif package == "gcc":
+            # Build the native bootstrap compiler without a three-stage GCC
+            # bootstrap and without 32-bit multilib requirements.
+            configure += (
+                " --disable-bootstrap"
+                " --disable-multilib"
+                " --enable-languages=c,c++"
+            )
         elif package == "coreutils":
             # Keep the bootstrap closure minimal and deterministic. Coreutils
             # otherwise auto-detects optional G0 libraries and links against

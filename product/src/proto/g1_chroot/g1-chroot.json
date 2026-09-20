@@ -26,6 +26,36 @@
       "name": "coreutils",
       "url": "https://ftp.gnu.org/gnu/coreutils/",
       "management": "stable"
+    },
+    {
+      "name": "gmp",
+      "url": "https://ftp.gnu.org/gnu/gmp/",
+      "management": "stable"
+    },
+    {
+      "name": "mpfr",
+      "url": "https://ftp.gnu.org/gnu/mpfr/",
+      "management": "stable"
+    },
+    {
+      "name": "mpc",
+      "url": "https://ftp.gnu.org/gnu/mpc/",
+      "management": "stable"
+    },
+    {
+      "name": "binutils",
+      "url": "https://ftp.gnu.org/gnu/binutils/",
+      "management": "stable"
+    },
+    {
+      "name": "gcc",
+      "url": "https://ftp.gnu.org/gnu/gcc/",
+      "management": "stable"
+    },
+    {
+      "name": "make",
+      "url": "https://ftp.gnu.org/gnu/make/",
+      "management": "stable"
     }
   ]
 }

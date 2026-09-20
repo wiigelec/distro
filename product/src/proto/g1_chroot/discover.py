@@ -76,12 +76,15 @@ def candidate_from_filename(package: str, filename: str):
     }
 
 
-def discover_stable(package: dict) -> dict:
+def parse_links(url: str) -> list[str]:
     parser = LinkParser()
-    parser.feed(fetch_text(package["url"]))
+    parser.feed(fetch_text(url))
+    return parser.links
 
+
+def archive_candidates(package: str, links: list[str]) -> dict:
     candidates = {}
-    for href in parser.links:
+    for href in links:
         filename = urllib.parse.unquote(urllib.parse.urlparse(href).path.rsplit("/", 1)[-1])
         candidate = candidate_from_filename(package["name"], filename)
         if candidate is None:
@@ -97,6 +100,50 @@ def discover_stable(package: dict) -> dict:
             ),
         )[0]
         candidates[candidate["version"]] = preferred
+    return candidates
+
+
+def release_directory(package: str, href: str):
+    path = urllib.parse.unquote(urllib.parse.urlparse(href).path)
+    name = path.rstrip("/").rsplit("/", 1)[-1]
+    prefixes = (f"{package}-", f"{package}_")
+    prefix = next((value for value in prefixes if name.startswith(value)), None)
+    if prefix is None:
+        return None
+    version = name[len(prefix):]
+    if not version or not version[0].isdigit():
+        return None
+    if any(marker in version.lower() for marker in UNSTABLE_MARKERS):
+        return None
+    return {"version": version, "href": href}
+
+
+def discover_stable(package: dict) -> dict:
+    links = parse_links(package["url"])
+    candidates = archive_candidates(package["name"], links)
+    discovery_url = package["url"]
+
+    if not candidates:
+        directories = [
+            candidate
+            for href in links
+            if (candidate := release_directory(package["name"], href)) is not None
+        ]
+        if directories:
+            selected_dir = max(
+                directories,
+                key=lambda item: version_key(item["version"]),
+            )
+            discovery_url = urllib.parse.urljoin(package["url"], selected_dir["href"])
+            candidates = archive_candidates(
+                package["name"],
+                parse_links(discovery_url),
+            )
+            candidates = {
+                version: candidate
+                for version, candidate in candidates.items()
+                if version == selected_dir["version"]
+            }
 
     if not candidates:
         raise RuntimeError(
@@ -108,8 +155,8 @@ def discover_stable(package: dict) -> dict:
         "name": package["name"],
         "management": package["management"],
         "version": selected["version"],
-        "source_url": urllib.parse.urljoin(package["url"], selected["filename"]),
-        "discovery_url": package["url"],
+        "source_url": urllib.parse.urljoin(discovery_url, selected["filename"]),
+        "discovery_url": discovery_url,
     }
 
 
