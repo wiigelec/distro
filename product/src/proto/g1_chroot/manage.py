@@ -72,7 +72,13 @@ def validate_member(member: tarfile.TarInfo) -> None:
     if path.is_absolute() or ".." in path.parts:
         raise RuntimeError(f"unsafe package path: {member.name}")
     if member.islnk():
-        raise RuntimeError(f"hard links are not supported: {member.name}")
+        link = Path(member.linkname)
+        if link.is_absolute() or ".." in link.parts:
+            raise RuntimeError(f"unsafe hard-link target: {member.name}")
+        if not link.parts or link.parts[0] != "root":
+            raise RuntimeError(
+                f"hard-link target must remain inside root payload: {member.name}"
+            )
     if member.issym():
         link = Path(member.linkname)
         if link.is_absolute():
@@ -153,6 +159,7 @@ def install_artifact(root: Path, artifact: Path) -> None:
         if not payload.is_dir():
             raise RuntimeError(f"{artifact.name}: missing root payload")
 
+        hardlinks = {}
         for source in sorted(payload.rglob("*")):
             relative = source.relative_to(payload)
             target = root / relative
@@ -170,8 +177,17 @@ def install_artifact(root: Path, artifact: Path) -> None:
 
             if source.is_symlink():
                 target.symlink_to(os.readlink(source))
+                continue
+
+            stat = source.stat(follow_symlinks=False)
+            inode_key = (stat.st_dev, stat.st_ino)
+            existing = hardlinks.get(inode_key)
+            if stat.st_nlink > 1 and existing is not None:
+                os.link(existing, target)
             else:
                 shutil.copy2(source, target, follow_symlinks=False)
+                if stat.st_nlink > 1:
+                    hardlinks[inode_key] = target
 
 
 def install(repository: Path, root: Path, requested: str) -> dict:
