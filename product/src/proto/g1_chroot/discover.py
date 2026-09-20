@@ -105,6 +105,8 @@ def archive_candidates(package: str, links: list[str]) -> dict:
 
 def release_directory(package: str, href: str):
     path = urllib.parse.unquote(urllib.parse.urlparse(href).path)
+    if not path.endswith("/"):
+        return None
     name = path.rstrip("/").rsplit("/", 1)[-1]
     prefixes = (f"{package}-", f"{package}_")
     prefix = next((value for value in prefixes if name.startswith(value)), None)
