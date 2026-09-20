@@ -10,6 +10,7 @@ from discover import discover_package
 from execute import execute_recipe
 from package import publish_repository
 from recipe import derive_recipe
+from runtime import verify_runtime_closure
 
 HERE = Path(__file__).resolve().parent
 MANAGEMENT_POLICIES = {"stable", "lts", "bleeding-edge"}
@@ -83,24 +84,40 @@ def main() -> int:
         builds.append(execute_recipe(recipe_path, args.output, args.jobs))
 
     failed = [build for build in builds if build["status"] != "success"]
+    runtime = None
     repository = None
     if not failed:
+        print("==> verify staged runtime closure", flush=True)
+        runtime = verify_runtime_closure(builds)
+
+    if not failed and runtime["status"] == "success":
         print("==> publish prototype repository", flush=True)
         repository = publish_repository(builds, manifest, args.output)
 
+    status = "build-failures" if failed else (
+        "runtime-closure-failures"
+        if runtime["status"] != "success"
+        else "published"
+    )
+
     result = {
-        "status": "build-failures" if failed else "published",
+        "status": status,
         "operation": "build",
         "manifest": manifest["name"],
         "output": str(args.output),
         "jobs": args.jobs,
         "packages": builds,
         "failed_packages": [build["name"] for build in failed],
+        "runtime": runtime,
         "repository": repository,
         "next": (
             "refine candidate recipes from build evidence"
             if failed
-            else f"./product/scripts/manage install {manifest['name']}"
+            else (
+                "refine recipes from runtime closure evidence"
+                if runtime["status"] != "success"
+                else f"./product/scripts/manage install {manifest['name']}"
+            )
         ),
     }
 
@@ -110,7 +127,7 @@ def main() -> int:
         encoding="utf-8",
     )
     print(json.dumps(result, indent=2, sort_keys=True))
-    return 1 if failed else 0
+    return 1 if status != "published" else 0
 
 
 if __name__ == "__main__":

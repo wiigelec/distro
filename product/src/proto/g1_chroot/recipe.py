@@ -86,10 +86,16 @@ def documentation_evidence(source: Path) -> list[str]:
     return [name for name in DOCUMENTATION if (source / name).is_file()]
 
 
-def commands_for(method: str) -> list[str]:
+def commands_for(package: str, method: str) -> list[str]:
     if method == "autotools":
+        configure = 'cd "$BUILD" && "$SRC/configure" --prefix=/usr'
+        if package == "ncurses":
+            # Learned from upstream INSTALL after runtime closure showed Bash
+            # linked against libncursesw.so.6 while the default ncurses build
+            # staged only static libraries.
+            configure += " --with-shared"
         return [
-            'cd "$BUILD" && "$SRC/configure" --prefix=/usr',
+            configure,
             'cd "$BUILD" && make -j"$JOBS"',
             'cd "$BUILD" && make DESTDIR="$DESTDIR" install',
         ]
@@ -161,7 +167,7 @@ def derive_recipe(resolved: dict, output_root: Path) -> dict:
         },
         "build": {
             "system": method,
-            "commands": commands_for(method),
+            "commands": commands_for(package, method),
         },
     }
 
