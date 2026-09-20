@@ -103,7 +103,7 @@ def commands_for(package: str, method: str) -> list[str]:
                 " --disable-xattr"
                 " --disable-acl"
                 " --disable-libcap"
-                " --without-gmp"
+                " --without-libgmp"
                 " --with-openssl=no"
             )
         return [
