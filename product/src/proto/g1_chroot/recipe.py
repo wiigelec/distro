@@ -94,6 +94,18 @@ def commands_for(package: str, method: str) -> list[str]:
             # linked against libncursesw.so.6 while the default ncurses build
             # staged only static libraries.
             configure += " --with-shared"
+        elif package == "coreutils":
+            # Keep the bootstrap closure minimal and deterministic. Coreutils
+            # otherwise auto-detects optional G0 libraries and links against
+            # them, making the staged G1 payload depend on undeclared host
+            # capabilities.
+            configure += (
+                " --disable-xattr"
+                " --disable-acl"
+                " --disable-libcap"
+                " --without-gmp"
+                " --with-openssl=no"
+            )
         return [
             configure,
             'cd "$BUILD" && make -j"$JOBS"',
