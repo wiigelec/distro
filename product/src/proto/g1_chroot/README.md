@@ -19,11 +19,15 @@ Public prototype interface:
 The manifest does not pin concrete versions, checksums, build commands, or
 recipes. Build owns those decisions and generated state.
 
-The first implemented Build step resolves `stable` packages by inspecting their
-upstream release indexes, excluding prerelease-looking archives, and selecting
-the newest stable version it can identify. `lts` and `bleeding-edge` are
-recognized manifest values but intentionally fail until their selection
-semantics are prototyped.
+Build currently performs two discovery stages for `stable` packages:
+
+1. inspect the upstream release index and select the newest stable release
+   archive;
+2. download and hash that source, safely extract it, inspect the source tree for
+   supported build-system markers and documentation, and emit a candidate recipe.
+
+`lts` and `bleeding-edge` are recognized manifest values but intentionally fail
+until their selection semantics are prototyped.
 
 Run:
 
@@ -31,8 +35,13 @@ Run:
 ./product/scripts/build g1-chroot
 ```
 
-The command currently reports the concrete source version and source URL selected
-for every package. Recipe discovery and package production are the next slice.
+By default generated source archives, extracted work trees, candidate recipes,
+and the result record are written below `/tmp/distro-g1-chroot`.
+
+Candidate recipes are evidence from source inspection, not yet accepted package
+recipes. The next slice executes them in the Generation-0 Arch build environment
+and uses real build failures or package-specific requirements to refine recipe
+derivation.
 
 The first functional target remains a chroot containing GNU Bash and GNU
 Coreutils (`ls`) without BusyBox.

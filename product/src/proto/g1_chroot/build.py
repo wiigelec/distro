@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 from discover import discover_package
+from recipe import derive_recipe
 
 HERE = Path(__file__).resolve().parent
 MANAGEMENT_POLICIES = {"stable", "lts", "bleeding-edge"}
@@ -49,25 +50,41 @@ def load_manifest(name: str) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description="G1 chroot Build prototype")
     parser.add_argument("manifest")
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=Path("/tmp/distro-g1-chroot"),
+    )
     args = parser.parse_args()
 
     manifest = load_manifest(args.manifest)
+    args.output.mkdir(parents=True, exist_ok=True)
 
     resolved = []
+    recipes = []
     for package in manifest["packages"]:
         print(
             f"==> {package['name']}: resolve {package['management']}",
             flush=True,
         )
-        resolved.append(discover_package(package))
+        selected = discover_package(package)
+        resolved.append(selected)
+        recipes.append(derive_recipe(selected, args.output))
 
-    print(json.dumps({
-        "status": "resolved",
+    result = {
+        "status": "recipes-derived",
         "operation": "build",
         "manifest": manifest["name"],
-        "packages": resolved,
-        "next": "recipe discovery and package production"
-    }, indent=2, sort_keys=True))
+        "output": str(args.output),
+        "packages": recipes,
+        "next": "execute candidate recipes and refine from build evidence",
+    }
+    result_path = args.output / "result.json"
+    result_path.write_text(
+        json.dumps(result, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    print(json.dumps(result, indent=2, sort_keys=True))
     return 0
 
 
