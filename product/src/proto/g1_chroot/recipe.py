@@ -93,7 +93,7 @@ def commands_for(package: str, method: str) -> list[str]:
             # Learned from upstream INSTALL after runtime closure showed Bash
             # linked against libncursesw.so.6 while the default ncurses build
             # staged only static libraries.
-            configure += " --with-shared"
+            configure += " --with-shared --with-versioned-syms --libdir=/usr/lib64"
         elif package == "coreutils":
             # Keep the bootstrap closure minimal and deterministic. Coreutils
             # otherwise auto-detects optional G0 libraries and links against
