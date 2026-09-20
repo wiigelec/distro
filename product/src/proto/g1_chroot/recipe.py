@@ -94,6 +94,17 @@ def commands_for(package: str, method: str) -> list[str]:
             # linked against libncursesw.so.6 while the default ncurses build
             # staged only static libraries.
             configure += " --with-shared --with-versioned-syms --libdir=/usr/lib64"
+        elif package == "binutils":
+            # Avoid optional G0 integrations in the bootstrap toolchain.
+            configure += (
+                " --disable-gprofng"
+                " --without-zstd"
+                " --without-debuginfod"
+            )
+        elif package == "make":
+            # Guile support is optional and otherwise auto-detects host Guile
+            # and its garbage collector.
+            configure += " --without-guile"
         elif package == "gcc":
             # Build the native bootstrap compiler without a three-stage GCC
             # bootstrap and without 32-bit multilib requirements.

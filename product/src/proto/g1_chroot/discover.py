@@ -123,27 +123,38 @@ def discover_stable(package: dict) -> dict:
     candidates = archive_candidates(package["name"], links)
     discovery_url = package["url"]
 
-    if not candidates:
-        directories = [
-            candidate
-            for href in links
-            if (candidate := release_directory(package["name"], href)) is not None
-        ]
-        if directories:
-            selected_dir = max(
-                directories,
-                key=lambda item: version_key(item["version"]),
-            )
-            discovery_url = urllib.parse.urljoin(package["url"], selected_dir["href"])
-            candidates = archive_candidates(
-                package["name"],
-                parse_links(discovery_url),
-            )
-            candidates = {
-                version: candidate
-                for version, candidate in candidates.items()
-                if version == selected_dir["version"]
-            }
+    directories = [
+        candidate
+        for href in links
+        if (candidate := release_directory(package["name"], href)) is not None
+    ]
+    direct_version = (
+        max(candidates, key=version_key)
+        if candidates
+        else None
+    )
+    selected_dir = (
+        max(directories, key=lambda item: version_key(item["version"]))
+        if directories
+        else None
+    )
+    if (
+        selected_dir is not None
+        and (
+            direct_version is None
+            or version_key(selected_dir["version"]) > version_key(direct_version)
+        )
+    ):
+        discovery_url = urllib.parse.urljoin(package["url"], selected_dir["href"])
+        candidates = archive_candidates(
+            package["name"],
+            parse_links(discovery_url),
+        )
+        candidates = {
+            version: candidate
+            for version, candidate in candidates.items()
+            if version == selected_dir["version"]
+        }
 
     if not candidates:
         raise RuntimeError(
