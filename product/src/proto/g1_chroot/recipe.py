@@ -118,6 +118,8 @@ def commands_for(package: str, method: str) -> list[str]:
                 " --disable-bootstrap"
                 " --disable-multilib"
                 " --enable-languages=c,c++"
+                " --without-isl"
+                " --without-zstd"
             )
         elif package == "coreutils":
             # Keep the bootstrap closure minimal and deterministic. Coreutils
