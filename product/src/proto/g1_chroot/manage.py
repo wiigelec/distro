@@ -202,6 +202,18 @@ def prepare_root(root: Path) -> None:
         directory.chmod(mode)
 
 
+def finalize_root(root: Path) -> None:
+    usr_bin = root / "usr/bin"
+    bash = usr_bin / "bash"
+    sh = usr_bin / "sh"
+    if bash.exists() and not sh.exists() and not sh.is_symlink():
+        sh.symlink_to("bash")
+
+    bin_path = root / "bin"
+    if not bin_path.exists() and not bin_path.is_symlink():
+        bin_path.symlink_to("usr/bin")
+
+
 def install(repository: Path, root: Path, requested: str) -> dict:
     prepare_root(root)
     packages = load_database(repository)
@@ -223,6 +235,8 @@ def install(repository: Path, root: Path, requested: str) -> dict:
             "owned_paths": packages[name].get("owned_paths", []),
             "install_reason": "explicit" if name == requested else "dependency",
         }
+
+    finalize_root(root)
 
     state_path = root / STATE_PATH
     state_path.parent.mkdir(parents=True, exist_ok=True)
