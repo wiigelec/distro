@@ -94,7 +94,14 @@ def commands_for(package: str, method: str) -> list[str]:
             # to gnu23, so force the older GNU C dialect expected by the
             # upstream configure test while leaving GMP's ABI/optimization
             # selection intact.
-            configure = 'cd "$BUILD" && CC="gcc -std=gnu17" "$SRC/configure" --prefix=/usr'
+            configure = (
+                'cd "$BUILD" && CC="gcc -std=gnu17" "$SRC/configure"'
+                " --prefix=/usr --libdir=/usr/lib64"
+            )
+        elif package in ("mpfr", "mpc"):
+            # Keep bootstrap shared libraries on the loader-visible x86_64
+            # runtime path used by the G1 root.
+            configure += " --libdir=/usr/lib64"
         elif package == "ncurses":
             # Learned from upstream INSTALL after runtime closure showed Bash
             # linked against libncursesw.so.6 while the default ncurses build
