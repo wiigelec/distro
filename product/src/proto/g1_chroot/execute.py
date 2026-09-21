@@ -31,10 +31,43 @@ def source_root(output_root: Path, recipe: dict) -> Path:
     return children[0]
 
 
+def prepare_chroot_workspace(
+    chroot_root: Path,
+    src: Path,
+    name: str,
+    version: str,
+) -> tuple[Path, Path, Path, Path]:
+    chroot_root = chroot_root.resolve()
+    if not (chroot_root / "usr/bin/bash").is_file():
+        raise RuntimeError(f"{chroot_root}: G1 root does not contain /usr/bin/bash")
+
+    relative_work = Path("tmp") / "distro-g2" / f"{name}-{version}"
+    host_work = chroot_root / relative_work
+    if host_work.exists():
+        shutil.rmtree(host_work)
+
+    host_src = host_work / "src"
+    host_build = host_work / "build"
+    host_stage = host_work / "stage"
+    shutil.copytree(src, host_src, symlinks=True)
+    host_build.mkdir(parents=True)
+    host_stage.mkdir(parents=True)
+
+    chroot_work = Path("/") / relative_work
+    return (
+        host_work,
+        chroot_work / "src",
+        chroot_work / "build",
+        chroot_work / "stage",
+    )
+
+
 def execute_recipe(
     recipe_path: Path,
     output_root: Path,
     jobs: int,
+    *,
+    chroot_root: Path | None = None,
 ) -> dict:
     recipe = load_recipe(recipe_path)
     identity = recipe["identity"]
@@ -64,6 +97,15 @@ def execute_recipe(
         }
     )
 
+    chroot_workspace = None
+    if chroot_root is not None:
+        (
+            chroot_workspace,
+            chroot_src,
+            chroot_build,
+            chroot_stage,
+        ) = prepare_chroot_workspace(chroot_root, src, name, version)
+
     commands = recipe.get("build", {}).get("commands")
     if not isinstance(commands, list) or not commands:
         raise RuntimeError(f"{name}: recipe has no build commands")
@@ -75,6 +117,7 @@ def execute_recipe(
         "build_log": str(log),
         "build_dir": str(build),
         "stage_dir": str(stage),
+        "execution": "g1-chroot" if chroot_root is not None else "g0",
         "commands": [],
     }
 
@@ -84,10 +127,40 @@ def execute_recipe(
             handle.write(f"\n$ {command}\n")
             handle.flush()
 
+            if chroot_root is None:
+                argv = ["/bin/bash", "-o", "pipefail", "-c", command]
+                cwd = package_work
+                command_env = env
+            else:
+                script = "\n".join(
+                    [
+                        'export PATH="/usr/bin:/bin"',
+                        'export HOME="/tmp"',
+                        f'export SRC="{chroot_src}"',
+                        f'export BUILD="{chroot_build}"',
+                        f'export DESTDIR="{chroot_stage}"',
+                        f'export JOBS="{jobs}"',
+                        command,
+                    ]
+                )
+                argv = [
+                    "sudo",
+                    "chroot",
+                    f"--userspec={os.getuid()}:{os.getgid()}",
+                    str(chroot_root.resolve()),
+                    "/usr/bin/bash",
+                    "-o",
+                    "pipefail",
+                    "-c",
+                    script,
+                ]
+                cwd = None
+                command_env = None
+
             completed = subprocess.run(
-                ["/bin/bash", "-o", "pipefail", "-c", command],
-                cwd=package_work,
-                env=env,
+                argv,
+                cwd=cwd,
+                env=command_env,
                 stdout=handle,
                 stderr=subprocess.STDOUT,
                 text=True,
@@ -104,6 +177,11 @@ def execute_recipe(
                 result["failed_command"] = index
                 result["exit_code"] = completed.returncode
                 return result
+
+    if chroot_root is not None:
+        host_stage = chroot_workspace / "stage"
+        shutil.rmtree(stage)
+        shutil.copytree(host_stage, stage, symlinks=True)
 
     staged = [
         path.relative_to(stage).as_posix()

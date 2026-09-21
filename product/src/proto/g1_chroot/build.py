@@ -65,6 +65,11 @@ def main() -> int:
         default=os.cpu_count() or 1,
     )
     parser.add_argument(
+        "--chroot-root",
+        type=Path,
+        help="execute recipe build commands inside this installed G1 root",
+    )
+    parser.add_argument(
         "--pkg",
         action="append",
         dest="packages",
@@ -164,7 +169,14 @@ def main() -> int:
                 }
             )
             continue
-        builds.append(execute_recipe(recipe_path, args.output, args.jobs))
+        builds.append(
+            execute_recipe(
+                recipe_path,
+                args.output,
+                args.jobs,
+                chroot_root=args.chroot_root,
+            )
+        )
 
     failed = [build for build in builds if build["status"] != "success"]
     runtime = None
@@ -207,6 +219,11 @@ def main() -> int:
         "manifest": manifest["name"],
         "output": str(args.output),
         "jobs": args.jobs,
+        "chroot_root": (
+            str(args.chroot_root.resolve())
+            if args.chroot_root is not None
+            else None
+        ),
         "selected_packages": [package["name"] for package in selected_packages],
         "partial": partial,
         "forced_packages": forced,
