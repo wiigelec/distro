@@ -57,7 +57,7 @@ def main() -> int:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("/tmp/distro-g1-chroot"),
+        default=Path.home() / "distro-g1-chroot",
     )
     parser.add_argument(
         "--jobs",

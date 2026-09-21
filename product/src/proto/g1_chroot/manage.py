@@ -10,9 +10,13 @@ import tarfile
 import tempfile
 from pathlib import Path
 
-DEFAULT_REPOSITORY = Path("/tmp/distro-g1-chroot/repository")
-DEFAULT_ROOT = Path("/tmp/distro-g1-root")
+DEFAULT_REPOSITORY = Path.home() / "distro-g1-chroot" / "repository"
+DEFAULT_ROOT = Path.home() / "distro-g1-root"
 STATE_PATH = Path("var/lib/distro/manage/installed.json")
+ROOT_DIRECTORIES = {
+    Path("tmp"): 0o1777,
+    Path("var/tmp"): 0o1777,
+}
 
 
 def sha256_file(path: Path) -> str:
@@ -190,7 +194,16 @@ def install_artifact(root: Path, artifact: Path) -> None:
                     hardlinks[inode_key] = target
 
 
+def prepare_root(root: Path) -> None:
+    root.mkdir(parents=True, exist_ok=True)
+    for relative, mode in ROOT_DIRECTORIES.items():
+        directory = root / relative
+        directory.mkdir(parents=True, exist_ok=True)
+        directory.chmod(mode)
+
+
 def install(repository: Path, root: Path, requested: str) -> dict:
+    prepare_root(root)
     packages = load_database(repository)
     order = resolve(packages, requested)
     state = load_state(root)
