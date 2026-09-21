@@ -133,6 +133,15 @@ def commands_for(package: str, method: str) -> list[str]:
                 " --without-libgmp"
                 " --with-openssl=no"
             )
+        if package == "binutils":
+            # arlex.l provides yywrap itself, so the Flex runtime library
+            # detected by configure is unnecessary. Override LEXLIB only for
+            # Binutils to avoid a libfl runtime dependency in ar and ranlib.
+            return [
+                configure,
+                'cd "$BUILD" && make -j"$JOBS" LEXLIB=',
+                'cd "$BUILD" && make DESTDIR="$DESTDIR" LEXLIB= install',
+            ]
         return [
             configure,
             'cd "$BUILD" && make -j"$JOBS"',
