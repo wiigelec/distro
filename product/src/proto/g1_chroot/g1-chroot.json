@@ -33,6 +33,16 @@
       "management": "stable"
     },
     {
+      "name": "grep",
+      "url": "https://ftp.gnu.org/gnu/grep/",
+      "management": "stable"
+    },
+    {
+      "name": "findutils",
+      "url": "https://ftp.gnu.org/gnu/findutils/",
+      "management": "stable"
+    },
+    {
       "name": "gmp",
       "url": "https://ftp.gnu.org/gnu/gmp/",
       "management": "stable"
