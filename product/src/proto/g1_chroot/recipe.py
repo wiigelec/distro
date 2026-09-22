@@ -128,6 +128,11 @@ def commands_for(package: str, method: str) -> list[str]:
                 " --without-isl"
                 " --without-zstd"
             )
+        elif package == "sed":
+            # Sed's ACL/xattr support is optional. Disable host-detected
+            # integrations so the bootstrap package does not acquire
+            # undeclared libacl/libattr runtime dependencies.
+            configure += " --disable-acl --disable-xattr"
         elif package == "coreutils":
             # Keep the bootstrap closure minimal and deterministic. Coreutils
             # otherwise auto-detects optional G0 libraries and links against
