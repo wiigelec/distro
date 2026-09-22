@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import re
+import time
 import urllib.parse
 import urllib.request
 from html.parser import HTMLParser
@@ -121,15 +122,23 @@ def release_directory(package: str, href: str):
 
 
 def discover_stable(package: dict) -> dict:
-    links = parse_links(package["url"])
-    candidates = archive_candidates(package["name"], links)
+    candidates = {}
+    directories = []
+    for attempt in range(3):
+        links = parse_links(package["url"])
+        candidates = archive_candidates(package["name"], links)
+        directories = [
+            candidate
+            for href in links
+            if (candidate := release_directory(package["name"], href)) is not None
+        ]
+        if candidates or directories:
+            break
+        if attempt < 2:
+            time.sleep(1)
+
     discovery_url = package["url"]
 
-    directories = [
-        candidate
-        for href in links
-        if (candidate := release_directory(package["name"], href)) is not None
-    ]
     direct_version = (
         max(candidates, key=version_key)
         if candidates
