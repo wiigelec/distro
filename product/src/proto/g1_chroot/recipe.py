@@ -128,6 +128,10 @@ def commands_for(package: str, method: str) -> list[str]:
                 " --without-isl"
                 " --without-zstd"
             )
+        elif package == "grep":
+            # PCRE2 support is optional and otherwise auto-detects the G0
+            # library, introducing an undeclared runtime dependency.
+            configure += " --disable-perl-regexp"
         elif package == "sed":
             # Sed's ACL/xattr support is optional. Disable host-detected
             # integrations so the bootstrap package does not acquire
