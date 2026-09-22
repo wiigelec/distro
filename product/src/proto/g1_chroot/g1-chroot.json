@@ -28,6 +28,11 @@
       "management": "stable"
     },
     {
+      "name": "sed",
+      "url": "https://ftp.gnu.org/gnu/sed/",
+      "management": "stable"
+    },
+    {
       "name": "gmp",
       "url": "https://ftp.gnu.org/gnu/gmp/",
       "management": "stable"

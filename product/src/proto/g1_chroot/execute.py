@@ -31,6 +31,17 @@ def source_root(output_root: Path, recipe: dict) -> Path:
     return children[0]
 
 
+def prepare_chroot_devices(chroot_root: Path) -> None:
+    dev = chroot_root / "dev"
+    null = dev / "null"
+    subprocess.run(["sudo", "mkdir", "-p", str(dev)], check=True)
+    if not null.exists():
+        subprocess.run(
+            ["sudo", "mknod", "-m", "666", str(null), "c", "1", "3"],
+            check=True,
+        )
+
+
 def prepare_chroot_workspace(
     chroot_root: Path,
     src: Path,
@@ -40,6 +51,8 @@ def prepare_chroot_workspace(
     chroot_root = chroot_root.resolve()
     if not (chroot_root / "usr/bin/bash").is_file():
         raise RuntimeError(f"{chroot_root}: G1 root does not contain /usr/bin/bash")
+
+    prepare_chroot_devices(chroot_root)
 
     relative_work = Path("tmp") / "distro-g2" / f"{name}-{version}"
     host_work = chroot_root / relative_work
