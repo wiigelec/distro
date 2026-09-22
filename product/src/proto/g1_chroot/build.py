@@ -70,6 +70,14 @@ def main() -> int:
         help="execute recipe build commands inside this installed G1 root",
     )
     parser.add_argument(
+        "--seed-output",
+        type=Path,
+        help=(
+            "reuse exact package selections from this prior build output; "
+            "defaults to ~/distro-g1-chroot for chroot builds"
+        ),
+    )
+    parser.add_argument(
         "--pkg",
         action="append",
         dest="packages",
@@ -87,6 +95,10 @@ def main() -> int:
 
     manifest = load_manifest(args.manifest)
     args.output.mkdir(parents=True, exist_ok=True)
+
+    seed_output = args.seed_output
+    if args.chroot_root is not None and seed_output is None:
+        seed_output = Path.home() / "distro-g1-chroot"
 
     manifest_packages = manifest["packages"]
     package_by_name = {package["name"]: package for package in manifest_packages}
@@ -126,11 +138,38 @@ def main() -> int:
 
     derived = []
     for package in selected_packages:
-        print(
-            f"==> {package['name']}: resolve {package['management']}",
-            flush=True,
-        )
-        selected = discover_package(package)
+        if seed_output is None:
+            print(
+                f"==> {package['name']}: resolve {package['management']}",
+                flush=True,
+            )
+            selected = discover_package(package)
+        else:
+            seed_recipe_path = seed_output / "recipes" / f"{package['name']}.json"
+            if not seed_recipe_path.is_file():
+                raise RuntimeError(
+                    f"{package['name']}: seed recipe not found: {seed_recipe_path}"
+                )
+            seed_recipe = json.loads(
+                seed_recipe_path.read_text(encoding="utf-8")
+            )
+            if seed_recipe.get("identity", {}).get("name") != package["name"]:
+                raise RuntimeError(
+                    f"{package['name']}: seed recipe identity mismatch: "
+                    f"{seed_recipe_path}"
+                )
+            print(
+                f"==> {package['name']}: reuse G1 selection "
+                f"{seed_recipe['identity']['version']}",
+                flush=True,
+            )
+            selected = {
+                "name": package["name"],
+                "management": package["management"],
+                "version": seed_recipe["identity"]["version"],
+                "source_url": seed_recipe["source"]["url"],
+                "discovery_url": seed_recipe["discovery"]["discovery_url"],
+            }
         derived.append(derive_recipe(selected, args.output))
 
     builds = []
@@ -222,6 +261,11 @@ def main() -> int:
         "chroot_root": (
             str(args.chroot_root.resolve())
             if args.chroot_root is not None
+            else None
+        ),
+        "seed_output": (
+            str(seed_output.resolve())
+            if seed_output is not None
             else None
         ),
         "selected_packages": [package["name"] for package in selected_packages],
