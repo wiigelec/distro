@@ -31,13 +31,34 @@ def source_root(output_root: Path, recipe: dict) -> Path:
     return children[0]
 
 
+def invoking_ids() -> tuple[int, int]:
+    if os.geteuid() == 0:
+        sudo_uid = os.environ.get("SUDO_UID")
+        sudo_gid = os.environ.get("SUDO_GID")
+        if sudo_uid is not None and sudo_gid is not None:
+            return int(sudo_uid), int(sudo_gid)
+    return os.getuid(), os.getgid()
+
+
+def privileged_argv(*args: str) -> list[str]:
+    if os.geteuid() == 0:
+        return list(args)
+    return ["sudo", *args]
+
+
+def chown_tree(path: Path, uid: int, gid: int) -> None:
+    os.chown(path, uid, gid, follow_symlinks=False)
+    for entry in path.rglob("*"):
+        os.chown(entry, uid, gid, follow_symlinks=False)
+
+
 def prepare_chroot_devices(chroot_root: Path) -> None:
     dev = chroot_root / "dev"
     null = dev / "null"
-    subprocess.run(["sudo", "mkdir", "-p", str(dev)], check=True)
+    subprocess.run(privileged_argv("mkdir", "-p", str(dev)), check=True)
     if not null.exists():
         subprocess.run(
-            ["sudo", "mknod", "-m", "666", str(null), "c", "1", "3"],
+            privileged_argv("mknod", "-m", "666", str(null), "c", "1", "3"),
             check=True,
         )
 
@@ -65,6 +86,10 @@ def prepare_chroot_workspace(
     shutil.copytree(src, host_src, symlinks=True)
     host_build.mkdir(parents=True)
     host_stage.mkdir(parents=True)
+
+    if os.geteuid() == 0:
+        uid, gid = invoking_ids()
+        chown_tree(host_work, uid, gid)
 
     chroot_work = Path("/") / relative_work
     return (
@@ -156,17 +181,17 @@ def execute_recipe(
                         command,
                     ]
                 )
-                argv = [
-                    "sudo",
+                uid, gid = invoking_ids()
+                argv = privileged_argv(
                     "chroot",
-                    f"--userspec={os.getuid()}:{os.getgid()}",
+                    f"--userspec={uid}:{gid}",
                     str(chroot_root.resolve()),
                     "/usr/bin/bash",
                     "-o",
                     "pipefail",
                     "-c",
                     script,
-                ]
+                )
                 cwd = None
                 command_env = None
 
