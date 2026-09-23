@@ -13,6 +13,26 @@
       "management": "stable"
     },
     {
+      "name": "gawk",
+      "url": "https://ftp.gnu.org/gnu/gawk/",
+      "management": "stable"
+    },
+    {
+      "name": "diffutils",
+      "url": "https://ftp.gnu.org/gnu/diffutils/",
+      "management": "stable"
+    },
+    {
+      "name": "m4",
+      "url": "https://ftp.gnu.org/gnu/m4/",
+      "management": "stable"
+    },
+    {
+      "name": "bison",
+      "url": "https://ftp.gnu.org/gnu/bison/",
+      "management": "stable"
+    },
+    {
       "name": "glibc",
       "url": "https://ftp.gnu.org/gnu/glibc/",
       "management": "stable"
