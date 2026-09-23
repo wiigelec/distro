@@ -137,9 +137,13 @@ def commands_for(package: str, method: str) -> list[str]:
             # auto-detecting the G0 library in the bootstrap build.
             configure += " --without-readline"
         elif package == "bison":
-            # Colored/styled diagnostics via libtextstyle are optional. Avoid
-            # linking the bootstrap parser generator to a G0-only library.
-            configure += " --without-libtextstyle-prefix"
+            # libtextstyle is optional, but the prefix switch alone still
+            # permits system discovery. Force the configure cache result to
+            # no so the bootstrap build cannot link a G0 libtextstyle.
+            configure = (
+                'cd "$BUILD" && ac_cv_libtextstyle=no "$SRC/configure"'
+                " --prefix=/usr"
+            )
         elif package == "grep":
             # PCRE2 support is optional and otherwise auto-detects the G0
             # library, introducing an undeclared runtime dependency.
