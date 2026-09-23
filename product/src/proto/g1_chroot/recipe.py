@@ -87,6 +87,10 @@ def documentation_evidence(source: Path) -> list[str]:
 
 
 def commands_for(package: str, method: str) -> list[str]:
+    if method == "linux-headers":
+        return [
+            'cd "$SRC" && make -j"$JOBS" headers_install INSTALL_HDR_PATH="$DESTDIR/usr"',
+        ]
     if method == "autotools":
         configure = 'cd "$BUILD" && "$SRC/configure" --prefix=/usr'
         if package == "gmp":
@@ -206,7 +210,15 @@ def derive_recipe(resolved: dict, output_root: Path) -> dict:
     extract_root = output_root / "work" / f"{package}-{version}" / "unpack"
     source = safe_extract(archive, extract_root)
 
-    method, markers = detect_method(source)
+    if (
+        package == "linux"
+        and (source / "Makefile").is_file()
+        and (source / "include/uapi/linux").is_dir()
+    ):
+        method = "linux-headers"
+        markers = ["Makefile", "include/uapi/linux"]
+    else:
+        method, markers = detect_method(source)
     docs = documentation_evidence(source)
 
     recipe = {

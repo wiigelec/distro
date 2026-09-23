@@ -3,6 +3,11 @@
   "name": "g1-chroot",
   "packages": [
     {
+      "name": "linux",
+      "url": "https://cdn.kernel.org/pub/linux/kernel/v6.x/",
+      "management": "stable"
+    },
+    {
       "name": "glibc",
       "url": "https://ftp.gnu.org/gnu/glibc/",
       "management": "stable"
