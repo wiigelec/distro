@@ -136,6 +136,20 @@ def commands_for(package: str, method: str) -> list[str]:
             # PCRE2 support is optional and otherwise auto-detects the G0
             # library, introducing an undeclared runtime dependency.
             configure += " --disable-perl-regexp"
+        elif package == "rsync":
+            # Rsync bundles popt and can operate without these optional
+            # host integrations. Keep the bootstrap package self-contained
+            # instead of linking against G0-only libraries.
+            configure += (
+                " --with-included-popt"
+                " --disable-acl-support"
+                " --disable-xattr-support"
+                " --disable-openssl"
+                " --disable-xxhash"
+                " --disable-zstd"
+                " --disable-lz4"
+                " --disable-idn"
+            )
         elif package == "sed":
             # Sed's ACL/xattr support is optional. Disable host-detected
             # integrations so the bootstrap package does not acquire
