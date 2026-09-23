@@ -8,6 +8,11 @@
       "management": "stable"
     },
     {
+      "name": "rsync",
+      "url": "https://download.samba.org/pub/rsync/src/",
+      "management": "stable"
+    },
+    {
       "name": "glibc",
       "url": "https://ftp.gnu.org/gnu/glibc/",
       "management": "stable"
