@@ -132,6 +132,14 @@ def commands_for(package: str, method: str) -> list[str]:
                 " --without-isl"
                 " --without-zstd"
             )
+        elif package == "gawk":
+            # Readline is optional for gawk's interactive debugger. Avoid
+            # auto-detecting the G0 library in the bootstrap build.
+            configure += " --without-readline"
+        elif package == "bison":
+            # Colored/styled diagnostics via libtextstyle are optional. Avoid
+            # linking the bootstrap parser generator to a G0-only library.
+            configure += " --without-libtextstyle-prefix"
         elif package == "grep":
             # PCRE2 support is optional and otherwise auto-detects the G0
             # library, introducing an undeclared runtime dependency.
