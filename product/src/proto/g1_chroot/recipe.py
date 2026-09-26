@@ -145,20 +145,21 @@ def commands_for(package: str, method: str) -> list[str]:
                 " --prefix=/usr"
             )
         elif package == "tar":
-            # ACL/xattr support is optional and otherwise auto-detects the G0
-            # headers. Tar 1.35 then collides with the host ACL API, so keep
-            # the bootstrap archiver independent of those integrations.
-            configure += " --disable-acl --disable-xattr"
+            # Tar 1.35's own ACL configure knob is --without-posix-acls.
+            # That path also disables gnulib ACL probing, preventing the
+            # bootstrap archiver from linking the G0 libacl.
+            configure += " --without-posix-acls"
         elif package == "python":
-            # CPython intentionally auto-detects many optional extension
-            # modules. For the bootstrap interpreter, disable only the modules
-            # proven by runtime closure to link against G0-only libraries.
+            # In an out-of-tree CPython build, configure consumes
+            # Modules/Setup.local from the build tree. Disable only extension
+            # modules proven by runtime closure to link against G0 libraries.
             configure = (
-                'cd "$SRC" && printf "%s\\n"'
+                'mkdir -p "$BUILD/Modules"'
+                ' && printf "%s\\n"'
                 ' "*disabled*"'
                 ' "_bz2 zlib _uuid _zstd binascii _hashlib _decimal _lzma"'
                 ' "_dbm readline _gdbm _ctypes _ssl _sqlite3"'
-                ' > Modules/Setup.local'
+                ' > "$BUILD/Modules/Setup.local"'
                 ' && cd "$BUILD" && "$SRC/configure" --prefix=/usr'
             )
         elif package == "grep":
