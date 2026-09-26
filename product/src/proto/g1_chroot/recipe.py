@@ -160,7 +160,7 @@ def commands_for(package: str, method: str) -> list[str]:
                 ' "_bz2 zlib _uuid _zstd binascii _hashlib _decimal _lzma"'
                 ' "_dbm readline _gdbm _ctypes _ssl _sqlite3"'
                 ' > "$BUILD/Modules/Setup.local"'
-                ' && cd "$BUILD" && "$SRC/configure" --prefix=/usr'
+                ' && cd "$BUILD" && "$SRC/configure" --prefix=/usr --with-ensurepip=no'
             )
         elif package == "grep":
             # PCRE2 support is optional and otherwise auto-detects the G0
