@@ -168,9 +168,16 @@ def main() -> int:
                 "management": package["management"],
                 "version": seed_recipe["identity"]["version"],
                 "source_url": seed_recipe["source"]["url"],
+                "source_sha256": seed_recipe["source"]["sha256"],
                 "discovery_url": seed_recipe["discovery"]["discovery_url"],
             }
-        derived.append(derive_recipe(selected, args.output))
+        derived.append(
+            derive_recipe(
+                selected,
+                args.output,
+                seed_output=seed_output,
+            )
+        )
 
     builds = []
     skipped = []

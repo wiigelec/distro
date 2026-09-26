@@ -5,6 +5,8 @@ import hashlib
 import json
 import shutil
 import tarfile
+import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -40,12 +42,36 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def download(url: str, destination: Path) -> None:
+def download(
+    url: str,
+    destination: Path,
+    *,
+    attempts: int = 4,
+    timeout: int = 120,
+) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
+    temporary = destination.with_name(destination.name + ".part")
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-    with urllib.request.urlopen(request, timeout=300) as response:
-        with destination.open("wb") as output:
-            shutil.copyfileobj(response, output)
+
+    for attempt in range(1, attempts + 1):
+        try:
+            temporary.unlink(missing_ok=True)
+            with urllib.request.urlopen(request, timeout=timeout) as response:
+                with temporary.open("wb") as output:
+                    shutil.copyfileobj(response, output)
+            temporary.replace(destination)
+            return
+        except (OSError, urllib.error.URLError) as error:
+            temporary.unlink(missing_ok=True)
+            if attempt == attempts:
+                raise
+            delay = 2 ** (attempt - 1)
+            print(
+                f"==> fetch retry {attempt}/{attempts - 1} "
+                f"after {error}; sleeping {delay}s",
+                flush=True,
+            )
+            time.sleep(delay)
 
 
 def safe_extract(archive: Path, destination: Path) -> Path:
@@ -236,7 +262,12 @@ def commands_for(package: str, method: str) -> list[str]:
     raise RuntimeError(f"unsupported build method: {method}")
 
 
-def derive_recipe(resolved: dict, output_root: Path) -> dict:
+def derive_recipe(
+    resolved: dict,
+    output_root: Path,
+    *,
+    seed_output: Path | None = None,
+) -> dict:
     package = resolved["name"]
     version = resolved["version"]
     source_url = resolved["source_url"]
@@ -247,9 +278,49 @@ def derive_recipe(resolved: dict, output_root: Path) -> dict:
         raise RuntimeError(f"{package}: source URL has no archive filename")
 
     archive = output_root / "sources" / filename
-    print(f"==> {package}: fetch {source_url}", flush=True)
-    download(source_url, archive)
+    archive.parent.mkdir(parents=True, exist_ok=True)
+    expected_checksum = resolved.get("source_sha256")
+    have_source = False
+
+    if archive.is_file() and expected_checksum is not None:
+        checksum = sha256_file(archive)
+        if checksum == expected_checksum:
+            print(f"==> {package}: reuse output source {archive}", flush=True)
+            have_source = True
+        else:
+            print(
+                f"==> {package}: discard output source with checksum mismatch",
+                flush=True,
+            )
+            archive.unlink()
+
+    if not have_source and seed_output is not None:
+        seed_archive = seed_output / "sources" / filename
+        if seed_archive.is_file():
+            seed_checksum = sha256_file(seed_archive)
+            if expected_checksum is None or seed_checksum == expected_checksum:
+                print(
+                    f"==> {package}: reuse seed source {seed_archive}",
+                    flush=True,
+                )
+                shutil.copy2(seed_archive, archive)
+                have_source = True
+            else:
+                print(
+                    f"==> {package}: seed source checksum mismatch; fetch fallback",
+                    flush=True,
+                )
+
+    if not have_source:
+        print(f"==> {package}: fetch {source_url}", flush=True)
+        download(source_url, archive)
+
     checksum = sha256_file(archive)
+    if expected_checksum is not None and checksum != expected_checksum:
+        raise RuntimeError(
+            f"{package}: source checksum mismatch: "
+            f"expected {expected_checksum}, got {checksum}"
+        )
 
     extract_root = output_root / "work" / f"{package}-{version}" / "unpack"
     source = safe_extract(archive, extract_root)
