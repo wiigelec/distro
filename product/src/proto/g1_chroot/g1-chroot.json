@@ -38,6 +38,11 @@
       "management": "stable"
     },
     {
+      "name": "gzip",
+      "url": "https://ftp.gnu.org/gnu/gzip/",
+      "management": "stable"
+    },
+    {
       "name": "python",
       "url": "https://www.python.org/ftp/python/",
       "management": "stable"
