@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import re
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from html.parser import HTMLParser
@@ -33,10 +34,29 @@ class LinkParser(HTMLParser):
                 self.links.append(value)
 
 
-def fetch_text(url: str) -> str:
+def fetch_text(
+    url: str,
+    *,
+    attempts: int = 4,
+    timeout: int = 60,
+) -> str:
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-    with urllib.request.urlopen(request, timeout=60) as response:
-        return response.read().decode("utf-8", errors="replace")
+    for attempt in range(1, attempts + 1):
+        try:
+            with urllib.request.urlopen(request, timeout=timeout) as response:
+                return response.read().decode("utf-8", errors="replace")
+        except (OSError, urllib.error.URLError) as error:
+            if attempt == attempts:
+                raise
+            delay = 2 ** (attempt - 1)
+            print(
+                f"==> discovery retry {attempt}/{attempts - 1} "
+                f"after {error}; sleeping {delay}s",
+                flush=True,
+            )
+            time.sleep(delay)
+
+    raise RuntimeError(f"unreachable discovery retry state for {url}")
 
 
 def version_key(version: str):
