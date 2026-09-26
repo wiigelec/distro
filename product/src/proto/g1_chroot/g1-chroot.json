@@ -39,7 +39,7 @@
     },
     {
       "name": "gzip",
-      "url": "https://ftp.gnu.org/gnu/gzip/",
+      "url": "https://ftpmirror.gnu.org/gzip/",
       "management": "stable"
     },
     {
