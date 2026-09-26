@@ -33,6 +33,16 @@
       "management": "stable"
     },
     {
+      "name": "tar",
+      "url": "https://ftp.gnu.org/gnu/tar/",
+      "management": "stable"
+    },
+    {
+      "name": "python",
+      "url": "https://www.python.org/ftp/python/",
+      "management": "stable"
+    },
+    {
       "name": "glibc",
       "url": "https://ftp.gnu.org/gnu/glibc/",
       "management": "stable"

@@ -55,8 +55,12 @@ def candidate_from_filename(package: str, filename: str):
         return None
 
     stem = filename[:-len(suffix)]
+    stem_lower = stem.lower()
     prefixes = (f"{package}-", f"{package}_")
-    prefix = next((value for value in prefixes if stem.startswith(value)), None)
+    prefix = next(
+        (value for value in prefixes if stem_lower.startswith(value.lower())),
+        None,
+    )
     if prefix is None:
         return None
 
@@ -121,7 +125,60 @@ def release_directory(package: str, href: str):
     return {"version": version, "href": href}
 
 
+def python_release_directory(href: str):
+    path = urllib.parse.unquote(urllib.parse.urlparse(href).path)
+    if not path.endswith("/"):
+        return None
+    version = path.rstrip("/").rsplit("/", 1)[-1]
+    if re.fullmatch(r"[0-9]+(?:\.[0-9]+)+", version) is None:
+        return None
+    return {"version": version, "href": href}
+
+
+def discover_python_stable(package: dict) -> dict:
+    directories = []
+    for attempt in range(3):
+        links = parse_links(package["url"])
+        directories = [
+            candidate
+            for href in links
+            if (candidate := python_release_directory(href)) is not None
+        ]
+        if directories:
+            break
+        if attempt < 2:
+            time.sleep(1)
+
+    for selected_dir in sorted(
+        directories,
+        key=lambda item: version_key(item["version"]),
+        reverse=True,
+    ):
+        discovery_url = urllib.parse.urljoin(package["url"], selected_dir["href"])
+        candidates = archive_candidates("python", parse_links(discovery_url))
+        candidate = candidates.get(selected_dir["version"])
+        if candidate is None:
+            continue
+        return {
+            "name": package["name"],
+            "management": package["management"],
+            "version": candidate["version"],
+            "source_url": urllib.parse.urljoin(
+                discovery_url,
+                candidate["filename"],
+            ),
+            "discovery_url": discovery_url,
+        }
+
+    raise RuntimeError(
+        f"python: no stable release archives discovered at {package['url']}"
+    )
+
+
 def discover_stable(package: dict) -> dict:
+    if package["name"] == "python":
+        return discover_python_stable(package)
+
     candidates = {}
     directories = []
     for attempt in range(3):
