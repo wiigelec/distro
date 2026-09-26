@@ -144,6 +144,23 @@ def commands_for(package: str, method: str) -> list[str]:
                 'cd "$BUILD" && ac_cv_libtextstyle=no "$SRC/configure"'
                 " --prefix=/usr"
             )
+        elif package == "tar":
+            # ACL/xattr support is optional and otherwise auto-detects the G0
+            # headers. Tar 1.35 then collides with the host ACL API, so keep
+            # the bootstrap archiver independent of those integrations.
+            configure += " --disable-acl --disable-xattr"
+        elif package == "python":
+            # CPython intentionally auto-detects many optional extension
+            # modules. For the bootstrap interpreter, disable only the modules
+            # proven by runtime closure to link against G0-only libraries.
+            configure = (
+                'cd "$SRC" && printf "%s\\n"'
+                ' "*disabled*"'
+                ' "_bz2 zlib _uuid _zstd binascii _hashlib _decimal _lzma"'
+                ' "_dbm readline _gdbm _ctypes _ssl _sqlite3"'
+                ' > Modules/Setup.local'
+                ' && cd "$BUILD" && "$SRC/configure" --prefix=/usr'
+            )
         elif package == "grep":
             # PCRE2 support is optional and otherwise auto-detects the G0
             # library, introducing an undeclared runtime dependency.
