@@ -14,6 +14,8 @@ ARCHIVE_SUFFIXES = (".tar.xz", ".tar.gz", ".tar.bz2")
 UNSTABLE_MARKERS = (
     "alpha",
     "beta",
+    "devel",
+    "development",
     "pre",
     "preview",
     "rc",
