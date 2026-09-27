@@ -222,7 +222,11 @@ def commands_for(package: str, method: str) -> list[str]:
         ]
     if method == "autotools":
         configure = 'cd "$BUILD" && "$SRC/configure" --prefix=/usr'
-        if package == "gmp":
+        if package == "glibc":
+            # Keep system administration binaries under the merged-/usr
+            # executable path so /sbin can remain a compatibility symlink.
+            configure += " --sbindir=/usr/bin"
+        elif package == "gmp":
             # GMP 6.3.0's compiler probe is not C23-clean. GCC 15 defaults
             # to gnu23, so force the older GNU C dialect expected by the
             # upstream configure test while leaving GMP's ABI/optimization
