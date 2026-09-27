@@ -408,9 +408,9 @@ def derive_recipe(
     expected_checksum = resolved.get("source_sha256")
     have_source = False
 
-    if archive.is_file() and expected_checksum is not None:
+    if archive.is_file():
         checksum = sha256_file(archive)
-        if checksum == expected_checksum:
+        if expected_checksum is None or checksum == expected_checksum:
             print(f"==> {package}: reuse output source {archive}", flush=True)
             have_source = True
         else:
