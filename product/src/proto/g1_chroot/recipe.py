@@ -333,14 +333,14 @@ def commands_for(package: str, method: str) -> list[str]:
             )
         elif package == "shadow":
             # Keep the first console-login proof independent of PAM, audit,
-            # SELinux, ACL, and logind integrations.
+            # SELinux, ACL, libbsd, and logind integrations.
             configure += (
                 " --sbindir=/usr/bin"
                 " --without-libpam"
                 " --without-audit"
                 " --without-selinux"
                 " --without-acl"
-                " --without-attr"
+                " --without-libbsd"
                 " --disable-logind"
             )
         elif package == "grub":
