@@ -41,6 +41,16 @@
       "name": "perl",
       "url": "https://www.cpan.org/src/5.0/",
       "management": "stable"
+    },
+    {
+      "name": "bc",
+      "url": "https://ftpmirror.gnu.org/bc/",
+      "management": "stable"
+    },
+    {
+      "name": "gperf",
+      "url": "https://ftpmirror.gnu.org/gperf/",
+      "management": "stable"
     }
   ]
 }

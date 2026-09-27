@@ -323,6 +323,14 @@ def commands_for(package: str, method: str) -> list[str]:
                 " --without-libgmp"
                 " --with-openssl=no"
             )
+        elif package == "libxcrypt":
+            # GCC 16 diagnoses two upstream const-qualification assignments.
+            # Keep upstream's warning set while making only that warning
+            # non-fatal for this release.
+            configure = (
+                'cd "$BUILD" && CFLAGS="-O2 -g -Wno-error=discarded-qualifiers" "$SRC/configure"'
+                " --prefix=/usr"
+            )
         elif package == "shadow":
             # Keep the first console-login proof independent of PAM, audit,
             # SELinux, ACL, and logind integrations.
@@ -350,6 +358,15 @@ def commands_for(package: str, method: str) -> list[str]:
             # pkgconf installs a shared libpkgconf used by its CLI.
             # Keep it on G1's loader-visible x86_64 runtime path.
             configure += " --libdir=/usr/lib64"
+        if package == "pkgconf":
+            return [
+                configure,
+                'cd "$BUILD" && make -j"$JOBS"',
+                (
+                    'cd "$BUILD" && make DESTDIR="$DESTDIR" install'
+                    ' && ln -sf pkgconf "$DESTDIR/usr/bin/pkg-config"'
+                ),
+            ]
         if package == "binutils":
             # arlex.l provides yywrap itself, so the Flex runtime library
             # detected by configure is unnecessary. Override LEXLIB only for
@@ -391,6 +408,7 @@ def commands_for(package: str, method: str) -> list[str]:
                     " -Dbuild-su=disabled"
                     " -Dbuild-runuser=disabled"
                     " -Dbuild-chfn-chsh=disabled"
+                    " -Dbuild-newgrp=disabled"
                     " -Dbuild-agetty=enabled"
                     " -Dbuild-mount=enabled"
                     " -Dprogram-tests=false"
