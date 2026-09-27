@@ -498,6 +498,21 @@ def commands_for(package: str, method: str) -> list[str]:
             'echo "cargo install staging requires recipe refinement" >&2; exit 2',
         ]
     if method == "python":
+        if package in ("markupsafe", "jinja2"):
+            # These are Python build-time modules for systemd. Install the
+            # source packages directly into G1's site-packages rather than
+            # introducing pip/flit/setuptools into the bootstrap environment.
+            # MarkupSafe falls back to its pure-Python implementation when its
+            # optional C speedup module is absent.
+            module = "markupsafe" if package == "markupsafe" else "jinja2"
+            return [
+                (
+                    'site="$(python3 -c \'import sysconfig; '
+                    'print(sysconfig.get_path("purelib"))\')"'
+                    ' && install -d "$DESTDIR$site"'
+                    ' && cp -a "$SRC/src/' + module + '" "$DESTDIR$site/"'
+                ),
+            ]
         if package == "meson":
             # Meson is pure Python. Install its source package directly and
             # avoid Python's zipapp/zipfile path, which depends on stdlib

@@ -51,6 +51,16 @@
       "name": "gperf",
       "url": "https://ftpmirror.gnu.org/gperf/",
       "management": "stable"
+    },
+    {
+      "name": "markupsafe",
+      "url": "https://api.github.com/repos/pallets/markupsafe/releases",
+      "management": "stable"
+    },
+    {
+      "name": "jinja2",
+      "url": "https://api.github.com/repos/pallets/jinja/releases",
+      "management": "stable"
     }
   ]
 }
