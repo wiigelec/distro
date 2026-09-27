@@ -389,11 +389,18 @@ def commands_for(package: str, method: str) -> list[str]:
         ]
     if method == "python":
         if package == "meson":
-            # Meson upstream supports a standalone Python zipapp, avoiding a
-            # pip/setuptools bootstrap dependency inside G1.
+            # Meson is pure Python. Install its source package directly and
+            # avoid Python's zipapp/zipfile path, which depends on stdlib
+            # extensions intentionally omitted from the accepted G1 Python.
             return [
-                'install -d "$DESTDIR/usr/bin"',
-                'python3 "$SRC/packaging/create_zipapp.py" --outfile "$DESTDIR/usr/bin/meson" --interpreter "/usr/bin/env python3" "$SRC"',
+                'install -d "$DESTDIR/usr/bin" "$DESTDIR/usr/lib/meson"',
+                'cp "$SRC/meson.py" "$DESTDIR/usr/lib/meson/meson.py"',
+                'cp -a "$SRC/mesonbuild" "$DESTDIR/usr/lib/meson/mesonbuild"',
+                (
+                    'printf "%s\\n" "#!/bin/sh"'
+                    ' "exec python3 /usr/lib/meson/meson.py \"\\$@\""'
+                    ' > "$DESTDIR/usr/bin/meson"'
+                ),
                 'chmod 0755 "$DESTDIR/usr/bin/meson"',
             ]
         return [
