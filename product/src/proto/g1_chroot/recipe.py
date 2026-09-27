@@ -338,6 +338,7 @@ def commands_for(package: str, method: str) -> list[str]:
             # Keep the first console-login proof independent of PAM, audit,
             # SELinux, ACL, libbsd, and logind integrations.
             configure += (
+                " --bindir=/usr/bin"
                 " --sbindir=/usr/bin"
                 " --libdir=/usr/lib64"
                 " --without-libpam"
