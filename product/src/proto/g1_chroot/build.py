@@ -73,8 +73,7 @@ def main() -> int:
         "--seed-output",
         type=Path,
         help=(
-            "reuse exact package selections from this prior build output; "
-            "defaults to ~/distro-g1-chroot for chroot builds"
+            "reuse exact package selections from this prior build output"
         ),
     )
     parser.add_argument(
@@ -97,8 +96,6 @@ def main() -> int:
     args.output.mkdir(parents=True, exist_ok=True)
 
     seed_output = args.seed_output
-    if args.chroot_root is not None and seed_output is None:
-        seed_output = Path.home() / "distro-g1-chroot"
 
     manifest_packages = manifest["packages"]
     package_by_name = {package["name"]: package for package in manifest_packages}
