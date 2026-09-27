@@ -113,44 +113,50 @@ def documentation_evidence(source: Path) -> list[str]:
 
 
 def commands_for(package: str, method: str) -> list[str]:
-    if method == "linux-headers":
+    if method == "linux-kernel":
         return [
+            'cd "$SRC" && make O="$BUILD" x86_64_defconfig',
+            (
+                'cd "$SRC" && scripts/config --file "$BUILD/.config"'
+                " -d MODULES"
+                " -e BLK_DEV"
+                " -e PCI"
+                " -e VIRTIO"
+                " -e VIRTIO_PCI"
+                " -e VIRTIO_BLK"
+                " -e EXT4_FS"
+                " -e DEVTMPFS"
+                " -e DEVTMPFS_MOUNT"
+                " -e TMPFS"
+                " -e CGROUPS"
+                " -e VT"
+                " -e VT_CONSOLE"
+            ),
+            'cd "$SRC" && make O="$BUILD" olddefconfig',
+            'cd "$SRC" && make O="$BUILD" -j"$JOBS"',
             'cd "$SRC" && make -j"$JOBS" headers_install INSTALL_HDR_PATH="$DESTDIR/usr"',
+            'release="$(cd "$SRC" && make -s O="$BUILD" kernelrelease)" && install -Dm755 "$BUILD/arch/x86/boot/bzImage" "$DESTDIR/boot/vmlinuz-$release"',
         ]
     if method == "autotools":
         configure = 'cd "$BUILD" && "$SRC/configure" --prefix=/usr'
         if package == "gmp":
-            # GMP 6.3.0's compiler probe is not C23-clean. GCC 15 defaults
-            # to gnu23, so force the older GNU C dialect expected by the
-            # upstream configure test while leaving GMP's ABI/optimization
-            # selection intact.
             configure = (
                 'cd "$BUILD" && CC="gcc -std=gnu17" "$SRC/configure"'
                 " --prefix=/usr --libdir=/usr/lib64"
             )
         elif package in ("mpfr", "mpc"):
-            # Keep bootstrap shared libraries on the loader-visible x86_64
-            # runtime path used by the G1 root.
             configure += " --libdir=/usr/lib64"
         elif package == "ncurses":
-            # Learned from upstream INSTALL after runtime closure showed Bash
-            # linked against libncursesw.so.6 while the default ncurses build
-            # staged only static libraries.
             configure += " --with-shared --with-versioned-syms --libdir=/usr/lib64"
         elif package == "binutils":
-            # Avoid optional G0 integrations in the bootstrap toolchain.
             configure += (
                 " --disable-gprofng"
                 " --without-zstd"
                 " --without-debuginfod"
             )
         elif package == "make":
-            # Guile support is optional and otherwise auto-detects host Guile
-            # and its garbage collector.
             configure += " --without-guile"
         elif package == "gcc":
-            # Build the native bootstrap compiler without a three-stage GCC
-            # bootstrap and without 32-bit multilib requirements.
             configure += (
                 " --disable-bootstrap"
                 " --disable-multilib"
@@ -159,29 +165,18 @@ def commands_for(package: str, method: str) -> list[str]:
                 " --without-zstd"
             )
         elif package == "gawk":
-            # Readline is optional for gawk's interactive debugger. Avoid
-            # auto-detecting the G0 library in the bootstrap build.
             configure += " --without-readline"
         elif package == "bison":
-            # libtextstyle is optional, but the prefix switch alone still
-            # permits system discovery. Force the configure cache result to
-            # no so the bootstrap build cannot link a G0 libtextstyle.
             configure = (
                 'cd "$BUILD" && ac_cv_libtextstyle=no "$SRC/configure"'
                 " --prefix=/usr"
             )
         elif package == "tar":
-            # Tar 1.35's own ACL configure knob is --without-posix-acls.
-            # That path also disables gnulib ACL probing, preventing the
-            # bootstrap archiver from linking the G0 libacl.
             configure += " --without-posix-acls"
         elif package == "python":
-            # In an out-of-tree CPython build, configure consumes
-            # Modules/Setup.local from the build tree. Disable only extension
-            # modules proven by runtime closure to link against G0 libraries.
             configure = (
                 'mkdir -p "$BUILD/Modules"'
-                ' && printf "%s\\n"'
+                ' && printf "%s\n"'
                 ' "*disabled*"'
                 ' "_bz2 zlib _uuid _zstd binascii _hashlib _decimal _lzma"'
                 ' "_dbm readline _gdbm _ctypes _ssl _sqlite3"'
@@ -189,13 +184,8 @@ def commands_for(package: str, method: str) -> list[str]:
                 ' && cd "$BUILD" && "$SRC/configure" --prefix=/usr --with-ensurepip=no'
             )
         elif package == "grep":
-            # PCRE2 support is optional and otherwise auto-detects the G0
-            # library, introducing an undeclared runtime dependency.
             configure += " --disable-perl-regexp"
         elif package == "rsync":
-            # Rsync bundles popt and can operate without these optional
-            # host integrations. Keep the bootstrap package self-contained
-            # instead of linking against G0-only libraries.
             configure += (
                 " --with-included-popt"
                 " --disable-acl-support"
@@ -207,15 +197,8 @@ def commands_for(package: str, method: str) -> list[str]:
                 " --disable-idn"
             )
         elif package == "sed":
-            # Sed's ACL/xattr support is optional. Disable host-detected
-            # integrations so the bootstrap package does not acquire
-            # undeclared libacl/libattr runtime dependencies.
             configure += " --disable-acl --disable-xattr"
         elif package == "coreutils":
-            # Keep the bootstrap closure minimal and deterministic. Coreutils
-            # otherwise auto-detects optional G0 libraries and links against
-            # them, making the staged G1 payload depend on undeclared host
-            # capabilities.
             configure += (
                 " --disable-xattr"
                 " --disable-acl"
@@ -223,10 +206,24 @@ def commands_for(package: str, method: str) -> list[str]:
                 " --without-libgmp"
                 " --with-openssl=no"
             )
+        elif package == "shadow":
+            configure += (
+                " --sbindir=/usr/bin"
+                " --without-libpam"
+                " --without-audit"
+                " --without-selinux"
+                " --without-acl"
+                " --without-attr"
+                " --disable-logind"
+            )
+        elif package == "grub":
+            configure += (
+                " --sbindir=/usr/bin"
+                " --disable-nls"
+                " --disable-werror"
+                " --with-platform=pc"
+            )
         if package == "binutils":
-            # arlex.l provides yywrap itself, so the Flex runtime library
-            # detected by configure is unnecessary. Override LEXLIB only for
-            # Binutils to avoid a libfl runtime dependency in ar and ranlib.
             return [
                 configure,
                 'cd "$BUILD" && make -j"$JOBS" LEXLIB=',
@@ -244,6 +241,86 @@ def commands_for(package: str, method: str) -> list[str]:
             'DESTDIR="$DESTDIR" cmake --install "$BUILD"',
         ]
     if method == "meson":
+        if package == "util-linux":
+            return [
+                (
+                    'meson setup "$BUILD" "$SRC" --prefix=/usr --sbindir=bin'
+                    " -Dbuild-python=disabled"
+                    " -Dselinux=disabled"
+                    " -Daudit=disabled"
+                    " -Dsystemd=disabled"
+                    " -Dcryptsetup=disabled"
+                    " -Dcryptsetup-dlopen=disabled"
+                    " -Dzlib=disabled"
+                    " -Dlibpcre2-posix=disabled"
+                    " -Dmagic=disabled"
+                    " -Deconf=disabled"
+                    " -Dbuild-login=disabled"
+                    " -Dbuild-su=disabled"
+                    " -Dbuild-runuser=disabled"
+                    " -Dbuild-chfn-chsh=disabled"
+                    " -Dbuild-agetty=enabled"
+                    " -Dbuild-mount=enabled"
+                    " -Dprogram-tests=false"
+                ),
+                'meson compile -C "$BUILD" -j "$JOBS"',
+                'DESTDIR="$DESTDIR" meson install -C "$BUILD"',
+            ]
+        if package == "systemd":
+            return [
+                (
+                    'meson setup "$BUILD" "$SRC" --prefix=/usr --sbindir=bin --libdir=lib64'
+                    " -Dmode=release"
+                    " -Dsplit-bin=false"
+                    " -Dinitrd=false"
+                    " -Dnetworkd=false"
+                    " -Dresolve=false"
+                    " -Dtimesyncd=false"
+                    " -Dremote=disabled"
+                    " -Dcoredump=false"
+                    " -Dpstore=false"
+                    " -Doomd=false"
+                    " -Dlogind=false"
+                    " -Dhostnamed=false"
+                    " -Dlocaled=false"
+                    " -Dtimedated=false"
+                    " -Dmachined=false"
+                    " -Dportabled=false"
+                    " -Dhomed=disabled"
+                    " -Dnspawn=disabled"
+                    " -Dvmspawn=disabled"
+                    " -Drepart=disabled"
+                    " -Dsysupdate=disabled"
+                    " -Dimportd=disabled"
+                    " -Dseccomp=disabled"
+                    " -Dselinux=disabled"
+                    " -Dapparmor=disabled"
+                    " -Dpolkit=disabled"
+                    " -Dacl=disabled"
+                    " -Daudit=disabled"
+                    " -Dblkid=disabled"
+                    " -Dfdisk=disabled"
+                    " -Dkmod=disabled"
+                    " -Dpam=disabled"
+                    " -Dlibcryptsetup=disabled"
+                    " -Dlibcurl=disabled"
+                    " -Dlibidn2=disabled"
+                    " -Dqrencode=disabled"
+                    " -Dgnutls=disabled"
+                    " -Dopenssl=disabled"
+                    " -Dtpm2=disabled"
+                    " -Dzlib=disabled"
+                    " -Dbzip2=disabled"
+                    " -Dlz4=disabled"
+                    " -Dzstd=disabled"
+                    " -Dpcre2=disabled"
+                    " -Dtranslations=false"
+                    " -Dman=disabled"
+                    " -Dhtml=disabled"
+                ),
+                'meson compile -C "$BUILD" -j "$JOBS"',
+                'DESTDIR="$DESTDIR" meson install -C "$BUILD"',
+            ]
         return [
             'meson setup "$BUILD" "$SRC" --prefix=/usr',
             'meson compile -C "$BUILD" -j "$JOBS"',
@@ -330,7 +407,7 @@ def derive_recipe(
         and (source / "Makefile").is_file()
         and (source / "include/uapi/linux").is_dir()
     ):
-        method = "linux-headers"
+        method = "linux-kernel"
         markers = ["Makefile", "include/uapi/linux"]
     else:
         method, markers = detect_method(source)
