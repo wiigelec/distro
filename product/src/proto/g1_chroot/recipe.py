@@ -348,12 +348,17 @@ def commands_for(package: str, method: str) -> list[str]:
                 " --disable-logind"
             )
         elif package == "grub":
-            # The first bootable proof targets legacy BIOS only.
-            configure += (
-                " --sbindir=/usr/bin"
-                " --disable-nls"
-                " --disable-werror"
-                " --with-platform=pc"
+            # GRUB 2.12's release archive omitted grub-core/extra_deps.lst.
+            # Restore the upstream file before configuring the BIOS-only build.
+            configure = (
+                'printf "%s\\n" "depends bli part_gpt"'
+                ' > "$SRC/grub-core/extra_deps.lst"'
+                " && "
+                + configure
+                + " --sbindir=/usr/bin"
+                + " --disable-nls"
+                + " --disable-werror"
+                + " --with-platform=pc"
             )
         elif package == "zlib":
             # Keep x86_64 shared libraries on G1's loader-visible lib64 path.
