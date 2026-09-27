@@ -8,6 +8,11 @@
       "management": "stable"
     },
     {
+      "name": "zlib",
+      "url": "https://api.github.com/repos/madler/zlib/releases",
+      "management": "stable"
+    },
+    {
       "name": "meson",
       "url": "https://api.github.com/repos/mesonbuild/meson/releases",
       "management": "stable"
