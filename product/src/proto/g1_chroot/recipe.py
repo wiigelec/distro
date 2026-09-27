@@ -140,23 +140,37 @@ def commands_for(package: str, method: str) -> list[str]:
     if method == "autotools":
         configure = 'cd "$BUILD" && "$SRC/configure" --prefix=/usr'
         if package == "gmp":
+            # GMP 6.3.0's compiler probe is not C23-clean. GCC 15 defaults
+            # to gnu23, so force the older GNU C dialect expected by the
+            # upstream configure test while leaving GMP's ABI/optimization
+            # selection intact.
             configure = (
                 'cd "$BUILD" && CC="gcc -std=gnu17" "$SRC/configure"'
                 " --prefix=/usr --libdir=/usr/lib64"
             )
         elif package in ("mpfr", "mpc"):
+            # Keep bootstrap shared libraries on the loader-visible x86_64
+            # runtime path used by the G1 root.
             configure += " --libdir=/usr/lib64"
         elif package == "ncurses":
+            # Learned from upstream INSTALL after runtime closure showed Bash
+            # linked against libncursesw.so.6 while the default ncurses build
+            # staged only static libraries.
             configure += " --with-shared --with-versioned-syms --libdir=/usr/lib64"
         elif package == "binutils":
+            # Avoid optional G0 integrations in the bootstrap toolchain.
             configure += (
                 " --disable-gprofng"
                 " --without-zstd"
                 " --without-debuginfod"
             )
         elif package == "make":
+            # Guile support is optional and otherwise auto-detects host Guile
+            # and its garbage collector.
             configure += " --without-guile"
         elif package == "gcc":
+            # Build the native bootstrap compiler without a three-stage GCC
+            # bootstrap and without 32-bit multilib requirements.
             configure += (
                 " --disable-bootstrap"
                 " --disable-multilib"
@@ -165,18 +179,29 @@ def commands_for(package: str, method: str) -> list[str]:
                 " --without-zstd"
             )
         elif package == "gawk":
+            # Readline is optional for gawk's interactive debugger. Avoid
+            # auto-detecting the G0 library in the bootstrap build.
             configure += " --without-readline"
         elif package == "bison":
+            # libtextstyle is optional, but the prefix switch alone still
+            # permits system discovery. Force the configure cache result to
+            # no so the bootstrap build cannot link a G0 libtextstyle.
             configure = (
                 'cd "$BUILD" && ac_cv_libtextstyle=no "$SRC/configure"'
                 " --prefix=/usr"
             )
         elif package == "tar":
+            # Tar 1.35's own ACL configure knob is --without-posix-acls.
+            # That path also disables gnulib ACL probing, preventing the
+            # bootstrap archiver from linking the G0 libacl.
             configure += " --without-posix-acls"
         elif package == "python":
+            # In an out-of-tree CPython build, configure consumes
+            # Modules/Setup.local from the build tree. Disable only extension
+            # modules proven by runtime closure to link against G0 libraries.
             configure = (
                 'mkdir -p "$BUILD/Modules"'
-                ' && printf "%s\n"'
+                ' && printf "%s\\n"'
                 ' "*disabled*"'
                 ' "_bz2 zlib _uuid _zstd binascii _hashlib _decimal _lzma"'
                 ' "_dbm readline _gdbm _ctypes _ssl _sqlite3"'
@@ -184,8 +209,13 @@ def commands_for(package: str, method: str) -> list[str]:
                 ' && cd "$BUILD" && "$SRC/configure" --prefix=/usr --with-ensurepip=no'
             )
         elif package == "grep":
+            # PCRE2 support is optional and otherwise auto-detects the G0
+            # library, introducing an undeclared runtime dependency.
             configure += " --disable-perl-regexp"
         elif package == "rsync":
+            # Rsync bundles popt and can operate without these optional
+            # host integrations. Keep the bootstrap package self-contained
+            # instead of linking against G0-only libraries.
             configure += (
                 " --with-included-popt"
                 " --disable-acl-support"
@@ -197,8 +227,15 @@ def commands_for(package: str, method: str) -> list[str]:
                 " --disable-idn"
             )
         elif package == "sed":
+            # Sed's ACL/xattr support is optional. Disable host-detected
+            # integrations so the bootstrap package does not acquire
+            # undeclared libacl/libattr runtime dependencies.
             configure += " --disable-acl --disable-xattr"
         elif package == "coreutils":
+            # Keep the bootstrap closure minimal and deterministic. Coreutils
+            # otherwise auto-detects optional G0 libraries and links against
+            # them, making the staged G1 payload depend on undeclared host
+            # capabilities.
             configure += (
                 " --disable-xattr"
                 " --disable-acl"
@@ -207,6 +244,8 @@ def commands_for(package: str, method: str) -> list[str]:
                 " --with-openssl=no"
             )
         elif package == "shadow":
+            # Keep the first console-login proof independent of PAM, audit,
+            # SELinux, ACL, and logind integrations.
             configure += (
                 " --sbindir=/usr/bin"
                 " --without-libpam"
@@ -217,6 +256,7 @@ def commands_for(package: str, method: str) -> list[str]:
                 " --disable-logind"
             )
         elif package == "grub":
+            # The first bootable proof targets legacy BIOS only.
             configure += (
                 " --sbindir=/usr/bin"
                 " --disable-nls"
@@ -224,6 +264,9 @@ def commands_for(package: str, method: str) -> list[str]:
                 " --with-platform=pc"
             )
         if package == "binutils":
+            # arlex.l provides yywrap itself, so the Flex runtime library
+            # detected by configure is unnecessary. Override LEXLIB only for
+            # Binutils to avoid a libfl runtime dependency in ar and ranlib.
             return [
                 configure,
                 'cd "$BUILD" && make -j"$JOBS" LEXLIB=',
@@ -242,6 +285,8 @@ def commands_for(package: str, method: str) -> list[str]:
         ]
     if method == "meson":
         if package == "util-linux":
+            # Retain only the tools needed for the first boot/login proof and
+            # avoid host-detected optional integrations.
             return [
                 (
                     'meson setup "$BUILD" "$SRC" --prefix=/usr --sbindir=bin'
@@ -267,6 +312,10 @@ def commands_for(package: str, method: str) -> list[str]:
                 'DESTDIR="$DESTDIR" meson install -C "$BUILD"',
             ]
         if package == "systemd":
+            # Build only the local init/service-manager surface needed to
+            # reach a console login. Networking, initrd, PAM, security
+            # integrations, and optional compression/crypto stacks are out of
+            # scope for this milestone.
             return [
                 (
                     'meson setup "$BUILD" "$SRC" --prefix=/usr --sbindir=bin --libdir=lib64'
