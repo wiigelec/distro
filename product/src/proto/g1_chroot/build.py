@@ -51,6 +51,36 @@ def load_manifest(name: str) -> dict:
     return manifest
 
 
+def load_chroot_provider_records(root: Path) -> list[dict]:
+    state_path = root / "var/lib/distro/manage/installed.json"
+    if not state_path.is_file():
+        return []
+
+    state = json.loads(state_path.read_text(encoding="utf-8"))
+    if state.get("schema_version") != 1:
+        raise RuntimeError(f"unsupported installed-state schema: {state_path}")
+
+    records = []
+    for name, record in state.get("packages", {}).items():
+        identity = record.get("identity")
+        owned_paths = record.get("owned_paths")
+        if not isinstance(identity, dict) or identity.get("name") != name:
+            raise RuntimeError(
+                f"{state_path}: installed package identity mismatch: {name}"
+            )
+        if not isinstance(owned_paths, list):
+            raise RuntimeError(
+                f"{state_path}: installed package paths invalid: {name}"
+            )
+        records.append(
+            {
+                "identity": identity,
+                "owned_paths": owned_paths,
+            }
+        )
+    return records
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="G1 chroot Build prototype")
     parser.add_argument("manifest")
@@ -227,6 +257,8 @@ def main() -> int:
     if not failed:
         if builds:
             providers = load_repository_records(args.output)
+            if args.chroot_root is not None:
+                providers.extend(load_chroot_provider_records(args.chroot_root))
             print("==> verify selected runtime closure", flush=True)
             runtime = verify_runtime_closure(builds, providers)
         else:
