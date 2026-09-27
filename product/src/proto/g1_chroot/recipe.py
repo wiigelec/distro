@@ -329,7 +329,7 @@ def commands_for(package: str, method: str) -> list[str]:
             # non-fatal for this release.
             configure = (
                 'cd "$BUILD" && CFLAGS="-O2 -g -Wno-error=discarded-qualifiers" "$SRC/configure"'
-                " --prefix=/usr"
+                " --prefix=/usr --libdir=/usr/lib64"
             )
         elif package == "shadow":
             # Keep the first console-login proof independent of PAM, audit,
