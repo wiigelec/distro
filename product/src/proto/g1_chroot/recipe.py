@@ -358,6 +358,15 @@ def commands_for(package: str, method: str) -> list[str]:
             # pkgconf installs a shared libpkgconf used by its CLI.
             # Keep it on G1's loader-visible x86_64 runtime path.
             configure += " --libdir=/usr/lib64"
+        if package == "bc":
+            # The kernel build only needs the bc calculator. Build and stage
+            # the executable directly so bootstrap does not require Texinfo
+            # solely to regenerate upstream documentation.
+            return [
+                configure,
+                'cd "$BUILD" && make -C lib -j"$JOBS" && make -C bc -j"$JOBS"',
+                'install -Dm755 "$BUILD/bc/bc" "$DESTDIR/usr/bin/bc"',
+            ]
         if package == "pkgconf":
             return [
                 configure,
