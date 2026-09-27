@@ -302,7 +302,7 @@ def discover_github_stable(package: dict) -> dict:
 
 
 def discover_stable(package: dict) -> dict:
-    if package["name"] == "python":
+    if package["name"] in {"python", "python-binascii"}:
         return discover_python_stable(package)
     if urllib.parse.urlparse(package["url"]).hostname == "api.github.com":
         return discover_github_stable(package)

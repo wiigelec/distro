@@ -4,7 +4,7 @@
   "packages": [
     {
       "name": "python-binascii",
-      "url": "https://api.github.com/repos/python/cpython/releases",
+      "url": "https://www.python.org/ftp/python/",
       "management": "stable"
     },
     {
