@@ -137,6 +137,13 @@ def commands_for(package: str, method: str) -> list[str]:
             'cd "$SRC" && make -j"$JOBS" headers_install INSTALL_HDR_PATH="$DESTDIR/usr"',
             'release="$(cd "$SRC" && make -s O="$BUILD" kernelrelease)" && install -Dm755 "$BUILD/arch/x86/boot/bzImage" "$DESTDIR/boot/vmlinuz-$release"',
         ]
+    if method == "ninja-bootstrap":
+        # Ninja's upstream bootstrap path needs only Python and a C++ compiler,
+        # both already present in the completed G1 chroot.
+        return [
+            'cd "$SRC" && python configure.py --bootstrap',
+            'install -Dm755 "$SRC/ninja" "$DESTDIR/usr/bin/ninja"',
+        ]
     if method == "autotools":
         configure = 'cd "$BUILD" && "$SRC/configure" --prefix=/usr'
         if package == "gmp":
@@ -381,6 +388,14 @@ def commands_for(package: str, method: str) -> list[str]:
             'echo "cargo install staging requires recipe refinement" >&2; exit 2',
         ]
     if method == "python":
+        if package == "meson":
+            # Meson upstream supports a standalone Python zipapp, avoiding a
+            # pip/setuptools bootstrap dependency inside G1.
+            return [
+                'install -d "$DESTDIR/usr/bin"',
+                'python "$SRC/packaging/create_zipapp.py" --outfile "$DESTDIR/usr/bin/meson" --interpreter "/usr/bin/env python3" "$SRC"',
+                'chmod 0755 "$DESTDIR/usr/bin/meson"',
+            ]
         return [
             'cd "$SRC" && python -m build',
             'echo "python install staging requires recipe refinement" >&2; exit 2',
@@ -458,6 +473,9 @@ def derive_recipe(
     ):
         method = "linux-kernel"
         markers = ["Makefile", "include/uapi/linux"]
+    elif package == "ninja" and (source / "configure.py").is_file():
+        method = "ninja-bootstrap"
+        markers = ["configure.py"]
     else:
         method, markers = detect_method(source)
     docs = documentation_evidence(source)

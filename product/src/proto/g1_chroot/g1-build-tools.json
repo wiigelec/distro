@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "name": "g1-build-tools",
+  "packages": [
+    {
+      "name": "meson",
+      "url": "https://api.github.com/repos/mesonbuild/meson/releases",
+      "management": "stable"
+    },
+    {
+      "name": "ninja",
+      "url": "https://api.github.com/repos/ninja-build/ninja/releases",
+      "management": "stable"
+    }
+  ]
+}
