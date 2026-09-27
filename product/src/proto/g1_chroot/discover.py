@@ -205,7 +205,7 @@ def discover_perl_stable(package: dict) -> dict:
         version: candidate
         for version, candidate in candidates.items()
         if (
-            re.fullmatch(r"[0-9]+(?:\\.[0-9]+)+", version) is not None
+            re.fullmatch(r"[0-9]+(?:\.[0-9]+)+", version) is not None
             and len(version.split(".")) >= 2
             and int(version.split(".")[1]) % 2 == 0
         )
