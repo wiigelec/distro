@@ -141,7 +141,7 @@ def commands_for(package: str, method: str) -> list[str]:
         # Ninja's upstream bootstrap path needs only Python and a C++ compiler,
         # both already present in the completed G1 chroot.
         return [
-            'cd "$SRC" && python configure.py --bootstrap',
+            'cd "$SRC" && python3 configure.py --bootstrap',
             'install -Dm755 "$SRC/ninja" "$DESTDIR/usr/bin/ninja"',
         ]
     if method == "autotools":
@@ -393,7 +393,7 @@ def commands_for(package: str, method: str) -> list[str]:
             # pip/setuptools bootstrap dependency inside G1.
             return [
                 'install -d "$DESTDIR/usr/bin"',
-                'python "$SRC/packaging/create_zipapp.py" --outfile "$DESTDIR/usr/bin/meson" --interpreter "/usr/bin/env python3" "$SRC"',
+                'python3 "$SRC/packaging/create_zipapp.py" --outfile "$DESTDIR/usr/bin/meson" --interpreter "/usr/bin/env python3" "$SRC"',
                 'chmod 0755 "$DESTDIR/usr/bin/meson"',
             ]
         return [
