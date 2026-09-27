@@ -121,7 +121,7 @@ def commands_for(package: str, method: str) -> list[str]:
                 " -d MODULES"
                 " -d SYSTEM_TRUSTED_KEYRING"
                 " -d SYSTEM_REVOCATION_LIST"
-                " -d CFG80211_REQUIRE_SIGNED_REGDB"
+                " -d CFG80211"
                 " -e BLK_DEV"
                 " -e PCI"
                 " -e VIRTIO"
