@@ -139,6 +139,7 @@ def commands_for(package: str, method: str) -> list[str]:
             'cd "$SRC" && make O="$BUILD" -j"$JOBS"',
             'cd "$SRC" && make -j"$JOBS" headers_install INSTALL_HDR_PATH="$DESTDIR/usr"',
             'release="$(cd "$SRC" && make -s O="$BUILD" kernelrelease)" && install -Dm755 "$BUILD/arch/x86/boot/bzImage" "$DESTDIR/boot/vmlinuz-$release"',
+            'release="$(cd "$SRC" && make -s O="$BUILD" kernelrelease)" && install -Dm644 "$BUILD/.config" "$DESTDIR/boot/config-$release"',
         ]
     if method == "ninja-bootstrap":
         # Ninja's upstream bootstrap path needs only Python and a C++ compiler,
