@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import json
 import re
 import time
 import urllib.error
@@ -195,9 +196,74 @@ def discover_python_stable(package: dict) -> dict:
     )
 
 
+
+def discover_github_stable(package: dict) -> dict:
+    releases = json.loads(fetch_text(package["url"]))
+    if not isinstance(releases, list):
+        raise RuntimeError(
+            f"{package['name']}: expected GitHub releases array at {package['url']}"
+        )
+
+    candidates = []
+    for release in releases:
+        if release.get("draft") or release.get("prerelease"):
+            continue
+        tag = release.get("tag_name")
+        if not isinstance(tag, str) or not tag:
+            continue
+        version = tag[1:] if tag.startswith("v") else tag
+        if not version or not version[0].isdigit():
+            continue
+        if any(marker in version.lower() for marker in UNSTABLE_MARKERS):
+            continue
+
+        source_url = None
+        for asset in release.get("assets", []):
+            name = asset.get("name")
+            url = asset.get("browser_download_url")
+            if not isinstance(name, str) or not isinstance(url, str):
+                continue
+            candidate = candidate_from_filename(package["name"], name)
+            if candidate is not None and candidate["version"] == version:
+                source_url = url
+                break
+
+        if source_url is None:
+            html_url = release.get("html_url")
+            if not isinstance(html_url, str) or "/releases/" not in html_url:
+                continue
+            repository_url = html_url.split("/releases/", 1)[0]
+            quoted_tag = urllib.parse.quote(tag, safe="")
+            source_url = f"{repository_url}/archive/refs/tags/{quoted_tag}.tar.gz"
+
+        candidates.append(
+            {
+                "version": version,
+                "source_url": source_url,
+            }
+        )
+
+    if not candidates:
+        raise RuntimeError(
+            f"{package['name']}: no stable GitHub releases discovered at "
+            f"{package['url']}"
+        )
+
+    selected = max(candidates, key=lambda item: version_key(item["version"]))
+    return {
+        "name": package["name"],
+        "management": package["management"],
+        "version": selected["version"],
+        "source_url": selected["source_url"],
+        "discovery_url": package["url"],
+    }
+
+
 def discover_stable(package: dict) -> dict:
     if package["name"] == "python":
         return discover_python_stable(package)
+    if urllib.parse.urlparse(package["url"]).hostname == "api.github.com":
+        return discover_github_stable(package)
 
     candidates = {}
     directories = []
