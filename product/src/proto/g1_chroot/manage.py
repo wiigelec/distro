@@ -202,6 +202,14 @@ def prepare_root(root: Path) -> None:
         directory.chmod(mode)
 
 
+def write_default(path: Path, content: str, mode: int = 0o644) -> None:
+    if path.exists() or path.is_symlink():
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+    path.chmod(mode)
+
+
 def finalize_root(root: Path) -> None:
     usr_bin = root / "usr/bin"
     bash = usr_bin / "bash"
@@ -209,9 +217,90 @@ def finalize_root(root: Path) -> None:
     if bash.exists() and not sh.exists() and not sh.is_symlink():
         sh.symlink_to("bash")
 
-    bin_path = root / "bin"
-    if not bin_path.exists() and not bin_path.is_symlink():
-        bin_path.symlink_to("usr/bin")
+    for link, target in (
+        ("bin", "usr/bin"),
+        ("sbin", "usr/bin"),
+        ("lib", "usr/lib"),
+        ("lib64", "usr/lib64"),
+    ):
+        path = root / link
+        if not path.exists() and not path.is_symlink():
+            path.symlink_to(target)
+
+    for relative, mode in (
+        ("boot", 0o755),
+        ("dev", 0o755),
+        ("proc", 0o555),
+        ("sys", 0o555),
+        ("run", 0o755),
+        ("root", 0o700),
+        ("home", 0o755),
+    ):
+        path = root / relative
+        path.mkdir(parents=True, exist_ok=True)
+        path.chmod(mode)
+
+    var_run = root / "var/run"
+    if not var_run.exists() and not var_run.is_symlink():
+        var_run.parent.mkdir(parents=True, exist_ok=True)
+        var_run.symlink_to("../run")
+
+    # Prototype-only machine-independent defaults for the first boot/login
+    # proof. Existing target configuration is never replaced.
+    write_default(
+        root / "etc/passwd",
+        "root:x:0:0:root:/root:/bin/bash\n"
+        "nobody:x:65534:65534:nobody:/:/usr/bin/nologin\n",
+    )
+    write_default(
+        root / "etc/group",
+        "root:x:0:\n"
+        "tty:x:5:\n"
+        "disk:x:6:\n"
+        "lp:x:7:\n"
+        "kmem:x:9:\n"
+        "wheel:x:10:\n"
+        "audio:x:18:\n"
+        "cdrom:x:19:\n"
+        "video:x:27:\n"
+        "tape:x:33:\n"
+        "kvm:x:78:\n"
+        "input:x:97:\n"
+        "render:x:98:\n"
+        "sgx:x:99:\n"
+        "systemd-journal:x:190:\n"
+        "nobody:x:65534:\n",
+    )
+    write_default(
+        root / "etc/shadow",
+        "root:!:1::::::\n"
+        "nobody:!:1::::::\n",
+        0o600,
+    )
+    write_default(
+        root / "etc/gshadow",
+        "root:*::\n"
+        "nobody:*::\n",
+        0o600,
+    )
+    write_default(
+        root / "etc/nsswitch.conf",
+        "passwd: files\n"
+        "group: files\n"
+        "shadow: files\n"
+        "hosts: files\n",
+    )
+    write_default(
+        root / "etc/shells",
+        "/bin/bash\n/usr/bin/bash\n",
+    )
+    write_default(root / "etc/hostname", "distro\n")
+    write_default(
+        root / "etc/os-release",
+        'NAME="distro"\n'
+        "ID=distro\n"
+        'PRETTY_NAME="distro G1 bootable prototype"\n',
+    )
 
 
 def install(repository: Path, root: Path, requested: str) -> dict:
