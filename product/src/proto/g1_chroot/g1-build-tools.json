@@ -3,6 +3,11 @@
   "name": "g1-build-tools",
   "packages": [
     {
+      "name": "python-binascii",
+      "url": "https://api.github.com/repos/python/cpython/releases",
+      "management": "stable"
+    },
+    {
       "name": "meson",
       "url": "https://api.github.com/repos/mesonbuild/meson/releases",
       "management": "stable"

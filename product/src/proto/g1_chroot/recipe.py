@@ -144,6 +144,38 @@ def commands_for(package: str, method: str) -> list[str]:
             'cd "$SRC" && python3 configure.py --bootstrap',
             'install -Dm755 "$SRC/ninja" "$DESTDIR/usr/bin/ninja"',
         ]
+    if method == "python-binascii":
+        # Add only the stdlib extension Meson needs. Build it against the
+        # already-installed G1 Python and omit optional zlib acceleration.
+        return [
+            (
+                'src_version="$(awk \'/^#define PY_MAJOR_VERSION / {major=$3} '
+                '/^#define PY_MINOR_VERSION / {minor=$3} '
+                'END {print major "." minor}\' "$SRC/Include/patchlevel.h")"'
+                ' && runtime_version="$(python3 -c \'import sys; '
+                'print(f"{sys.version_info.major}.{sys.version_info.minor}")\')"'
+                ' && test "$src_version" = "$runtime_version"'
+            ),
+            (
+                'include="$(python3 -c \'import sysconfig; '
+                'print(sysconfig.get_path("include"))\')"'
+                ' && suffix="$(python3 -c \'import sysconfig; '
+                'print(sysconfig.get_config_var("EXT_SUFFIX"))\')"'
+                ' && cc="$(python3 -c \'import sysconfig; '
+                'print(sysconfig.get_config_var("CC").split()[0])\')"'
+                ' && "$cc" -shared -fPIC $(python3-config --cflags)'
+                ' -I"$include/internal" "$SRC/Modules/binascii.c"'
+                ' -o "$BUILD/binascii$suffix"'
+            ),
+            (
+                'stdlib="$(python3 -c \'import sysconfig; '
+                'print(sysconfig.get_path("stdlib"))\')"'
+                ' && suffix="$(python3 -c \'import sysconfig; '
+                'print(sysconfig.get_config_var("EXT_SUFFIX"))\')"'
+                ' && install -Dm755 "$BUILD/binascii$suffix"'
+                ' "$DESTDIR$stdlib/lib-dynload/binascii$suffix"'
+            ),
+        ]
     if method == "autotools":
         configure = 'cd "$BUILD" && "$SRC/configure" --prefix=/usr'
         if package == "gmp":
@@ -483,6 +515,9 @@ def derive_recipe(
     elif package == "ninja" and (source / "configure.py").is_file():
         method = "ninja-bootstrap"
         markers = ["configure.py"]
+    elif package == "python-binascii" and (source / "Modules/binascii.c").is_file():
+        method = "python-binascii"
+        markers = ["Modules/binascii.c", "Include/patchlevel.h"]
     else:
         method, markers = detect_method(source)
     docs = documentation_evidence(source)
