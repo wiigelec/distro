@@ -437,6 +437,9 @@ def commands_for(package: str, method: str) -> list[str]:
                     'meson setup "$BUILD" "$SRC" --prefix=/usr --sbindir=bin --libdir=lib64'
                     " -Dmode=release"
                     " -Dsplit-bin=false"
+                    " -Defi=false"
+                    " -Dbootloader=disabled"
+                    " -Dukify=disabled"
                     " -Dinitrd=false"
                     " -Dhibernate=false"
                     " -Dnetworkd=false"
