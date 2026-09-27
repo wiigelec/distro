@@ -33,9 +33,17 @@ def load_manifest(name: str) -> dict:
 
     seen = set()
     for package in packages:
-        if set(package) != {"name", "url", "management"}:
+        required = {"name", "url", "management"}
+        optional = {"version", "source_url"}
+        keys = set(package)
+        if not required <= keys or not keys <= required | optional:
             raise RuntimeError(
-                "each manifest package must contain exactly name, url, and management"
+                "each manifest package must contain name, url, and management "
+                "with optional version and source_url"
+            )
+        if ("version" in package) != ("source_url" in package):
+            raise RuntimeError(
+                f"{package.get('name')}: version and source_url must be provided together"
             )
         if not all(isinstance(package[key], str) and package[key] for key in package):
             raise RuntimeError("manifest package values must be non-empty strings")

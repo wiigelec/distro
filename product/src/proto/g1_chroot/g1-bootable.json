@@ -140,7 +140,9 @@
     {
       "name": "grub",
       "url": "https://ftpmirror.gnu.org/grub/",
-      "management": "stable"
+      "management": "stable",
+      "version": "2.12",
+      "source_url": "https://ftp.gnu.org/gnu/grub/grub-2.12.tar.xz"
     }
   ]
 }

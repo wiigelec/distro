@@ -400,4 +400,16 @@ def discover_package(package: dict) -> dict:
         raise RuntimeError(
             f"{package.get('name')}: management policy {management!r} is not implemented"
         )
+
+    version = package.get("version")
+    source_url = package.get("source_url")
+    if version is not None and source_url is not None:
+        return {
+            "name": package["name"],
+            "management": management,
+            "version": version,
+            "source_url": source_url,
+            "discovery_url": package["url"],
+        }
+
     return discover_stable(package)
