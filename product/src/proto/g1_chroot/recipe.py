@@ -500,6 +500,7 @@ def commands_for(package: str, method: str) -> list[str]:
                     " -Dpolkit=disabled"
                     " -Dacl=disabled"
                     " -Daudit=disabled"
+                    " -Dlibmount=enabled"
                     " -Dblkid=disabled"
                     " -Dfdisk=disabled"
                     " -Dkmod=disabled"
