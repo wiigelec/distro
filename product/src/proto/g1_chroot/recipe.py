@@ -222,11 +222,7 @@ def commands_for(package: str, method: str) -> list[str]:
         ]
     if method == "autotools":
         configure = 'cd "$BUILD" && "$SRC/configure" --prefix=/usr'
-        if package == "glibc":
-            # Keep system administration binaries under the merged-/usr
-            # executable path so /sbin can remain a compatibility symlink.
-            configure += " --sbindir=/usr/bin"
-        elif package == "gmp":
+        if package == "gmp":
             # GMP 6.3.0's compiler probe is not C23-clean. GCC 15 defaults
             # to gnu23, so force the older GNU C dialect expected by the
             # upstream configure test while leaving GMP's ABI/optimization
@@ -387,6 +383,14 @@ def commands_for(package: str, method: str) -> list[str]:
                 " --without-zstd"
                 " --without-libarchive"
             )
+        if package == "glibc":
+            # glibc installs ldconfig and sln through its separate
+            # rootsbindir variable rather than the Autoconf sbindir.
+            return [
+                configure,
+                'cd "$BUILD" && make -j"$JOBS"',
+                'cd "$BUILD" && make DESTDIR="$DESTDIR" rootsbindir=/usr/bin install',
+            ]
         if package == "bc":
             # The kernel build only needs the bc calculator. Build and stage
             # the executable directly so bootstrap does not require Texinfo
