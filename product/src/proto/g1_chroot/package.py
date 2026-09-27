@@ -21,6 +21,8 @@ def sha256_file(path: Path) -> str:
 def payload_entries(stage: Path) -> list[tuple[Path, str]]:
     entries = []
     for path in sorted(stage.rglob("*")):
+        if not (path.is_file() or path.is_symlink()):
+            continue
         relative = path.relative_to(stage).as_posix()
         if relative in EXCLUDED_PAYLOAD_PATHS:
             continue
