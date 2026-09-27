@@ -176,6 +176,39 @@ def commands_for(package: str, method: str) -> list[str]:
                 ' "$DESTDIR$stdlib/lib-dynload/binascii$suffix"'
             ),
         ]
+    if method == "python-zlib":
+        # Build Python's zlib extension against the zlib package installed
+        # in the G1 root. Keep the extension ABI-matched to the runtime.
+        return [
+            (
+                'src_version="$(awk \'/^#define PY_MAJOR_VERSION / {major=$3} '
+                '/^#define PY_MINOR_VERSION / {minor=$3} '
+                'END {print major "." minor}\' "$SRC/Include/patchlevel.h")"'
+                ' && runtime_version="$(python3 -c \'import sys; '
+                'print(f"{sys.version_info.major}.{sys.version_info.minor}")\')"'
+                ' && test "$src_version" = "$runtime_version"'
+            ),
+            (
+                'include="$(python3 -c \'import sysconfig; '
+                'print(sysconfig.get_path("include"))\')"'
+                ' && suffix="$(python3 -c \'import sysconfig; '
+                'print(sysconfig.get_config_var("EXT_SUFFIX"))\')"'
+                ' && cc="$(python3 -c \'import sysconfig; '
+                'print(sysconfig.get_config_var("CC").split()[0])\')"'
+                ' && "$cc" -shared -fPIC $(python3-config --cflags)'
+                ' -I"$include/internal" "$SRC/Modules/zlibmodule.c"'
+                ' -L/usr/lib64 -Wl,-rpath-link,/usr/lib64 -lz'
+                ' -o "$BUILD/zlib$suffix"'
+            ),
+            (
+                'stdlib="$(python3 -c \'import sysconfig; '
+                'print(sysconfig.get_path("stdlib"))\')"'
+                ' && suffix="$(python3 -c \'import sysconfig; '
+                'print(sysconfig.get_config_var("EXT_SUFFIX"))\')"'
+                ' && install -Dm755 "$BUILD/zlib$suffix"'
+                ' "$DESTDIR$stdlib/lib-dynload/zlib$suffix"'
+            ),
+        ]
     if method == "autotools":
         configure = 'cd "$BUILD" && "$SRC/configure" --prefix=/usr'
         if package == "gmp":
@@ -302,6 +335,9 @@ def commands_for(package: str, method: str) -> list[str]:
                 " --disable-werror"
                 " --with-platform=pc"
             )
+        elif package == "zlib":
+            # Keep x86_64 shared libraries on G1's loader-visible lib64 path.
+            configure += " --libdir=/usr/lib64 --sharedlibdir=/usr/lib64"
         if package == "binutils":
             # arlex.l provides yywrap itself, so the Flex runtime library
             # detected by configure is unnecessary. Override LEXLIB only for
@@ -518,6 +554,9 @@ def derive_recipe(
     elif package == "python-binascii" and (source / "Modules/binascii.c").is_file():
         method = "python-binascii"
         markers = ["Modules/binascii.c", "Include/patchlevel.h"]
+    elif package == "python-zlib" and (source / "Modules/zlibmodule.c").is_file():
+        method = "python-zlib"
+        markers = ["Modules/zlibmodule.c", "Include/patchlevel.h"]
     else:
         method, markers = detect_method(source)
     docs = documentation_evidence(source)

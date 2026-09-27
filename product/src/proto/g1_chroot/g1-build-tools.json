@@ -13,6 +13,11 @@
       "management": "stable"
     },
     {
+      "name": "python-zlib",
+      "url": "https://www.python.org/ftp/python/",
+      "management": "stable"
+    },
+    {
       "name": "meson",
       "url": "https://api.github.com/repos/mesonbuild/meson/releases",
       "management": "stable"
