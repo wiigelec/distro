@@ -26,6 +26,21 @@
       "name": "ninja",
       "url": "https://api.github.com/repos/ninja-build/ninja/releases",
       "management": "stable"
+    },
+    {
+      "name": "flex",
+      "url": "https://api.github.com/repos/westes/flex/releases",
+      "management": "stable"
+    },
+    {
+      "name": "pkgconf",
+      "url": "https://distfiles.ariadne.space/pkgconf/",
+      "management": "stable"
+    },
+    {
+      "name": "perl",
+      "url": "https://www.cpan.org/src/5.0/",
+      "management": "stable"
     }
   ]
 }

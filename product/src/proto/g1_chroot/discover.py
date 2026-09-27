@@ -199,6 +199,33 @@ def discover_python_stable(package: dict) -> dict:
 
 
 
+def discover_perl_stable(package: dict) -> dict:
+    candidates = archive_candidates("perl", parse_links(package["url"]))
+    candidates = {
+        version: candidate
+        for version, candidate in candidates.items()
+        if (
+            re.fullmatch(r"[0-9]+(?:\\.[0-9]+)+", version) is not None
+            and len(version.split(".")) >= 2
+            and int(version.split(".")[1]) % 2 == 0
+        )
+    }
+    if not candidates:
+        raise RuntimeError(
+            f"perl: no stable maintenance release archives discovered at "
+            f"{package['url']}"
+        )
+
+    selected = max(candidates.values(), key=lambda item: version_key(item["version"]))
+    return {
+        "name": package["name"],
+        "management": package["management"],
+        "version": selected["version"],
+        "source_url": urllib.parse.urljoin(package["url"], selected["filename"]),
+        "discovery_url": package["url"],
+    }
+
+
 def discover_github_stable(package: dict) -> dict:
     releases = json.loads(fetch_text(package["url"]))
     if not isinstance(releases, list):
@@ -302,6 +329,8 @@ def discover_github_stable(package: dict) -> dict:
 
 
 def discover_stable(package: dict) -> dict:
+    if package["name"] == "perl":
+        return discover_perl_stable(package)
     if package["name"] in {"python", "python-binascii", "python-zlib"}:
         return discover_python_stable(package)
     if urllib.parse.urlparse(package["url"]).hostname == "api.github.com":

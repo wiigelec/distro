@@ -209,6 +209,14 @@ def commands_for(package: str, method: str) -> list[str]:
                 ' "$DESTDIR$stdlib/lib-dynload/zlib$suffix"'
             ),
         ]
+    if method == "perl":
+        # Perl is a build-time dependency for libxcrypt. Use upstream's
+        # native Configure flow and stage installation with DESTDIR.
+        return [
+            'cd "$SRC" && sh Configure -des -Dprefix=/usr -Dman1dir=none -Dman3dir=none',
+            'cd "$SRC" && make -j"$JOBS"',
+            'cd "$SRC" && make DESTDIR="$DESTDIR" install',
+        ]
     if method == "autotools":
         configure = 'cd "$BUILD" && "$SRC/configure" --prefix=/usr'
         if package == "gmp":
@@ -338,6 +346,10 @@ def commands_for(package: str, method: str) -> list[str]:
         elif package == "zlib":
             # Keep x86_64 shared libraries on G1's loader-visible lib64 path.
             configure += " --libdir=/usr/lib64 --sharedlibdir=/usr/lib64"
+        elif package == "pkgconf":
+            # pkgconf installs a shared libpkgconf used by its CLI.
+            # Keep it on G1's loader-visible x86_64 runtime path.
+            configure += " --libdir=/usr/lib64"
         if package == "binutils":
             # arlex.l provides yywrap itself, so the Flex runtime library
             # detected by configure is unnecessary. Override LEXLIB only for
@@ -397,6 +409,7 @@ def commands_for(package: str, method: str) -> list[str]:
                     " -Dmode=release"
                     " -Dsplit-bin=false"
                     " -Dinitrd=false"
+                    " -Dhibernate=false"
                     " -Dnetworkd=false"
                     " -Dresolve=false"
                     " -Dtimesyncd=false"
@@ -557,6 +570,9 @@ def derive_recipe(
     elif package == "python-zlib" and (source / "Modules/zlibmodule.c").is_file():
         method = "python-zlib"
         markers = ["Modules/zlibmodule.c", "Include/patchlevel.h"]
+    elif package == "perl" and (source / "Configure").is_file() and (source / "perl.c").is_file():
+        method = "perl"
+        markers = ["Configure", "perl.c"]
     else:
         method, markers = detect_method(source)
     docs = documentation_evidence(source)
