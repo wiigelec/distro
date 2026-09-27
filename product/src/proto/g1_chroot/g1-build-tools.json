@@ -61,6 +61,11 @@
       "name": "jinja2",
       "url": "https://api.github.com/repos/pallets/jinja/releases",
       "management": "stable"
+    },
+    {
+      "name": "elfutils",
+      "url": "https://sourceware.org/pub/elfutils/",
+      "management": "stable"
     }
   ]
 }

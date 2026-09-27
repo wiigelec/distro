@@ -359,6 +359,21 @@ def commands_for(package: str, method: str) -> list[str]:
             # pkgconf installs a shared libpkgconf used by its CLI.
             # Keep it on G1's loader-visible x86_64 runtime path.
             configure += " --libdir=/usr/lib64"
+        elif package == "elfutils":
+            # Linux objtool requires libelf development headers, including
+            # gelf.h. Keep this G1 build-tool package focused on the core
+            # libelf surface and avoid unrelated compression, localization,
+            # archive, and debuginfod dependency chains.
+            configure += (
+                " --libdir=/usr/lib64"
+                " --disable-nls"
+                " --disable-debuginfod"
+                " --disable-libdebuginfod"
+                " --without-bzlib"
+                " --without-lzma"
+                " --without-zstd"
+                " --without-libarchive"
+            )
         if package == "bc":
             # The kernel build only needs the bc calculator. Build and stage
             # the executable directly so bootstrap does not require Texinfo
