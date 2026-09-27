@@ -419,6 +419,7 @@ def commands_for(package: str, method: str) -> list[str]:
                     " -Dbuild-runuser=disabled"
                     " -Dbuild-chfn-chsh=disabled"
                     " -Dbuild-newgrp=disabled"
+                    " -Dbuild-nologin=disabled"
                     " -Dbuild-agetty=enabled"
                     " -Dbuild-mount=enabled"
                     " -Dprogram-tests=false"
