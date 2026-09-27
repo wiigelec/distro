@@ -138,10 +138,8 @@ def release_directory(package: str, href: str):
     name = path.rstrip("/").rsplit("/", 1)[-1]
     prefixes = (f"{package}-", f"{package}_")
     prefix = next((value for value in prefixes if name.startswith(value)), None)
-    if prefix is None:
-        return None
-    version = name[len(prefix):]
-    if not version or not version[0].isdigit():
+    version = name[len(prefix):] if prefix is not None else name
+    if re.fullmatch(r"[0-9]+(?:\.[0-9]+)+", version) is None:
         return None
     if any(marker in version.lower() for marker in UNSTABLE_MARKERS):
         return None
