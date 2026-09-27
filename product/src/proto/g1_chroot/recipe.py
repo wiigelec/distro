@@ -119,6 +119,8 @@ def commands_for(package: str, method: str) -> list[str]:
             (
                 'cd "$SRC" && scripts/config --file "$BUILD/.config"'
                 " -d MODULES"
+                " -d SYSTEM_TRUSTED_KEYRING"
+                " -d SYSTEM_REVOCATION_LIST"
                 " -e BLK_DEV"
                 " -e PCI"
                 " -e VIRTIO"

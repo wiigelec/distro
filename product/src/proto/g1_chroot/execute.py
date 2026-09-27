@@ -181,6 +181,16 @@ def execute_recipe(
                         command,
                     ]
                 )
+                proc = chroot_root.resolve() / "proc"
+                proc.mkdir(parents=True, exist_ok=True)
+                mounted_proc = False
+                if not os.path.ismount(proc):
+                    subprocess.run(
+                        privileged_argv("mount", "-t", "proc", "proc", str(proc)),
+                        check=True,
+                    )
+                    mounted_proc = True
+
                 uid, gid = invoking_ids()
                 argv = privileged_argv(
                     "chroot",
@@ -203,6 +213,12 @@ def execute_recipe(
                 stderr=subprocess.STDOUT,
                 text=True,
             )
+            if chroot_root is not None and mounted_proc:
+                subprocess.run(
+                    privileged_argv("umount", str(chroot_root.resolve() / "proc")),
+                    check=True,
+                )
+
             command_result = {
                 "index": index,
                 "command": command,
