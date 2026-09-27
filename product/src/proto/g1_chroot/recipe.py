@@ -336,6 +336,7 @@ def commands_for(package: str, method: str) -> list[str]:
             # SELinux, ACL, libbsd, and logind integrations.
             configure += (
                 " --sbindir=/usr/bin"
+                " --libdir=/usr/lib64"
                 " --without-libpam"
                 " --without-audit"
                 " --without-selinux"
