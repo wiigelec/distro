@@ -213,7 +213,7 @@ def commands_for(package: str, method: str) -> list[str]:
         # Perl is a build-time dependency for libxcrypt. Use upstream's
         # native Configure flow and stage installation with DESTDIR.
         return [
-            'cd "$SRC" && sh Configure -des -Dprefix=/usr -Dman1dir=none -Dman3dir=none',
+            'cd "$SRC" && sh Configure -des -Dcc=gcc -Dprefix=/usr -Dman1dir=none -Dman3dir=none',
             'cd "$SRC" && make -j"$JOBS"',
             'cd "$SRC" && make DESTDIR="$DESTDIR" install',
         ]
