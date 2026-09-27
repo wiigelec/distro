@@ -139,7 +139,7 @@
     },
     {
       "name": "grub",
-      "url": "https://ftp.gnu.org/gnu/grub/",
+      "url": "https://ftpmirror.gnu.org/grub/",
       "management": "stable"
     }
   ]
