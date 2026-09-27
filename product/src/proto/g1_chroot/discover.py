@@ -244,8 +244,48 @@ def discover_github_stable(package: dict) -> dict:
         )
 
     if not candidates:
+        parsed = urllib.parse.urlparse(package["url"])
+        path = parsed.path
+        if not path.endswith("/releases"):
+            raise RuntimeError(
+                f"{package['name']}: unsupported GitHub discovery URL "
+                f"{package['url']}"
+            )
+
+        tags_url = urllib.parse.urlunparse(
+            parsed._replace(path=path[:-len("/releases")] + "/tags", query="per_page=100")
+        )
+        tags = json.loads(fetch_text(tags_url))
+        if not isinstance(tags, list):
+            raise RuntimeError(
+                f"{package['name']}: expected GitHub tags array at {tags_url}"
+            )
+
+        repository_path = path[:-len("/releases")]
+        repository_url = f"https://github.com{repository_path.removeprefix('/repos')}"
+        for tag_record in tags:
+            tag = tag_record.get("name")
+            if not isinstance(tag, str) or not tag:
+                continue
+            version = tag[1:] if tag.startswith("v") else tag
+            if not version or not version[0].isdigit():
+                continue
+            if any(marker in version.lower() for marker in UNSTABLE_MARKERS):
+                continue
+
+            quoted_tag = urllib.parse.quote(tag, safe="")
+            candidates.append(
+                {
+                    "version": version,
+                    "source_url": (
+                        f"{repository_url}/archive/refs/tags/{quoted_tag}.tar.gz"
+                    ),
+                }
+            )
+
+    if not candidates:
         raise RuntimeError(
-            f"{package['name']}: no stable GitHub releases discovered at "
+            f"{package['name']}: no stable GitHub releases or tags discovered at "
             f"{package['url']}"
         )
 
