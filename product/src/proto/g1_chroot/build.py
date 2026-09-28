@@ -276,7 +276,7 @@ def main() -> int:
                 "status": "success",
             }
 
-    if builds and not failed and runtime["status"] == "success":
+    if not failed and runtime["status"] == "success" and (builds or not partial):
         print("==> publish repository update", flush=True)
         repository = publish_repository(
             builds,
@@ -289,6 +289,8 @@ def main() -> int:
         status = "build-failures"
     elif runtime["status"] != "success":
         status = "runtime-closure-failures"
+    elif repository is not None and not partial:
+        status = "published"
     elif not builds:
         status = "up-to-date"
     elif partial:
