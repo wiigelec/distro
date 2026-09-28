@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "name": "g2-installer",
+  "packages": [
+    {
+      "name": "linux",
+      "url": "https://cdn.kernel.org/pub/linux/kernel/v6.x/",
+      "management": "stable"
+    },
+    {
+      "name": "rsync",
+      "url": "https://download.samba.org/pub/rsync/src/",
+      "management": "stable"
+    },
+    {
+      "name": "gawk",
+      "url": "https://ftp.gnu.org/gnu/gawk/",
+      "management": "stable"
+    },
+    {
+      "name": "diffutils",
+      "url": "https://ftp.gnu.org/gnu/diffutils/",
+      "management": "stable"
+    },
+    {
+      "name": "m4",
+      "url": "https://ftp.gnu.org/gnu/m4/",
+      "management": "stable"
+    },
+    {
+      "name": "bison",
+      "url": "https://ftp.gnu.org/gnu/bison/",
+      "management": "stable"
+    },
+    {
+      "name": "tar",
+      "url": "https://ftp.gnu.org/gnu/tar/",
+      "management": "stable"
+    },
+    {
+      "name": "gzip",
+      "url": "https://ftpmirror.gnu.org/gzip/",
+      "management": "stable"
+    },
+    {
+      "name": "python",
+      "url": "https://www.python.org/ftp/python/",
+      "management": "stable"
+    },
+    {
+      "name": "glibc",
+      "url": "https://ftp.gnu.org/gnu/glibc/",
+      "management": "stable"
+    },
+    {
+      "name": "ncurses",
+      "url": "https://invisible-mirror.net/archives/ncurses/",
+      "management": "stable"
+    },
+    {
+      "name": "readline",
+      "url": "https://ftp.gnu.org/gnu/readline/",
+      "management": "stable"
+    },
+    {
+      "name": "bash",
+      "url": "https://ftp.gnu.org/gnu/bash/",
+      "management": "stable"
+    },
+    {
+      "name": "coreutils",
+      "url": "https://ftp.gnu.org/gnu/coreutils/",
+      "management": "stable"
+    },
+    {
+      "name": "sed",
+      "url": "https://ftp.gnu.org/gnu/sed/",
+      "management": "stable"
+    },
+    {
+      "name": "grep",
+      "url": "https://ftp.gnu.org/gnu/grep/",
+      "management": "stable"
+    },
+    {
+      "name": "findutils",
+      "url": "https://ftp.gnu.org/gnu/findutils/",
+      "management": "stable"
+    },
+    {
+      "name": "gmp",
+      "url": "https://ftp.gnu.org/gnu/gmp/",
+      "management": "stable"
+    },
+    {
+      "name": "mpfr",
+      "url": "https://ftp.gnu.org/gnu/mpfr/",
+      "management": "stable"
+    },
+    {
+      "name": "mpc",
+      "url": "https://ftp.gnu.org/gnu/mpc/",
+      "management": "stable"
+    },
+    {
+      "name": "binutils",
+      "url": "https://ftp.gnu.org/gnu/binutils/",
+      "management": "stable"
+    },
+    {
+      "name": "gcc",
+      "url": "https://ftp.gnu.org/gnu/gcc/",
+      "management": "stable"
+    },
+    {
+      "name": "make",
+      "url": "https://ftp.gnu.org/gnu/make/",
+      "management": "stable"
+    },
+    {
+      "name": "libxcrypt",
+      "url": "https://api.github.com/repos/besser82/libxcrypt/releases",
+      "management": "stable"
+    },
+    {
+      "name": "util-linux",
+      "url": "https://api.github.com/repos/util-linux/util-linux/releases",
+      "management": "stable"
+    },
+    {
+      "name": "shadow",
+      "url": "https://api.github.com/repos/shadow-maint/shadow/releases",
+      "management": "stable"
+    },
+    {
+      "name": "kmod",
+      "url": "https://api.github.com/repos/kmod-project/kmod/releases",
+      "management": "stable"
+    },
+    {
+      "name": "systemd",
+      "url": "https://api.github.com/repos/systemd/systemd/releases",
+      "management": "stable"
+    },
+    {
+      "name": "grub",
+      "url": "https://ftpmirror.gnu.org/grub/",
+      "management": "stable",
+      "version": "2.12",
+      "source_url": "https://ftpmirror.gnu.org/grub/grub-2.12.tar.xz"
+    },
+    {
+      "name": "e2fsprogs",
+      "url": "https://mirrors.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/",
+      "management": "stable"
+    }
+  ]
+}
