@@ -23,16 +23,6 @@
       "management": "stable"
     },
     {
-      "name": "m4",
-      "url": "https://ftp.gnu.org/gnu/m4/",
-      "management": "stable"
-    },
-    {
-      "name": "bison",
-      "url": "https://ftp.gnu.org/gnu/bison/",
-      "management": "stable"
-    },
-    {
       "name": "tar",
       "url": "https://ftp.gnu.org/gnu/tar/",
       "management": "stable"
@@ -85,36 +75,6 @@
     {
       "name": "findutils",
       "url": "https://ftp.gnu.org/gnu/findutils/",
-      "management": "stable"
-    },
-    {
-      "name": "gmp",
-      "url": "https://ftp.gnu.org/gnu/gmp/",
-      "management": "stable"
-    },
-    {
-      "name": "mpfr",
-      "url": "https://ftp.gnu.org/gnu/mpfr/",
-      "management": "stable"
-    },
-    {
-      "name": "mpc",
-      "url": "https://ftp.gnu.org/gnu/mpc/",
-      "management": "stable"
-    },
-    {
-      "name": "binutils",
-      "url": "https://ftp.gnu.org/gnu/binutils/",
-      "management": "stable"
-    },
-    {
-      "name": "gcc",
-      "url": "https://ftp.gnu.org/gnu/gcc/",
-      "management": "stable"
-    },
-    {
-      "name": "make",
-      "url": "https://ftp.gnu.org/gnu/make/",
       "management": "stable"
     },
     {
