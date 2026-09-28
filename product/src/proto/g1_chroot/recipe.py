@@ -447,6 +447,8 @@ def commands_for(package: str, method: str) -> list[str]:
                     " -Dlibpcre2-posix=disabled"
                     " -Dmagic=disabled"
                     " -Deconf=disabled"
+                    " -Dbuild-libblkid=enabled"
+                    " -Dbuild-libmount=enabled"
                     " -Dbuild-login=disabled"
                     " -Dbuild-su=disabled"
                     " -Dbuild-runuser=disabled"
