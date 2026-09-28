@@ -34,7 +34,7 @@
     },
     {
       "name": "flex",
-      "url": "https://github.com/westes/flex/releases",
+      "url": "https://api.github.com/repos/westes/flex/releases",
       "management": "stable"
     },
     {
