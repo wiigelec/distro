@@ -134,6 +134,12 @@ def commands_for(package: str, method: str) -> list[str]:
                 " -e CGROUPS"
                 " -e VT"
                 " -e VT_CONSOLE"
+                " -e DRM"
+                " -e DRM_VIRTIO_GPU"
+                " -e DRM_VIRTIO_GPU_KMS"
+                " -e DRM_FBDEV_EMULATION"
+                " -e FRAMEBUFFER_CONSOLE"
+                " -e VGA_CONSOLE"
             ),
             'cd "$SRC" && make O="$BUILD" olddefconfig',
             'cd "$SRC" && make O="$BUILD" -j"$JOBS"',
