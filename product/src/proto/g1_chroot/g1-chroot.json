@@ -33,6 +33,11 @@
       "management": "stable"
     },
     {
+      "name": "flex",
+      "url": "https://github.com/westes/flex/releases",
+      "management": "stable"
+    },
+    {
       "name": "tar",
       "url": "https://ftp.gnu.org/gnu/tar/",
       "management": "stable"
