@@ -151,8 +151,10 @@
     },
     {
       "name": "e2fsprogs",
-      "url": "https://mirrors.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/",
-      "management": "stable"
+      "url": "https://kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/",
+      "management": "stable",
+      "version": "1.47.4",
+      "source_url": "https://kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v1.47.4/e2fsprogs-1.47.4.tar.gz"
     }
   ]
 }
