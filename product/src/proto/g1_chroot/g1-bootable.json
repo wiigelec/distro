@@ -133,6 +133,11 @@
       "management": "stable"
     },
     {
+      "name": "kmod",
+      "url": "https://api.github.com/repos/kmod-project/kmod/releases",
+      "management": "stable"
+    },
+    {
       "name": "systemd",
       "url": "https://api.github.com/repos/systemd/systemd/releases",
       "management": "stable"

@@ -431,6 +431,30 @@ def commands_for(package: str, method: str) -> list[str]:
             'DESTDIR="$DESTDIR" cmake --install "$BUILD"',
         ]
     if method == "meson":
+        if package == "kmod":
+            # systemd's early boot units invoke modprobe directly. Keep the
+            # first boot closure focused on the module-management tools while
+            # avoiding optional compression, crypto, documentation, and shell
+            # completion dependency chains.
+            return [
+                (
+                    'meson setup "$BUILD" "$SRC" --prefix=/usr --sbindir=bin --libdir=lib64'
+                    " -Dtools=true"
+                    " -Dzstd=disabled"
+                    " -Dxz=disabled"
+                    " -Dzlib=disabled"
+                    " -Dopenssl=disabled"
+                    " -Dlogging=false"
+                    " -Dbuild-tests=false"
+                    " -Dmanpages=false"
+                    " -Ddocs=false"
+                    " -Dbashcompletiondir=no"
+                    " -Dfishcompletiondir=no"
+                    " -Dzshcompletiondir=no"
+                ),
+                'meson compile -C "$BUILD" -j "$JOBS"',
+                'DESTDIR="$DESTDIR" meson install -C "$BUILD"',
+            ]
         if package == "util-linux":
             # Retain only the tools needed for the first boot/login proof and
             # avoid host-detected optional integrations.
