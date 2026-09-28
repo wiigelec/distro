@@ -39,10 +39,25 @@ def write_init(root: Path) -> None:
         "#!/bin/bash\n"
         "set -eu\n"
         "export PATH=/usr/bin:/bin:/usr/sbin:/sbin\n"
-        "mkdir -p /dev /proc /sys /run\n"
+        "mkdir -p /dev /proc /sys /run /run/distro-media\n"
         "mountpoint -q /dev || mount -t devtmpfs devtmpfs /dev\n"
         "mountpoint -q /proc || mount -t proc proc /proc\n"
         "mountpoint -q /sys || mount -t sysfs sysfs /sys\n"
+        "media=''\n"
+        "for device in /dev/sr0 /dev/cdrom; do\n"
+        "  if [ -b \"$device\" ] && mount -t iso9660 -o ro \"$device\" /run/distro-media; then\n"
+        "    media=\"$device\"\n"
+        "    break\n"
+        "  fi\n"
+        "done\n"
+        "if [ -z \"$media\" ]; then\n"
+        "  printf 'distro installer: unable to mount installation media\\n' >&2\n"
+        "  exec setsid /bin/bash -i </dev/console >/dev/console 2>&1\n"
+        "fi\n"
+        "if [ ! -f /run/distro-media/distro/repository/database.json ]; then\n"
+        "  printf 'distro installer: repository missing from installation media\\n' >&2\n"
+        "  exec setsid /bin/bash -i </dev/console >/dev/console 2>&1\n"
+        "fi\n"
         "printf '\\n'\n"
         "printf 'distro G2 installer prototype\\n'\n"
         "printf 'Run: distro-install /dev/vda --confirm-device /dev/vda --yes-really-destroy\\n'\n"
@@ -53,13 +68,7 @@ def write_init(root: Path) -> None:
     init.chmod(0o755)
 
 
-def embed_installer(root: Path, repository: Path) -> None:
-    embedded_repo = root / "var/lib/distro/installer/repository"
-    if embedded_repo.exists():
-        shutil.rmtree(embedded_repo)
-    embedded_repo.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copytree(repository, embedded_repo)
-
+def embed_installer(root: Path) -> None:
     proto_dir = root / "usr/lib/distro/proto"
     proto_dir.mkdir(parents=True, exist_ok=True)
     shutil.copy2(MANAGE_SCRIPT, proto_dir / "manage.py")
@@ -104,8 +113,12 @@ def build_iso(repository: Path, output: Path) -> None:
             "g2-installer",
         ])
 
-        embed_installer(live_root, repository)
+        embed_installer(live_root)
         write_init(live_root)
+
+        media_repo = iso_root / "distro/repository"
+        media_repo.parent.mkdir(parents=True)
+        shutil.copytree(repository, media_repo)
 
         boot = iso_root / "boot"
         grub = boot / "grub"

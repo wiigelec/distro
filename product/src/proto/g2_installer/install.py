@@ -9,7 +9,7 @@ import sys
 import time
 from pathlib import Path
 
-DEFAULT_REPOSITORY = Path("/var/lib/distro/installer/repository")
+DEFAULT_REPOSITORY = Path("/run/distro-media/distro/repository")
 DEFAULT_TARGET = Path("/mnt/distro-target")
 MANAGE = Path("/usr/lib/distro/proto/manage.py")
 PACKAGE = "g2-installer"
