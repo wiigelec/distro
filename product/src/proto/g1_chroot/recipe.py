@@ -368,6 +368,11 @@ def commands_for(package: str, method: str) -> list[str]:
                 + " --disable-werror"
                 + " --with-platform=pc"
             )
+        elif package == "e2fsprogs":
+            # G2 needs the native ext filesystem formatter/checker surface,
+            # not e2fsprogs' overlapping UUID/blkid utilities. Keep feature
+            # detection deterministic inside the G1 build root.
+            configure += " --disable-fuse2fs --with-root-prefix="
         elif package == "zlib":
             # Keep x86_64 shared libraries on G1's loader-visible lib64 path.
             configure += " --libdir=/usr/lib64 --sharedlibdir=/usr/lib64"
@@ -390,6 +395,25 @@ def commands_for(package: str, method: str) -> list[str]:
                 " --without-zstd"
                 " --without-libarchive"
             )
+        if package == "e2fsprogs":
+            # util-linux already owns UUID/blkid/fsck wrapper paths in the
+            # bootable closure. Stage only the ext filesystem surface G2
+            # needs while still building upstream normally.
+            return [
+                configure,
+                'cd "$BUILD" && make -j"$JOBS"',
+                (
+                    'install -Dm755 "$BUILD/misc/mke2fs" "$DESTDIR/usr/bin/mke2fs"'
+                    ' && ln -sf mke2fs "$DESTDIR/usr/bin/mkfs.ext2"'
+                    ' && ln -sf mke2fs "$DESTDIR/usr/bin/mkfs.ext3"'
+                    ' && ln -sf mke2fs "$DESTDIR/usr/bin/mkfs.ext4"'
+                    ' && install -Dm755 "$BUILD/e2fsck/e2fsck" "$DESTDIR/usr/bin/e2fsck"'
+                    ' && ln -sf e2fsck "$DESTDIR/usr/bin/fsck.ext2"'
+                    ' && ln -sf e2fsck "$DESTDIR/usr/bin/fsck.ext3"'
+                    ' && ln -sf e2fsck "$DESTDIR/usr/bin/fsck.ext4"'
+                    ' && install -Dm644 "$BUILD/misc/mke2fs.conf" "$DESTDIR/etc/mke2fs.conf"'
+                ),
+            ]
         if package == "glibc":
             # glibc installs ldconfig and sln through its separate
             # rootsbindir variable rather than the Autoconf sbindir.
