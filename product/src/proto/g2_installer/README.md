@@ -42,7 +42,9 @@ environment and uses the host's `grub-mkrescue`, `xorriso`, `cpio`, and `gzip`
 tools to create BIOS-bootable media.
 
 ```sh
-sudo python3 product/src/proto/g2_installer/build_iso.py   --output /tmp/distro-g2-installer.iso
+sudo ./product/scripts/install \
+  --repository ~/distro-g1-bootable/repository \
+  --output /tmp/distro-g2-installer.iso
 ```
 
 The live environment contains the complete `g2-installer` closure, the generated
