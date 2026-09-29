@@ -33,21 +33,6 @@
       "management": "stable"
     },
     {
-      "name": "flex",
-      "url": "https://api.github.com/repos/westes/flex/releases",
-      "management": "stable"
-    },
-    {
-      "name": "bc",
-      "url": "https://ftpmirror.gnu.org/bc/",
-      "management": "stable"
-    },
-    {
-      "name": "elfutils",
-      "url": "https://sourceware.org/pub/elfutils/",
-      "management": "stable"
-    },
-    {
       "name": "tar",
       "url": "https://ftp.gnu.org/gnu/tar/",
       "management": "stable"
