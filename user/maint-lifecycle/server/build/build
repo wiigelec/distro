@@ -320,11 +320,26 @@ def cmd_working_init(args):
         raise RuntimeError("recipe discovery must run before working-init")
     if working.exists() and not args.force:
         raise RuntimeError(f"working recipe already exists: {working}")
-    working.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(discovery, working)
+
+    prior = previous_working_recipe(args.name, args.version)
+    discovery_recipe = load(discovery, {})
+    if prior:
+        working_recipe = load(prior, {})
+        working_recipe["identity"] = discovery_recipe["identity"]
+        working_recipe["source"] = discovery_recipe["source"]
+        working_recipe["validation"] = discovery_recipe.get(
+            "validation", working_recipe.get("validation", {})
+        )
+        source = prior
+        result = "previous-working-adapted"
+    else:
+        working_recipe = discovery_recipe
+        source = discovery
+        result = "manual-edit-required"
+
+    save(working, working_recipe)
     emit({"operation": "working-init", "package": args.name, "version": args.version,
-          "source": str(discovery), "working_recipe": str(working),
-          "result": "manual-edit-required"})
+          "source": str(source), "working_recipe": str(working), "result": result})
 
 
 def cmd_test_working(args):

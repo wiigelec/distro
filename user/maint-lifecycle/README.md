@@ -42,7 +42,7 @@ test-discovery
     ├── succeeds → recipe-working established automatically
     └── fails
           ├── working recipe exists → test-working
-          ├── earlier-version working recipe exists → available for maintainer adaptation
+          ├── earlier-version working recipe exists → working-init carries it forward
           └── neither exists → needs-manual-intervention
     ↓
 build from recipe-working
@@ -64,6 +64,7 @@ rm -rf \
   server/build/manifest.json \
   server/build/state.json \
   server/build/packages \
+  server/build/recipes \
   server/build/sources \
   server/build/work \
   server/build/stage \
@@ -109,6 +110,31 @@ client/root/usr/bin/tree --version
 ```
 
 After the manual correction, `status tree 2.3.1` should report `manual_intervention: true`.
+
+
+## Tree 2.3.2 upgrade exercise
+
+After publishing and installing 2.3.1:
+
+```sh
+python3 server/build/build discover tree
+python3 server/build/build accept tree 2.3.2
+python3 server/build/build recipe-discover tree 2.3.2
+
+# Expected to fail discovery again, but report the 2.3.1 working recipe.
+python3 server/build/build test-discovery tree 2.3.2
+
+# Carries forward the previous working recipe while replacing
+# version-specific identity, source, and validation from 2.3.2 discovery.
+python3 server/build/build working-init tree 2.3.2
+python3 server/build/build test-working tree 2.3.2
+python3 server/build/build status tree 2.3.2
+python3 server/build/build build tree 2.3.2
+python3 server/build/build publish tree 2.3.2
+```
+
+A carried-forward working recipe is still compared with the new version's
+`recipe-discovery.json`, so package-specific maintenance remains visible.
 
 ## Offline fixtures
 
