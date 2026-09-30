@@ -1,0 +1,178 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+import argparse, hashlib, io, json, os, re, shutil, subprocess, sys, tarfile, tempfile, urllib.request
+from pathlib import Path
+
+HERE=Path(__file__).resolve().parent
+SERVER=HERE.parent
+PUBLISH=SERVER/'publish'
+MANIFEST=HERE/'manifest.json'
+STATE=HERE/'state.json'
+RECIPES=HERE/'recipes'
+SOURCES=HERE/'sources'
+WORK=HERE/'work'
+STAGE=HERE/'stage'
+CANDIDATES=HERE/'candidates'
+ARCH='x86_64'
+UA='distro-maint-lifecycle-prototype/0'
+
+def load(path, default):
+    return json.loads(path.read_text()) if path.exists() else default
+
+def save(path,obj):
+    path.parent.mkdir(parents=True,exist_ok=True); path.write_text(json.dumps(obj,indent=2,sort_keys=True)+'\n')
+
+def emit(obj): print(json.dumps(obj,indent=2,sort_keys=True))
+
+def sha256(path):
+    h=hashlib.sha256()
+    with path.open('rb') as f:
+        for b in iter(lambda:f.read(1024*1024),b''): h.update(b)
+    return h.hexdigest()
+
+def version_key(v):
+    # tree-specific discovery ordering; not distro-wide version semantics.
+    return tuple(int(x) for x in v.split('.'))
+
+def package_entry(name):
+    m=load(MANIFEST,{'schema_version':1,'packages':{}})
+    try:return m['packages'][name]
+    except KeyError: raise SystemExit(f'not tracked: {name}')
+
+def cmd_track(a):
+    m=load(MANIFEST,{'schema_version':1,'packages':{}})
+    before=m['packages'].get(a.name)
+    m['packages'][a.name]={'repository':a.repository,'automation':'assisted','discovery':'github-tags'}
+    save(MANIFEST,m)
+    emit({'operation':'track','package':a.name,'previous':before,'tracked':m['packages'][a.name],'manifest':str(MANIFEST)})
+
+def github_tags(repo):
+    mm=re.match(r'https://github\.com/([^/]+)/([^/]+?)(?:\.git)?$',repo)
+    if not mm: raise RuntimeError('prototype discovery currently expects a github.com repository URL')
+    owner,name=mm.groups(); url=f'https://api.github.com/repos/{owner}/{name}/tags?per_page=100'
+    req=urllib.request.Request(url,headers={'User-Agent':UA,'Accept':'application/vnd.github+json'})
+    with urllib.request.urlopen(req,timeout=30) as r: rows=json.load(r)
+    return [x['name'] for x in rows]
+
+def cmd_discover(a):
+    p=package_entry(a.name)
+    if a.tags_file:
+        tags=load(Path(a.tags_file),[])
+        source=f'fixture:{a.tags_file}'
+    else:
+        tags=github_tags(p['repository']); source=p['repository']
+    stable=[t for t in tags if re.fullmatch(r'\d+(?:\.\d+)+',t)]
+    if a.max_version:
+        ceiling=version_key(a.max_version); stable=[t for t in stable if version_key(t)<=ceiling]
+    if not stable: raise RuntimeError('no acceptable stable tags discovered')
+    stable=sorted(set(stable),key=version_key)
+    latest=stable[-1]
+    s=load(STATE,{'schema_version':1,'packages':{}}); ps=s['packages'].setdefault(a.name,{})
+    previous=ps.get('latest_observed'); accepted=ps.get('accepted_version')
+    ps['observed_versions']=sorted(set(ps.get('observed_versions',[]))|set(stable),key=version_key)
+    ps['latest_observed']=latest
+    ps['last_discovery_source']=source
+    save(STATE,s)
+    result='new-version-observed' if accepted and latest!=accepted else ('initial-version-observed' if not accepted else 'accepted-version-current')
+    emit({'operation':'discover','package':a.name,'previous_latest':previous,'accepted_version':accepted,'observed_versions':stable,'latest_observed':latest,'result':result,'state':str(STATE)})
+
+def cmd_accept(a):
+    package_entry(a.name); s=load(STATE,{'schema_version':1,'packages':{}}); ps=s['packages'].setdefault(a.name,{})
+    obs=ps.get('observed_versions',[])
+    if a.version not in obs: raise RuntimeError(f'{a.version} has not been observed')
+    before=ps.get('accepted_version'); registry=ps.get('version_registry',[])
+    if a.version not in registry: registry.append(a.version); registry.sort(key=version_key)
+    ps['version_registry']=registry; ps['accepted_version']=a.version
+    save(STATE,s)
+    emit({'operation':'accept','package':a.name,'previous_accepted':before,'accepted_version':a.version,'version_registry':registry,'revision':'r1','state':str(STATE)})
+
+def cmd_prepare(a):
+    p=package_entry(a.name); s=load(STATE,{'packages':{}}); ps=s['packages'].get(a.name,{})
+    if ps.get('accepted_version')!=a.version: raise RuntimeError('version must be accepted before prepare')
+    if a.name!='tree': raise RuntimeError('prototype recipe generation currently implements tree only')
+    repo=p['repository'].rstrip('/')
+    recipe={'schema_version':1,'identity':{'name':a.name,'version':a.version,'architecture':ARCH,'revision':'r1'},
+      'source':{'url':f'{repo}/archive/refs/tags/{a.version}.tar.gz'},
+      'build':{'commands':['make',"make DESTDIR=\"$DESTDIR\" PREFIX=/usr MANDIR=/usr/share/man install"]},
+      'runtime':{'depends':[],'conflicts':[],'provides':[]}}
+    path=RECIPES/f'{a.name}-{a.version}.json'; save(path,recipe)
+    emit({'operation':'prepare','package':a.name,'version':a.version,'recipe':str(path),'source':recipe['source'],'commands':recipe['build']['commands']})
+
+def safe_extract(tf,dest):
+    root=dest.resolve()
+    for m in tf.getmembers():
+        target=(dest/m.name).resolve()
+        if root not in target.parents and target!=root: raise RuntimeError('unsafe archive member')
+    tf.extractall(dest, filter='data')
+
+def cmd_build(a):
+    recipe_path=RECIPES/f'{a.name}-{a.version}.json'
+    if not recipe_path.exists(): raise RuntimeError('prepare must run before build')
+    r=load(recipe_path,{})
+    source=SOURCES/f'{a.name}-{a.version}.tar.gz'; source.parent.mkdir(parents=True,exist_ok=True)
+    transport='cache'
+    if a.source_archive:
+        shutil.copy2(a.source_archive,source); transport=f'provided:{a.source_archive}'
+    elif not source.exists():
+        req=urllib.request.Request(r['source']['url'],headers={'User-Agent':UA})
+        with urllib.request.urlopen(req,timeout=60) as inp, source.open('wb') as out: shutil.copyfileobj(inp,out)
+        transport='download'
+    work=WORK/f'{a.name}-{a.version}'; stage=STAGE/f'{a.name}-{a.version}-{ARCH}-r1'
+    shutil.rmtree(work,ignore_errors=True); shutil.rmtree(stage,ignore_errors=True); work.mkdir(parents=True); stage.mkdir(parents=True)
+    with tarfile.open(source,'r:*') as tf: safe_extract(tf,work)
+    roots=[p for p in work.iterdir() if p.is_dir()]; src=roots[0] if len(roots)==1 else work
+    env=os.environ.copy(); env['DESTDIR']=str(stage)
+    log=[]
+    for command in r['build']['commands']:
+        cp=subprocess.run(command,shell=True,cwd=src,env=env,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+        log.append({'command':command,'returncode':cp.returncode,'output':cp.stdout})
+        if cp.returncode: save(WORK/f'{a.name}-{a.version}.build-log.json',log); raise RuntimeError(f'build command failed: {command}')
+    owned=[p.relative_to(stage).as_posix() for p in sorted(stage.rglob('*')) if p.is_file() or p.is_symlink()]
+    metadata={'schema_version':1,'identity':r['identity'],'depends':[],'conflicts':[],'provides':[],'owned_paths':owned}
+    CANDIDATES.mkdir(parents=True,exist_ok=True); artifact=CANDIDATES/f"{a.name}-{a.version}-{ARCH}-r1.distro.tar.gz"
+    encoded=(json.dumps(metadata,indent=2,sort_keys=True)+'\n').encode()
+    with tarfile.open(artifact,'w:gz') as tf:
+        ti=tarfile.TarInfo('metadata.json'); ti.size=len(encoded); ti.mode=0o644; tf.addfile(ti,io.BytesIO(encoded))
+        for p in sorted(stage.rglob('*')): tf.add(p,arcname='root/'+p.relative_to(stage).as_posix(),recursive=False)
+    result={'operation':'build','package':a.name,'version':a.version,'source_transport':transport,'source_sha256':sha256(source),'artifact':str(artifact),'artifact_sha256':sha256(artifact),'owned_paths':owned,'build_log':log}
+    save(CANDIDATES/f'{a.name}-{a.version}.result.json',result); emit(result)
+
+def cmd_publish(a):
+    s=load(STATE,{'packages':{}}); ps=s['packages'].get(a.name,{})
+    if ps.get('accepted_version')!=a.version: raise RuntimeError('version must be accepted before publication')
+    artifact=CANDIDATES/f'{a.name}-{a.version}-{ARCH}-r1.distro.tar.gz'; result_path=CANDIDATES/f'{a.name}-{a.version}.result.json'
+    if not artifact.exists() or not result_path.exists(): raise RuntimeError('build must run before publish')
+    b=load(result_path,{})
+    PUBLISH.mkdir(parents=True,exist_ok=True); (PUBLISH/'artifacts').mkdir(exist_ok=True)
+    dst=PUBLISH/'artifacts'/artifact.name; shutil.copy2(artifact,dst)
+    db=load(PUBLISH/'package-db.json',{'schema_version':1,'generation':0,'requirements':{},'catalogs':{ARCH:{'packages':{}}}})
+    db['generation']+=1
+    req=db['requirements'].setdefault(a.name,{'kind':'package','versions':[]})
+    for v in ps.get('version_registry',[]):
+        if v not in req['versions']: req['versions'].append(v)
+    req['versions'].sort(key=version_key)
+    pkg=db['catalogs'].setdefault(ARCH,{'packages':{}})['packages'].setdefault(a.name,{'current':None,'available':[]})
+    entry={'version':a.version,'revision':'r1','artifact_reference':'artifacts/'+dst.name,'artifact_checksum':sha256(dst),'metadata':{'depends':[],'conflicts':[],'provides':[],'owned_paths':b['owned_paths']}}
+    pkg['available']=[x for x in pkg['available'] if x['version']!=a.version]+[entry]
+    pkg['available'].sort(key=lambda x:version_key(x['version']))
+    pkg['current']={'version':a.version,'revision':'r1'}
+    save(PUBLISH/'package-db.json',db)
+    emit({'operation':'publish','package':a.name,'version':a.version,'generation':db['generation'],'current':pkg['current'],'available':[x['version']+'-'+x['revision'] for x in pkg['available']],'package_database':str(PUBLISH/'package-db.json'),'artifact':str(dst)})
+
+def cmd_status(a):
+    s=load(STATE,{'packages':{}}); emit({'operation':'status','package':a.name,'state':s.get('packages',{}).get(a.name)})
+
+def main():
+    ap=argparse.ArgumentParser(); sp=ap.add_subparsers(dest='cmd',required=True)
+    p=sp.add_parser('track'); p.add_argument('name'); p.add_argument('repository'); p.set_defaults(fn=cmd_track)
+    p=sp.add_parser('discover'); p.add_argument('name'); p.add_argument('--max-version'); p.add_argument('--tags-file'); p.set_defaults(fn=cmd_discover)
+    p=sp.add_parser('accept'); p.add_argument('name'); p.add_argument('version'); p.set_defaults(fn=cmd_accept)
+    p=sp.add_parser('prepare'); p.add_argument('name'); p.add_argument('version'); p.set_defaults(fn=cmd_prepare)
+    p=sp.add_parser('build'); p.add_argument('name'); p.add_argument('version'); p.add_argument('--source-archive',type=Path); p.set_defaults(fn=cmd_build)
+    p=sp.add_parser('publish'); p.add_argument('name'); p.add_argument('version'); p.set_defaults(fn=cmd_publish)
+    p=sp.add_parser('status'); p.add_argument('name'); p.set_defaults(fn=cmd_status)
+    a=ap.parse_args()
+    try:a.fn(a)
+    except Exception as e:
+        emit({'operation':a.cmd,'status':'error','error':str(e)}); raise SystemExit(1)
+if __name__=='__main__': main()

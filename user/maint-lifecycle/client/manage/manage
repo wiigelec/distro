@@ -1,0 +1,125 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+import argparse, hashlib, json, shutil, tarfile
+from pathlib import Path
+HERE=Path(__file__).resolve().parent
+CLIENT=HERE.parent
+ROOT=CLIENT/'root'
+LOCAL_DB=HERE/'package-db.json'
+INSTALLED=HERE/'installed.json'
+DEFAULT_PUBLISH=CLIENT.parent/'server'/'publish'
+ARCH='x86_64'
+
+def load(p,d):return json.loads(p.read_text()) if p.exists() else d
+
+def save(p,o):p.parent.mkdir(parents=True,exist_ok=True);p.write_text(json.dumps(o,indent=2,sort_keys=True)+'\n')
+
+def emit(o):print(json.dumps(o,indent=2,sort_keys=True))
+
+def sha256(p):
+ h=hashlib.sha256()
+ with p.open('rb') as f:
+  for b in iter(lambda:f.read(1024*1024),b''):h.update(b)
+ return h.hexdigest()
+
+def catalog():
+ db=load(LOCAL_DB,None)
+ if db is None:raise RuntimeError('refresh required')
+ return db,db['catalogs'][ARCH]['packages']
+
+def current(pkg):
+ ident=pkg['current']
+ return next(x for x in pkg['available'] if x['version']==ident['version'] and x['revision']==ident['revision'])
+
+def installed_db():return load(INSTALLED,{'schema_version':1,'packages':{}})
+
+def safe_members(tf):
+ for m in tf.getmembers():
+  if not m.name.startswith('root/') or '..' in Path(m.name).parts: continue
+  yield m
+
+def remove_owned(paths):
+ for rel in sorted(paths,key=lambda x:len(Path(x).parts),reverse=True):
+  p=ROOT/rel
+  if p.is_symlink() or p.is_file():p.unlink(missing_ok=True)
+ for rel in sorted({str(Path(x).parent) for x in paths},key=lambda x:len(Path(x).parts),reverse=True):
+  p=ROOT/rel
+  try:p.rmdir()
+  except OSError:pass
+
+def apply(name,entry,reason='explicit'):
+ publish=DEFAULT_PUBLISH; art=publish/entry['artifact_reference']
+ if not art.exists():raise RuntimeError(f'missing artifact: {art}')
+ if sha256(art)!=entry['artifact_checksum']:raise RuntimeError('artifact checksum mismatch')
+ db=installed_db(); old=db['packages'].get(name)
+ if old:remove_owned(old['owned_paths'])
+ ROOT.mkdir(parents=True,exist_ok=True)
+ with tarfile.open(art,'r:*') as tf:
+  metadata=json.load(tf.extractfile('metadata.json'))
+  expected={'name':name,'version':entry['version'],'architecture':ARCH,'revision':entry['revision']}
+  if metadata['identity']!=expected:raise RuntimeError('embedded identity mismatch')
+  for m in safe_members(tf):
+   rel=Path(m.name).relative_to('root'); target=ROOT/rel
+   if m.isdir():target.mkdir(parents=True,exist_ok=True);continue
+   target.parent.mkdir(parents=True,exist_ok=True)
+   if m.issym(): target.symlink_to(m.linkname)
+   elif m.isfile():
+    with tf.extractfile(m) as src,target.open('wb') as dst:shutil.copyfileobj(src,dst)
+    target.chmod(m.mode)
+ db['packages'][name]={'identity':expected,'artifact_checksum':entry['artifact_checksum'],'install_reason':old.get('install_reason',reason) if old else reason,'held':False,'depends':entry['metadata']['depends'],'conflicts':entry['metadata']['conflicts'],'provides':entry['metadata']['provides'],'owned_paths':entry['metadata']['owned_paths']}
+ save(INSTALLED,db);return old,db['packages'][name]
+
+def cmd_refresh(a):
+ src=a.source/'package-db.json'
+ if not src.exists():raise RuntimeError(f'no published package database: {src}')
+ before=load(LOCAL_DB,{}).get('generation'); shutil.copy2(src,LOCAL_DB); after=load(LOCAL_DB,{})['generation']
+ emit({'operation':'refresh','previous_generation':before,'generation':after,'source':str(src),'local_database':str(LOCAL_DB)})
+
+def cmd_info(a):
+ db,pkgs=catalog(); inst=installed_db()['packages'].get(a.name); pub=pkgs.get(a.name)
+ emit({'operation':'info','package':a.name,'published':pub,'installed':inst,'generation':db['generation']})
+
+def cmd_status(a):
+ db,pkgs=catalog(); inst=installed_db()['packages'].get(a.name); pub=pkgs.get(a.name)
+ if not inst: result='not-installed'
+ elif not pub: result='installed-unavailable'
+ else:
+  cur=pub['current']; ii=inst['identity']; result='current' if ii['version']==cur['version'] and ii['revision']==cur['revision'] else 'change-available'
+ emit({'operation':'status','package':a.name,'result':result,'installed':inst['identity'] if inst else None,'current':pub['current'] if pub else None,'generation':db['generation']})
+
+def cmd_list(a):emit({'operation':'list','packages':installed_db()['packages']})
+
+def cmd_install(a):
+ db,pkgs=catalog()
+ if a.name not in pkgs:raise RuntimeError('package unavailable')
+ old,new=apply(a.name,current(pkgs[a.name])); emit({'operation':'install','package':a.name,'previous':old['identity'] if old else None,'installed':new['identity'],'root':str(ROOT)})
+
+def cmd_upgrade(a):
+ db,pkgs=catalog(); idb=installed_db(); names=[a.name] if a.name else sorted(idb['packages']); changes=[]
+ for name in names:
+  old=idb['packages'].get(name)
+  if not old or name not in pkgs:continue
+  ent=current(pkgs[name]); oi=old['identity']
+  if oi['version']==ent['version'] and oi['revision']==ent['revision']:continue
+  _,new=apply(name,ent,old['install_reason']); idb=installed_db(); changes.append({'package':name,'from':oi,'to':new['identity']})
+ emit({'operation':'upgrade','changes':changes,'root':str(ROOT)})
+
+def cmd_remove(a):
+ db=installed_db(); old=db['packages'].get(a.name)
+ if not old:raise RuntimeError('package not installed')
+ remove_owned(old['owned_paths']); del db['packages'][a.name]; save(INSTALLED,db)
+ emit({'operation':'remove','package':a.name,'removed':old['identity'],'removed_paths':old['owned_paths'],'root':str(ROOT)})
+
+def main():
+ ap=argparse.ArgumentParser();sp=ap.add_subparsers(dest='cmd',required=True)
+ p=sp.add_parser('refresh');p.add_argument('--source',type=Path,default=DEFAULT_PUBLISH);p.set_defaults(fn=cmd_refresh)
+ for n,fn in [('info',cmd_info),('status',cmd_status)]:
+  p=sp.add_parser(n);p.add_argument('name');p.set_defaults(fn=fn)
+ p=sp.add_parser('list');p.set_defaults(fn=cmd_list)
+ p=sp.add_parser('install');p.add_argument('name');p.set_defaults(fn=cmd_install)
+ p=sp.add_parser('upgrade');p.add_argument('name',nargs='?');p.set_defaults(fn=cmd_upgrade)
+ p=sp.add_parser('remove');p.add_argument('name');p.set_defaults(fn=cmd_remove)
+ a=ap.parse_args()
+ try:a.fn(a)
+ except Exception as e:emit({'operation':a.cmd,'status':'error','error':str(e)});raise SystemExit(1)
+if __name__=='__main__':main()
