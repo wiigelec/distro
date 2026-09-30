@@ -3,7 +3,7 @@ client/manage/installed.json
 client/root/
 server/build/manifest.json
 server/build/state.json
-server/build/recipes/
+server/build/packages/
 server/build/sources/
 server/build/work/
 server/build/stage/
