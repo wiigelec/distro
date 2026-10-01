@@ -118,6 +118,15 @@ def materialize_delta(source_root: Path, stage_root: Path,
         src = source_root / relative
         dst = stage_root / relative
         dst.parent.mkdir(parents=True, exist_ok=True)
+
+        parent = dst.parent
+        while parent != stage_root:
+            parent_relative = parent.relative_to(stage_root)
+            source_parent = source_root / parent_relative
+            shutil.copystat(source_parent, parent, follow_symlinks=False)
+            st = source_parent.lstat()
+            os.chown(parent, st.st_uid, st.st_gid, follow_symlinks=False)
+            parent = parent.parent
         if src.is_symlink():
             if dst.exists() or dst.is_symlink():
                 dst.unlink()
@@ -186,9 +195,13 @@ def self_test() -> None:
         realized = base / "realized"
         before_root.mkdir()
         (before_root / "usr/bin").mkdir(parents=True)
+        (before_root / "var/cache/private").mkdir(parents=True)
+        (before_root / "var/cache/private").chmod(0o700)
+        (before_root / "var/cache/private/keep").write_text("same\n", encoding="utf-8")
         (before_root / "usr/bin/keep").write_text("same\n", encoding="utf-8")
         shutil.copytree(before_root, after_root, dirs_exist_ok=True)
         (after_root / "usr/bin/new").write_text("new\n", encoding="utf-8")
+        (after_root / "var/cache/private/new").write_text("new\n", encoding="utf-8")
         (after_root / "usr/bin/keep").write_text("changed\n", encoding="utf-8")
         (after_root / "usr/lib").mkdir(parents=True)
         os.symlink("../bin/new", after_root / "usr/lib/new-link")

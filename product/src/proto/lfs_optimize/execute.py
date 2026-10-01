@@ -27,7 +27,7 @@ from artifact import (
 from resolve import HERE, resolve
 
 USER_AGENT = "distro-lfs-optimize-prototype/0"
-CACHE_SCHEMA_VERSION = 3
+CACHE_SCHEMA_VERSION = 4
 
 
 def canonical_sha256(value: Any) -> str:
