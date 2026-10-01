@@ -256,7 +256,19 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
                 )
             for command in step["commands"]:
                 index += 1
-                item = chroot_command(clone, command, source_cwd, log, index)
+                if command.get("kind") == "session-transition":
+                    item = {
+                        "index": index,
+                        "user": command["user"],
+                        "command": command["command"],
+                        "source_command": command.get("source_command"),
+                        "exit_code": 0,
+                        "executed": False,
+                        "disposition": "recorded-session-transition",
+                    }
+                else:
+                    item = chroot_command(clone, command, source_cwd, log, index)
+                    item["executed"] = True
                 item["phase"] = step["phase"]
                 command_results.append(item)
                 if item["exit_code"] != 0:

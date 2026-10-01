@@ -62,7 +62,8 @@
       "commands": [
         {
           "command": "exec /usr/bin/bash --login",
-          "user": "root"
+          "user": "root",
+          "kind": "session-transition"
         }
       ],
       "working_directory": "source",
