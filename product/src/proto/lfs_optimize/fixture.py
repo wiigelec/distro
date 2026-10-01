@@ -13,18 +13,32 @@ from pathlib import Path
 
 IMAGE = "debian:13-slim"
 PACKAGES = [
+    "autoconf",
+    "automake",
     "bash",
+    "bison",
     "build-essential",
     "ca-certificates",
+    "diffutils",
+    "e2fsprogs",
+    "expect",
+    "findutils",
     "gawk",
     "gettext",
     "grep",
+    "libcap-dev",
+    "libgmp-dev",
+    "libncurses-dev",
     "libpcre2-dev",
+    "libreadline-dev",
+    "libssl-dev",
     "make",
+    "passwd",
     "patch",
     "sed",
     "tar",
     "texinfo",
+    "util-linux",
     "xz-utils",
 ]
 
@@ -125,6 +139,10 @@ id tester
         "usr/bin/sed",
         "usr/bin/gawk",
         "usr/bin/patch",
+        "usr/bin/autoconf",
+        "usr/bin/automake",
+        "usr/bin/bison",
+        "usr/bin/expect",
         "etc/passwd",
     ]
     missing = [relative for relative in required if not (output / relative).exists()]
