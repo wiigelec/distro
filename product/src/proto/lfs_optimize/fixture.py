@@ -145,7 +145,11 @@ id tester
         "usr/bin/expect",
         "etc/passwd",
     ]
-    missing = [relative for relative in required if not (output / relative).exists()]
+    missing = [
+        relative
+        for relative in required
+        if not os.path.lexists(output / relative)
+    ]
     if missing:
         raise RuntimeError(f"fixture missing required paths: {missing}")
 
