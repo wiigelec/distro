@@ -27,7 +27,7 @@ from artifact import (
 from resolve import HERE, resolve
 
 USER_AGENT = "distro-lfs-optimize-prototype/0"
-CACHE_SCHEMA_VERSION = 2
+CACHE_SCHEMA_VERSION = 3
 
 
 def canonical_sha256(value: Any) -> str:
@@ -261,6 +261,22 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
                     f"{package['name']}: unsupported working directory "
                     f"{step['working_directory']}"
                 )
+            if test_ready and step["phase"] != "test":
+                source_relative = Path(source_cwd.lstrip("/"))
+                test_source = test_clone / source_relative
+                clone_source = clone / source_relative
+                if clone_source.exists():
+                    shutil.rmtree(clone_source)
+                subprocess.run(
+                    [
+                        "cp", "-a", "--reflink=auto",
+                        str(test_source), str(clone_source),
+                    ],
+                    check=True,
+                )
+                shutil.rmtree(test_clone)
+                test_ready = False
+
             execution_root = clone
             if step["phase"] == "test":
                 if not test_ready:

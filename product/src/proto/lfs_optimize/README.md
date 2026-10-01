@@ -106,9 +106,12 @@ optional extraction into target root
 ```
 
 Test steps execute in a disposable clone of the built root. Their success or
-failure is recorded, but filesystem side effects from test setup and test
-cleanup are discarded before installation. This keeps test artifacts such as
-temporary files or account/group database backups out of the package payload.
+failure is recorded. Changes inside the package source/build tree are copied
+back before later phases so test-generated build state remains available to
+installation, while test-only mutations elsewhere in the system root are
+discarded. This keeps artifacts such as temporary files or account/group
+database backups out of the package payload without changing package build
+semantics.
 
 The archive contains only filesystem payload. The result JSON and build log
 remain external evidence; they are not embedded package metadata.
