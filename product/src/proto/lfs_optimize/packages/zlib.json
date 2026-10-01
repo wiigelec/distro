@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "name": "zlib",
+  "reference": {
+    "lfs_section": "ch-system-zlib"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        "./configure --prefix=/usr"
+      ]
+    },
+    {
+      "phase": "build",
+      "commands": [
+        "make"
+      ]
+    },
+    {
+      "phase": "test",
+      "commands": [
+        "make check"
+      ]
+    },
+    {
+      "phase": "install",
+      "commands": [
+        "make install",
+        "rm -fv /usr/lib/libz.a"
+      ]
+    }
+  ],
+  "installed": {
+    "libraries": [
+      "libz.so"
+    ]
+  }
+}

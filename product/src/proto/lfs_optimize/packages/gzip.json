@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "name": "gzip",
+  "reference": {
+    "lfs_section": "ch-system-gzip"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        "./configure --prefix=/usr"
+      ]
+    },
+    {
+      "phase": "build",
+      "commands": [
+        "make"
+      ]
+    },
+    {
+      "phase": "test",
+      "commands": [
+        "make check"
+      ]
+    },
+    {
+      "phase": "install",
+      "commands": [
+        "make install"
+      ]
+    }
+  ],
+  "installed": {
+    "programs": [
+      "gunzip",
+      "gzexe",
+      "gzip",
+      "uncompress",
+      "zcat",
+      "zcmp",
+      "zdiff",
+      "zegrep",
+      "zfgrep",
+      "zforce",
+      "zgrep",
+      "zless",
+      "zmore",
+      "znew"
+    ]
+  }
+}

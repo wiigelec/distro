@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "name": "bash",
+  "reference": {
+    "lfs_section": "ch-system-bash"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        "./configure --prefix=/usr --without-bash-malloc --with-installed-readline --docdir=/usr/share/doc/bash-{version}"
+      ]
+    },
+    {
+      "phase": "build",
+      "commands": [
+        "make"
+      ]
+    },
+    {
+      "phase": "test",
+      "commands": [
+        "chown -R tester .",
+        "LC_ALL=C.UTF-8 su -s /usr/bin/expect tester << \"EOF\"\nset timeout -1\nspawn make tests\nexpect eof\nlassign [wait] _ _ _ value\nexit $value\nEOF"
+      ]
+    },
+    {
+      "phase": "install",
+      "commands": [
+        "make install"
+      ]
+    },
+    {
+      "phase": "system",
+      "commands": [
+        "exec /usr/bin/bash --login"
+      ]
+    }
+  ],
+  "test_expectations": [
+    "run-builtins may fail on some host distributions at output lines 479 and 480",
+    "tests requiring zh_TW.BIG5 or ja_JP.SJIS may fail when those locales are unavailable"
+  ],
+  "installed": {
+    "programs": [
+      "bash",
+      "bashbug",
+      "sh"
+    ],
+    "directories": [
+      "/usr/include/bash",
+      "/usr/lib/bash",
+      "/usr/share/doc/bash-{version}"
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "name": "lfs-normal-proof",
+  "packages": [
+    "zlib",
+    "bash",
+    "coreutils",
+    "gzip",
+    "make"
+  ]
+}

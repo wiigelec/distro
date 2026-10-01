@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "name": "make",
+  "reference": {
+    "lfs_section": "ch-system-make"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        "./configure --prefix=/usr"
+      ]
+    },
+    {
+      "phase": "build",
+      "commands": [
+        "make"
+      ]
+    },
+    {
+      "phase": "test",
+      "commands": [
+        "chown -R tester .",
+        "su tester -c \"PATH=$PATH make check\""
+      ]
+    },
+    {
+      "phase": "install",
+      "commands": [
+        "make install"
+      ]
+    }
+  ],
+  "installed": {
+    "programs": [
+      "make"
+    ]
+  }
+}
