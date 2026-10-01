@@ -9,41 +9,94 @@
       "phase": "prepare",
       "resource": "i18n",
       "commands": [
-        "patch -Np1 -i ../coreutils-{version}-i18n-1.patch"
-      ]
+        {
+          "command": "patch -Np1 -i ../coreutils-{version}-i18n-1.patch",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
     },
     {
       "phase": "configure",
       "commands": [
-        "autoreconf -fv",
-        "automake -af",
-        "FORCE_UNSAFE_CONFIGURE=1 ./configure --prefix=/usr"
-      ]
+        {
+          "command": "autoreconf -fv",
+          "user": "root"
+        },
+        {
+          "command": "automake -af",
+          "user": "root"
+        },
+        {
+          "command": "FORCE_UNSAFE_CONFIGURE=1 ./configure --prefix=/usr",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
     },
     {
       "phase": "build",
       "commands": [
-        "make"
-      ]
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
     },
     {
       "phase": "test",
       "commands": [
-        "make NON_ROOT_USERNAME=tester check-root",
-        "groupadd -g 102 dummy -U tester",
-        "chown -R tester .",
-        "su tester -c \"PATH=$PATH make -k RUN_EXPENSIVE_TESTS=yes check\" < /dev/null",
-        "groupdel dummy"
-      ]
+        {
+          "command": "make NON_ROOT_USERNAME=tester check-root",
+          "user": "root"
+        },
+        {
+          "command": "groupadd -g 102 dummy -U tester",
+          "user": "root"
+        },
+        {
+          "command": "chown -R tester .",
+          "user": "root"
+        },
+        {
+          "command": "PATH=$PATH make -k RUN_EXPENSIVE_TESTS=yes check < /dev/null",
+          "user": "tester",
+          "source_command": "su tester -c \"PATH=$PATH make -k RUN_EXPENSIVE_TESTS=yes check\" < /dev/null"
+        },
+        {
+          "command": "groupdel dummy",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
     },
     {
       "phase": "install",
       "commands": [
-        "make install",
-        "mv -v /usr/bin/chroot /usr/sbin",
-        "mv -v /usr/share/man/man1/chroot.1 /usr/share/man/man8/chroot.8",
-        "sed -i 's/\"1\"/\"8\"/' /usr/share/man/man8/chroot.8"
-      ]
+        {
+          "command": "make install",
+          "user": "root"
+        },
+        {
+          "command": "mv -v /usr/bin/chroot /usr/sbin",
+          "user": "root"
+        },
+        {
+          "command": "mv -v /usr/share/man/man1/chroot.1 /usr/share/man/man8/chroot.8",
+          "user": "root"
+        },
+        {
+          "command": "sed -i 's/\"1\"/\"8\"/' /usr/share/man/man8/chroot.8",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
     }
   ],
   "test_expectations": [
@@ -160,5 +213,570 @@
     "directories": [
       "/usr/libexec/coreutils"
     ]
-  }
+  },
+  "description": "The Coreutils package contains the basic utility programs needed by every operating system.",
+  "document": {
+    "section_id": "ch-system-coreutils",
+    "filename": "coreutils.html",
+    "contents_id": "contents-coreutils"
+  },
+  "dependencies": {
+    "build": [
+      "Autoconf",
+      "Automake",
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "GCC",
+      "Gettext",
+      "Glibc",
+      "GMP",
+      "Grep",
+      "Libcap",
+      "Make",
+      "OpenSSL",
+      "Patch",
+      "Perl",
+      "Sed",
+      "Texinfo"
+    ],
+    "runtime": [
+      "Glibc"
+    ],
+    "test": [
+      "Diffutils",
+      "E2fsprogs",
+      "Findutils",
+      "Shadow",
+      "Util-linux"
+    ],
+    "before": [
+      "Bash",
+      "Diffutils",
+      "Findutils",
+      "Man-DB",
+      "Systemd"
+    ],
+    "optional": [
+      "Expect.pm",
+      "IO::Tty"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "lbracket",
+      "name": "[",
+      "description": "Is an actual command, /usr/bin/[; it is a synonym for the test command"
+    },
+    {
+      "id": "base32",
+      "name": "base32",
+      "description": "Encodes and decodes data according to the base32 specification (RFC 4648)"
+    },
+    {
+      "id": "base64",
+      "name": "base64",
+      "description": "Encodes and decodes data according to the base64 specification (RFC 4648)"
+    },
+    {
+      "id": "b2sum",
+      "name": "b2sum",
+      "description": "Prints or checks BLAKE2 (512-bit) checksums"
+    },
+    {
+      "id": "basename",
+      "name": "basename",
+      "description": "Strips any path and a given suffix from a file name"
+    },
+    {
+      "id": "basenc",
+      "name": "basenc",
+      "description": "Encodes or decodes data using various algorithms"
+    },
+    {
+      "id": "cat",
+      "name": "cat",
+      "description": "Concatenates files to standard output"
+    },
+    {
+      "id": "chgrp",
+      "name": "chgrp",
+      "description": "Changes the group ownership of files and directories"
+    },
+    {
+      "id": "chmod",
+      "name": "chmod",
+      "description": "Changes the permissions of each file to the given mode; the mode can be either a symbolic representation of the changes to be made, or an octal number representing the new permissions"
+    },
+    {
+      "id": "chown",
+      "name": "chown",
+      "description": "Changes the user and/or group ownership of files and directories"
+    },
+    {
+      "id": "chroot",
+      "name": "chroot",
+      "description": "Runs a command with the specified directory as the / directory"
+    },
+    {
+      "id": "cksum",
+      "name": "cksum",
+      "description": "Prints the Cyclic Redundancy Check (CRC) checksum and the byte counts of each specified file"
+    },
+    {
+      "id": "comm",
+      "name": "comm",
+      "description": "Compares two sorted files, outputting in three columns the lines that are unique and the lines that are common"
+    },
+    {
+      "id": "cp",
+      "name": "cp",
+      "description": "Copies files"
+    },
+    {
+      "id": "csplit",
+      "name": "csplit",
+      "description": "Splits a given file into several new files, separating them according to given patterns or line numbers, and outputting the byte count of each new file"
+    },
+    {
+      "id": "cut",
+      "name": "cut",
+      "description": "Prints sections of lines, selecting the parts according to given fields or positions"
+    },
+    {
+      "id": "date",
+      "name": "date",
+      "description": "Displays the current date and time in the given format, or sets the system date and time"
+    },
+    {
+      "id": "dd",
+      "name": "dd",
+      "description": "Copies a file using the given block size and count, while optionally performing conversions on it"
+    },
+    {
+      "id": "df",
+      "name": "df",
+      "description": "Reports the amount of disk space available (and used) on all mounted file systems, or only on the file systems holding the selected files"
+    },
+    {
+      "id": "dir",
+      "name": "dir",
+      "description": "Lists the contents of each given directory (the same as the ls command)"
+    },
+    {
+      "id": "dircolors",
+      "name": "dircolors",
+      "description": "Outputs commands to set the LS_COLOR environment variable to change the color scheme used by ls"
+    },
+    {
+      "id": "dirname",
+      "name": "dirname",
+      "description": "Extracts the directory portion(s) of the given name(s)"
+    },
+    {
+      "id": "du",
+      "name": "du",
+      "description": "Reports the amount of disk space used by the current directory, by each of the given directories (including all subdirectories) or by each of the given files"
+    },
+    {
+      "id": "echo",
+      "name": "echo",
+      "description": "Displays the given strings"
+    },
+    {
+      "id": "env",
+      "name": "env",
+      "description": "Runs a command in a modified environment"
+    },
+    {
+      "id": "expand",
+      "name": "expand",
+      "description": "Converts tabs to spaces"
+    },
+    {
+      "id": "expr",
+      "name": "expr",
+      "description": "Evaluates expressions"
+    },
+    {
+      "id": "factor",
+      "name": "factor",
+      "description": "Prints the prime factors of the specified integers"
+    },
+    {
+      "id": "false",
+      "name": "false",
+      "description": "Does nothing, unsuccessfully; it always exits with a status code indicating failure"
+    },
+    {
+      "id": "fmt",
+      "name": "fmt",
+      "description": "Reformats the paragraphs in the given files"
+    },
+    {
+      "id": "fold",
+      "name": "fold",
+      "description": "Wraps the lines in the given files"
+    },
+    {
+      "id": "groups",
+      "name": "groups",
+      "description": "Reports a user's group memberships"
+    },
+    {
+      "id": "head",
+      "name": "head",
+      "description": "Prints the first ten lines (or the given number of lines) of each given file"
+    },
+    {
+      "id": "hostid",
+      "name": "hostid",
+      "description": "Reports the numeric identifier (in hexadecimal) of the host"
+    },
+    {
+      "id": "id",
+      "name": "id",
+      "description": "Reports the effective user ID, group ID, and group memberships of the current user or specified user"
+    },
+    {
+      "id": "install",
+      "name": "install",
+      "description": "Copies files while setting their permission modes and, if possible, their owner and group"
+    },
+    {
+      "id": "join",
+      "name": "join",
+      "description": "Joins the lines that have identical join fields from two separate files"
+    },
+    {
+      "id": "link",
+      "name": "link",
+      "description": "Creates a hard link (with the given name) to a file"
+    },
+    {
+      "id": "ln",
+      "name": "ln",
+      "description": "Makes hard links or soft (symbolic) links between files"
+    },
+    {
+      "id": "logname",
+      "name": "logname",
+      "description": "Reports the current user's login name"
+    },
+    {
+      "id": "ls",
+      "name": "ls",
+      "description": "Lists the contents of each given directory"
+    },
+    {
+      "id": "md5sum",
+      "name": "md5sum",
+      "description": "Reports or checks Message Digest 5 (MD5) checksums"
+    },
+    {
+      "id": "mkdir",
+      "name": "mkdir",
+      "description": "Creates directories with the given names"
+    },
+    {
+      "id": "mkfifo",
+      "name": "mkfifo",
+      "description": "Creates First-In, First-Outs (FIFOs), \"named pipes\" in UNIX parlance, with the given names"
+    },
+    {
+      "id": "mknod",
+      "name": "mknod",
+      "description": "Creates device nodes with the given names; a device node is a character special file, a block special file, or a FIFO"
+    },
+    {
+      "id": "mktemp",
+      "name": "mktemp",
+      "description": "Creates temporary files in a secure manner; it is used in scripts"
+    },
+    {
+      "id": "mv",
+      "name": "mv",
+      "description": "Moves or renames files or directories"
+    },
+    {
+      "id": "nice",
+      "name": "nice",
+      "description": "Runs a program with modified scheduling priority"
+    },
+    {
+      "id": "nl",
+      "name": "nl",
+      "description": "Numbers the lines from the given files"
+    },
+    {
+      "id": "nohup",
+      "name": "nohup",
+      "description": "Runs a command immune to hangups, with its output redirected to a log file"
+    },
+    {
+      "id": "nproc",
+      "name": "nproc",
+      "description": "Prints the number of processing units available to a process"
+    },
+    {
+      "id": "numfmt",
+      "name": "numfmt",
+      "description": "Converts numbers to or from human-readable strings"
+    },
+    {
+      "id": "od",
+      "name": "od",
+      "description": "Dumps files in octal and other formats"
+    },
+    {
+      "id": "paste",
+      "name": "paste",
+      "description": "Merges the given files, joining sequentially corresponding lines side by side, separated by tab characters"
+    },
+    {
+      "id": "pathchk",
+      "name": "pathchk",
+      "description": "Checks if file names are valid or portable"
+    },
+    {
+      "id": "pinky",
+      "name": "pinky",
+      "description": "Is a lightweight finger client; it reports some information about the given users"
+    },
+    {
+      "id": "pr",
+      "name": "pr",
+      "description": "Paginates and columnates files for printing"
+    },
+    {
+      "id": "printenv",
+      "name": "printenv",
+      "description": "Prints the environment"
+    },
+    {
+      "id": "printf",
+      "name": "printf",
+      "description": "Prints the given arguments according to the given format, much like the C printf function"
+    },
+    {
+      "id": "ptx",
+      "name": "ptx",
+      "description": "Produces a permuted index from the contents of the given files, with each keyword in its context"
+    },
+    {
+      "id": "pwd",
+      "name": "pwd",
+      "description": "Reports the name of the current working directory"
+    },
+    {
+      "id": "readlink",
+      "name": "readlink",
+      "description": "Reports the value of the given symbolic link"
+    },
+    {
+      "id": "realpath",
+      "name": "realpath",
+      "description": "Prints the resolved path"
+    },
+    {
+      "id": "rm",
+      "name": "rm",
+      "description": "Removes files or directories"
+    },
+    {
+      "id": "rmdir",
+      "name": "rmdir",
+      "description": "Removes directories if they are empty"
+    },
+    {
+      "id": "seq",
+      "name": "seq",
+      "description": "Prints a sequence of numbers within a given range and with a given increment"
+    },
+    {
+      "id": "sha1sum",
+      "name": "sha1sum",
+      "description": "Prints or checks 160-bit Secure Hash Algorithm 1 (SHA1) checksums"
+    },
+    {
+      "id": "sha224sum",
+      "name": "sha224sum",
+      "description": "Prints or checks 224-bit Secure Hash Algorithm checksums"
+    },
+    {
+      "id": "sha256sum",
+      "name": "sha256sum",
+      "description": "Prints or checks 256-bit Secure Hash Algorithm checksums"
+    },
+    {
+      "id": "sha384sum",
+      "name": "sha384sum",
+      "description": "Prints or checks 384-bit Secure Hash Algorithm checksums"
+    },
+    {
+      "id": "sha512sum",
+      "name": "sha512sum",
+      "description": "Prints or checks 512-bit Secure Hash Algorithm checksums"
+    },
+    {
+      "id": "shred",
+      "name": "shred",
+      "description": "Overwrites the given files repeatedly with complex patterns, making it difficult to recover the data"
+    },
+    {
+      "id": "shuf",
+      "name": "shuf",
+      "description": "Shuffles lines of text"
+    },
+    {
+      "id": "sleep",
+      "name": "sleep",
+      "description": "Pauses for the given amount of time"
+    },
+    {
+      "id": "sort",
+      "name": "sort",
+      "description": "Sorts the lines from the given files"
+    },
+    {
+      "id": "split",
+      "name": "split",
+      "description": "Splits the given file into pieces, by size or by number of lines"
+    },
+    {
+      "id": "stat",
+      "name": "stat",
+      "description": "Displays file or filesystem status"
+    },
+    {
+      "id": "stdbuf",
+      "name": "stdbuf",
+      "description": "Runs commands with altered buffering operations for its standard streams"
+    },
+    {
+      "id": "stty",
+      "name": "stty",
+      "description": "Sets or reports terminal line settings"
+    },
+    {
+      "id": "sum",
+      "name": "sum",
+      "description": "Prints checksum and block counts for each given file"
+    },
+    {
+      "id": "sync",
+      "name": "sync",
+      "description": "Flushes file system buffers; it forces changed blocks to disk and updates the super block"
+    },
+    {
+      "id": "tac",
+      "name": "tac",
+      "description": "Concatenates the given files in reverse"
+    },
+    {
+      "id": "tail",
+      "name": "tail",
+      "description": "Prints the last ten lines (or the given number of lines) of each given file"
+    },
+    {
+      "id": "tee",
+      "name": "tee",
+      "description": "Reads from standard input while writing both to standard output and to the given files"
+    },
+    {
+      "id": "test",
+      "name": "test",
+      "description": "Compares values and checks file types"
+    },
+    {
+      "id": "timeout",
+      "name": "timeout",
+      "description": "Runs a command with a time limit"
+    },
+    {
+      "id": "touch",
+      "name": "touch",
+      "description": "Changes file timestamps, setting the access and modification times of the given files to the current time; files that do not exist are created with zero length"
+    },
+    {
+      "id": "tr",
+      "name": "tr",
+      "description": "Translates, squeezes, and deletes the given characters from standard input"
+    },
+    {
+      "id": "true",
+      "name": "true",
+      "description": "Does nothing, successfully; it always exits with a status code indicating success"
+    },
+    {
+      "id": "truncate",
+      "name": "truncate",
+      "description": "Shrinks or expands a file to the specified size"
+    },
+    {
+      "id": "tsort",
+      "name": "tsort",
+      "description": "Performs a topological sort; it writes a completely ordered list according to the partial ordering in a given file"
+    },
+    {
+      "id": "tty",
+      "name": "tty",
+      "description": "Reports the file name of the terminal connected to standard input"
+    },
+    {
+      "id": "uname",
+      "name": "uname",
+      "description": "Reports system information"
+    },
+    {
+      "id": "unexpand",
+      "name": "unexpand",
+      "description": "Converts spaces to tabs"
+    },
+    {
+      "id": "uniq",
+      "name": "uniq",
+      "description": "Discards all but one of successive identical lines"
+    },
+    {
+      "id": "unlink",
+      "name": "unlink",
+      "description": "Removes the given file"
+    },
+    {
+      "id": "users",
+      "name": "users",
+      "description": "Reports the names of the users currently logged on"
+    },
+    {
+      "id": "vdir",
+      "name": "vdir",
+      "description": "Is the same as ls -l"
+    },
+    {
+      "id": "wc",
+      "name": "wc",
+      "description": "Reports the number of lines, words, and bytes for each given file, as well as grand totals when more than one file is given"
+    },
+    {
+      "id": "who",
+      "name": "who",
+      "description": "Reports who is logged on"
+    },
+    {
+      "id": "whoami",
+      "name": "whoami",
+      "description": "Reports the user name associated with the current effective user ID"
+    },
+    {
+      "id": "yes",
+      "name": "yes",
+      "description": "Repeatedly outputs y or a given string, until killed"
+    },
+    {
+      "id": "libstdbuf",
+      "name": "libstdbuf",
+      "description": "Library used by stdbuf"
+    }
+  ]
 }

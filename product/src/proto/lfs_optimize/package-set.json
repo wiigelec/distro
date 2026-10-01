@@ -5,6 +5,7 @@
     "zlib",
     "bash",
     "coreutils",
+    "grep",
     "gzip",
     "make"
   ]

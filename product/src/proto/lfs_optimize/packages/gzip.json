@@ -8,26 +8,46 @@
     {
       "phase": "configure",
       "commands": [
-        "./configure --prefix=/usr"
-      ]
+        {
+          "command": "./configure --prefix=/usr",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
     },
     {
       "phase": "build",
       "commands": [
-        "make"
-      ]
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
     },
     {
       "phase": "test",
       "commands": [
-        "make check"
-      ]
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
     },
     {
       "phase": "install",
       "commands": [
-        "make install"
-      ]
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
     }
   ],
   "installed": {
@@ -47,5 +67,108 @@
       "zmore",
       "znew"
     ]
-  }
+  },
+  "description": "The Gzip package contains programs for compressing and decompressing files.",
+  "document": {
+    "section_id": "ch-system-gzip",
+    "filename": "gzip.html",
+    "contents_id": "contents-gzip"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "GCC",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Sed",
+      "Texinfo"
+    ],
+    "runtime": [
+      "Bash",
+      "Glibc"
+    ],
+    "test": [
+      "Diffutils",
+      "Less"
+    ],
+    "before": [
+      "Man-DB"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "gunzip",
+      "name": "gunzip",
+      "description": "Decompresses gzipped files"
+    },
+    {
+      "id": "gzexe",
+      "name": "gzexe",
+      "description": "Creates self-decompressing executable files"
+    },
+    {
+      "id": "gzip",
+      "name": "gzip",
+      "description": "Compresses the given files using Lempel-Ziv (LZ77) coding"
+    },
+    {
+      "id": "uncompress",
+      "name": "uncompress",
+      "description": "Decompresses compressed files"
+    },
+    {
+      "id": "zcat",
+      "name": "zcat",
+      "description": "Decompresses the given gzipped files to standard output"
+    },
+    {
+      "id": "zcmp",
+      "name": "zcmp",
+      "description": "Runs cmp on gzipped files"
+    },
+    {
+      "id": "zdiff",
+      "name": "zdiff",
+      "description": "Runs diff on gzipped files"
+    },
+    {
+      "id": "zegrep",
+      "name": "zegrep",
+      "description": "Runs egrep on gzipped files"
+    },
+    {
+      "id": "zfgrep",
+      "name": "zfgrep",
+      "description": "Runs fgrep on gzipped files"
+    },
+    {
+      "id": "zforce",
+      "name": "zforce",
+      "description": "Forces a .gz extension on all given files that are gzipped files, so that gzip will not compress them again; this can be useful when file names were truncated during a file transfer"
+    },
+    {
+      "id": "zgrep",
+      "name": "zgrep",
+      "description": "Runs grep on gzipped files"
+    },
+    {
+      "id": "zless",
+      "name": "zless",
+      "description": "Runs less on gzipped files"
+    },
+    {
+      "id": "zmore",
+      "name": "zmore",
+      "description": "Runs more on gzipped files"
+    },
+    {
+      "id": "znew",
+      "name": "znew",
+      "description": "Re-compresses files from compress format to gzip format— .Z to .gz"
+    }
+  ]
 }

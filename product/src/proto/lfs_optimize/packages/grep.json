@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "name": "grep",
+  "reference": {
+    "lfs_section": "ch-system-grep"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "command": "sed -i \"s/echo/#echo/\" src/egrep.sh",
+          "user": "root"
+        }
+      ]
+    },
+    {
+      "phase": "configure",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr",
+          "user": "root"
+        }
+      ]
+    },
+    {
+      "phase": "build",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ]
+    },
+    {
+      "phase": "test",
+      "working_directory": "source",
+      "condition": "tests-enabled",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ]
+    },
+    {
+      "phase": "install",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ]
+    }
+  ],
+  "installed": {
+    "programs": [
+      "egrep",
+      "fgrep",
+      "grep"
+    ]
+  },
+  "description": "The Grep package contains programs for searching through the contents of files.",
+  "document": {
+    "section_id": "ch-system-grep",
+    "filename": "grep.html",
+    "contents_id": "contents-grep"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Diffutils",
+      "GCC",
+      "Gettext",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Patch",
+      "Pcre2",
+      "Sed",
+      "Texinfo"
+    ],
+    "runtime": [
+      "Glibc"
+    ],
+    "test": [
+      "Gawk"
+    ],
+    "before": [
+      "Man-DB"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "egrep",
+      "name": "egrep",
+      "description": "Prints lines matching an extended regular expression. It is obsolete, use grep -E instead"
+    },
+    {
+      "id": "fgrep",
+      "name": "fgrep",
+      "description": "Prints lines matching a list of fixed strings. It is obsolete, use grep -F instead"
+    },
+    {
+      "id": "grep",
+      "name": "grep",
+      "description": "Prints lines matching a basic regular expression"
+    }
+  ]
+}

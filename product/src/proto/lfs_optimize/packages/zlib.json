@@ -8,32 +8,92 @@
     {
       "phase": "configure",
       "commands": [
-        "./configure --prefix=/usr"
-      ]
+        {
+          "command": "./configure --prefix=/usr",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
     },
     {
       "phase": "build",
       "commands": [
-        "make"
-      ]
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
     },
     {
       "phase": "test",
       "commands": [
-        "make check"
-      ]
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
     },
     {
       "phase": "install",
       "commands": [
-        "make install",
-        "rm -fv /usr/lib/libz.a"
-      ]
+        {
+          "command": "make install",
+          "user": "root"
+        },
+        {
+          "command": "rm -fv /usr/lib/libz.a",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
     }
   ],
   "installed": {
     "libraries": [
       "libz.so"
     ]
-  }
+  },
+  "description": "The Zlib package contains compression and decompression routines used by some programs.",
+  "document": {
+    "section_id": "ch-system-zlib",
+    "filename": "zlib.html",
+    "contents_id": "contents-zlib"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "GCC",
+      "Glibc",
+      "Make",
+      "Sed"
+    ],
+    "runtime": [
+      "Glibc"
+    ],
+    "test": [],
+    "before": [
+      "File",
+      "Kmod",
+      "Libelf",
+      "Perl",
+      "Python",
+      "Util-linux"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "libz",
+      "name": "libz",
+      "description": "Contains compression and decompression functions used by some programs"
+    }
+  ]
 }

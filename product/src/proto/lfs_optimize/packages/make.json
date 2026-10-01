@@ -8,32 +8,94 @@
     {
       "phase": "configure",
       "commands": [
-        "./configure --prefix=/usr"
-      ]
+        {
+          "command": "./configure --prefix=/usr",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
     },
     {
       "phase": "build",
       "commands": [
-        "make"
-      ]
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
     },
     {
       "phase": "test",
       "commands": [
-        "chown -R tester .",
-        "su tester -c \"PATH=$PATH make check\""
-      ]
+        {
+          "command": "chown -R tester .",
+          "user": "root"
+        },
+        {
+          "command": "PATH=$PATH make check",
+          "user": "tester",
+          "source_command": "su tester -c \"PATH=$PATH make check\""
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
     },
     {
       "phase": "install",
       "commands": [
-        "make install"
-      ]
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
     }
   ],
   "installed": {
     "programs": [
       "make"
     ]
-  }
+  },
+  "description": "The Make package contains a program for controlling the generation of executables and other non-source files of a package from source files.",
+  "document": {
+    "section_id": "ch-system-make",
+    "filename": "make.html",
+    "contents_id": "contents-make"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "GCC",
+      "Gettext",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Sed",
+      "Texinfo"
+    ],
+    "runtime": [
+      "Glibc"
+    ],
+    "test": [
+      "Perl",
+      "Procps-ng"
+    ],
+    "before": [],
+    "optional": [
+      "Guile"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "make",
+      "name": "make",
+      "description": "Automatically determines which pieces of a package need to be (re)compiled and then issues the relevant commands"
+    }
+  ]
 }

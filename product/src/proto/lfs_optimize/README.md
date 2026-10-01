@@ -8,17 +8,21 @@ not inherited.
 
 ## Milestone 1 — model proof
 
-The first proof represents five normal Chapter 8 LFS packages:
+The first proof represents six normal Chapter 8 LFS packages:
 
 - zlib
 - bash
 - coreutils
+- grep
 - gzip
 - make
 
-Package definitions are version-independent. `versions/development.json`
-selects the concrete versions, sources, checksums, version-specific resources,
-and reference build metrics for the current development state.
+Package definitions are version-independent. They preserve build procedures,
+structured execution context, dependency classes, package descriptions,
+document identities, and installed-item descriptions. `versions/development.json`
+selects the concrete versions, sources, checksums, source sizes,
+version-specific resources, and reference build metrics for the current
+development state.
 
 `resolve.py` combines a package definition with the selected development
 version and emits the resolved package description consumed by later
@@ -62,3 +66,8 @@ without changing the authoritative package build definition.
 
 Milestone 1 does not execute package builds. Staging, artifact creation,
 caching, extraction, and execution are Milestone 2 concerns.
+
+Milestone 1 is complete when validation proves that all six representative
+packages retain the modeled build and render semantics required by the
+roadmap without moving concrete version/source selection into package
+definitions.

@@ -11,7 +11,9 @@
       "version": "1.3.2",
       "source": {
         "url": "https://zlib.net/fossils/zlib-1.3.2.tar.gz",
-        "md5": "a1e6c958597af3c67d162995a342138a"
+        "md5": "a1e6c958597af3c67d162995a342138a",
+        "size": "1,468 KB",
+        "home": "https://zlib.net/"
       },
       "reference_metrics": {
         "build_time": "less than 0.1 SBU",
@@ -22,7 +24,9 @@
       "version": "5.3",
       "source": {
         "url": "https://ftpmirror.gnu.org/bash/bash-5.3.tar.gz",
-        "md5": "977c8c0c5ae6309191e7768e28ebc951"
+        "md5": "977c8c0c5ae6309191e7768e28ebc951",
+        "size": "11,089 KB",
+        "home": "https://www.gnu.org/software/bash/"
       },
       "reference_metrics": {
         "build_time": "1.4 SBU",
@@ -33,7 +37,9 @@
       "version": "9.12",
       "source": {
         "url": "https://ftpmirror.gnu.org/coreutils/coreutils-9.12.tar.xz",
-        "md5": "d7451ac748c319e6e1bc30e9ec63956c"
+        "md5": "d7451ac748c319e6e1bc30e9ec63956c",
+        "size": "6,548 KB",
+        "home": "https://www.gnu.org/software/coreutils/"
       },
       "resources": {
         "i18n": {
@@ -46,11 +52,26 @@
         "disk_space": "194 MB"
       }
     },
+    "grep": {
+      "version": "3.12",
+      "source": {
+        "url": "https://ftpmirror.gnu.org/grep/grep-3.12.tar.xz",
+        "md5": "5d9301ed9d209c4a88c8d3a6fd08b9ac",
+        "size": "1,874 KB",
+        "home": "https://www.gnu.org/software/grep/"
+      },
+      "reference_metrics": {
+        "build_time": "0.5 SBU",
+        "disk_space": "48 MB"
+      }
+    },
     "gzip": {
       "version": "1.15",
       "source": {
         "url": "https://ftpmirror.gnu.org/gzip/gzip-1.15.tar.xz",
-        "md5": "8b5711442bf246612d0c51de0bf79964"
+        "md5": "8b5711442bf246612d0c51de0bf79964",
+        "size": "790 KB",
+        "home": "https://www.gnu.org/software/gzip/"
       },
       "reference_metrics": {
         "build_time": "0.1 SBU",
@@ -61,7 +82,9 @@
       "version": "4.4.1",
       "source": {
         "url": "https://ftpmirror.gnu.org/make/make-4.4.1.tar.gz",
-        "md5": "c8469a3713cbbe04d955d4ae4be23eeb"
+        "md5": "c8469a3713cbbe04d955d4ae4be23eeb",
+        "size": "2,300 KB",
+        "home": "https://www.gnu.org/software/make/"
       },
       "reference_metrics": {
         "build_time": "0.6 SBU",

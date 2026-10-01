@@ -8,33 +8,65 @@
     {
       "phase": "configure",
       "commands": [
-        "./configure --prefix=/usr --without-bash-malloc --with-installed-readline --docdir=/usr/share/doc/bash-{version}"
-      ]
+        {
+          "command": "./configure --prefix=/usr --without-bash-malloc --with-installed-readline --docdir=/usr/share/doc/bash-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
     },
     {
       "phase": "build",
       "commands": [
-        "make"
-      ]
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
     },
     {
       "phase": "test",
       "commands": [
-        "chown -R tester .",
-        "LC_ALL=C.UTF-8 su -s /usr/bin/expect tester << \"EOF\"\nset timeout -1\nspawn make tests\nexpect eof\nlassign [wait] _ _ _ value\nexit $value\nEOF"
-      ]
+        {
+          "command": "chown -R tester .",
+          "user": "root"
+        },
+        {
+          "command": "/usr/bin/expect << \"EOF\"\nset timeout -1\nspawn make tests\nexpect eof\nlassign [wait] _ _ _ value\nexit $value\nEOF",
+          "user": "tester",
+          "environment": {
+            "LC_ALL": "C.UTF-8"
+          },
+          "source_command": "LC_ALL=C.UTF-8 su -s /usr/bin/expect tester << \"EOF\"\nset timeout -1\nspawn make tests\nexpect eof\nlassign [wait] _ _ _ value\nexit $value\nEOF"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
     },
     {
       "phase": "install",
       "commands": [
-        "make install"
-      ]
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
     },
     {
       "phase": "system",
       "commands": [
-        "exec /usr/bin/bash --login"
-      ]
+        {
+          "command": "exec /usr/bin/bash --login",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
     }
   ],
   "test_expectations": [
@@ -52,5 +84,60 @@
       "/usr/lib/bash",
       "/usr/share/doc/bash-{version}"
     ]
-  }
+  },
+  "description": "The Bash package contains the Bourne-Again Shell.",
+  "document": {
+    "section_id": "ch-system-bash",
+    "filename": "bash.html",
+    "contents_id": "contents-bash"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Bison",
+      "Coreutils",
+      "Diffutils",
+      "Gawk",
+      "GCC",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Ncurses",
+      "Patch",
+      "Readline",
+      "Sed",
+      "Texinfo"
+    ],
+    "runtime": [
+      "Glibc",
+      "Ncurses",
+      "Readline"
+    ],
+    "test": [
+      "Expect",
+      "Shadow"
+    ],
+    "before": [],
+    "optional": [
+      "Xorg"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "bash",
+      "name": "bash",
+      "description": "A widely-used command interpreter; it performs many types of expansions and substitutions on a given command line before executing it, thus making this interpreter a powerful tool"
+    },
+    {
+      "id": "bashbug",
+      "name": "bashbug",
+      "description": "A shell script to help the user compose and mail standard formatted bug reports concerning bash"
+    },
+    {
+      "id": "sh",
+      "name": "sh",
+      "description": "A symlink to the bash program; when invoked as sh , bash tries to mimic the startup behavior of historical versions of sh as closely as possible, while conforming to the POSIX standard as well"
+    }
+  ]
 }
