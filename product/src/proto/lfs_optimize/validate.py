@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import json
 
+from artifact import self_test as artifact_self_test
+from execute import plan
 from resolve import HERE, load_json, resolve
 
 DEPENDENCY_CLASSES = ("build", "runtime", "test", "before", "optional")
@@ -124,6 +126,14 @@ def main() -> int:
     result = resolve()
     require(len(result["packages"]) == len(names),
             "resolver did not return full package set")
+
+    artifact_self_test()
+    for package in result["packages"]:
+        execution_plan = plan(package, run_tests=True)
+        require(execution_plan["status"] == "success",
+                f"{package['name']}: execution plan failed")
+        require(execution_plan["commands"],
+                f"{package['name']}: execution plan is empty")
 
     print(json.dumps({
         "status": "success",
