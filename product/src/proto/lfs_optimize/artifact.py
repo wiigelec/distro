@@ -8,6 +8,7 @@ import shutil
 import stat
 import tarfile
 import tempfile
+import posixpath
 from pathlib import Path
 from typing import Any
 
@@ -25,30 +26,43 @@ def sha256_file(path: Path) -> str:
 def _record(path: Path) -> dict[str, Any]:
     st = path.lstat()
     mode = stat.S_IMODE(st.st_mode)
+    common = {"mode": mode, "uid": st.st_uid, "gid": st.st_gid}
     if path.is_symlink():
-        return {"type": "symlink", "mode": mode, "target": os.readlink(path)}
+        return {"type": "symlink", **common, "target": os.readlink(path)}
     if path.is_dir():
-        return {"type": "directory", "mode": mode}
+        return {"type": "directory", **common}
     if path.is_file():
         return {
             "type": "file",
-            "mode": mode,
+            **common,
             "size": st.st_size,
             "sha256": sha256_file(path),
         }
-    return {"type": "special", "mode": mode, "rdev": st.st_rdev}
+    return {"type": "special", **common, "rdev": st.st_rdev}
 
 
 def snapshot(root: Path) -> dict[str, dict[str, Any]]:
     root = root.resolve()
     result: dict[str, dict[str, Any]] = {}
+    hardlinks: dict[tuple[int, int], str] = {}
     for path in sorted(root.rglob("*")):
         relative = path.relative_to(root)
         if relative.parts and relative.parts[0] in IGNORED_TOP_LEVEL:
             continue
         if relative.parts[:2] == ("tmp", "distro-lfs-optimize"):
             continue
-        result[relative.as_posix()] = _record(path)
+        relative_name = relative.as_posix()
+        record = _record(path)
+        if record["type"] == "file":
+            st = path.lstat()
+            if st.st_nlink > 1:
+                key = (st.st_dev, st.st_ino)
+                first = hardlinks.get(key)
+                if first is None:
+                    hardlinks[key] = relative_name
+                else:
+                    record["hardlink_to"] = first
+        result[relative_name] = record
     return result
 
 
@@ -64,7 +78,16 @@ def delta(before: dict[str, dict[str, Any]],
         path for path, record in after.items()
         if path not in before or before[path] != record
     )
-    return changed, deleted
+    changed_set = set(changed)
+    hardlink_groups: dict[str, set[str]] = {}
+    for path, record in after.items():
+        target = record.get("hardlink_to")
+        if target is not None:
+            hardlink_groups.setdefault(target, {target}).add(path)
+    for group in hardlink_groups.values():
+        if group & changed_set:
+            changed_set.update(group)
+    return sorted(changed_set), deleted
 
 
 def materialize_delta(source_root: Path, stage_root: Path,
@@ -75,6 +98,7 @@ def materialize_delta(source_root: Path, stage_root: Path,
 
     directories = []
     payloads = []
+    hardlinks: dict[tuple[int, int], str] = {}
     for relative in changed:
         src = source_root / relative
         if src.is_dir() and not src.is_symlink():
@@ -87,6 +111,8 @@ def materialize_delta(source_root: Path, stage_root: Path,
         dst = stage_root / relative
         dst.mkdir(parents=True, exist_ok=True)
         shutil.copystat(src, dst, follow_symlinks=False)
+        st = src.lstat()
+        os.chown(dst, st.st_uid, st.st_gid, follow_symlinks=False)
 
     for relative in payloads:
         src = source_root / relative
@@ -96,8 +122,19 @@ def materialize_delta(source_root: Path, stage_root: Path,
             if dst.exists() or dst.is_symlink():
                 dst.unlink()
             os.symlink(os.readlink(src), dst)
+            st = src.lstat()
+            os.chown(dst, st.st_uid, st.st_gid, follow_symlinks=False)
         elif src.is_file():
-            shutil.copy2(src, dst, follow_symlinks=False)
+            st = src.lstat()
+            key = (st.st_dev, st.st_ino) if st.st_nlink > 1 else None
+            first = hardlinks.get(key) if key is not None else None
+            if first is not None:
+                os.link(stage_root / first, dst)
+            else:
+                shutil.copy2(src, dst, follow_symlinks=False)
+                if key is not None:
+                    hardlinks[key] = relative
+            os.chown(dst, st.st_uid, st.st_gid, follow_symlinks=False)
         else:
             raise RuntimeError(f"unsupported changed filesystem object: {relative}")
 
@@ -109,20 +146,35 @@ def create_tar_xz(stage_root: Path, artifact: Path) -> None:
             tar.add(path, arcname=path.relative_to(stage_root), recursive=False)
 
 
+def _validate_artifact_member(member: tarfile.TarInfo) -> None:
+    name = member.name
+    normalized = posixpath.normpath(name)
+    if name.startswith("/") or normalized == ".." or normalized.startswith("../"):
+        raise RuntimeError(f"artifact member escapes target root: {name}")
+    if member.issym():
+        link = member.linkname
+        resolved = posixpath.normpath(posixpath.join(posixpath.dirname(name), link))
+        if link.startswith("/") or resolved == ".." or resolved.startswith("../"):
+            raise RuntimeError(f"artifact symlink escapes target root: {name} -> {link}")
+    if member.islnk():
+        link = posixpath.normpath(member.linkname)
+        if member.linkname.startswith("/") or link == ".." or link.startswith("../"):
+            raise RuntimeError(
+                f"artifact hardlink escapes target root: {name} -> {member.linkname}"
+            )
+
+
 def extract_tar_xz(artifact: Path, target_root: Path) -> None:
     target_root.mkdir(parents=True, exist_ok=True)
     with tarfile.open(artifact, "r:xz") as tar:
+        for member in tar.getmembers():
+            _validate_artifact_member(member)
         try:
-            tar.extractall(target_root, filter="data")
+            tar.extractall(
+                target_root, numeric_owner=True, filter="fully_trusted"
+            )
         except TypeError:
-            root = target_root.resolve()
-            for member in tar.getmembers():
-                target = (target_root / member.name).resolve()
-                if target != root and root not in target.parents:
-                    raise RuntimeError(
-                        f"artifact member escapes target root: {member.name}"
-                    )
-            tar.extractall(target_root)
+            tar.extractall(target_root, numeric_owner=True)
 
 
 def self_test() -> None:
@@ -140,6 +192,8 @@ def self_test() -> None:
         (after_root / "usr/bin/keep").write_text("changed\n", encoding="utf-8")
         (after_root / "usr/lib").mkdir(parents=True)
         os.symlink("../bin/new", after_root / "usr/lib/new-link")
+        (after_root / "usr/bin/hard-a").write_text("hard\n", encoding="utf-8")
+        os.link(after_root / "usr/bin/hard-a", after_root / "usr/bin/hard-b")
 
         before = snapshot(before_root)
         after = snapshot(after_root)

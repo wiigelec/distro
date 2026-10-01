@@ -27,6 +27,7 @@ from artifact import (
 from resolve import HERE, resolve
 
 USER_AGENT = "distro-lfs-optimize-prototype/0"
+CACHE_SCHEMA_VERSION = 2
 
 
 def canonical_sha256(value: Any) -> str:
@@ -210,6 +211,7 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
     base_digest = snapshot_digest(before)
     definition_digest = canonical_sha256(package)
     cache_key = canonical_sha256({
+        "cache_schema_version": CACHE_SCHEMA_VERSION,
         "resolved_package_sha256": definition_digest,
         "baseline_root_sha256": base_digest,
         "tests": run_tests,
@@ -231,6 +233,8 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
             "artifact": str(artifact),
             "artifact_sha256": sha256_file(artifact),
             "baseline_root_sha256": base_digest,
+            "cache_schema_version": CACHE_SCHEMA_VERSION,
+            "realization_verified": True,
             "resolved_package_sha256": definition_digest,
         }
         result_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
@@ -238,13 +242,16 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
 
     package_work = work / package["name"]
     clone = package_work / "root-after"
+    test_clone = package_work / "root-test"
+    realized = package_work / "root-realized"
     stage = package_work / "stage"
     log_path = package_work / "build.log"
     clone_root(root, clone)
     source_cwd = prepare_sources(package, clone, cache)
 
     command_results = []
-    with virtual_mounts(clone), log_path.open("w", encoding="utf-8") as log:
+    test_ready = False
+    with log_path.open("w", encoding="utf-8") as log:
         index = 0
         for step in package["procedure"]:
             if step["condition"] == "tests-enabled" and not run_tests:
@@ -254,6 +261,12 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
                     f"{package['name']}: unsupported working directory "
                     f"{step['working_directory']}"
                 )
+            execution_root = clone
+            if step["phase"] == "test":
+                if not test_ready:
+                    clone_root(clone, test_clone)
+                    test_ready = True
+                execution_root = test_clone
             for command in step["commands"]:
                 index += 1
                 if command.get("kind") == "session-transition":
@@ -267,7 +280,10 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
                         "disposition": "recorded-session-transition",
                     }
                 else:
-                    item = chroot_command(clone, command, source_cwd, log, index)
+                    with virtual_mounts(execution_root):
+                        item = chroot_command(
+                            execution_root, command, source_cwd, log, index
+                        )
                     item["executed"] = True
                 item["phase"] = step["phase"]
                 command_results.append(item)
@@ -286,6 +302,9 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
                     )
                     return result
 
+    if test_ready:
+        shutil.rmtree(test_clone)
+
     after = snapshot(clone)
     changed, deleted = delta(before, after)
     if deleted:
@@ -298,6 +317,18 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
 
     materialize_delta(clone, stage, changed)
     create_tar_xz(stage, artifact)
+
+    clone_root(root, realized)
+    extract_tar_xz(artifact, realized)
+    realized_snapshot = snapshot(realized)
+    if realized_snapshot != after:
+        expected_digest = snapshot_digest(after)
+        realized_digest = snapshot_digest(realized_snapshot)
+        raise RuntimeError(
+            f"{package['name']}: artifact realization mismatch: "
+            f"{realized_digest} != {expected_digest}"
+        )
+    shutil.rmtree(realized)
 
     if realize_to is not None:
         extract_tar_xz(artifact, realize_to)
@@ -312,6 +343,8 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
         "artifact": str(artifact),
         "artifact_sha256": sha256_file(artifact),
         "baseline_root_sha256": base_digest,
+        "cache_schema_version": CACHE_SCHEMA_VERSION,
+        "realization_verified": True,
         "resolved_package_sha256": definition_digest,
         "changed_paths": changed,
         "commands": command_results,

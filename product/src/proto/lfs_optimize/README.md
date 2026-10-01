@@ -79,8 +79,9 @@ parse LFS XML or synthesize an independent recipe.
 
 The execution proof uses a complete LFS-compatible filesystem tree supplied
 with `--root`. The tree is fingerprinted, cloned, and used as the chroot in
-which the original LFS commands run. `/dev`, `/proc`, and `/sys` are temporary
-execution mounts and are excluded from the captured filesystem result.
+which the original LFS commands run. `/dev`, `/dev/pts`, `/proc`, `/sys`, and
+`/run` are temporary execution mounts and are excluded from the captured
+filesystem result.
 
 After a successful build, the executor compares the cloned root with the
 baseline and materializes only new or changed filesystem objects into a
@@ -104,12 +105,30 @@ tar.xz cache artifact
 optional extraction into target root
 ```
 
+Test steps execute in a disposable clone of the built root. Their success or
+failure is recorded, but filesystem side effects from test setup and test
+cleanup are discarded before installation. This keeps test artifacts such as
+temporary files or account/group database backups out of the package payload.
+
 The archive contains only filesystem payload. The result JSON and build log
 remain external evidence; they are not embedded package metadata.
 
 Cache identity includes the resolved package definition, whether tests were
-enabled, and a content fingerprint of the baseline execution root. A cached
-artifact is therefore not reused across a materially different baseline root.
+enabled, a content fingerprint of the baseline execution root, and an explicit
+cache schema version. A cached artifact is therefore not reused across a
+materially different baseline root or across an incompatible artifact contract.
+
+Artifact snapshots and realization preserve file type, content, mode, numeric
+UID/GID ownership, symlink targets, and hardlink topology. Generated artifacts
+are path/link validated and then extracted with trusted metadata semantics so
+numeric ownership is not sanitized away. After each cache miss, the executor
+clones the original baseline again, realizes the new artifact into that clone,
+and requires the resulting snapshot to equal the directly installed build
+snapshot before reporting success.
+
+Modification times are not part of the Milestone 2 equivalence contract.
+Changed special filesystem objects remain unsupported and cause execution to
+fail rather than being silently approximated.
 
 A metadata-free tar archive cannot express deletion of a file that existed in
 the baseline root. The proof executor rejects such a result rather than hiding

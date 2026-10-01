@@ -78,6 +78,12 @@ def main() -> int:
                         f"{name}: step {index}/{command_index}: missing command")
                 require(command.get("user") in ("root", "tester"),
                         f"{name}: step {index}/{command_index}: invalid user")
+                kind = command.get("kind")
+                require(kind in (None, "session-transition"),
+                        f"{name}: step {index}/{command_index}: invalid command kind")
+                if kind == "session-transition":
+                    require(step["phase"] == "system",
+                            f"{name}: session transition must be a system step")
                 environment = command.get("environment")
                 if environment is not None:
                     require(
