@@ -39,6 +39,7 @@ PACKAGES = [
     "tar",
     "texinfo",
     "util-linux",
+    "wget",
     "xz-utils",
 ]
 
@@ -88,6 +89,26 @@ set -eux
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get install -y --no-install-recommends {package_line}
+
+cd /tmp
+wget -q https://ftpmirror.gnu.org/readline/readline-8.3.tar.gz
+tar -xzf readline-8.3.tar.gz
+cd readline-8.3
+sed -i '/MV.*old/d' Makefile.in
+sed -i '/{{OLDSUFF}}/c:' support/shlib-install
+sed -i 's/-Wl,-rpath,[^ ]*//' support/shobj-conf
+sed -e '270a\\
+     else\\
+       chars_avail = 1;'      \\
+    -e '288i\\   result = -1;' \\
+    -i.orig input.c
+./configure --prefix=/usr --disable-static --with-curses --docdir=/usr/share/doc/readline-8.3
+make
+make install
+ldconfig
+cd /
+rm -rf /tmp/readline-8.3 /tmp/readline-8.3.tar.gz
+
 useradd -m -s /bin/bash tester
 mkdir -p /dev /proc /sys /run /tmp
 chmod 1777 /tmp
@@ -152,6 +173,20 @@ id tester
     ]
     if missing:
         raise RuntimeError(f"fixture missing required paths: {missing}")
+
+    symbol_check = subprocess.run(
+        [
+            "chroot",
+            str(output),
+            "/usr/bin/bash",
+            "-lc",
+            "nm -D /usr/lib/libreadline.so | grep -q ' rl_full_quoting_desired$'",
+        ],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    if symbol_check.returncode != 0:
+        raise RuntimeError("fixture readline does not provide Bash 5.3 symbols")
 
     result = {
         "schema_version": 1,
