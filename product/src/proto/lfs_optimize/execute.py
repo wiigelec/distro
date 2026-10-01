@@ -106,13 +106,15 @@ def clone_root(source: Path, destination: Path) -> None:
 
 
 def mount(source: str, target: Path, *, fstype: str | None = None,
-          bind: bool = False) -> None:
+          bind: bool = False, options: str | None = None) -> None:
     target.mkdir(parents=True, exist_ok=True)
     argv = ["mount"]
     if bind:
         argv.append("--bind")
     elif fstype:
         argv.extend(["-t", fstype])
+    if options:
+        argv.extend(["-o", options])
     argv.extend([source, str(target)])
     subprocess.run(argv, check=True)
 
@@ -123,10 +125,19 @@ def virtual_mounts(root: Path):
     try:
         mount("/dev", root / "dev", bind=True)
         mounted.append(root / "dev")
+        mount(
+            "devpts",
+            root / "dev/pts",
+            fstype="devpts",
+            options="gid=5,mode=0620",
+        )
+        mounted.append(root / "dev/pts")
         mount("proc", root / "proc", fstype="proc")
         mounted.append(root / "proc")
         mount("sysfs", root / "sys", fstype="sysfs")
         mounted.append(root / "sys")
+        mount("tmpfs", root / "run", fstype="tmpfs")
+        mounted.append(root / "run")
         yield
     finally:
         for target in reversed(mounted):
