@@ -113,9 +113,9 @@ def materialize_delta(
         src = source_root / relative
         dst = stage_root / relative
         dst.mkdir(parents=True, exist_ok=True)
-        shutil.copystat(src, dst, follow_symlinks=False)
         st = src.lstat()
         os.chown(dst, st.st_uid, st.st_gid, follow_symlinks=False)
+        shutil.copystat(src, dst, follow_symlinks=False)
 
     for relative in payloads:
         src = source_root / relative
@@ -126,9 +126,9 @@ def materialize_delta(
         while parent != stage_root:
             parent_relative = parent.relative_to(stage_root)
             source_parent = source_root / parent_relative
-            shutil.copystat(source_parent, parent, follow_symlinks=False)
             st = source_parent.lstat()
             os.chown(parent, st.st_uid, st.st_gid, follow_symlinks=False)
+            shutil.copystat(source_parent, parent, follow_symlinks=False)
             parent = parent.parent
         if src.is_symlink():
             if dst.exists() or dst.is_symlink():
@@ -149,6 +149,7 @@ def materialize_delta(
             else:
                 shutil.copy2(src, dst, follow_symlinks=False)
             os.chown(dst, st.st_uid, st.st_gid, follow_symlinks=False)
+            shutil.copystat(src, dst, follow_symlinks=False)
         else:
             raise RuntimeError(f"unsupported changed filesystem object: {relative}")
 
@@ -246,6 +247,10 @@ def self_test() -> None:
         (after_root / "usr/bin/independent-b").write_text(
             "independent-b\n", encoding="utf-8"
         )
+        (after_root / "usr/bin/setuid-tool").write_text(
+            "setuid\n", encoding="utf-8"
+        )
+        (after_root / "usr/bin/setuid-tool").chmod(0o4755)
 
         before = snapshot(before_root)
         after = snapshot(after_root)
