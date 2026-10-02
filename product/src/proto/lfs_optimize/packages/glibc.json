@@ -1,0 +1,220 @@
+{
+  "schema_version": 1,
+  "name": "glibc",
+  "reference": {
+    "lfs_section": "ch-system-glibc"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "resource": "fhs",
+      "commands": [
+        {
+          "command": "patch -Np1 -i ../glibc-fhs-1.patch",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "prepare",
+      "resource": "upstream-fixes",
+      "commands": [
+        {
+          "command": "patch -Np1 -i ../glibc-2.44-upstream_fixes-3.patch",
+          "user": "root"
+        },
+        {
+          "command": "mkdir -v build",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "../configure --prefix=/usr --disable-werror --disable-nscd libc_cv_slibdir=/usr/lib --enable-stack-protector=strong --enable-kernel=5.10",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "touch /etc/ld.so.conf",
+          "user": "root"
+        },
+        {
+          "command": "sed '/test-installation/s@$(PERL)@echo not running@' -i ../Makefile",
+          "user": "root"
+        },
+        {
+          "command": "make install",
+          "user": "root"
+        },
+        {
+          "command": "sed '/RTLDLIST=/s@/usr@@g' -i /usr/bin/ldd",
+          "user": "root"
+        },
+        {
+          "command": "make localedata/install-locales",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    }
+  ],
+  "test_expectations": [
+    "The Glibc test suite is critical and must not be skipped.",
+    "io/tst-lchmod is known to fail in the LFS chroot environment.",
+    "Some tests may time out on slow systems or with parallel make jobs.",
+    "Some tests may fail with relatively old CPU models, older host kernels, or a host kernel newer than 7.2.8."
+  ],
+  "installed": {
+    "programs": [
+      "gencat",
+      "getconf",
+      "getent",
+      "iconv",
+      "iconvconfig",
+      "ldconfig",
+      "ldd",
+      "lddlibc4",
+      "ld.so",
+      "locale",
+      "localedef",
+      "makedb",
+      "mtrace",
+      "pcprofiledump",
+      "pldd",
+      "sln",
+      "sotruss",
+      "sprof",
+      "tzselect",
+      "xtrace",
+      "zdump",
+      "zic"
+    ],
+    "libraries": [
+      "ld-linux-x86-64.so.2",
+      "ld-linux.so.2",
+      "libBrokenLocale",
+      "libanl",
+      "libc",
+      "libc_nonshared.a",
+      "libc_malloc_debug.so",
+      "libdl",
+      "libg.a",
+      "libm",
+      "libmcheck.a",
+      "libmemusage.so",
+      "libmvec",
+      "libnsl.so.1",
+      "libnss_compat.so",
+      "libnss_dns.so",
+      "libnss_files.so",
+      "libnss_hesiod.so",
+      "libpthread.a",
+      "libresolv",
+      "librt.a",
+      "libthread_db",
+      "libutil.a"
+    ]
+  },
+  "description": "The Glibc package contains the main C library. This library provides the basic routines for allocating memory, searching directories, opening and closing files, reading and writing files, string handling, pattern matching, arithmetic, and so on.",
+  "document": {
+    "section_id": "ch-system-glibc",
+    "filename": "glibc.html",
+    "contents_id": "contents-glibc"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Bison",
+      "Coreutils",
+      "Diffutils",
+      "Gawk",
+      "GCC",
+      "Gettext",
+      "Grep",
+      "Gzip",
+      "Linux API Headers",
+      "Make",
+      "Perl",
+      "Python",
+      "Sed",
+      "Texinfo"
+    ],
+    "runtime": [],
+    "test": [
+      "File"
+    ],
+    "before": [],
+    "optional": [
+      "Libidn2"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "ldd",
+      "name": "ldd",
+      "description": "Reports which shared libraries are required by each given program or shared library"
+    },
+    {
+      "id": "ldconfig",
+      "name": "ldconfig",
+      "description": "Configures the dynamic linker run-time bindings"
+    },
+    {
+      "id": "locale",
+      "name": "locale",
+      "description": "Prints various information about the current locale"
+    },
+    {
+      "id": "localedef",
+      "name": "localedef",
+      "description": "Compiles locale specifications"
+    },
+    {
+      "id": "libc",
+      "name": "libc",
+      "description": "The main C library"
+    },
+    {
+      "id": "libm",
+      "name": "libm",
+      "description": "The mathematical library"
+    }
+  ]
+}

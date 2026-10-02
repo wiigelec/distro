@@ -4,6 +4,7 @@
   "packages": [
     "man-pages",
     "iana-etc",
+    "glibc",
     "zlib",
     "bash",
     "coreutils",
