@@ -35,6 +35,7 @@ PACKAGES = [
     "make",
     "passwd",
     "patch",
+    "python3",
     "sed",
     "tar",
     "texinfo",
@@ -116,6 +117,7 @@ rm -rf /var/lib/apt/lists/*
 test -x /usr/bin/bash
 test -x /usr/bin/gcc
 test -x /usr/bin/make
+test -x /usr/bin/python3
 test -x /usr/bin/sed
 id tester
 """
@@ -164,6 +166,7 @@ id tester
         "usr/bin/sed",
         "usr/bin/gawk",
         "usr/bin/patch",
+        "usr/bin/python3",
         "usr/bin/autoconf",
         "usr/bin/automake",
         "usr/bin/bison",
