@@ -75,9 +75,9 @@
     },
     "glibc": {
       "version": "2.44",
-      "url": "https://sourceware.org/git/?p=glibc.git;a=shortlog;h=refs/heads/release/2.44/master",
+      "url": "https://ftpmirror.gnu.org/glibc/glibc-2.44.tar.xz",
       "md5": "7677da43ef759c68e005f5d4c37986a6",
-      "filename": "master",
+      "filename": "glibc-2.44.tar.xz",
       "resources": {
         "fhs": {
           "url": "https://www.linuxfromscratch.org/patches/lfs/13.1/glibc-fhs-1.patch",
