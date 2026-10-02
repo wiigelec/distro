@@ -155,3 +155,50 @@ sudo python3 product/src/proto/lfs_optimize/execute.py \
 
 Use `--realize-to` to extract the resulting cached filesystem artifact into a
 target root after a successful build.
+
+
+Milestone 2 is complete: the normalized package model has been proven through
+execution, artifact capture, cache reuse, and realization equivalence.
+
+## Milestone 3 — normal-LFS proof
+
+Milestone 3 expands the proven package executor from isolated package builds to
+the complete normal final-system LFS package set.
+
+`system.py` is the first system-level slice. It resolves the package set in its
+declared order, clones the supplied baseline once, and executes each package
+against the progressively realized system root:
+
+```text
+baseline root
+    |
+package 1 -> artifact -> realize
+    |
+package 2 -> artifact -> realize
+    |
+...
+    |
+normal LFS system
+```
+
+The caller's baseline root is never modified. The progressive result is kept
+under the system work directory, while each package continues to use the
+Milestone 2 executor and artifact contract unchanged.
+
+Inspect the ordered system plan without root access:
+
+```sh
+python3 product/src/proto/lfs_optimize/system.py --plan
+```
+
+Execute the currently modeled package set:
+
+```sh
+sudo python3 product/src/proto/lfs_optimize/system.py \
+  --root /path/to/lfs-root \
+  --work /tmp/lfs-optimize-work \
+  --cache /tmp/lfs-optimize-cache
+```
+
+The next Milestone 3 work is package-model expansion until every normal LFS
+final-system package participates in this same ordered execution path.

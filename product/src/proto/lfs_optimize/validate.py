@@ -6,6 +6,7 @@ import json
 from artifact import self_test as artifact_self_test
 from execute import plan
 from resolve import HERE, load_json, resolve
+from system import plan_system
 
 DEPENDENCY_CLASSES = ("build", "runtime", "test", "before", "optional")
 
@@ -141,6 +142,14 @@ def main() -> int:
         require(execution_plan["commands"],
                 f"{package['name']}: execution plan is empty")
 
+    system_plan = plan_system(run_tests=True)
+    require(system_plan["status"] == "success",
+            "system execution plan failed")
+    require(
+        [item["package"] for item in system_plan["packages"]] == names,
+        "system execution plan does not preserve package-set order",
+    )
+
     print(json.dumps({
         "status": "success",
         "milestone": "model-proof",
@@ -153,6 +162,7 @@ def main() -> int:
             "dependency_classes": list(DEPENDENCY_CLASSES),
             "document_identity": True,
             "package_and_installed_descriptions": True,
+            "ordered_system_execution": True,
         },
     }, indent=2, sort_keys=True))
     return 0
