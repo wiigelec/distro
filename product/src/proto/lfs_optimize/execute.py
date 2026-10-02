@@ -28,6 +28,7 @@ from resolve import HERE, resolve
 
 USER_AGENT = "distro-lfs-optimize-prototype/0"
 CACHE_SCHEMA_VERSION = 4
+WORKING_DIRECTORIES = ("source", "build")
 
 
 def canonical_sha256(value: Any) -> str:
@@ -200,6 +201,14 @@ def prepare_sources(package: dict[str, Any], clone: Path, cache: Path) -> str:
     return f"/tmp/distro-lfs-optimize/{name}-{version}/source"
 
 
+def resolve_working_directory(source_cwd: str, working_directory: str) -> str:
+    if working_directory == "source":
+        return source_cwd
+    if working_directory == "build":
+        return f"{source_cwd}/build"
+    raise RuntimeError(f"unsupported working directory: {working_directory}")
+
+
 def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
                   run_tests: bool, realize_to: Path | None) -> dict[str, Any]:
     require_root()
@@ -256,11 +265,9 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
         for step in package["procedure"]:
             if step["condition"] == "tests-enabled" and not run_tests:
                 continue
-            if step["working_directory"] != "source":
-                raise RuntimeError(
-                    f"{package['name']}: unsupported working directory "
-                    f"{step['working_directory']}"
-                )
+            step_cwd = resolve_working_directory(
+                source_cwd, step["working_directory"]
+            )
             if test_ready and step["phase"] != "test":
                 source_relative = Path(source_cwd.lstrip("/"))
                 test_source = test_clone / source_relative
@@ -298,7 +305,7 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
                 else:
                     with virtual_mounts(execution_root):
                         item = chroot_command(
-                            execution_root, command, source_cwd, log, index
+                            execution_root, command, step_cwd, log, index
                         )
                     item["executed"] = True
                 item["phase"] = step["phase"]

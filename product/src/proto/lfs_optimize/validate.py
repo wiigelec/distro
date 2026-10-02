@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 
 from artifact import self_test as artifact_self_test
-from execute import plan
+from execute import WORKING_DIRECTORIES, plan
 from resolve import HERE, load_json, resolve
 from system import plan_system
 
@@ -65,8 +65,8 @@ def main() -> int:
         for index, step in enumerate(procedure):
             require(isinstance(step.get("phase"), str) and step["phase"],
                     f"{name}: step {index}: missing phase")
-            require(step.get("working_directory") == "source",
-                    f"{name}: step {index}: missing source working directory")
+            require(step.get("working_directory") in WORKING_DIRECTORIES,
+                    f"{name}: step {index}: invalid working directory")
             require(step.get("condition") in ("always", "tests-enabled"),
                     f"{name}: step {index}: invalid condition")
             commands = step.get("commands")
