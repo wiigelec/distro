@@ -28,7 +28,7 @@
     "glibc": {
       "version": "2.44",
       "source": {
-        "url": "https://sourceware.org/git/?p=glibc.git;a=shortlog;h=refs/heads/release/2.44/master",
+        "url": "https://ftpmirror.gnu.org/glibc/glibc-2.44.tar.xz",
         "md5": "7677da43ef759c68e005f5d4c37986a6",
         "size": "20,138 KB",
         "home": "https://www.gnu.org/software/libc/"
@@ -721,7 +721,7 @@
     "vim": {
       "version": "9.2.1025",
       "source": {
-        "url": "https://github.com/vim/vim/tags",
+        "url": "https://github.com/vim/vim/archive/v9.2.1025/vim-9.2.1025.tar.gz",
         "md5": "060c9c0d7e2bdb5e5d80daad596cae02",
         "size": "19,662 KB",
         "home": "https://www.vim.org"

@@ -62,9 +62,36 @@ def download(url: str, destination: Path) -> None:
             shutil.copyfileobj(response, output)
 
 
+def mirror_md5_index(cache_root: Path) -> dict[str, str]:
+    index_path = cache_root / "sources" / "lfs-13.1-md5sums"
+    if not index_path.is_file():
+        download(LFS_SOURCE_MIRROR + "md5sums", index_path)
+
+    index: dict[str, str] = {}
+    for line in index_path.read_text(encoding="utf-8").splitlines():
+        fields = line.split(None, 1)
+        if len(fields) != 2:
+            continue
+        digest, filename = fields
+        filename = filename.lstrip("*")
+        previous = index.get(digest)
+        if previous is not None and previous != filename:
+            raise RuntimeError(
+                f"LFS mirror md5 {digest} maps to both {previous} and {filename}"
+            )
+        index[digest] = filename
+    return index
+
+
 def cached_download(item: dict[str, Any], cache_root: Path) -> Path:
     expected = item["md5"]
-    suffix = Path(item["url"]).name
+    suffix = mirror_md5_index(cache_root).get(expected)
+    if suffix is None:
+        raise RuntimeError(
+            f"LFS 13.1 mirror does not list expected md5 {expected} "
+            f"for {item['url']}"
+        )
+
     path = cache_root / "sources" / f"{expected}-{suffix}"
     mirror_url = LFS_SOURCE_MIRROR + suffix
     if not path.is_file():
