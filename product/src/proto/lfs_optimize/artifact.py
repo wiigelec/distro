@@ -90,15 +90,18 @@ def delta(before: dict[str, dict[str, Any]],
     return sorted(changed_set), deleted
 
 
-def materialize_delta(source_root: Path, stage_root: Path,
-                      changed: list[str]) -> None:
+def materialize_delta(
+    source_root: Path,
+    stage_root: Path,
+    changed: list[str],
+    after: dict[str, dict[str, Any]],
+) -> None:
     if stage_root.exists():
         shutil.rmtree(stage_root)
     stage_root.mkdir(parents=True)
 
     directories = []
     payloads = []
-    hardlinks: dict[tuple[int, int], str] = {}
     for relative in changed:
         src = source_root / relative
         if src.is_dir() and not src.is_symlink():
@@ -135,14 +138,16 @@ def materialize_delta(source_root: Path, stage_root: Path,
             os.chown(dst, st.st_uid, st.st_gid, follow_symlinks=False)
         elif src.is_file():
             st = src.lstat()
-            key = (st.st_dev, st.st_ino) if st.st_nlink > 1 else None
-            first = hardlinks.get(key) if key is not None else None
-            if first is not None:
-                os.link(stage_root / first, dst)
+            hardlink_to = after[relative].get("hardlink_to")
+            if hardlink_to is not None:
+                target = stage_root / hardlink_to
+                if not target.is_file():
+                    raise RuntimeError(
+                        f"hardlink target not materialized: {relative} -> {hardlink_to}"
+                    )
+                os.link(target, dst)
             else:
                 shutil.copy2(src, dst, follow_symlinks=False)
-                if key is not None:
-                    hardlinks[key] = relative
             os.chown(dst, st.st_uid, st.st_gid, follow_symlinks=False)
         else:
             raise RuntimeError(f"unsupported changed filesystem object: {relative}")
@@ -207,13 +212,19 @@ def self_test() -> None:
         os.symlink("../bin/new", after_root / "usr/lib/new-link")
         (after_root / "usr/bin/hard-a").write_text("hard\n", encoding="utf-8")
         os.link(after_root / "usr/bin/hard-a", after_root / "usr/bin/hard-b")
+        (after_root / "usr/bin/independent-a").write_text(
+            "independent-a\n", encoding="utf-8"
+        )
+        (after_root / "usr/bin/independent-b").write_text(
+            "independent-b\n", encoding="utf-8"
+        )
 
         before = snapshot(before_root)
         after = snapshot(after_root)
         changed, deleted = delta(before, after)
         if deleted:
             raise RuntimeError(f"self-test unexpected deletion: {deleted}")
-        materialize_delta(after_root, stage, changed)
+        materialize_delta(after_root, stage, changed, after)
 
         artifact = base / "proof.tar.xz"
         create_tar_xz(stage, artifact)

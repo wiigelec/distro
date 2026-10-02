@@ -400,7 +400,7 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
     if not changed:
         raise RuntimeError(f"{package['name']}: build produced no filesystem delta")
 
-    materialize_delta(clone, stage, changed)
+    materialize_delta(clone, stage, changed, after)
     create_tar_xz(stage, artifact)
 
     clone_root(root, realized)
