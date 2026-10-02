@@ -181,8 +181,28 @@ def _validate_artifact_member(member: tarfile.TarInfo) -> None:
 def extract_tar_xz(artifact: Path, target_root: Path) -> None:
     target_root.mkdir(parents=True, exist_ok=True)
     with tarfile.open(artifact, "r:xz") as tar:
-        for member in tar.getmembers():
+        members = tar.getmembers()
+        for member in members:
             _validate_artifact_member(member)
+
+        # Artifact members define the final topology. Remove existing
+        # non-directory targets first so extraction cannot preserve stale
+        # baseline hardlinks when a package replaces one side of a link.
+        for member in members:
+            target = target_root / member.name
+            if member.isdir():
+                if target.exists() and not target.is_dir():
+                    if target.is_symlink():
+                        target.unlink()
+                    else:
+                        target.unlink()
+                continue
+            if target.is_symlink() or target.exists():
+                if target.is_dir():
+                    shutil.rmtree(target)
+                else:
+                    target.unlink()
+
         try:
             tar.extractall(
                 target_root, numeric_owner=True, filter="fully_trusted"
@@ -204,6 +224,14 @@ def self_test() -> None:
         (before_root / "var/cache/private").chmod(0o700)
         (before_root / "var/cache/private/keep").write_text("same\n", encoding="utf-8")
         (before_root / "usr/bin/keep").write_text("same\n", encoding="utf-8")
+        (before_root / "usr/target/bin").mkdir(parents=True)
+        (before_root / "usr/bin/split-link").write_text(
+            "baseline\n", encoding="utf-8"
+        )
+        os.link(
+            before_root / "usr/bin/split-link",
+            before_root / "usr/target/bin/split-link",
+        )
         shutil.copytree(before_root, after_root, dirs_exist_ok=True)
         (after_root / "usr/bin/new").write_text("new\n", encoding="utf-8")
         (after_root / "var/cache/private/new").write_text("new\n", encoding="utf-8")
