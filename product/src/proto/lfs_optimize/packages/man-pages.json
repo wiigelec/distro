@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "name": "man-pages",
+  "reference": {
+    "lfs_section": "ch-system-man-pages"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "rm -v man3/crypt*",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make -R GIT=false prefix=/usr install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "files": [
+      "various man pages"
+    ]
+  },
+  "description": "The Man-pages package contains the basic Linux manual pages.",
+  "document": {
+    "section_id": "ch-system-man-pages",
+    "filename": "man-pages.html",
+    "contents_id": "contents-man-pages"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Coreutils",
+      "Make",
+      "Sed"
+    ],
+    "runtime": [],
+    "test": [],
+    "before": [],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "man-pages",
+      "name": "man pages",
+      "description": "Describe C programming language functions, important device files, and significant configuration files"
+    }
+  ]
+}

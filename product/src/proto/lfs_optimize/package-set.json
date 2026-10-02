@@ -2,6 +2,8 @@
   "schema_version": 1,
   "name": "lfs-normal-proof",
   "packages": [
+    "man-pages",
+    "iana-etc",
     "zlib",
     "bash",
     "coreutils",

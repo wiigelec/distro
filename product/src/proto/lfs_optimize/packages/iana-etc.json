@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "name": "iana-etc",
+  "reference": {
+    "lfs_section": "ch-system-iana-etc"
+  },
+  "procedure": [
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "cp -v services protocols /etc",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "files": [
+      "/etc/protocols",
+      "/etc/services"
+    ]
+  },
+  "description": "The Iana-Etc package provides data for network services and protocols.",
+  "document": {
+    "section_id": "ch-system-iana-etc",
+    "filename": "iana-etc.html",
+    "contents_id": "contents-iana-etc"
+  },
+  "dependencies": {
+    "build": [
+      "Coreutils"
+    ],
+    "runtime": [],
+    "test": [],
+    "before": [
+      "Perl"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "protocols",
+      "name": "/etc/protocols",
+      "description": "Describes the various DARPA Internet protocols available from the TCP/IP subsystem"
+    },
+    {
+      "id": "services",
+      "name": "/etc/services",
+      "description": "Maps friendly internet service names to assigned port numbers and protocol types"
+    }
+  ]
+}
