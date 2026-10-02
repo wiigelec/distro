@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "name": "psmisc",
+  "reference": {
+    "lfs_section": "ch-system-psmisc"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "fuser",
+      "killall",
+      "peekfd",
+      "prtstat",
+      "pslog",
+      "pstree",
+      "pstree.x11 (link to pstree)"
+    ]
+  },
+  "description": "The Psmisc package contains programs for displaying information about running processes.",
+  "document": {
+    "section_id": "ch-system-psmisc",
+    "filename": "psmisc.html",
+    "contents_id": "contents-psmisc"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "GCC",
+      "Gettext",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Ncurses",
+      "Sed"
+    ],
+    "runtime": [
+      "Glibc",
+      "Ncurses"
+    ],
+    "test": [
+      "Expect"
+    ],
+    "before": [],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "fuser",
+      "name": "fuser",
+      "description": "Reports the Process IDs (PIDs) of processes that use the given files or file systems"
+    },
+    {
+      "id": "killall",
+      "name": "killall",
+      "description": "Kills processes by name; it sends a signal to all processes running any of the given commands"
+    },
+    {
+      "id": "peekfd",
+      "name": "peekfd",
+      "description": "Peek at file descriptors of a running process, given its PID"
+    },
+    {
+      "id": "prtstat",
+      "name": "prtstat",
+      "description": "Prints information about a process"
+    },
+    {
+      "id": "pslog",
+      "name": "pslog",
+      "description": "Reports current logs path of a process"
+    },
+    {
+      "id": "pstree",
+      "name": "pstree",
+      "description": "Displays running processes as a tree"
+    },
+    {
+      "id": "pstree.x11",
+      "name": "pstree.x11",
+      "description": "Same as pstree, except that it waits for confirmation before exiting"
+    }
+  ]
+}

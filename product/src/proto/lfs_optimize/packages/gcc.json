@@ -1,0 +1,463 @@
+{
+  "schema_version": 1,
+  "name": "gcc",
+  "reference": {
+    "lfs_section": "ch-system-gcc"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "case $(uname -m) in\n  x86_64)\n    sed -e '/m64=/s/lib64/lib/' \\\n        -i.orig gcc/config/i386/t-linux64\n  ;;\nesac",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "mkdir -v build\ncd       build",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "../configure --prefix=/usr            \\\n             LD=ld                    \\\n             --enable-languages=c,c++ \\\n             --enable-default-pie     \\\n             --enable-default-ssp     \\\n             --enable-host-pie        \\\n             --enable-targets=all     \\\n             --disable-multilib       \\\n             --disable-bootstrap      \\\n             --disable-fixincludes    \\\n             --with-system-zlib",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "ulimit -s -H unlimited",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "chown -R tester .\nsu tester -c \"PATH=$PATH make -k check\"",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "../contrib/test_summary -t",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "chown -v -R root:root $(gcc -print-file-name=include){{,-fixed}}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "ln -svr /usr/bin/cpp /usr/lib",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "ln -sv gcc.1 /usr/share/man/man1/cc.1",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "ln -sfvr $(gcc -print-prog-name=liblto_plugin.so) /usr/lib/bfd-plugins/",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "echo 'int main(){{}}' | cc -x c - -v -Wl,--verbose &> dummy.log\nreadelf -l a.out | grep ': /lib'",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "grep -E -o '/usr/lib.*/S?crt[1in].*succeeded' dummy.log",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "grep -B4 '^ /usr/include' dummy.log",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "grep 'SEARCH.*/usr/lib' dummy.log |sed 's|; |\\n|g'",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "grep \"/lib.*/libc.so.6 \" dummy.log",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "grep found dummy.log",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "rm -v a.out dummy.log",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "mkdir -pv /usr/share/gdb/auto-load/usr/lib\nmv -v /usr/lib/*gdb.py /usr/share/gdb/auto-load/usr/lib",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "c++",
+      "cc (link to gcc)",
+      "cpp",
+      "g++",
+      "gcc",
+      "gcc-ar",
+      "gcc-nm",
+      "gcc-ranlib",
+      "gcov",
+      "gcov-dump",
+      "gcov-tool",
+      "lto-dump"
+    ],
+    "libraries": [
+      "libasan.{{a",
+      "so}}",
+      "libatomic.{{a",
+      "so}}",
+      "libcc1.so",
+      "libgcc.a",
+      "libgcc_eh.a",
+      "libgcc_s.so",
+      "libgcov.a",
+      "libgomp.{{a",
+      "so}}",
+      "libhwasan.{{a",
+      "so}}",
+      "libitm.{{a",
+      "so}}",
+      "liblsan.{{a",
+      "so}}",
+      "liblto_plugin.so",
+      "libquadmath.{{a",
+      "so}}",
+      "libssp.{{a",
+      "so}}",
+      "libssp_nonshared.a",
+      "libstdc++.{{a",
+      "so}}",
+      "libstdc++exp.a",
+      "libstdc++fs.a",
+      "libsupc++.a",
+      "libtsan.{{a",
+      "so}}",
+      "libubsan.{{a",
+      "so}}"
+    ],
+    "directories": [
+      "/usr/include/c++",
+      "/usr/lib/gcc",
+      "/usr/libexec/gcc",
+      "/usr/share/gcc-{version}"
+    ]
+  },
+  "description": "The GCC package contains the GNU compiler collection, which includes the C and C++ compilers.",
+  "document": {
+    "section_id": "ch-system-gcc",
+    "filename": "gcc.html",
+    "contents_id": "contents-gcc"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Diffutils",
+      "GCC",
+      "Grep",
+      "Make",
+      "Sed"
+    ],
+    "runtime": [
+      "Bash",
+      "Glibc",
+      "Readline"
+    ],
+    "test": [],
+    "before": [],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "c",
+      "name": "c++",
+      "description": "The C++ compiler"
+    },
+    {
+      "id": "cc",
+      "name": "cc",
+      "description": "The C compiler"
+    },
+    {
+      "id": "cpp",
+      "name": "cpp",
+      "description": "The C preprocessor; it is used by the compiler to expand the #include, #define, and similar directives in the source files"
+    },
+    {
+      "id": "g",
+      "name": "g++",
+      "description": "The C++ compiler"
+    },
+    {
+      "id": "gcc",
+      "name": "gcc",
+      "description": "The C compiler"
+    },
+    {
+      "id": "gcc-ar",
+      "name": "gcc-ar",
+      "description": "A wrapper around ar that adds a plugin to the command line. This program is only used to add \"link time optimization\" and is not useful with the default build options."
+    },
+    {
+      "id": "gcc-nm",
+      "name": "gcc-nm",
+      "description": "A wrapper around nm that adds a plugin to the command line. This program is only used to add \"link time optimization\" and is not useful with the default build options."
+    },
+    {
+      "id": "gcc-ranlib",
+      "name": "gcc-ranlib",
+      "description": "A wrapper around ranlib that adds a plugin to the command line. This program is only used to add \"link time optimization\" and is not useful with the default build options."
+    },
+    {
+      "id": "gcov",
+      "name": "gcov",
+      "description": "A coverage testing tool; it is used to analyze programs to determine where optimizations will have the greatest effect"
+    },
+    {
+      "id": "gcov-dump",
+      "name": "gcov-dump",
+      "description": "Offline gcda and gcno profile dump tool"
+    },
+    {
+      "id": "gcov-tool",
+      "name": "gcov-tool",
+      "description": "Offline gcda profile processing tool"
+    },
+    {
+      "id": "lto-dump",
+      "name": "lto-dump",
+      "description": "Tool for dumping object files produced by GCC with LTO enabled"
+    },
+    {
+      "id": "libasan",
+      "name": "libasan",
+      "description": "The Address Sanitizer runtime library"
+    },
+    {
+      "id": "libatomic",
+      "name": "libatomic",
+      "description": "GCC atomic built-in runtime library"
+    },
+    {
+      "id": "libcc1",
+      "name": "libcc1",
+      "description": "A library that allows GDB to make use of GCC"
+    },
+    {
+      "id": "libgcc",
+      "name": "libgcc",
+      "description": "Contains run-time support for gcc"
+    },
+    {
+      "id": "libgcov",
+      "name": "libgcov",
+      "description": "This library is linked into a program when GCC is instructed to enable profiling"
+    },
+    {
+      "id": "libgomp",
+      "name": "libgomp",
+      "description": "GNU implementation of the OpenMP API for multi-platform shared-memory parallel programming in C/C++ and Fortran"
+    },
+    {
+      "id": "libhwasan",
+      "name": "libhwasan",
+      "description": "The Hardware-assisted Address Sanitizer runtime library"
+    },
+    {
+      "id": "libitm",
+      "name": "libitm",
+      "description": "The GNU transactional memory library"
+    },
+    {
+      "id": "liblsan",
+      "name": "liblsan",
+      "description": "The Leak Sanitizer runtime library"
+    },
+    {
+      "id": "liblto_plugin",
+      "name": "liblto_plugin",
+      "description": "GCC's LTO plugin allows Binutils to process object files produced by GCC with LTO enabled"
+    },
+    {
+      "id": "libquadmath",
+      "name": "libquadmath",
+      "description": "GCC Quad Precision Math Library API"
+    },
+    {
+      "id": "libssp",
+      "name": "libssp",
+      "description": "Contains routines supporting GCC's stack-smashing protection functionality. Normally it is not used, because Glibc also provides those routines."
+    },
+    {
+      "id": "libstdc",
+      "name": "libstdc++",
+      "description": "The standard C++ library"
+    },
+    {
+      "id": "libstdcexp",
+      "name": "libstdc++exp",
+      "description": "Experimental C++ Contracts library"
+    },
+    {
+      "id": "libstdcfs",
+      "name": "libstdc++fs",
+      "description": "ISO/IEC TS 18822:2015 Filesystem library"
+    },
+    {
+      "id": "libsupc",
+      "name": "libsupc++",
+      "description": "Provides supporting routines for the C++ programming language"
+    },
+    {
+      "id": "libtsan",
+      "name": "libtsan",
+      "description": "The Thread Sanitizer runtime library"
+    },
+    {
+      "id": "libubsan",
+      "name": "libubsan",
+      "description": "The Undefined Behavior Sanitizer runtime library"
+    }
+  ]
+}

@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "name": "gawk",
+  "reference": {
+    "lfs_section": "ch-system-gawk"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "sed -i 's/extras//' Makefile.in",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "chown -R tester .\nsu tester -c \"PATH=$PATH make check\"",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "rm -f /usr/bin/gawk-{version}\nmake install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "ln -sv gawk.1 /usr/share/man/man1/awk.1",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "install -vDm644 doc/{{awkforai.txt,*.{{eps,pdf,jpg}}}} -t /usr/share/doc/gawk-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "awk (link to gawk)",
+      "gawk",
+      "gawk-{version}"
+    ],
+    "libraries": [
+      "filefuncs.so",
+      "fnmatch.so",
+      "fork.so",
+      "inplace.so",
+      "intdiv.so",
+      "ordchr.so",
+      "readdir.so",
+      "readfile.so",
+      "revoutput.so",
+      "revtwoway.so",
+      "rwarray.so",
+      "time.so (all in /usr/lib/gawk)"
+    ],
+    "directories": [
+      "/usr/lib/gawk",
+      "/usr/libexec/awk",
+      "/usr/share/awk",
+      "/usr/share/doc/gawk-{version}"
+    ]
+  },
+  "description": "The Gawk package contains programs for manipulating text files.",
+  "document": {
+    "section_id": "ch-system-gawk",
+    "filename": "gawk.html",
+    "contents_id": "contents-gawk"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "GCC",
+      "Gettext",
+      "Glibc",
+      "GMP",
+      "Grep",
+      "Make",
+      "MPFR",
+      "Patch",
+      "Readline",
+      "Sed",
+      "Texinfo"
+    ],
+    "runtime": [
+      "Bash",
+      "Glibc",
+      "Mpfr"
+    ],
+    "test": [
+      "Diffutils"
+    ],
+    "before": [],
+    "optional": [
+      "libsigsegv"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "awk",
+      "name": "awk",
+      "description": "A link to gawk"
+    },
+    {
+      "id": "gawk",
+      "name": "gawk",
+      "description": "A program for manipulating text files; it is the GNU implementation of awk"
+    },
+    {
+      "id": "gawk-version",
+      "name": "gawk-{version}",
+      "description": "A hard link to gawk"
+    }
+  ]
+}

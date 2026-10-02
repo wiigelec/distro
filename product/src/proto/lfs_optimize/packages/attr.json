@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "name": "attr",
+  "reference": {
+    "lfs_section": "ch-system-attr"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr     \\\n            --disable-static  \\\n            --sysconfdir=/etc \\\n            --docdir=/usr/share/doc/attr-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "attr",
+      "getfattr",
+      "setfattr"
+    ],
+    "libraries": [
+      "libattr.so"
+    ],
+    "directories": [
+      "/usr/include/attr",
+      "/usr/share/doc/attr-{version}"
+    ]
+  },
+  "description": "The Attr package contains utilities to administer the extended attributes of filesystem objects.",
+  "document": {
+    "section_id": "ch-system-attr",
+    "filename": "attr.html",
+    "contents_id": "contents-attr"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "GCC",
+      "Gettext",
+      "Glibc",
+      "Grep",
+      "M4",
+      "Make",
+      "Perl",
+      "Sed",
+      "Texinfo"
+    ],
+    "runtime": [
+      "Glibc"
+    ],
+    "test": [
+      "Automake",
+      "Diffutils",
+      "Findutils",
+      "Libtool"
+    ],
+    "before": [
+      "Acl",
+      "Libcap",
+      "Patch"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "attr",
+      "name": "attr",
+      "description": "Extends attributes on filesystem objects"
+    },
+    {
+      "id": "getfattr",
+      "name": "getfattr",
+      "description": "Gets the extended attributes of filesystem objects"
+    },
+    {
+      "id": "setfattr",
+      "name": "setfattr",
+      "description": "Sets the extended attributes of filesystem objects"
+    },
+    {
+      "id": "libattr",
+      "name": "libattr",
+      "description": "Contains the library functions for manipulating extended attributes"
+    }
+  ]
+}

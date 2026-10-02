@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "name": "lz4",
+  "reference": {
+    "lfs_section": "ch-system-lz4"
+  },
+  "procedure": [
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make BUILD_STATIC=no PREFIX=/usr",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make -j1 check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make BUILD_STATIC=no PREFIX=/usr install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "lz4",
+      "lz4c (link to lz4)",
+      "lz4cat (link to lz4)",
+      "unlz4 (link to lz4)"
+    ],
+    "libraries": [
+      "liblz4.so"
+    ]
+  },
+  "description": "Lz4 is a lossless compression algorithm, providing compression speed greater than 500 MB/s per core. It features an extremely fast decoder, with speed in multiple GB/s per core. Lz4 can work with Zstandard to allow both algorithms to compress data faster.",
+  "document": {
+    "section_id": "ch-system-lz4",
+    "filename": "lz4.html",
+    "contents_id": "contents-lz4"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "GCC",
+      "Glibc",
+      "Make"
+    ],
+    "runtime": [
+      "Glibc"
+    ],
+    "test": [
+      "Python"
+    ],
+    "before": [
+      "Zstd",
+      "Systemd"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "lz4",
+      "name": "lz4",
+      "description": "Compresses or decompresses files using the LZ4 format"
+    },
+    {
+      "id": "lz4c",
+      "name": "lz4c",
+      "description": "Compresses files using the LZ4 format"
+    },
+    {
+      "id": "lz4cat",
+      "name": "lz4cat",
+      "description": "Lists the contents of a file compressed using the LZ4 format"
+    },
+    {
+      "id": "unlz4",
+      "name": "unlz4",
+      "description": "Decompresses files using the LZ4 format"
+    },
+    {
+      "id": "liblz4",
+      "name": "liblz4",
+      "description": "The library implementing lossless data compression, using the LZ4 algorithm"
+    }
+  ]
+}

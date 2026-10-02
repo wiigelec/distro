@@ -1,0 +1,300 @@
+{
+  "schema_version": 1,
+  "name": "perl",
+  "reference": {
+    "lfs_section": "ch-system-perl"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "export BUILD_ZLIB=False\nexport BUILD_BZIP2=0",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "sh Configure -des                                          \\\n             -D prefix=/usr                                \\\n             -D vendorprefix=/usr                          \\\n             -D privlib=/usr/lib/perl5/5.44/core_perl      \\\n             -D archlib=/usr/lib/perl5/5.44/core_perl      \\\n             -D sitelib=/usr/lib/perl5/5.44/site_perl      \\\n             -D sitearch=/usr/lib/perl5/5.44/site_perl     \\\n             -D vendorlib=/usr/lib/perl5/5.44/vendor_perl  \\\n             -D vendorarch=/usr/lib/perl5/5.44/vendor_perl \\\n             -D man1dir=/usr/share/man/man1                \\\n             -D man3dir=/usr/share/man/man3                \\\n             -D pager=\"/usr/bin/less -isR\"                 \\\n             -D useshrplib                                 \\\n             -D usethreads",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "TEST_JOBS=$(nproc) make test_harness",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install\nunset BUILD_ZLIB BUILD_BZIP2",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "corelist",
+      "cpan",
+      "enc2xs",
+      "encguess",
+      "h2ph",
+      "h2xs",
+      "instmodsh",
+      "json_pp",
+      "libnetcfg",
+      "perl",
+      "perl{version} (hard link to perl)",
+      "perlbug",
+      "perldoc",
+      "perlivp",
+      "perlthanks (hard link to perlbug)",
+      "piconv",
+      "pl2pm",
+      "pod2html",
+      "pod2man",
+      "pod2text",
+      "pod2usage",
+      "podchecker",
+      "podselect",
+      "prove",
+      "ptar",
+      "ptardiff",
+      "ptargrep",
+      "shasum",
+      "splain",
+      "xsubpp",
+      "zipdetails"
+    ],
+    "libraries": [
+      "Many which cannot all be listed here"
+    ],
+    "directories": [
+      "/usr/lib/perl5"
+    ]
+  },
+  "description": "The Perl package contains the Practical Extraction and Report Language.",
+  "document": {
+    "section_id": "ch-system-perl",
+    "filename": "perl.html",
+    "contents_id": "contents-perl"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Gawk",
+      "GCC",
+      "GDBM",
+      "Glibc",
+      "Grep",
+      "Libxcrypt",
+      "Make",
+      "Sed",
+      "Zlib"
+    ],
+    "runtime": [
+      "GDBM",
+      "Glibc",
+      "Libxcrypt"
+    ],
+    "test": [
+      "Iana-Etc",
+      "Less",
+      "Procps-ng"
+    ],
+    "before": [
+      "Autoconf"
+    ],
+    "optional": [
+      "Berkeley DB"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "corelist",
+      "name": "corelist",
+      "description": "A command line front end to Module::CoreList"
+    },
+    {
+      "id": "cpan",
+      "name": "cpan",
+      "description": "Interact with the Comprehensive Perl Archive Network (CPAN) from the command line"
+    },
+    {
+      "id": "enc2xs",
+      "name": "enc2xs",
+      "description": "Builds a Perl extension for the Encode module from either Unicode Character Mappings or Tcl Encoding Files"
+    },
+    {
+      "id": "encguess",
+      "name": "encguess",
+      "description": "Guess the encoding type of one or several files"
+    },
+    {
+      "id": "h2ph",
+      "name": "h2ph",
+      "description": "Converts .h C header files to .ph Perl header files"
+    },
+    {
+      "id": "h2xs",
+      "name": "h2xs",
+      "description": "Converts .h C header files to Perl extensions"
+    },
+    {
+      "id": "instmodsh",
+      "name": "instmodsh",
+      "description": "Shell script for examining installed Perl modules; it can create a tarball from an installed module"
+    },
+    {
+      "id": "json_pp",
+      "name": "json_pp",
+      "description": "Converts data between certain input and output formats"
+    },
+    {
+      "id": "libnetcfg",
+      "name": "libnetcfg",
+      "description": "Can be used to configure the libnet Perl module"
+    },
+    {
+      "id": "perl",
+      "name": "perl",
+      "description": "Combines some of the best features of C, sed, awk and sh into a single Swiss Army language"
+    },
+    {
+      "id": "perl-version",
+      "name": "perl{version}",
+      "description": "A hard link to perl"
+    },
+    {
+      "id": "perlbug",
+      "name": "perlbug",
+      "description": "Used to generate bug reports about Perl, or the modules that come with it, and mail them"
+    },
+    {
+      "id": "perldoc",
+      "name": "perldoc",
+      "description": "Displays a piece of documentation in pod format that is embedded in the Perl installation tree or in a Perl script"
+    },
+    {
+      "id": "perlivp",
+      "name": "perlivp",
+      "description": "The Perl Installation Verification Procedure; it can be used to verify that Perl and its libraries have been installed correctly"
+    },
+    {
+      "id": "perlthanks",
+      "name": "perlthanks",
+      "description": "Used to generate thank you messages to mail to the Perl developers"
+    },
+    {
+      "id": "piconv",
+      "name": "piconv",
+      "description": "A Perl version of the character encoding converter iconv"
+    },
+    {
+      "id": "pl2pm",
+      "name": "pl2pm",
+      "description": "A rough tool for converting Perl4 .pl files to Perl5 .pm modules"
+    },
+    {
+      "id": "pod2html",
+      "name": "pod2html",
+      "description": "Converts files from pod format to HTML format"
+    },
+    {
+      "id": "pod2man",
+      "name": "pod2man",
+      "description": "Converts pod data to formatted *roff input"
+    },
+    {
+      "id": "pod2text",
+      "name": "pod2text",
+      "description": "Converts pod data to formatted ASCII text"
+    },
+    {
+      "id": "pod2usage",
+      "name": "pod2usage",
+      "description": "Prints usage messages from embedded pod docs in files"
+    },
+    {
+      "id": "podchecker",
+      "name": "podchecker",
+      "description": "Checks the syntax of pod format documentation files"
+    },
+    {
+      "id": "podselect",
+      "name": "podselect",
+      "description": "Displays selected sections of pod documentation"
+    },
+    {
+      "id": "prove",
+      "name": "prove",
+      "description": "Command line tool for running tests against the Test::Harness module"
+    },
+    {
+      "id": "ptar",
+      "name": "ptar",
+      "description": "A tar-like program written in Perl"
+    },
+    {
+      "id": "ptardiff",
+      "name": "ptardiff",
+      "description": "A Perl program that compares an extracted archive with an unextracted one"
+    },
+    {
+      "id": "ptargrep",
+      "name": "ptargrep",
+      "description": "A Perl program that applies pattern matching to the contents of files in a tar archive"
+    },
+    {
+      "id": "shasum",
+      "name": "shasum",
+      "description": "Prints or checks SHA checksums"
+    },
+    {
+      "id": "splain",
+      "name": "splain",
+      "description": "Is used to force verbose warning diagnostics in Perl"
+    },
+    {
+      "id": "xsubpp",
+      "name": "xsubpp",
+      "description": "Converts Perl XS code into C code"
+    },
+    {
+      "id": "zipdetails",
+      "name": "zipdetails",
+      "description": "Displays details about the internal structure of a Zip file"
+    }
+  ]
+}

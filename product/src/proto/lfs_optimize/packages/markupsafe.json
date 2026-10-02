@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "name": "markupsafe",
+  "reference": {
+    "lfs_section": "ch-system-markupsafe"
+  },
+  "procedure": [
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "pip3 install --no-index --find-links dist Markupsafe",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "directories": [
+      "/usr/lib/python3.14/site-packages/MarkupSafe-{version}.dist-info"
+    ]
+  },
+  "description": "MarkupSafe is a Python module that implements an XML/HTML/XHTML Markup safe string.",
+  "document": {
+    "section_id": "ch-system-markupsafe",
+    "filename": "markupsafe.html",
+    "contents_id": "contents-markupsafe"
+  },
+  "dependencies": {
+    "build": [
+      "Python",
+      "Setuptools",
+      "Wheel"
+    ],
+    "runtime": [
+      "Python"
+    ],
+    "test": [
+      "No test suite available"
+    ],
+    "before": [
+      "Jinja2"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": []
+}

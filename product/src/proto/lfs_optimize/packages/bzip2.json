@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "name": "bzip2",
+  "reference": {
+    "lfs_section": "ch-system-bzip2"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "patch -Np1 -i ../bzip2-{version}-install_docs-1.patch",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "sed -i 's@\\(ln -s -f \\)$(PREFIX)/bin/@\\1@' Makefile",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "sed -i \"s@(PREFIX)/man@(PREFIX)/share/man@g\" Makefile",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make -f Makefile-libbz2_so\nmake clean",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make PREFIX=/usr install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "cp -av libbz2.so.* /usr/lib\nln -sfv libbz2.so.{version} /usr/lib/libbz2.so",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "ln -sfv libbz2.so.{version} /usr/lib/libbz2.so.1",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "cp -v bzip2-shared /usr/bin/bzip2\nfor i in /usr/bin/{{bzcat,bunzip2}}; do\n  ln -sfv bzip2 $i\ndone",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "rm -fv /usr/lib/libbz2.a",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "bunzip2 (link to bzip2)",
+      "bzcat (link to bzip2)",
+      "bzcmp (link to bzdiff)",
+      "bzdiff",
+      "bzegrep (link to bzgrep)",
+      "bzfgrep (link to bzgrep)",
+      "bzgrep",
+      "bzip2",
+      "bzip2recover",
+      "bzless (link to bzmore)",
+      "bzmore"
+    ],
+    "libraries": [
+      "libbz2.so"
+    ],
+    "directories": [
+      "/usr/share/doc/bzip2-{version}"
+    ]
+  },
+  "description": "The Bzip2 package contains programs for compressing and decompressing files. Compressing text files with bzip2 yields a much better compression percentage than with the traditional gzip.",
+  "document": {
+    "section_id": "ch-system-bzip2",
+    "filename": "bzip2.html",
+    "contents_id": "contents-bzip2"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Diffutils",
+      "GCC",
+      "Glibc",
+      "Make",
+      "Patch"
+    ],
+    "runtime": [
+      "Glibc"
+    ],
+    "test": [],
+    "before": [
+      "File",
+      "Libelf"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "bunzip2",
+      "name": "bunzip2",
+      "description": "Decompresses bzipped files"
+    },
+    {
+      "id": "bzcat",
+      "name": "bzcat",
+      "description": "Decompresses to standard output"
+    },
+    {
+      "id": "bzcmp",
+      "name": "bzcmp",
+      "description": "Runs cmp on bzipped files"
+    },
+    {
+      "id": "bzdiff",
+      "name": "bzdiff",
+      "description": "Runs diff on bzipped files"
+    },
+    {
+      "id": "bzegrep",
+      "name": "bzegrep",
+      "description": "Runs egrep on bzipped files"
+    },
+    {
+      "id": "bzfgrep",
+      "name": "bzfgrep",
+      "description": "Runs fgrep on bzipped files"
+    },
+    {
+      "id": "bzgrep",
+      "name": "bzgrep",
+      "description": "Runs grep on bzipped files"
+    },
+    {
+      "id": "bzip2",
+      "name": "bzip2",
+      "description": "Compresses files using the Burrows-Wheeler block sorting text compression algorithm with Huffman coding; the compression rate is better than that achieved by more conventional compressors using Lempel-Ziv algorithms, like gzip"
+    },
+    {
+      "id": "bzip2recover",
+      "name": "bzip2recover",
+      "description": "Tries to recover data from damaged bzipped files"
+    },
+    {
+      "id": "bzless",
+      "name": "bzless",
+      "description": "Runs less on bzipped files"
+    },
+    {
+      "id": "bzmore",
+      "name": "bzmore",
+      "description": "Runs more on bzipped files"
+    },
+    {
+      "id": "libbz2",
+      "name": "libbz2",
+      "description": "The library implementing lossless, block-sorting data compression, using the Burrows-Wheeler algorithm"
+    }
+  ]
+}

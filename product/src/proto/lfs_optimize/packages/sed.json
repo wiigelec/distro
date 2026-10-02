@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "name": "sed",
+  "reference": {
+    "lfs_section": "ch-system-sed"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make\nmake html",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "chown -R tester .\nsu tester -c \"PATH=$PATH make check\"",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install\ninstall -vDm644 doc/sed.html -t /usr/share/doc/sed-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "sed"
+    ],
+    "directories": [
+      "/usr/share/doc/sed-{version}"
+    ]
+  },
+  "description": "The Sed package contains a stream editor.",
+  "document": {
+    "section_id": "ch-system-sed",
+    "filename": "sed.html",
+    "contents_id": "contents-sed"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "GCC",
+      "Gettext",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Sed",
+      "Texinfo"
+    ],
+    "runtime": [
+      "Acl",
+      "Attr",
+      "Glibc"
+    ],
+    "test": [
+      "Diffutils",
+      "Gawk"
+    ],
+    "before": [
+      "E2fsprogs",
+      "File",
+      "Libtool",
+      "Shadow"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "sed",
+      "name": "sed",
+      "description": "Filters and transforms text files in a single pass"
+    }
+  ]
+}

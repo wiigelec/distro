@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "name": "ninja",
+  "reference": {
+    "lfs_section": "ch-system-ninja"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "sed -i '/int Guess/a \\\n  int   j = 0;\\\n  char* jobs = getenv( \"NINJAJOBS\" );\\\n  if ( jobs != NULL ) j = atoi( jobs );\\\n  if ( j > 0 ) return j;\\\n' src/ninja.cc",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "python3 configure.py --bootstrap --verbose",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "install -vm755 ninja /usr/bin/\ninstall -vDm644 misc/bash-completion /usr/share/bash-completion/completions/ninja\ninstall -vDm644 misc/zsh-completion  /usr/share/zsh/site-functions/_ninja",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "ninja"
+    ]
+  },
+  "description": "Ninja is a small build system with a focus on speed.",
+  "document": {
+    "section_id": "ch-system-ninja",
+    "filename": "ninja.html",
+    "contents_id": "contents-ninja"
+  },
+  "dependencies": {
+    "build": [
+      "Binutils",
+      "Coreutils",
+      "GCC",
+      "Python"
+    ],
+    "runtime": [
+      "GCC",
+      "Glibc"
+    ],
+    "test": [
+      "cmake"
+    ],
+    "before": [
+      "Meson"
+    ],
+    "optional": [
+      "Asciidoc",
+      "Doxygen",
+      "Emacs",
+      "re2c"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "ninja",
+      "name": "ninja",
+      "description": "is the Ninja build system"
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "name": "wheel",
+  "reference": {
+    "lfs_section": "ch-system-wheel"
+  },
+  "procedure": [
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "pip3 install --no-index --find-links dist wheel",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "wheel"
+    ],
+    "directories": [
+      "/usr/lib/python3.14/site-packages/wheel",
+      "/usr/lib/python3.14/site-packages/wheel-{version}.dist-info"
+    ]
+  },
+  "description": "Wheel is a Python library that is the reference implementation of the Python wheel packaging standard.",
+  "document": {
+    "section_id": "ch-system-wheel",
+    "filename": "wheel.html",
+    "contents_id": "contents-wheel"
+  },
+  "dependencies": {
+    "build": [
+      "Python",
+      "Flit-core",
+      "packaging"
+    ],
+    "runtime": [
+      "Python"
+    ],
+    "test": [
+      "No test suite available"
+    ],
+    "before": [
+      "Jinja2",
+      "MarkupSafe",
+      "Meson",
+      "Setuptools"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "wheel-wheel",
+      "name": "wheel",
+      "description": "is a utility to unpack, pack, or convert wheel archives"
+    }
+  ]
+}

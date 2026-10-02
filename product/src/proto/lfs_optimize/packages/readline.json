@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "name": "readline",
+  "reference": {
+    "lfs_section": "ch-system-readline"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "sed -i '/MV.*old/d' Makefile.in\nsed -i '/{{OLDSUFF}}/c:' support/shlib-install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "sed -i 's/-Wl,-rpath,[^ ]*//' support/shobj-conf",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "sed -e '270a\\\n     else\\\n       chars_avail = 1;'      \\\n    -e '288i\\   result = -1;' \\\n    -i.orig input.c",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr    \\\n            --disable-static \\\n            --with-curses    \\\n            --docdir=/usr/share/doc/readline-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make SHLIB_LIBS=\"-lncursesw\"",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "install -v -m644 doc/*.{{ps,pdf,html,dvi}} /usr/share/doc/readline-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "libraries": [
+      "libhistory.so",
+      "libreadline.so"
+    ],
+    "directories": [
+      "/usr/include/readline",
+      "/usr/share/doc/readline-{version}"
+    ]
+  },
+  "description": "The Readline package is a set of libraries that offer command-line editing and history capabilities.",
+  "document": {
+    "section_id": "ch-system-readline",
+    "filename": "readline.html",
+    "contents_id": "contents-readline"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Gawk",
+      "GCC",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Ncurses",
+      "Patch",
+      "Sed",
+      "Texinfo"
+    ],
+    "runtime": [
+      "Glibc",
+      "Ncurses"
+    ],
+    "test": [
+      "No test suite available"
+    ],
+    "before": [
+      "Bash",
+      "Bc",
+      "Gawk"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "libhistory",
+      "name": "libhistory",
+      "description": "Provides a consistent user interface for recalling lines of history"
+    },
+    {
+      "id": "libreadline",
+      "name": "libreadline",
+      "description": "Provides a set of commands for manipulating text entered in an interactive session of a program"
+    }
+  ]
+}

@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "name": "procps",
+  "reference": {
+    "lfs_section": "ch-system-procps"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr                           \\\n            --docdir=/usr/share/doc/procps-ng-{version} \\\n            --disable-static                        \\\n            --disable-kill                          \\\n            --enable-watch8bit                      \\\n            --with-systemd",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "free",
+      "pgrep",
+      "pidof",
+      "pkill",
+      "pmap",
+      "ps",
+      "pwdx",
+      "slabtop",
+      "sysctl",
+      "tload",
+      "top",
+      "uptime",
+      "vmstat",
+      "w",
+      "watch"
+    ],
+    "libraries": [
+      "libproc-2.so"
+    ],
+    "directories": [
+      "/usr/include/procps",
+      "/usr/share/doc/procps-ng-{version}"
+    ]
+  },
+  "description": "The Procps-ng package contains programs for monitoring processes.",
+  "document": {
+    "section_id": "ch-system-procps",
+    "filename": "procps-ng.html",
+    "contents_id": "contents-procps"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "GCC",
+      "Glibc",
+      "Make",
+      "Ncurses",
+      "Pkgconf",
+      "Systemd"
+    ],
+    "runtime": [
+      "Glibc"
+    ],
+    "test": [
+      "DejaGNU"
+    ],
+    "before": [],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "free",
+      "name": "free",
+      "description": "Reports the amount of free and used memory (both physical and swap memory) in the system"
+    },
+    {
+      "id": "pgrep",
+      "name": "pgrep",
+      "description": "Looks up processes based on their name and other attributes"
+    },
+    {
+      "id": "pidof",
+      "name": "pidof",
+      "description": "Reports the PIDs of the given programs"
+    },
+    {
+      "id": "pkill",
+      "name": "pkill",
+      "description": "Signals processes based on their name and other attributes"
+    },
+    {
+      "id": "pmap",
+      "name": "pmap",
+      "description": "Reports the memory map of the given process"
+    },
+    {
+      "id": "ps",
+      "name": "ps",
+      "description": "Lists the current running processes"
+    },
+    {
+      "id": "pwdx",
+      "name": "pwdx",
+      "description": "Reports the current working directory of a process"
+    },
+    {
+      "id": "slabtop",
+      "name": "slabtop",
+      "description": "Displays detailed kernel slab cache information in real time"
+    },
+    {
+      "id": "sysctl",
+      "name": "sysctl",
+      "description": "Modifies kernel parameters at run time"
+    },
+    {
+      "id": "tload",
+      "name": "tload",
+      "description": "Prints a graph of the current system load average"
+    },
+    {
+      "id": "top",
+      "name": "top",
+      "description": "Displays a list of the most CPU intensive processes; it provides an ongoing look at processor activity in real time"
+    },
+    {
+      "id": "uptime",
+      "name": "uptime",
+      "description": "Reports how long the system has been running, how many users are logged on, and the system load averages"
+    },
+    {
+      "id": "vmstat",
+      "name": "vmstat",
+      "description": "Reports virtual memory statistics, giving information about processes, memory, paging, block Input/Output (IO), traps, and CPU activity"
+    },
+    {
+      "id": "w",
+      "name": "w",
+      "description": "Shows which users are currently logged on, where, and since when"
+    },
+    {
+      "id": "watch",
+      "name": "watch",
+      "description": "Runs a given command repeatedly, displaying the first screen-full of its output; this allows a user to watch the output change over time"
+    },
+    {
+      "id": "libproc-2",
+      "name": "libproc-2",
+      "description": "Contains the functions used by most programs in this package"
+    }
+  ]
+}

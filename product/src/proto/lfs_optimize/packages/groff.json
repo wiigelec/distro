@@ -1,0 +1,375 @@
+{
+  "schema_version": 1,
+  "name": "groff",
+  "reference": {
+    "lfs_section": "ch-system-groff"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "PAGE=<paper_size> ./configure --prefix=/usr",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make -j1",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "addftinfo",
+      "afmtodit",
+      "chem",
+      "eqn",
+      "eqn2graph",
+      "gdiffmk",
+      "glilypond",
+      "gperl",
+      "gpinyin",
+      "grap2graph",
+      "grn",
+      "grodvi",
+      "groff",
+      "groffer",
+      "grog",
+      "grolbp",
+      "grolj4",
+      "gropdf",
+      "grops",
+      "grotty",
+      "hpftodit",
+      "indxbib",
+      "lkbib",
+      "lookbib",
+      "mmroff",
+      "neqn",
+      "nroff",
+      "pdfmom",
+      "pdfroff",
+      "pfbtops",
+      "pic",
+      "pic2graph",
+      "post-grohtml",
+      "preconv",
+      "pre-grohtml",
+      "refer",
+      "roff2dvi",
+      "roff2html",
+      "roff2pdf",
+      "roff2ps",
+      "roff2text",
+      "roff2x",
+      "soelim",
+      "tbl",
+      "tfmtodit",
+      "troff"
+    ],
+    "directories": [
+      "/usr/lib/groff",
+      "/usr/share/doc/groff-{version}",
+      "/usr/share/groff"
+    ]
+  },
+  "description": "The Groff package contains programs for processing and formatting text and images.",
+  "document": {
+    "section_id": "ch-system-groff",
+    "filename": "groff.html",
+    "contents_id": "contents-groff"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Bison",
+      "Coreutils",
+      "Gawk",
+      "GCC",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Patch",
+      "Sed",
+      "Texinfo"
+    ],
+    "runtime": [
+      "GCC",
+      "Glibc",
+      "Perl"
+    ],
+    "test": [],
+    "before": [
+      "Man-DB"
+    ],
+    "optional": [
+      "ghostscript",
+      "Uchardet"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "addftinfo",
+      "name": "addftinfo",
+      "description": "Reads a troff font file and adds some additional font-metric information that is used by the groff system"
+    },
+    {
+      "id": "afmtodit",
+      "name": "afmtodit",
+      "description": "Creates a font file for use with groff and grops"
+    },
+    {
+      "id": "chem",
+      "name": "chem",
+      "description": "Groff preprocessor for producing chemical structure diagrams"
+    },
+    {
+      "id": "eqn",
+      "name": "eqn",
+      "description": "Compiles descriptions of equations embedded within troff input files into commands that are understood by troff"
+    },
+    {
+      "id": "eqn2graph",
+      "name": "eqn2graph",
+      "description": "Converts a troff EQN (equation) into a cropped image"
+    },
+    {
+      "id": "gdiffmk",
+      "name": "gdiffmk",
+      "description": "Marks differences between groff/nroff/troff files"
+    },
+    {
+      "id": "glilypond",
+      "name": "glilypond",
+      "description": "Transforms sheet music written in the lilypond language into the groff language"
+    },
+    {
+      "id": "gperl",
+      "name": "gperl",
+      "description": "Preprocessor for groff, allowing the insertion of perl code into groff files"
+    },
+    {
+      "id": "gpinyin",
+      "name": "gpinyin",
+      "description": "Preprocessor for groff, allowing the insertion of Pinyin (Mandarin Chinese spelled with the Roman alphabet) into groff files."
+    },
+    {
+      "id": "grap2graph",
+      "name": "grap2graph",
+      "description": "Converts a grap program file into a cropped bitmap image (grap is an old Unix programming language for creating diagrams)"
+    },
+    {
+      "id": "grn",
+      "name": "grn",
+      "description": "A groff preprocessor for gremlin files"
+    },
+    {
+      "id": "grodvi",
+      "name": "grodvi",
+      "description": "A driver for groff that produces TeX dvi format output files"
+    },
+    {
+      "id": "groff",
+      "name": "groff",
+      "description": "A front end to the groff document formatting system; normally, it runs the troff program and a post-processor appropriate for the selected device"
+    },
+    {
+      "id": "groffer",
+      "name": "groffer",
+      "description": "Displays groff files and man pages on X and tty terminals"
+    },
+    {
+      "id": "grog",
+      "name": "grog",
+      "description": "Reads files and guesses which of the groff options -e, -man, -me, -mm, -ms, -p, -s, and -t are required for printing files, and reports the groff command including those options"
+    },
+    {
+      "id": "grolbp",
+      "name": "grolbp",
+      "description": "Is a groff driver for Canon CAPSL printers (LBP-4 and LBP-8 series laser printers)"
+    },
+    {
+      "id": "grolj4",
+      "name": "grolj4",
+      "description": "Is a driver for groff that produces output in PCL5 format suitable for an HP LaserJet 4 printer"
+    },
+    {
+      "id": "gropdf",
+      "name": "gropdf",
+      "description": "Translates the output of GNU troff to PDF"
+    },
+    {
+      "id": "grops",
+      "name": "grops",
+      "description": "Translates the output of GNU troff to PostScript"
+    },
+    {
+      "id": "grotty",
+      "name": "grotty",
+      "description": "Translates the output of GNU troff into a form suitable for typewriter-like devices"
+    },
+    {
+      "id": "hpftodit",
+      "name": "hpftodit",
+      "description": "Creates a font file for use with groff -Tlj4 from an HP-tagged font metric file"
+    },
+    {
+      "id": "indxbib",
+      "name": "indxbib",
+      "description": "Creates an inverted index for the bibliographic databases with a specified file for use with refer, lookbib, and lkbib"
+    },
+    {
+      "id": "lkbib",
+      "name": "lkbib",
+      "description": "Searches bibliographic databases for references that contain specified keys and reports any references found"
+    },
+    {
+      "id": "lookbib",
+      "name": "lookbib",
+      "description": "Prints a prompt on the standard error (unless the standard input is not a terminal), reads a line containing a set of keywords from the standard input, searches the bibliographic databases in a specified file for references containing those keywords, prints any references found on the standard output, and repeats this process until the end of input"
+    },
+    {
+      "id": "mmroff",
+      "name": "mmroff",
+      "description": "A simple preprocessor for groff"
+    },
+    {
+      "id": "neqn",
+      "name": "neqn",
+      "description": "Formats equations for American Standard Code for Information Interchange (ASCII) output"
+    },
+    {
+      "id": "nroff",
+      "name": "nroff",
+      "description": "A script that emulates the nroff command using groff"
+    },
+    {
+      "id": "pdfmom",
+      "name": "pdfmom",
+      "description": "Is a wrapper around groff that facilitates the production of PDF documents from files formatted with the mom macros."
+    },
+    {
+      "id": "pdfroff",
+      "name": "pdfroff",
+      "description": "Creates pdf documents using groff"
+    },
+    {
+      "id": "pfbtops",
+      "name": "pfbtops",
+      "description": "Translates a PostScript font in .pfb format to ASCII"
+    },
+    {
+      "id": "pic",
+      "name": "pic",
+      "description": "Compiles descriptions of pictures embedded within troff or TeX input files into commands understood by TeX or troff"
+    },
+    {
+      "id": "pic2graph",
+      "name": "pic2graph",
+      "description": "Converts a PIC diagram into a cropped image"
+    },
+    {
+      "id": "post-grohtml",
+      "name": "post-grohtml",
+      "description": "Translates the output of GNU troff to HTML"
+    },
+    {
+      "id": "preconv",
+      "name": "preconv",
+      "description": "Converts encoding of input files to something GNU troff understands"
+    },
+    {
+      "id": "pre-grohtml",
+      "name": "pre-grohtml",
+      "description": "Translates the output of GNU troff to HTML"
+    },
+    {
+      "id": "refer",
+      "name": "refer",
+      "description": "Copies the contents of a file to the standard output, except that lines between .[ and .] are interpreted as citations, and lines between .R1 and .R2 are interpreted as commands for how citations are to be processed"
+    },
+    {
+      "id": "roff2dvi",
+      "name": "roff2dvi",
+      "description": "Transforms roff files into DVI format"
+    },
+    {
+      "id": "roff2html",
+      "name": "roff2html",
+      "description": "Transforms roff files into HTML format"
+    },
+    {
+      "id": "roff2pdf",
+      "name": "roff2pdf",
+      "description": "Transforms roff files into PDFs"
+    },
+    {
+      "id": "roff2ps",
+      "name": "roff2ps",
+      "description": "Transforms roff files into ps files"
+    },
+    {
+      "id": "roff2text",
+      "name": "roff2text",
+      "description": "Transforms roff files into text files"
+    },
+    {
+      "id": "roff2x",
+      "name": "roff2x",
+      "description": "Transforms roff files into other formats"
+    },
+    {
+      "id": "soelim",
+      "name": "soelim",
+      "description": "Reads files and replaces lines of the form .so file by the contents of the mentioned file"
+    },
+    {
+      "id": "tbl",
+      "name": "tbl",
+      "description": "Compiles descriptions of tables embedded within troff input files into commands that are understood by troff"
+    },
+    {
+      "id": "tfmtodit",
+      "name": "tfmtodit",
+      "description": "Creates a font file for use with groff -Tdvi"
+    },
+    {
+      "id": "troff",
+      "name": "troff",
+      "description": "Is highly compatible with Unix troff; it should usually be invoked using the groff command, which will also run preprocessors and post-processors in the appropriate order and with the appropriate options"
+    }
+  ]
+}

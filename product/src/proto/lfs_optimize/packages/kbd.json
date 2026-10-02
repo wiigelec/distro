@@ -1,0 +1,281 @@
+{
+  "schema_version": 1,
+  "name": "kbd",
+  "reference": {
+    "lfs_section": "ch-system-kbd"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "patch -Np1 -i ../kbd-{version}-backspace-1.patch",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "sed -i '/RESIZECONS_PROGS=/s/yes/no/' configure\nsed -i 's/resizecons.8 //' docs/man/man8/Makefile.in",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr --disable-vlock",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "cp -R -v docs/doc -T /usr/share/doc/kbd-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "chvt",
+      "deallocvt",
+      "dumpkeys",
+      "fgconsole",
+      "getkeycodes",
+      "kbdinfo",
+      "kbd_mode",
+      "kbdrate",
+      "loadkeys",
+      "loadunimap",
+      "mapscrn",
+      "openvt",
+      "psfaddtable (link to psfxtable)",
+      "psfgettable (link to psfxtable)",
+      "psfstriptable (link to psfxtable)",
+      "psfxtable",
+      "setfont",
+      "setkeycodes",
+      "setleds",
+      "setmetamode",
+      "setvtrgb",
+      "showconsolefont",
+      "showkey",
+      "unicode_start",
+      "unicode_stop"
+    ],
+    "directories": [
+      "/usr/share/consolefonts",
+      "/usr/share/consoletrans",
+      "/usr/share/keymaps",
+      "/usr/share/doc/kbd-{version}",
+      "/usr/share/unimaps"
+    ]
+  },
+  "description": "The Kbd package contains key-table files, console fonts, and keyboard utilities.",
+  "document": {
+    "section_id": "ch-system-kbd",
+    "filename": "kbd.html",
+    "contents_id": "contents-kbd"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Bison",
+      "Coreutils",
+      "Flex",
+      "GCC",
+      "Gettext",
+      "Glibc",
+      "Gzip",
+      "Make",
+      "Patch",
+      "Sed"
+    ],
+    "runtime": [
+      "Bash",
+      "Coreutils",
+      "Glibc"
+    ],
+    "test": [],
+    "before": [],
+    "optional": [
+      "Linux-PAM"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "chvt",
+      "name": "chvt",
+      "description": "Changes the foreground virtual terminal"
+    },
+    {
+      "id": "deallocvt",
+      "name": "deallocvt",
+      "description": "Deallocates unused virtual terminals"
+    },
+    {
+      "id": "dumpkeys",
+      "name": "dumpkeys",
+      "description": "Dumps the keyboard translation tables"
+    },
+    {
+      "id": "fgconsole",
+      "name": "fgconsole",
+      "description": "Prints the number of the active virtual terminal"
+    },
+    {
+      "id": "getkeycodes",
+      "name": "getkeycodes",
+      "description": "Prints the kernel scancode-to-keycode mapping table"
+    },
+    {
+      "id": "kbdinfo",
+      "name": "kbdinfo",
+      "description": "Obtains information about the status of a console"
+    },
+    {
+      "id": "kbd_mode",
+      "name": "kbd_mode",
+      "description": "Reports or sets the keyboard mode"
+    },
+    {
+      "id": "kbdrate",
+      "name": "kbdrate",
+      "description": "Sets the keyboard repeat and delay rates"
+    },
+    {
+      "id": "loadkeys",
+      "name": "loadkeys",
+      "description": "Loads the keyboard translation tables"
+    },
+    {
+      "id": "loadunimap",
+      "name": "loadunimap",
+      "description": "Loads the kernel unicode-to-font mapping table"
+    },
+    {
+      "id": "mapscrn",
+      "name": "mapscrn",
+      "description": "An obsolete program that used to load a user-defined output character mapping table into the console driver; this is now done by setfont"
+    },
+    {
+      "id": "openvt",
+      "name": "openvt",
+      "description": "Starts a program on a new virtual terminal (VT)"
+    },
+    {
+      "id": "psfaddtable",
+      "name": "psfaddtable",
+      "description": "Adds a Unicode character table to a console font"
+    },
+    {
+      "id": "psfgettable",
+      "name": "psfgettable",
+      "description": "Extracts the embedded Unicode character table from a console font"
+    },
+    {
+      "id": "psfstriptable",
+      "name": "psfstriptable",
+      "description": "Removes the embedded Unicode character table from a console font"
+    },
+    {
+      "id": "psfxtable",
+      "name": "psfxtable",
+      "description": "Handles Unicode character tables for console fonts"
+    },
+    {
+      "id": "setfont",
+      "name": "setfont",
+      "description": "Changes the Enhanced Graphic Adapter (EGA) and Video Graphics Array (VGA) fonts on the console"
+    },
+    {
+      "id": "setkeycodes",
+      "name": "setkeycodes",
+      "description": "Loads kernel scancode-to-keycode mapping table entries; this is useful if there are unusual keys on the keyboard"
+    },
+    {
+      "id": "setleds",
+      "name": "setleds",
+      "description": "Sets the keyboard flags and Light Emitting Diodes (LEDs)"
+    },
+    {
+      "id": "setmetamode",
+      "name": "setmetamode",
+      "description": "Defines the keyboard meta-key handling"
+    },
+    {
+      "id": "setvtrgb",
+      "name": "setvtrgb",
+      "description": "Sets the console color map in all virtual terminals"
+    },
+    {
+      "id": "showconsolefont",
+      "name": "showconsolefont",
+      "description": "Shows the current EGA/VGA console screen font"
+    },
+    {
+      "id": "showkey",
+      "name": "showkey",
+      "description": "Reports the scancodes, keycodes, and ASCII codes of the keys pressed on the keyboard"
+    },
+    {
+      "id": "unicode_start",
+      "name": "unicode_start",
+      "description": "Puts the keyboard and console in UNICODE mode [Don't use this program unless your keymap file is in the ISO-8859-1 encoding. For other encodings, this utility produces incorrect results.]"
+    },
+    {
+      "id": "unicode_stop",
+      "name": "unicode_stop",
+      "description": "Reverts keyboard and console from UNICODE mode"
+    }
+  ]
+}

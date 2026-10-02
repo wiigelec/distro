@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "name": "automake",
+  "reference": {
+    "lfs_section": "ch-system-automake"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr --docdir=/usr/share/doc/automake-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make -j$(($(nproc)>4?$(nproc):4)) check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "aclocal",
+      "aclocal-{version} (hard linked with aclocal)",
+      "automake",
+      "automake-{version} (hard linked with automake)"
+    ],
+    "directories": [
+      "/usr/share/aclocal-{version}",
+      "/usr/share/automake-{version}",
+      "/usr/share/doc/automake-{version}"
+    ]
+  },
+  "description": "The Automake package contains programs for generating Makefiles for use with Autoconf.",
+  "document": {
+    "section_id": "ch-system-automake",
+    "filename": "automake.html",
+    "contents_id": "contents-automake"
+  },
+  "dependencies": {
+    "build": [
+      "Autoconf",
+      "Bash",
+      "Coreutils",
+      "Gettext",
+      "Grep",
+      "M4",
+      "Make",
+      "Perl",
+      "Sed",
+      "Texinfo"
+    ],
+    "runtime": [
+      "Bash",
+      "Coreutils",
+      "Grep",
+      "M4",
+      "Sed",
+      "Texinfo"
+    ],
+    "test": [
+      "Binutils",
+      "Bison",
+      "Bzip2",
+      "DejaGNU",
+      "Diffutils",
+      "Expect",
+      "Findutils",
+      "Flex",
+      "GCC",
+      "Gettext",
+      "Gzip",
+      "Libtool",
+      "Tar"
+    ],
+    "before": [
+      "Coreutils"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "aclocal",
+      "name": "aclocal",
+      "description": "Generates aclocal.m4 files based on the contents of configure.in files"
+    },
+    {
+      "id": "aclocalversion",
+      "name": "aclocal-{version}",
+      "description": "A hard link to aclocal"
+    },
+    {
+      "id": "automake",
+      "name": "automake",
+      "description": "A tool for automatically generating Makefile.in files from Makefile.am files [To create all the Makefile.in files for a package, run this program in the top-level directory. By scanning the configure.in file, it automatically finds each appropriate Makefile.am file and generates the corresponding Makefile.in file.]"
+    },
+    {
+      "id": "automake-version",
+      "name": "automake-{version}",
+      "description": "A hard link to automake"
+    }
+  ]
+}

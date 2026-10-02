@@ -1,0 +1,807 @@
+{
+  "schema_version": 1,
+  "name": "util-linux",
+  "reference": {
+    "lfs_section": "ch-system-util-linux"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --bindir=/usr/bin     \\\n            --libdir=/usr/lib     \\\n            --runstatedir=/run    \\\n            --sbindir=/usr/sbin   \\\n            --disable-chfn-chsh   \\\n            --disable-login       \\\n            --disable-nologin     \\\n            --disable-su          \\\n            --disable-setpriv     \\\n            --disable-runuser     \\\n            --disable-pylibmount  \\\n            --disable-liblastlog2 \\\n            --disable-static      \\\n            --without-python      \\\n            ADJTIME_PATH=/var/lib/hwclock/adjtime \\\n            --docdir=/usr/share/doc/util-linux-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "touch /etc/fstab\nchown -R tester .\nsu tester -c \"make -k check\"",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "addpart",
+      "agetty",
+      "blkdiscard",
+      "blkid",
+      "blkzone",
+      "blockdev",
+      "cal",
+      "cfdisk",
+      "chcpu",
+      "chmem",
+      "choom",
+      "chrt",
+      "col",
+      "colcrt",
+      "colrm",
+      "column",
+      "ctrlaltdel",
+      "delpart",
+      "dmesg",
+      "eject",
+      "fallocate",
+      "fdisk",
+      "fincore",
+      "findfs",
+      "findmnt",
+      "flock",
+      "fsck",
+      "fsck.cramfs",
+      "fsck.minix",
+      "fsfreeze",
+      "fstrim",
+      "getopt",
+      "hardlink",
+      "hexdump",
+      "hwclock",
+      "i386 (link to setarch)",
+      "ionice",
+      "ipcmk",
+      "ipcrm",
+      "ipcs",
+      "irqtop",
+      "isosize",
+      "kill",
+      "last",
+      "lastb (link to last)",
+      "ldattach",
+      "linux32 (link to setarch)",
+      "linux64 (link to setarch)",
+      "logger",
+      "look",
+      "losetup",
+      "lsblk",
+      "lscpu",
+      "lsipc",
+      "lsirq",
+      "lsfd",
+      "lslocks",
+      "lslogins",
+      "lsmem",
+      "lsns",
+      "mcookie",
+      "mesg",
+      "mkfs",
+      "mkfs.bfs",
+      "mkfs.cramfs",
+      "mkfs.minix",
+      "mkswap",
+      "more",
+      "mount",
+      "mountpoint",
+      "namei",
+      "nsenter",
+      "partx",
+      "pivot_root",
+      "prlimit",
+      "readprofile",
+      "rename",
+      "renice",
+      "resizepart",
+      "rev",
+      "rfkill",
+      "rtcwake",
+      "script",
+      "scriptlive",
+      "scriptreplay",
+      "setarch",
+      "setsid",
+      "setterm",
+      "sfdisk",
+      "sulogin",
+      "swaplabel",
+      "swapoff",
+      "swapon",
+      "switch_root",
+      "taskset",
+      "uclampset",
+      "ul",
+      "umount",
+      "uname26 (link to setarch)",
+      "unshare",
+      "utmpdump",
+      "uuidd",
+      "uuidgen",
+      "uuidparse",
+      "wall",
+      "wdctl",
+      "whereis",
+      "wipefs",
+      "x86_64 (link to setarch)",
+      "zramctl"
+    ],
+    "libraries": [
+      "libblkid.so",
+      "libfdisk.so",
+      "libmount.so",
+      "libsmartcols.so",
+      "libuuid.so"
+    ],
+    "directories": [
+      "/usr/include/blkid",
+      "/usr/include/libfdisk",
+      "/usr/include/libmount",
+      "/usr/include/libsmartcols",
+      "/usr/include/uuid",
+      "/usr/share/doc/util-linux-{version}",
+      "/var/lib/hwclock"
+    ]
+  },
+  "description": "The Util-linux package contains miscellaneous utility programs. Among them are utilities for handling file systems, consoles, partitions, and messages.",
+  "document": {
+    "section_id": "ch-system-util-linux",
+    "filename": "util-linux.html",
+    "contents_id": "contents-utillinux"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Diffutils",
+      "File",
+      "Findutils",
+      "Gawk",
+      "GCC",
+      "Gettext",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Ncurses",
+      "Pkgconf",
+      "Sed",
+      "Systemd",
+      "Zlib"
+    ],
+    "runtime": [
+      "Glibc",
+      "Ncurses",
+      "Readline",
+      "Systemd",
+      "Zlib"
+    ],
+    "test": [],
+    "before": [],
+    "optional": [
+      "Asciidoctor",
+      "Libcap-NG",
+      "libeconf",
+      "libuser",
+      "libutempter",
+      "Linux-PAM",
+      "smartmontools",
+      "po4a",
+      "slang"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "addpart",
+      "name": "addpart",
+      "description": "Informs the Linux kernel of new partitions"
+    },
+    {
+      "id": "agetty",
+      "name": "agetty",
+      "description": "Opens a tty port, prompts for a login name, and then invokes the login program"
+    },
+    {
+      "id": "blkdiscard",
+      "name": "blkdiscard",
+      "description": "Discards sectors on a device"
+    },
+    {
+      "id": "blkid",
+      "name": "blkid",
+      "description": "A command line utility to locate and print block device attributes"
+    },
+    {
+      "id": "blkzone",
+      "name": "blkzone",
+      "description": "Is used to manage zoned storage block devices"
+    },
+    {
+      "id": "blockdev",
+      "name": "blockdev",
+      "description": "Allows users to call block device ioctls from the command line"
+    },
+    {
+      "id": "cal",
+      "name": "cal",
+      "description": "Displays a simple calendar"
+    },
+    {
+      "id": "cfdisk",
+      "name": "cfdisk",
+      "description": "Manipulates the partition table of the given device"
+    },
+    {
+      "id": "chcpu",
+      "name": "chcpu",
+      "description": "Modifies the state of CPUs"
+    },
+    {
+      "id": "chmem",
+      "name": "chmem",
+      "description": "Configures memory"
+    },
+    {
+      "id": "choom",
+      "name": "choom",
+      "description": "Displays and adjusts OOM-killer scores, used to determine which process to kill first when Linux is Out Of Memory"
+    },
+    {
+      "id": "chrt",
+      "name": "chrt",
+      "description": "Manipulates real-time attributes of a process"
+    },
+    {
+      "id": "col",
+      "name": "col",
+      "description": "Filters out reverse line feeds"
+    },
+    {
+      "id": "colcrt",
+      "name": "colcrt",
+      "description": "Filters nroff output for terminals that lack some capabilities, such as overstriking and half-lines"
+    },
+    {
+      "id": "colrm",
+      "name": "colrm",
+      "description": "Filters out the given columns"
+    },
+    {
+      "id": "column",
+      "name": "column",
+      "description": "Formats a given file into multiple columns"
+    },
+    {
+      "id": "ctrlaltdel",
+      "name": "ctrlaltdel",
+      "description": "Sets the function of the Ctrl+Alt+Del key combination to a hard or a soft reset"
+    },
+    {
+      "id": "delpart",
+      "name": "delpart",
+      "description": "Asks the Linux kernel to remove a partition"
+    },
+    {
+      "id": "dmesg",
+      "name": "dmesg",
+      "description": "Dumps the kernel boot messages"
+    },
+    {
+      "id": "eject",
+      "name": "eject",
+      "description": "Ejects removable media"
+    },
+    {
+      "id": "fallocate",
+      "name": "fallocate",
+      "description": "Preallocates space to a file"
+    },
+    {
+      "id": "fdisk",
+      "name": "fdisk",
+      "description": "Manipulates the partition table of the given device"
+    },
+    {
+      "id": "fincore",
+      "name": "fincore",
+      "description": "Counts pages of file contents in core"
+    },
+    {
+      "id": "findfs",
+      "name": "findfs",
+      "description": "Finds a file system, either by label or Universally Unique Identifier (UUID)"
+    },
+    {
+      "id": "findmnt",
+      "name": "findmnt",
+      "description": "Is a command line interface to the libmount library for working with mountinfo, fstab and mtab files"
+    },
+    {
+      "id": "flock",
+      "name": "flock",
+      "description": "Acquires a file lock and then executes a command with the lock held"
+    },
+    {
+      "id": "fsck",
+      "name": "fsck",
+      "description": "Is used to check, and optionally repair, file systems"
+    },
+    {
+      "id": "fsck.cramfs",
+      "name": "fsck.cramfs",
+      "description": "Performs a consistency check on the Cramfs file system on the given device"
+    },
+    {
+      "id": "fsck.minix",
+      "name": "fsck.minix",
+      "description": "Performs a consistency check on the Minix file system on the given device"
+    },
+    {
+      "id": "fsfreeze",
+      "name": "fsfreeze",
+      "description": "Is a very simple wrapper around FIFREEZE/FITHAW ioctl kernel driver operations"
+    },
+    {
+      "id": "fstrim",
+      "name": "fstrim",
+      "description": "Discards unused blocks on a mounted filesystem"
+    },
+    {
+      "id": "getopt",
+      "name": "getopt",
+      "description": "Parses options in the given command line"
+    },
+    {
+      "id": "hardlink",
+      "name": "hardlink",
+      "description": "Consolidates duplicate files by creating hard links"
+    },
+    {
+      "id": "hexdump",
+      "name": "hexdump",
+      "description": "Dumps the given file in hexadecimal, decimal, octal, or ascii"
+    },
+    {
+      "id": "hwclock",
+      "name": "hwclock",
+      "description": "Reads or sets the system's hardware clock, also called the Real-Time Clock (RTC) or Basic Input-Output System (BIOS) clock"
+    },
+    {
+      "id": "i386",
+      "name": "i386",
+      "description": "A symbolic link to setarch"
+    },
+    {
+      "id": "ionice",
+      "name": "ionice",
+      "description": "Gets or sets the io scheduling class and priority for a program"
+    },
+    {
+      "id": "ipcmk",
+      "name": "ipcmk",
+      "description": "Creates various IPC resources"
+    },
+    {
+      "id": "ipcrm",
+      "name": "ipcrm",
+      "description": "Removes the given Inter-Process Communication (IPC) resource"
+    },
+    {
+      "id": "ipcs",
+      "name": "ipcs",
+      "description": "Provides IPC status information"
+    },
+    {
+      "id": "irqtop",
+      "name": "irqtop",
+      "description": "Displays kernel interrupt counter information in top(1) style view"
+    },
+    {
+      "id": "isosize",
+      "name": "isosize",
+      "description": "Reports the size of an iso9660 file system"
+    },
+    {
+      "id": "kill",
+      "name": "kill",
+      "description": "Sends signals to processes"
+    },
+    {
+      "id": "last",
+      "name": "last",
+      "description": "Shows which users last logged in (and out), searching back through the /var/log/wtmp file; it also shows system boots, shutdowns, and run-level changes"
+    },
+    {
+      "id": "lastb",
+      "name": "lastb",
+      "description": "Shows the failed login attempts, as logged in /var/log/btmp"
+    },
+    {
+      "id": "ldattach",
+      "name": "ldattach",
+      "description": "Attaches a line discipline to a serial line"
+    },
+    {
+      "id": "linux32",
+      "name": "linux32",
+      "description": "A symbolic link to setarch"
+    },
+    {
+      "id": "linux64",
+      "name": "linux64",
+      "description": "A symbolic link to setarch"
+    },
+    {
+      "id": "logger",
+      "name": "logger",
+      "description": "Enters the given message into the system log"
+    },
+    {
+      "id": "look",
+      "name": "look",
+      "description": "Displays lines that begin with the given string"
+    },
+    {
+      "id": "losetup",
+      "name": "losetup",
+      "description": "Sets up and controls loop devices"
+    },
+    {
+      "id": "lsblk",
+      "name": "lsblk",
+      "description": "Lists information about all or selected block devices in a tree-like format"
+    },
+    {
+      "id": "lscpu",
+      "name": "lscpu",
+      "description": "Prints CPU architecture information"
+    },
+    {
+      "id": "lsfd",
+      "name": "lsfd",
+      "description": "Displays information about open files; replaces lsof"
+    },
+    {
+      "id": "lsipc",
+      "name": "lsipc",
+      "description": "Prints information on IPC facilities currently employed in the system"
+    },
+    {
+      "id": "lsirq",
+      "name": "lsirq",
+      "description": "Displays kernel interrupt counter information"
+    },
+    {
+      "id": "lslocks",
+      "name": "lslocks",
+      "description": "Lists local system locks"
+    },
+    {
+      "id": "lslogins",
+      "name": "lslogins",
+      "description": "Lists information about users, groups and system accounts"
+    },
+    {
+      "id": "lsmem",
+      "name": "lsmem",
+      "description": "Lists the ranges of available memory with their online status"
+    },
+    {
+      "id": "lsns",
+      "name": "lsns",
+      "description": "Lists namespaces"
+    },
+    {
+      "id": "mcookie",
+      "name": "mcookie",
+      "description": "Generates magic cookies (128-bit random hexadecimal numbers) for xauth"
+    },
+    {
+      "id": "mesg",
+      "name": "mesg",
+      "description": "Controls whether other users can send messages to the current user's terminal"
+    },
+    {
+      "id": "mkfs",
+      "name": "mkfs",
+      "description": "Builds a file system on a device (usually a hard disk partition)"
+    },
+    {
+      "id": "mkfs.bfs",
+      "name": "mkfs.bfs",
+      "description": "Creates a Santa Cruz Operations (SCO) bfs file system"
+    },
+    {
+      "id": "mkfs.cramfs",
+      "name": "mkfs.cramfs",
+      "description": "Creates a cramfs file system"
+    },
+    {
+      "id": "mkfs.minix",
+      "name": "mkfs.minix",
+      "description": "Creates a Minix file system"
+    },
+    {
+      "id": "mkswap",
+      "name": "mkswap",
+      "description": "Initializes the given device or file to be used as a swap area"
+    },
+    {
+      "id": "more",
+      "name": "more",
+      "description": "A filter for paging through text one screen at a time"
+    },
+    {
+      "id": "mount",
+      "name": "mount",
+      "description": "Attaches the file system on the given device to a specified directory in the file-system tree"
+    },
+    {
+      "id": "mountpoint",
+      "name": "mountpoint",
+      "description": "Checks if the directory is a mountpoint"
+    },
+    {
+      "id": "namei",
+      "name": "namei",
+      "description": "Shows the symbolic links in the given paths"
+    },
+    {
+      "id": "nsenter",
+      "name": "nsenter",
+      "description": "Runs a program with namespaces of other processes"
+    },
+    {
+      "id": "partx",
+      "name": "partx",
+      "description": "Tells the kernel about the presence and numbering of on-disk partitions"
+    },
+    {
+      "id": "pivot_root",
+      "name": "pivot_root",
+      "description": "Makes the given file system the new root file system of the current process"
+    },
+    {
+      "id": "prlimit",
+      "name": "prlimit",
+      "description": "Gets and sets a process's resource limits"
+    },
+    {
+      "id": "readprofile",
+      "name": "readprofile",
+      "description": "Reads kernel profiling information"
+    },
+    {
+      "id": "rename",
+      "name": "rename",
+      "description": "Renames the given files, replacing a given string with another"
+    },
+    {
+      "id": "renice",
+      "name": "renice",
+      "description": "Alters the priority of running processes"
+    },
+    {
+      "id": "resizepart",
+      "name": "resizepart",
+      "description": "Asks the Linux kernel to resize a partition"
+    },
+    {
+      "id": "rev",
+      "name": "rev",
+      "description": "Reverses the lines of a given file"
+    },
+    {
+      "id": "rfkill",
+      "name": "rfkill",
+      "description": "Tool for enabling and disabling wireless devices"
+    },
+    {
+      "id": "rtcwake",
+      "name": "rtcwake",
+      "description": "Used to enter a system sleep state until the specified wakeup time"
+    },
+    {
+      "id": "script",
+      "name": "script",
+      "description": "Makes a typescript of a terminal session"
+    },
+    {
+      "id": "scriptlive",
+      "name": "scriptlive",
+      "description": "Re-runs session typescripts using timing information"
+    },
+    {
+      "id": "scriptreplay",
+      "name": "scriptreplay",
+      "description": "Plays back typescripts using timing information"
+    },
+    {
+      "id": "setarch",
+      "name": "setarch",
+      "description": "Changes reported architecture in a new program environment, and sets personality flags"
+    },
+    {
+      "id": "setsid",
+      "name": "setsid",
+      "description": "Runs the given program in a new session"
+    },
+    {
+      "id": "setterm",
+      "name": "setterm",
+      "description": "Sets terminal attributes"
+    },
+    {
+      "id": "sfdisk",
+      "name": "sfdisk",
+      "description": "A disk partition table manipulator"
+    },
+    {
+      "id": "sulogin",
+      "name": "sulogin",
+      "description": "Allows root to log in; it is normally invoked by init when the system goes into single user mode"
+    },
+    {
+      "id": "swaplabel",
+      "name": "swaplabel",
+      "description": "Makes changes to the swap area's UUID and label"
+    },
+    {
+      "id": "swapoff",
+      "name": "swapoff",
+      "description": "Disables devices and files for paging and swapping"
+    },
+    {
+      "id": "swapon",
+      "name": "swapon",
+      "description": "Enables devices and files for paging and swapping, and lists the devices and files currently in use"
+    },
+    {
+      "id": "switch_root",
+      "name": "switch_root",
+      "description": "Switches to another filesystem as the root of the mount tree"
+    },
+    {
+      "id": "taskset",
+      "name": "taskset",
+      "description": "Retrieves or sets a process's CPU affinity"
+    },
+    {
+      "id": "uclampset",
+      "name": "uclampset",
+      "description": "Manipulates the utilization clamping attributes of the system or a process"
+    },
+    {
+      "id": "ul",
+      "name": "ul",
+      "description": "A filter for translating underscores into escape sequences indicating underlining for the terminal in use"
+    },
+    {
+      "id": "umount",
+      "name": "umount",
+      "description": "Disconnects a file system from the system's file tree"
+    },
+    {
+      "id": "uname26",
+      "name": "uname26",
+      "description": "A symbolic link to setarch"
+    },
+    {
+      "id": "unshare",
+      "name": "unshare",
+      "description": "Runs a program with some namespaces unshared from parent"
+    },
+    {
+      "id": "utmpdump",
+      "name": "utmpdump",
+      "description": "Displays the content of the given login file in a user-friendly format"
+    },
+    {
+      "id": "uuidd",
+      "name": "uuidd",
+      "description": "A daemon used by the UUID library to generate time-based UUIDs in a secure and guaranteed-unique fashion"
+    },
+    {
+      "id": "uuidgen",
+      "name": "uuidgen",
+      "description": "Creates new UUIDs. Each new UUID is a random number likely to be unique among all UUIDs created, on the local system and on other systems, in the past and in the future, with extremely high probability (2128 UUIDs are possible)"
+    },
+    {
+      "id": "uuidparse",
+      "name": "uuidparse",
+      "description": "A utility to parse unique identifiers"
+    },
+    {
+      "id": "wall",
+      "name": "wall",
+      "description": "Displays the contents of a file or, by default, its standard input, on the terminals of all currently logged in users"
+    },
+    {
+      "id": "wdctl",
+      "name": "wdctl",
+      "description": "Shows hardware watchdog status"
+    },
+    {
+      "id": "whereis",
+      "name": "whereis",
+      "description": "Reports the location of the binary, source, and man page files for the given command"
+    },
+    {
+      "id": "wipefs",
+      "name": "wipefs",
+      "description": "Wipes a filesystem signature from a device"
+    },
+    {
+      "id": "x86_64",
+      "name": "x86_64",
+      "description": "A symbolic link to setarch"
+    },
+    {
+      "id": "zramctl",
+      "name": "zramctl",
+      "description": "A program to set up and control zram (compressed ram disk) devices"
+    },
+    {
+      "id": "libblkid",
+      "name": "libblkid",
+      "description": "Contains routines for device identification and token extraction"
+    },
+    {
+      "id": "libfdisk",
+      "name": "libfdisk",
+      "description": "Contains routines for manipulating partition tables"
+    },
+    {
+      "id": "libmount",
+      "name": "libmount",
+      "description": "Contains routines for block device mounting and unmounting"
+    },
+    {
+      "id": "libsmartcols",
+      "name": "libsmartcols",
+      "description": "Contains routines for aiding screen output in tabular form"
+    },
+    {
+      "id": "libuuid",
+      "name": "libuuid",
+      "description": "Contains routines for generating unique identifiers for objects that may be accessible beyond the local system"
+    }
+  ]
+}

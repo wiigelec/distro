@@ -1,0 +1,239 @@
+{
+  "schema_version": 1,
+  "name": "xz",
+  "reference": {
+    "lfs_section": "ch-system-xz"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr    \\\n            --disable-static \\\n            --docdir=/usr/share/doc/xz-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "lzcat (link to xz)",
+      "lzcmp (link to xzdiff)",
+      "lzdiff (link to xzdiff)",
+      "lzegrep (link to xzgrep)",
+      "lzfgrep (link to xzgrep)",
+      "lzgrep (link to xzgrep)",
+      "lzless (link to xzless)",
+      "lzma (link to xz)",
+      "lzmadec",
+      "lzmainfo",
+      "lzmore (link to xzmore)",
+      "unlzma (link to xz)",
+      "unxz (link to xz)",
+      "xz",
+      "xzcat (link to xz)",
+      "xzcmp (link to xzdiff)",
+      "xzdec",
+      "xzdiff",
+      "xzegrep (link to xzgrep)",
+      "xzfgrep (link to xzgrep)",
+      "xzgrep",
+      "xzless",
+      "xzmore"
+    ],
+    "libraries": [
+      "liblzma.so"
+    ],
+    "directories": [
+      "/usr/include/lzma",
+      "/usr/share/doc/xz-{version}"
+    ]
+  },
+  "description": "The Xz package contains programs for compressing and decompressing files. It provides capabilities for the lzma and the newer xz compression formats. Compressing text files with xz yields a better compression percentage than with the traditional gzip or bzip2 commands.",
+  "document": {
+    "section_id": "ch-system-xz",
+    "filename": "xz.html",
+    "contents_id": "contents-xz"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Diffutils",
+      "GCC",
+      "Glibc",
+      "Make"
+    ],
+    "runtime": [
+      "Glibc"
+    ],
+    "test": [],
+    "before": [
+      "File",
+      "GRUB",
+      "Kmod",
+      "Libelf",
+      "Man-DB",
+      "Systemd"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "lzcat",
+      "name": "lzcat",
+      "description": "Decompresses to standard output"
+    },
+    {
+      "id": "lzcmp",
+      "name": "lzcmp",
+      "description": "Runs cmp on LZMA compressed files"
+    },
+    {
+      "id": "lzdiff",
+      "name": "lzdiff",
+      "description": "Runs diff on LZMA compressed files"
+    },
+    {
+      "id": "lzegrep",
+      "name": "lzegrep",
+      "description": "Runs egrep on LZMA compressed files"
+    },
+    {
+      "id": "lzfgrep",
+      "name": "lzfgrep",
+      "description": "Runs fgrep on LZMA compressed files"
+    },
+    {
+      "id": "lzgrep",
+      "name": "lzgrep",
+      "description": "Runs grep on LZMA compressed files"
+    },
+    {
+      "id": "lzless",
+      "name": "lzless",
+      "description": "Runs less on LZMA compressed files"
+    },
+    {
+      "id": "lzma",
+      "name": "lzma",
+      "description": "Compresses or decompresses files using the LZMA format"
+    },
+    {
+      "id": "lzmadec",
+      "name": "lzmadec",
+      "description": "A small and fast decoder for LZMA compressed files"
+    },
+    {
+      "id": "lzmainfo",
+      "name": "lzmainfo",
+      "description": "Shows information stored in the LZMA compressed file header"
+    },
+    {
+      "id": "lzmore",
+      "name": "lzmore",
+      "description": "Runs more on LZMA compressed files"
+    },
+    {
+      "id": "unlzma",
+      "name": "unlzma",
+      "description": "Decompresses files using the LZMA format"
+    },
+    {
+      "id": "unxz",
+      "name": "unxz",
+      "description": "Decompresses files using the XZ format"
+    },
+    {
+      "id": "xz",
+      "name": "xz",
+      "description": "Compresses or decompresses files using the XZ format"
+    },
+    {
+      "id": "xzcat",
+      "name": "xzcat",
+      "description": "Decompresses to standard output"
+    },
+    {
+      "id": "xzcmp",
+      "name": "xzcmp",
+      "description": "Runs cmp on XZ compressed files"
+    },
+    {
+      "id": "xzdec",
+      "name": "xzdec",
+      "description": "A small and fast decoder for XZ compressed files"
+    },
+    {
+      "id": "xzdiff",
+      "name": "xzdiff",
+      "description": "Runs diff on XZ compressed files"
+    },
+    {
+      "id": "xzegrep",
+      "name": "xzegrep",
+      "description": "Runs egrep on XZ compressed files"
+    },
+    {
+      "id": "xzfgrep",
+      "name": "xzfgrep",
+      "description": "Runs fgrep on XZ compressed files"
+    },
+    {
+      "id": "xzgrep",
+      "name": "xzgrep",
+      "description": "Runs grep on XZ compressed files"
+    },
+    {
+      "id": "xzless",
+      "name": "xzless",
+      "description": "Runs less on XZ compressed files"
+    },
+    {
+      "id": "xzmore",
+      "name": "xzmore",
+      "description": "Runs more on XZ compressed files"
+    },
+    {
+      "id": "liblzma",
+      "name": "liblzma",
+      "description": "The library implementing lossless, block-sorting data compression, using the Lempel-Ziv-Markov chain algorithm"
+    }
+  ]
+}

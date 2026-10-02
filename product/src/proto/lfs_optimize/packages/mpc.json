@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "name": "mpc",
+  "reference": {
+    "lfs_section": "ch-system-mpc"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr    \\\n            --disable-static \\\n            --docdir=/usr/share/doc/mpc-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make\nmake html",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install\nmake install-html",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "libraries": [
+      "libmpc.so"
+    ],
+    "directories": [
+      "/usr/share/doc/mpc-{version}"
+    ]
+  },
+  "description": "The MPC package contains a library for the arithmetic of complex numbers with arbitrarily high precision and correct rounding of the result.",
+  "document": {
+    "section_id": "ch-system-mpc",
+    "filename": "mpc.html",
+    "contents_id": "contents-mpc"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Diffutils",
+      "Gawk",
+      "GCC",
+      "Glibc",
+      "Grep",
+      "GMP",
+      "Make",
+      "MPFR",
+      "Sed",
+      "Texinfo"
+    ],
+    "runtime": [
+      "Glibc",
+      "GMP",
+      "MPFR"
+    ],
+    "test": [],
+    "before": [
+      "GCC"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "libmpc",
+      "name": "libmpc",
+      "description": "Contains complex math functions"
+    }
+  ]
+}

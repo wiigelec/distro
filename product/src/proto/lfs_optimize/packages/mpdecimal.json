@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "name": "mpdecimal",
+  "reference": {
+    "lfs_section": "ch-system-mpdecimal"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr    \\\n            --disable-static \\\n            --docdir=/usr/share/doc/mpdecimal-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check_local",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "libraries": [
+      "libmpdec.so",
+      "libmpdec++.so"
+    ],
+    "directories": [
+      "/usr/share/doc/mpdecimal-{version}"
+    ]
+  },
+  "description": "The mpdecimal package contains fast C/C++ libraries for correctly-rounded arbitrary precision decimal floating point arithmetic.",
+  "document": {
+    "section_id": "ch-system-mpdecimal",
+    "filename": "mpdecimal.html",
+    "contents_id": "contents-mpdecimal"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Diffutils",
+      "Gawk",
+      "GCC",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Sed"
+    ],
+    "runtime": [
+      "GCC",
+      "Glibc"
+    ],
+    "test": [],
+    "before": [
+      "Python"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "libmpdec",
+      "name": "libmpdec",
+      "description": "Contains arbitrary precision decimal floating point arithmetic functions for C programs"
+    },
+    {
+      "id": "libmpdecpp",
+      "name": "libmpdec++",
+      "description": "Contains arbitrary precision decimal floating point arithmetic functions for C++ programs"
+    }
+  ]
+}

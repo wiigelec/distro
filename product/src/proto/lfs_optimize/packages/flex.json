@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "name": "flex",
+  "reference": {
+    "lfs_section": "ch-system-flex"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr    \\\n            --disable-static \\\n            --docdir=/usr/share/doc/flex-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "ln -sv flex   /usr/bin/lex\nln -sv flex.1 /usr/share/man/man1/lex.1",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "flex",
+      "flex++ (link to flex)",
+      "lex (link to flex)"
+    ],
+    "libraries": [
+      "libfl.so"
+    ],
+    "directories": [
+      "/usr/share/doc/flex-{version}"
+    ]
+  },
+  "description": "The Flex package contains a utility for generating programs that recognize patterns in text.",
+  "document": {
+    "section_id": "ch-system-flex",
+    "filename": "flex.html",
+    "contents_id": "contents-flex"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "GCC",
+      "Gettext",
+      "Glibc",
+      "Grep",
+      "M4",
+      "Make",
+      "Patch",
+      "Sed",
+      "Texinfo"
+    ],
+    "runtime": [
+      "Bash",
+      "Glibc",
+      "M4"
+    ],
+    "test": [
+      "Bison",
+      "Gawk"
+    ],
+    "before": [
+      "Binutils",
+      "IProute2",
+      "Kbd",
+      "Kmod",
+      "Man-DB"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "flex",
+      "name": "flex",
+      "description": "A tool for generating programs that recognize patterns in text; it allows for the versatility to specify the rules for pattern-finding, eradicating the need to develop a specialized program"
+    },
+    {
+      "id": "flexpp",
+      "name": "flex++",
+      "description": "An extension of flex, is used for generating C++ code and classes. It is a symbolic link to flex"
+    },
+    {
+      "id": "lex",
+      "name": "lex",
+      "description": "A symbolic link that runs flex in lex emulation mode"
+    },
+    {
+      "id": "libfl",
+      "name": "libfl",
+      "description": "The flex library"
+    }
+  ]
+}

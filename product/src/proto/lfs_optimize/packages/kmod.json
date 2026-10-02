@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "name": "kmod",
+  "reference": {
+    "lfs_section": "ch-system-kmod"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "mkdir -p build\ncd       build\n\nmeson setup --prefix=/usr ..    \\\n            --buildtype=release \\\n            -D manpages=false",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "ninja",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "ninja install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "depmod (link to kmod)",
+      "insmod (link to kmod)",
+      "kmod",
+      "lsmod (link to kmod)",
+      "modinfo (link to kmod)",
+      "modprobe (link to kmod)",
+      "rmmod (link to kmod)"
+    ],
+    "libraries": [
+      "libkmod.so"
+    ]
+  },
+  "description": "The Kmod package contains libraries and utilities for loading kernel modules",
+  "document": {
+    "section_id": "ch-system-kmod",
+    "filename": "kmod.html",
+    "contents_id": "contents-kmod"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Bison",
+      "Coreutils",
+      "Flex",
+      "GCC",
+      "Gettext",
+      "Glibc",
+      "Gzip",
+      "Make",
+      "OpenSSL",
+      "Pkgconf",
+      "Sed",
+      "Xz",
+      "Zlib",
+      "Zstd"
+    ],
+    "runtime": [
+      "Glibc",
+      "Xz",
+      "Zlib"
+    ],
+    "test": [
+      "No test suite available"
+    ],
+    "before": [
+      "Systemd"
+    ],
+    "optional": [
+      "scdoc (for man pages)"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "depmod",
+      "name": "depmod",
+      "description": "Creates a dependency file based on the symbols it finds in the existing set of modules; this dependency file is used by modprobe to automatically load the required modules"
+    },
+    {
+      "id": "insmod",
+      "name": "insmod",
+      "description": "Installs a loadable module in the running kernel"
+    },
+    {
+      "id": "kmod",
+      "name": "kmod",
+      "description": "Loads and unloads kernel modules"
+    },
+    {
+      "id": "lsmod",
+      "name": "lsmod",
+      "description": "Lists currently loaded modules"
+    },
+    {
+      "id": "modinfo",
+      "name": "modinfo",
+      "description": "Examines an object file associated with a kernel module and displays any information that it can glean"
+    },
+    {
+      "id": "modprobe",
+      "name": "modprobe",
+      "description": "Uses a dependency file, created by depmod, to automatically load relevant modules"
+    },
+    {
+      "id": "rmmod",
+      "name": "rmmod",
+      "description": "Unloads modules from the running kernel"
+    },
+    {
+      "id": "libkmod",
+      "name": "libkmod",
+      "description": "This library is used by other programs to load and unload kernel modules"
+    }
+  ]
+}

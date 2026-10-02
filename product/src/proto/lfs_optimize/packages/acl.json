@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "name": "acl",
+  "reference": {
+    "lfs_section": "ch-system-acl"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr    \\\n            --disable-static \\\n            --docdir=/usr/share/doc/acl-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "chacl",
+      "getfacl",
+      "setfacl"
+    ],
+    "libraries": [
+      "libacl.so"
+    ],
+    "directories": [
+      "/usr/include/acl",
+      "/usr/share/doc/acl-{version}"
+    ]
+  },
+  "description": "The Acl package contains utilities to administer Access Control Lists, which are used to define fine-grained discretionary access rights for files and directories.",
+  "document": {
+    "section_id": "ch-system-acl",
+    "filename": "acl.html",
+    "contents_id": "contents-acl"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "GCC",
+      "Gettext",
+      "Grep",
+      "M4",
+      "Make",
+      "Perl",
+      "Sed",
+      "Texinfo"
+    ],
+    "runtime": [
+      "Glibc"
+    ],
+    "test": [
+      "Automake",
+      "Diffutils",
+      "Findutils",
+      "Libtool"
+    ],
+    "before": [
+      "Coreutils",
+      "Sed",
+      "Tar",
+      "Vim"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "chacl",
+      "name": "chacl",
+      "description": "Changes the access control list of a file or directory"
+    },
+    {
+      "id": "getfacl",
+      "name": "getfacl",
+      "description": "Gets file access control lists"
+    },
+    {
+      "id": "setfacl",
+      "name": "setfacl",
+      "description": "Sets file access control lists"
+    },
+    {
+      "id": "libacl",
+      "name": "libacl",
+      "description": "Contains the library functions for manipulating Access Control Lists"
+    }
+  ]
+}

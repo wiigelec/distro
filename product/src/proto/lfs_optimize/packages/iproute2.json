@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "name": "iproute2",
+  "reference": {
+    "lfs_section": "ch-system-iproute2"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "sed -i /ARPD/d Makefile\nrm -fv man/man8/arpd.8",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make NETNS_RUN_DIR=/run/netns",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make SBINDIR=/usr/sbin install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "install -vDm644 COPYING README* -t /usr/share/doc/iproute2-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "bridge",
+      "ctstat (link to lnstat)",
+      "genl",
+      "ifstat",
+      "ip",
+      "lnstat",
+      "nstat",
+      "routel",
+      "rtacct",
+      "rtmon",
+      "rtpr",
+      "rtstat (link to lnstat)",
+      "ss",
+      "tc"
+    ],
+    "directories": [
+      "/etc/iproute2",
+      "/usr/lib/tc",
+      "/usr/share/doc/iproute2-{version}"
+    ]
+  },
+  "description": "The IPRoute2 package contains programs for basic and advanced IPV4-based networking.",
+  "document": {
+    "section_id": "ch-system-iproute2",
+    "filename": "iproute2.html",
+    "contents_id": "contents-iproute2"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Bison",
+      "Coreutils",
+      "Flex",
+      "GCC",
+      "Glibc",
+      "Make",
+      "Libcap",
+      "Libelf",
+      "Linux API Headers",
+      "Pkgconf",
+      "Zlib"
+    ],
+    "runtime": [
+      "Bash",
+      "Coreutils",
+      "Glibc",
+      "Libcap",
+      "Libelf",
+      "Zlib"
+    ],
+    "test": [
+      "No test suite available"
+    ],
+    "before": [],
+    "optional": [
+      "Berkeley DB",
+      "iptables",
+      "libbpf",
+      "libmnl",
+      "libtirpc"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "bridge",
+      "name": "bridge",
+      "description": "Configures network bridges"
+    },
+    {
+      "id": "ctstat",
+      "name": "ctstat",
+      "description": "Connection status utility"
+    },
+    {
+      "id": "genl",
+      "name": "genl",
+      "description": "Generic netlink utility front end"
+    },
+    {
+      "id": "ifstat",
+      "name": "ifstat",
+      "description": "Shows interface statistics, including the number of packets transmitted and received, by interface"
+    },
+    {
+      "id": "ip",
+      "name": "ip",
+      "description": "The main executable. It has several different functions, including these:"
+    },
+    {
+      "id": "lnstat",
+      "name": "lnstat",
+      "description": "Provides Linux network statistics; it is a generalized and more feature-complete replacement for the old rtstat program"
+    },
+    {
+      "id": "nstat",
+      "name": "nstat",
+      "description": "Displays network statistics"
+    },
+    {
+      "id": "routel",
+      "name": "routel",
+      "description": "A component of ip route, for listing the routing tables"
+    },
+    {
+      "id": "rtacct",
+      "name": "rtacct",
+      "description": "Displays the contents of /proc/net/rt_acct"
+    },
+    {
+      "id": "rtmon",
+      "name": "rtmon",
+      "description": "Route monitoring utility"
+    },
+    {
+      "id": "rtpr",
+      "name": "rtpr",
+      "description": "Converts the output of ip -o into a readable form"
+    },
+    {
+      "id": "rtstat",
+      "name": "rtstat",
+      "description": "Route status utility"
+    },
+    {
+      "id": "ss",
+      "name": "ss",
+      "description": "Similar to the netstat command; shows active connections"
+    },
+    {
+      "id": "tc",
+      "name": "tc",
+      "description": "Traffic control for Quality of Service (QoS) and Class of Service (CoS) implementations"
+    }
+  ]
+}

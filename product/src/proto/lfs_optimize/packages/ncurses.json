@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "name": "ncurses",
+  "reference": {
+    "lfs_section": "ch-system-ncurses"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr           \\\n            --mandir=/usr/share/man \\\n            --with-shared           \\\n            --without-debug         \\\n            --without-normal        \\\n            --with-cxx-shared       \\\n            --enable-pc-files       \\\n            --with-pkg-config-libdir=/usr/lib/pkgconfig",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make DESTDIR=$PWD/dest install\nsed -e 's/^#if.*XOPEN.*$/#if 1/' \\\n    -i dest/usr/include/curses.h\ncp --remove-destination -av dest/* /",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "for lib in ncurses form panel menu ; do\n    ln -sfv lib${{lib}}w.so /usr/lib/lib${{lib}}.so\n    ln -sfv ${{lib}}w.pc    /usr/lib/pkgconfig/${{lib}}.pc\ndone",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "ln -sfv libncursesw.so /usr/lib/libcurses.so",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "cp -v -R doc -T /usr/share/doc/ncurses-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "captoinfo (link to tic)",
+      "clear",
+      "infocmp",
+      "infotocap (link to tic)",
+      "ncursesw6-config",
+      "reset (link to tset)",
+      "tabs",
+      "tic",
+      "toe",
+      "tput",
+      "tset"
+    ],
+    "libraries": [
+      "libcurses.so (symlink)",
+      "libform.so (symlink)",
+      "libformw.so",
+      "libmenu.so (symlink)",
+      "libmenuw.so",
+      "libncurses.so (symlink)",
+      "libncursesw.so",
+      "libncurses++w.so",
+      "libpanel.so (symlink)",
+      "libpanelw.so"
+    ],
+    "directories": [
+      "/usr/share/tabset",
+      "/usr/share/terminfo",
+      "/usr/share/doc/ncurses-{version}"
+    ]
+  },
+  "description": "The Ncurses package contains libraries for terminal-independent handling of character screens.",
+  "document": {
+    "section_id": "ch-system-ncurses",
+    "filename": "ncurses.html",
+    "contents_id": "contents-ncurses"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Diffutils",
+      "Gawk",
+      "GCC",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Patch",
+      "Sed"
+    ],
+    "runtime": [
+      "Glibc"
+    ],
+    "test": [
+      "No test suite available"
+    ],
+    "before": [
+      "Bash",
+      "GRUB",
+      "Inetutils",
+      "Less",
+      "Procps-ng",
+      "Psmisc",
+      "Readline",
+      "Texinfo",
+      "Util-linux",
+      "Vim"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "captoinfo",
+      "name": "captoinfo",
+      "description": "Converts a termcap description into a terminfo description"
+    },
+    {
+      "id": "clear",
+      "name": "clear",
+      "description": "Clears the screen, if possible"
+    },
+    {
+      "id": "infocmp",
+      "name": "infocmp",
+      "description": "Compares or prints out terminfo descriptions"
+    },
+    {
+      "id": "infotocap",
+      "name": "infotocap",
+      "description": "Converts a terminfo description into a termcap description"
+    },
+    {
+      "id": "ncursesw6-config",
+      "name": "ncursesw6-config",
+      "description": "Provides configuration information for ncurses"
+    },
+    {
+      "id": "reset",
+      "name": "reset",
+      "description": "Reinitializes a terminal to its default values"
+    },
+    {
+      "id": "tabs",
+      "name": "tabs",
+      "description": "Clears and sets tab stops on a terminal"
+    },
+    {
+      "id": "tic",
+      "name": "tic",
+      "description": "The terminfo entry-description compiler that translates a terminfo file from source format into the binary format needed for the ncurses library routines [A terminfo file contains information on the capabilities of a certain terminal.]"
+    },
+    {
+      "id": "toe",
+      "name": "toe",
+      "description": "Lists all available terminal types, giving the primary name and description for each"
+    },
+    {
+      "id": "tput",
+      "name": "tput",
+      "description": "Makes the values of terminal-dependent capabilities available to the shell; it can also be used to reset or initialize a terminal or report its long name"
+    },
+    {
+      "id": "tset",
+      "name": "tset",
+      "description": "Can be used to initialize terminals"
+    },
+    {
+      "id": "libncursesw",
+      "name": "libncursesw",
+      "description": "Contains functions to display text in many complex ways on a terminal screen; a good example of the use of these functions is the menu displayed during the kernel's make menuconfig"
+    },
+    {
+      "id": "libncurses__w",
+      "name": "libncurses++w",
+      "description": "Contains C++ binding for other libraries in this package"
+    },
+    {
+      "id": "libformw",
+      "name": "libformw",
+      "description": "Contains functions to implement forms"
+    },
+    {
+      "id": "libmenuw",
+      "name": "libmenuw",
+      "description": "Contains functions to implement menus"
+    },
+    {
+      "id": "libpanelw",
+      "name": "libpanelw",
+      "description": "Contains functions to implement panels"
+    }
+  ]
+}

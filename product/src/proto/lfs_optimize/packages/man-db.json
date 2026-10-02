@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "name": "man-db",
+  "reference": {
+    "lfs_section": "ch-system-man-db"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr                         \\\n            --docdir=/usr/share/doc/man-db-{version} \\\n            --sysconfdir=/etc                     \\\n            --disable-setuid                      \\\n            --enable-cache-owner=bin              \\\n            --with-browser=/usr/bin/lynx          \\\n            --with-vgrind=/usr/bin/vgrind         \\\n            --with-grap=/usr/bin/grap",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "accessdb",
+      "apropos (link to whatis)",
+      "catman",
+      "lexgrog",
+      "man",
+      "man-recode",
+      "mandb",
+      "manpath",
+      "whatis"
+    ],
+    "libraries": [
+      "libman.so",
+      "libmandb.so (both in /usr/lib/man-db)"
+    ],
+    "directories": [
+      "/usr/lib/man-db",
+      "/usr/libexec/man-db",
+      "/usr/share/doc/man-db-{version}"
+    ]
+  },
+  "description": "The Man-DB package contains programs for finding and viewing man pages.",
+  "document": {
+    "section_id": "ch-system-man-db",
+    "filename": "man-db.html",
+    "contents_id": "contents-man-db"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Bzip2",
+      "Coreutils",
+      "Flex",
+      "GCC",
+      "GDBM",
+      "Gettext",
+      "Glibc",
+      "Grep",
+      "Groff",
+      "Gzip",
+      "Less",
+      "Libpipeline",
+      "Make",
+      "Pkgconf",
+      "Sed",
+      "Systemd",
+      "Xz"
+    ],
+    "runtime": [
+      "Bash",
+      "GDBM",
+      "Groff",
+      "Glibc",
+      "Gzip",
+      "Less",
+      "Libpipeline",
+      "Zlib"
+    ],
+    "test": [
+      "Util-linux"
+    ],
+    "before": [],
+    "optional": [
+      "libseccomp",
+      "po4a"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "accessdb",
+      "name": "accessdb",
+      "description": "Dumps the whatis database contents in human-readable form"
+    },
+    {
+      "id": "apropos",
+      "name": "apropos",
+      "description": "Searches the whatis database and displays the short descriptions of system commands that contain a given string"
+    },
+    {
+      "id": "catman",
+      "name": "catman",
+      "description": "Creates or updates the pre-formatted manual pages"
+    },
+    {
+      "id": "lexgrog",
+      "name": "lexgrog",
+      "description": "Displays one-line summary information about a given manual page"
+    },
+    {
+      "id": "man",
+      "name": "man",
+      "description": "Formats and displays the requested manual page"
+    },
+    {
+      "id": "man-recode",
+      "name": "man-recode",
+      "description": "Converts manual pages to another encoding"
+    },
+    {
+      "id": "mandb",
+      "name": "mandb",
+      "description": "Creates or updates the whatis database"
+    },
+    {
+      "id": "manpath",
+      "name": "manpath",
+      "description": "Displays the contents of $MANPATH or (if $MANPATH is not set) a suitable search path based on the settings in man.conf and the user's environment"
+    },
+    {
+      "id": "whatis",
+      "name": "whatis",
+      "description": "Searches the whatis database and displays the short descriptions of system commands that contain the given keyword as a separate word"
+    },
+    {
+      "id": "libman",
+      "name": "libman",
+      "description": "Contains run-time support for man"
+    },
+    {
+      "id": "libmandb",
+      "name": "libmandb",
+      "description": "Contains run-time support for man"
+    }
+  ]
+}

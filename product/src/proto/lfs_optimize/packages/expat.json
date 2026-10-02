@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "name": "expat",
+  "reference": {
+    "lfs_section": "ch-system-expat"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr    \\\n            --disable-static \\\n            --docdir=/usr/share/doc/expat-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "install -v -m644 doc/*.{{html,css}} /usr/share/doc/expat-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "xmlwf"
+    ],
+    "libraries": [
+      "libexpat.so"
+    ],
+    "directories": [
+      "/usr/share/doc/expat-{version}"
+    ]
+  },
+  "description": "The Expat package contains a stream oriented C library for parsing XML.",
+  "document": {
+    "section_id": "ch-system-expat",
+    "filename": "expat.html",
+    "contents_id": "contents-expat"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Gawk",
+      "GCC",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Sed"
+    ],
+    "runtime": [
+      "Glibc"
+    ],
+    "test": [],
+    "before": [
+      "Python",
+      "XML::Parser"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "xmlwf",
+      "name": "xmlwf",
+      "description": "Is a non-validating utility to check whether or not XML documents are well formed"
+    },
+    {
+      "id": "libexpat",
+      "name": "libexpat",
+      "description": "Contains API functions for parsing XML"
+    }
+  ]
+}

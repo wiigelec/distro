@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "name": "vim",
+  "reference": {
+    "lfs_section": "ch-system-vim"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "echo '#define SYS_VIMRC_FILE \"/etc/vimrc\"' >> src/feature.h",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "chown -R tester .\nsed '/test_plugin_glvs/d' -i src/testdir/Make_all.mak",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "su tester -c \"TERM=xterm-256color LANG=en_US.UTF-8 make -j1 test\" \\\n   &> vim-test.log",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "ln -sv vim /usr/bin/vi\nfor L in  /usr/share/man/{{,*/}}man1/vim.1; do\n    ln -sv vim.1 $(dirname $L)/vi.1\ndone",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "ln -sv ../vim/vim92/doc /usr/share/doc/vim-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "ex (link to vim)",
+      "rview (link to vim)",
+      "rvim (link to vim)",
+      "vi (link to vim)",
+      "view (link to vim)",
+      "vim",
+      "vimdiff (link to vim)",
+      "vimtutor",
+      "xxd"
+    ],
+    "directories": [
+      "/usr/share/vim"
+    ]
+  },
+  "description": "The Vim package contains a powerful text editor.",
+  "document": {
+    "section_id": "ch-system-vim",
+    "filename": "vim.html",
+    "contents_id": "contents-vim"
+  },
+  "dependencies": {
+    "build": [
+      "Acl",
+      "Attr",
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Diffutils",
+      "GCC",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Ncurses",
+      "Sed"
+    ],
+    "runtime": [
+      "Acl",
+      "Attr",
+      "Glibc",
+      "Python",
+      "Ncurses",
+      "Tcl"
+    ],
+    "test": [],
+    "before": [],
+    "optional": [
+      "Xorg",
+      "GTK+2",
+      "LessTif",
+      "Ruby",
+      "GPM"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "ex",
+      "name": "ex",
+      "description": "Starts vim in ex mode"
+    },
+    {
+      "id": "rview",
+      "name": "rview",
+      "description": "Is a restricted version of view; no shell commands can be started and view cannot be suspended"
+    },
+    {
+      "id": "rvim",
+      "name": "rvim",
+      "description": "Is a restricted version of vim; no shell commands can be started and vim cannot be suspended"
+    },
+    {
+      "id": "vi",
+      "name": "vi",
+      "description": "Link to vim"
+    },
+    {
+      "id": "view",
+      "name": "view",
+      "description": "Starts vim in read-only mode"
+    },
+    {
+      "id": "vim",
+      "name": "vim",
+      "description": "Is the editor"
+    },
+    {
+      "id": "vimdiff",
+      "name": "vimdiff",
+      "description": "Edits two or three versions of a file with vim and shows differences"
+    },
+    {
+      "id": "vimtutor",
+      "name": "vimtutor",
+      "description": "Teaches the basic keys and commands of vim"
+    },
+    {
+      "id": "xxd",
+      "name": "xxd",
+      "description": "Creates a hex dump of the given file; it can also perform the inverse operation, so it can be used for binary patching"
+    }
+  ]
+}

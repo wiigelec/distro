@@ -1,0 +1,347 @@
+{
+  "schema_version": 1,
+  "name": "e2fsprogs",
+  "reference": {
+    "lfs_section": "ch-system-e2fsprogs"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "mkdir -v build\ncd       build",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "../configure --prefix=/usr       \\\n             --sysconfdir=/etc   \\\n             --enable-elf-shlibs \\\n             --disable-libblkid  \\\n             --disable-libuuid   \\\n             --disable-uuidd     \\\n             --disable-fsck",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "rm -fv /usr/lib/{{libcom_err,libe2p,libext2fs,libss}}.a",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "gunzip -v /usr/share/info/libext2fs.info.gz\ninstall-info --dir-file=/usr/share/info/dir /usr/share/info/libext2fs.info",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "makeinfo -o      doc/com_err.info ../lib/et/com_err.texinfo\ninstall -v -m644 doc/com_err.info /usr/share/info\ninstall-info --dir-file=/usr/share/info/dir /usr/share/info/com_err.info",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "badblocks",
+      "chattr",
+      "compile_et",
+      "debugfs",
+      "dumpe2fs",
+      "e2freefrag",
+      "e2fsck",
+      "e2image",
+      "e2label",
+      "e2mmpstatus",
+      "e2scrub",
+      "e2scrub_all",
+      "e2undo",
+      "e4crypt",
+      "e4defrag",
+      "filefrag",
+      "fsck.ext2",
+      "fsck.ext3",
+      "fsck.ext4",
+      "logsave",
+      "lsattr",
+      "mk_cmds",
+      "mke2fs",
+      "mkfs.ext2",
+      "mkfs.ext3",
+      "mkfs.ext4",
+      "mklost+found",
+      "resize2fs",
+      "tune2fs"
+    ],
+    "libraries": [
+      "libcom_err.so",
+      "libe2p.so",
+      "libext2fs.so",
+      "libss.so"
+    ],
+    "directories": [
+      "/usr/include/e2p",
+      "/usr/include/et",
+      "/usr/include/ext2fs",
+      "/usr/include/ss",
+      "/usr/lib/e2fsprogs",
+      "/usr/share/et",
+      "/usr/share/ss"
+    ]
+  },
+  "description": "The E2fsprogs package contains the utilities for handling the ext2 file system. It also supports the ext3 and ext4 journaling file systems.",
+  "document": {
+    "section_id": "ch-system-e2fsprogs",
+    "filename": "e2fsprogs.html",
+    "contents_id": "contents-e2fsprogs"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Diffutils",
+      "Gawk",
+      "GCC",
+      "Glibc",
+      "Grep",
+      "Gzip",
+      "Make",
+      "Pkgconf",
+      "Sed",
+      "Systemd",
+      "Texinfo",
+      "Util-linux"
+    ],
+    "runtime": [
+      "Glibc",
+      "Util-linux"
+    ],
+    "test": [
+      "Procps-ng",
+      "Psmisc"
+    ],
+    "before": [],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "badblocks",
+      "name": "badblocks",
+      "description": "Searches a device (usually a disk partition) for bad blocks"
+    },
+    {
+      "id": "chattr",
+      "name": "chattr",
+      "description": "Changes the attributes of files on ext{{234}} file systems"
+    },
+    {
+      "id": "compile_et",
+      "name": "compile_et",
+      "description": "An error table compiler; it converts a table of error-code names and messages into a C source file suitable for use with the com_err library"
+    },
+    {
+      "id": "debugfs",
+      "name": "debugfs",
+      "description": "A file system debugger; it can be used to examine and change the state of ext{{234}} file systems"
+    },
+    {
+      "id": "dumpe2fs",
+      "name": "dumpe2fs",
+      "description": "Prints the super block and blocks group information for the file system present on a given device"
+    },
+    {
+      "id": "e2freefrag",
+      "name": "e2freefrag",
+      "description": "Reports free space fragmentation information"
+    },
+    {
+      "id": "e2fsck",
+      "name": "e2fsck",
+      "description": "Is used to check and optionally repair ext{{234}} file systems"
+    },
+    {
+      "id": "e2image",
+      "name": "e2image",
+      "description": "Is used to save critical ext{{234}} file system data to a file"
+    },
+    {
+      "id": "e2label",
+      "name": "e2label",
+      "description": "Displays or changes the file system label on the ext{{234}} file system on a given device"
+    },
+    {
+      "id": "e2mmpstatus",
+      "name": "e2mmpstatus",
+      "description": "Checks MMP (Multiple Mount Protection) status of an ext4 file system"
+    },
+    {
+      "id": "e2scrub",
+      "name": "e2scrub",
+      "description": "Checks the contents of a mounted ext{{234}} file system"
+    },
+    {
+      "id": "e2scrub_all",
+      "name": "e2scrub_all",
+      "description": "Checks all mounted ext{{234}} file systems for errors"
+    },
+    {
+      "id": "e2undo",
+      "name": "e2undo",
+      "description": "Replays the undo log for an ext{{234}} file system found on a device. [This can be used to undo a failed operation by an E2fsprogs program.]"
+    },
+    {
+      "id": "e4crypt",
+      "name": "e4crypt",
+      "description": "Ext4 file system encryption utility"
+    },
+    {
+      "id": "e4defrag",
+      "name": "e4defrag",
+      "description": "Online defragmenter for ext4 file systems"
+    },
+    {
+      "id": "filefrag",
+      "name": "filefrag",
+      "description": "Reports on how badly fragmented a particular file might be"
+    },
+    {
+      "id": "fsck.ext2",
+      "name": "fsck.ext2",
+      "description": "By default checks ext2 file systems and is a hard link to e2fsck"
+    },
+    {
+      "id": "fsck.ext3",
+      "name": "fsck.ext3",
+      "description": "By default checks ext3 file systems and is a hard link to e2fsck"
+    },
+    {
+      "id": "fsck.ext4",
+      "name": "fsck.ext4",
+      "description": "By default checks ext4 file systems and is a hard link to e2fsck"
+    },
+    {
+      "id": "logsave",
+      "name": "logsave",
+      "description": "Saves the output of a command in a log file"
+    },
+    {
+      "id": "lsattr",
+      "name": "lsattr",
+      "description": "Lists the attributes of files on a second extended file system"
+    },
+    {
+      "id": "mk_cmds",
+      "name": "mk_cmds",
+      "description": "Converts a table of command names and help messages into a C source file suitable for use with the libss subsystem library"
+    },
+    {
+      "id": "mke2fs",
+      "name": "mke2fs",
+      "description": "Creates an ext{{234}} file system on the given device"
+    },
+    {
+      "id": "mkfs.ext2",
+      "name": "mkfs.ext2",
+      "description": "By default creates ext2 file systems and is a hard link to mke2fs"
+    },
+    {
+      "id": "mkfs.ext3",
+      "name": "mkfs.ext3",
+      "description": "By default creates ext3 file systems and is a hard link to mke2fs"
+    },
+    {
+      "id": "mkfs.ext4",
+      "name": "mkfs.ext4",
+      "description": "By default creates ext4 file systems and is a hard link to mke2fs"
+    },
+    {
+      "id": "mklost-found",
+      "name": "mklost+found",
+      "description": "Creates a lost+found directory on an ext{{234}} file system; it pre-allocates disk blocks to this directory to lighten the task of e2fsck"
+    },
+    {
+      "id": "resize2fs",
+      "name": "resize2fs",
+      "description": "Can be used to enlarge or shrink ext{{234}} file systems"
+    },
+    {
+      "id": "tune2fs",
+      "name": "tune2fs",
+      "description": "Adjusts tunable file system parameters on ext{{234}} file systems"
+    },
+    {
+      "id": "libcom_err",
+      "name": "libcom_err",
+      "description": "The common error display routine"
+    },
+    {
+      "id": "libe2p",
+      "name": "libe2p",
+      "description": "Used by dumpe2fs, chattr, and lsattr"
+    },
+    {
+      "id": "libext2fs",
+      "name": "libext2fs",
+      "description": "Contains routines to enable user-level programs to manipulate ext{{234}} file systems"
+    },
+    {
+      "id": "libss",
+      "name": "libss",
+      "description": "Used by debugfs"
+    }
+  ]
+}

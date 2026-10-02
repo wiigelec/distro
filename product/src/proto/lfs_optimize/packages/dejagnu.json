@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "name": "dejagnu",
+  "reference": {
+    "lfs_section": "ch-system-dejagnu"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "mkdir -v build\ncd       build",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "../configure --prefix=/usr\nmakeinfo --html --no-split -o doc/dejagnu.html ../doc/dejagnu.texi\nmakeinfo --plaintext       -o doc/dejagnu.txt  ../doc/dejagnu.texi",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install\ninstall -v -dm755  /usr/share/doc/dejagnu-{version}\ninstall -v -m644   doc/dejagnu.{{html,txt}} /usr/share/doc/dejagnu-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "dejagnu",
+      "runtest"
+    ]
+  },
+  "description": "The DejaGnu package contains a framework for running test suites on GNU tools. It is written in expect, which itself uses Tcl (Tool Command Language).",
+  "document": {
+    "section_id": "ch-system-dejagnu",
+    "filename": "dejagnu.html",
+    "contents_id": "contents-dejagnu"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Coreutils",
+      "Diffutils",
+      "Expect",
+      "GCC",
+      "Grep",
+      "Make",
+      "Sed",
+      "Texinfo"
+    ],
+    "runtime": [
+      "Expect",
+      "Bash"
+    ],
+    "test": [],
+    "before": [],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "dejagnu",
+      "name": "dejagnu",
+      "description": "DejaGNU auxiliary command launcher"
+    },
+    {
+      "id": "runtest",
+      "name": "runtest",
+      "description": "A wrapper script that locates the proper expect shell and then runs DejaGNU"
+    }
+  ]
+}

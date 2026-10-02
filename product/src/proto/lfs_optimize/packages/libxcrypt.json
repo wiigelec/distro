@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "name": "libxcrypt",
+  "reference": {
+    "lfs_section": "ch-system-libxcrypt"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "sed -i '/strchr/s/const//' lib/crypt-{{sm3,gost}}-yescrypt.c",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr                \\\n            --enable-hashes=strong,glibc \\\n            --enable-obsolete-api=no     \\\n            --disable-static             \\\n            --disable-failure-tokens",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "libraries": [
+      "libcrypt.so"
+    ]
+  },
+  "description": "The Libxcrypt package contains a modern library for one-way hashing of passwords.",
+  "document": {
+    "section_id": "ch-system-libxcrypt",
+    "filename": "libxcrypt.html",
+    "contents_id": "contents-libxcrypt"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Diffutils",
+      "Gawk",
+      "GCC",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Perl",
+      "Sed"
+    ],
+    "runtime": [
+      "Glibc"
+    ],
+    "test": [],
+    "before": [
+      "Perl",
+      "Python",
+      "Shadow",
+      "Systemd"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "libcrypt",
+      "name": "libcrypt",
+      "description": "Contains functions to hash passwords"
+    }
+  ]
+}

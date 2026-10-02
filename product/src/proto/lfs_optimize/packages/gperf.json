@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "name": "gperf",
+  "reference": {
+    "lfs_section": "ch-system-gperf"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr --docdir=/usr/share/doc/gperf-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "gperf"
+    ],
+    "directories": [
+      "/usr/share/doc/gperf-{version}"
+    ]
+  },
+  "description": "Gperf generates a perfect hash function from a key set.",
+  "document": {
+    "section_id": "ch-system-gperf",
+    "filename": "gperf.html",
+    "contents_id": "contents-gperf"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "GCC",
+      "Glibc",
+      "Make"
+    ],
+    "runtime": [
+      "GCC",
+      "Glibc"
+    ],
+    "test": [
+      "Diffutils",
+      "Expect"
+    ],
+    "before": [],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "gperf",
+      "name": "gperf",
+      "description": "Generates a perfect hash from a key set"
+    }
+  ]
+}

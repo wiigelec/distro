@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "name": "Python",
+  "reference": {
+    "lfs_section": "ch-system-Python"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "patch -Np1 -i ../Python-{version}-openssl_4-1.patch",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr          \\\n            --enable-shared        \\\n            --with-system-expat    \\\n            --enable-optimizations \\\n            --without-static-libpython",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make test TESTOPTS=\"--timeout 120\"",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "cat > /etc/pip.conf << EOF\n[global]\nroot-user-action = ignore\ndisable-pip-version-check = true\nEOF",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "install -v -dm755 /usr/share/doc/python-{version}/html\n\ntar --strip-components=1  \\\n    --no-same-owner       \\\n    --no-same-permissions \\\n    -C /usr/share/doc/python-{version}/html \\\n    -xvf ../python-{version}-docs-html.tar.bz2",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "idle3",
+      "pip3",
+      "pydoc3",
+      "python3",
+      "python3-config"
+    ],
+    "libraries": [
+      "libpython3.14.so",
+      "libpython3.so"
+    ],
+    "directories": [
+      "/usr/include/python3.14",
+      "/usr/lib/python3",
+      "/usr/share/doc/python-{version}"
+    ]
+  },
+  "description": "The Python 3 package contains the Python development environment. It is useful for object-oriented programming, writing scripts, prototyping large programs, and developing entire applications. Python is an interpreted computer language.",
+  "document": {
+    "section_id": "ch-system-Python",
+    "filename": "Python.html",
+    "contents_id": "contents-python"
+  },
+  "dependencies": {
+    "build": [],
+    "runtime": [],
+    "test": [],
+    "before": [],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "idle3",
+      "name": "idle3",
+      "description": "is a wrapper script that opens a Python aware GUI editor. For this script to run, you must have installed Tk before Python, so that the Tkinter Python module is built."
+    },
+    {
+      "id": "pip3",
+      "name": "pip3",
+      "description": "The package installer for Python. You can use pip to install packages from Python Package Index and other indexes."
+    },
+    {
+      "id": "pydoc3",
+      "name": "pydoc3",
+      "description": "is the Python documentation tool"
+    },
+    {
+      "id": "python3",
+      "name": "python3",
+      "description": "is the interpreter for Python, an interpreted, interactive, object-oriented programming language"
+    }
+  ],
+  "dependency_source_note": "No dependency entry for this package is present in the book dependency appendix."
+}

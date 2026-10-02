@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "name": "gmp",
+  "reference": {
+    "lfs_section": "ch-system-gmp"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "sed -i '/long long t1;/,+1s/()/(...)/' configure",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr    \\\n            --enable-cxx     \\\n            --disable-static \\\n            --docdir=/usr/share/doc/gmp-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make\nmake html",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "cat $(find -name '*.log') | grep -c ^PASS",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install\nmake install-html",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "libraries": [
+      "libgmp.so",
+      "libgmpxx.so"
+    ],
+    "directories": [
+      "/usr/share/doc/gmp-{version}"
+    ]
+  },
+  "description": "The GMP package contains math libraries. These have useful functions for arbitrary precision arithmetic.",
+  "document": {
+    "section_id": "ch-system-gmp",
+    "filename": "gmp.html",
+    "contents_id": "contents-gmp"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Diffutils",
+      "Gawk",
+      "GCC",
+      "Glibc",
+      "Grep",
+      "M4",
+      "Make",
+      "Sed",
+      "Texinfo"
+    ],
+    "runtime": [
+      "GCC",
+      "Glibc"
+    ],
+    "test": [],
+    "before": [
+      "MPFR",
+      "GCC"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "libgmp",
+      "name": "libgmp",
+      "description": "Contains precision math functions"
+    },
+    {
+      "id": "libgmpxx",
+      "name": "libgmpxx",
+      "description": "Contains C++ precision math functions"
+    }
+  ]
+}

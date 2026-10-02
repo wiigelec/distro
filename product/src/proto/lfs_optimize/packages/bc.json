@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "name": "bc",
+  "reference": {
+    "lfs_section": "ch-system-bc"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "CC='gcc -std=c99' ./configure --prefix=/usr -G -O3 -r",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make test",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "bc",
+      "dc"
+    ]
+  },
+  "description": "The Bc package contains an arbitrary precision numeric processing language.",
+  "document": {
+    "section_id": "ch-system-bc",
+    "filename": "bc.html",
+    "contents_id": "contents-bc"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "GCC",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Readline"
+    ],
+    "runtime": [
+      "Glibc",
+      "Ncurses",
+      "Readline"
+    ],
+    "test": [
+      "Gawk"
+    ],
+    "before": [
+      "Linux"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "bc",
+      "name": "bc",
+      "description": "A command line calculator"
+    },
+    {
+      "id": "dc",
+      "name": "dc",
+      "description": "A reverse-polish command line calculator"
+    }
+  ]
+}

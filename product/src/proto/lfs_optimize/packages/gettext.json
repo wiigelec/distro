@@ -1,0 +1,275 @@
+{
+  "schema_version": 1,
+  "name": "gettext",
+  "reference": {
+    "lfs_section": "ch-system-gettext"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr    \\\n            --disable-static \\\n            --docdir=/usr/share/doc/gettext-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install\nchmod -v 0755 /usr/lib/preloadable_libintl.so",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "autopoint",
+      "envsubst",
+      "gettext",
+      "gettext.sh",
+      "gettextize",
+      "msgattrib",
+      "msgcat",
+      "msgcmp",
+      "msgcomm",
+      "msgconv",
+      "msgen",
+      "msgexec",
+      "msgfilter",
+      "msgfmt",
+      "msggrep",
+      "msginit",
+      "msgmerge",
+      "msgunfmt",
+      "msguniq",
+      "ngettext",
+      "recode-sr-latin",
+      "xgettext"
+    ],
+    "libraries": [
+      "libasprintf.so",
+      "libgettextlib.so",
+      "libgettextpo.so",
+      "libgettextsrc.so",
+      "libtextstyle.so",
+      "preloadable_libintl.so"
+    ],
+    "directories": [
+      "/usr/lib/gettext",
+      "/usr/share/doc/gettext-{version}",
+      "/usr/share/gettext",
+      "/usr/share/gettext-{version}"
+    ]
+  },
+  "description": "The Gettext package contains utilities for internationalization and localization. These allow programs to be compiled with NLS (Native Language Support), enabling them to output messages in the user's native language.",
+  "document": {
+    "section_id": "ch-system-gettext",
+    "filename": "gettext.html",
+    "contents_id": "contents-gettext"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Gawk",
+      "GCC",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Ncurses",
+      "Sed",
+      "Texinfo"
+    ],
+    "runtime": [
+      "Acl",
+      "Bash",
+      "Gcc",
+      "Glibc"
+    ],
+    "test": [
+      "Diffutils",
+      "Perl",
+      "Tcl"
+    ],
+    "before": [
+      "Automake",
+      "Bison"
+    ],
+    "optional": [
+      "libunistring",
+      "libxml2"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "autopoint",
+      "name": "autopoint",
+      "description": "Copies standard Gettext infrastructure files into a source package"
+    },
+    {
+      "id": "envsubst",
+      "name": "envsubst",
+      "description": "Substitutes environment variables in shell format strings"
+    },
+    {
+      "id": "gettext",
+      "name": "gettext",
+      "description": "Translates a natural language message into the user's language by looking up the translation in a message catalog"
+    },
+    {
+      "id": "gettext.sh",
+      "name": "gettext.sh",
+      "description": "Primarily serves as a shell function library for gettext"
+    },
+    {
+      "id": "gettextize",
+      "name": "gettextize",
+      "description": "Copies all standard Gettext files into the given top-level directory of a package to begin internationalizing it"
+    },
+    {
+      "id": "msgattrib",
+      "name": "msgattrib",
+      "description": "Filters the messages of a translation catalog according to their attributes and manipulates the attributes"
+    },
+    {
+      "id": "msgcat",
+      "name": "msgcat",
+      "description": "Concatenates and merges the given .po files"
+    },
+    {
+      "id": "msgcmp",
+      "name": "msgcmp",
+      "description": "Compares two .po files to check that both contain the same set of msgid strings"
+    },
+    {
+      "id": "msgcomm",
+      "name": "msgcomm",
+      "description": "Finds the messages that are common to the given .po files"
+    },
+    {
+      "id": "msgconv",
+      "name": "msgconv",
+      "description": "Converts a translation catalog to a different character encoding"
+    },
+    {
+      "id": "msgen",
+      "name": "msgen",
+      "description": "Creates an English translation catalog"
+    },
+    {
+      "id": "msgexec",
+      "name": "msgexec",
+      "description": "Applies a command to all translations of a translation catalog"
+    },
+    {
+      "id": "msgfilter",
+      "name": "msgfilter",
+      "description": "Applies a filter to all translations of a translation catalog"
+    },
+    {
+      "id": "msgfmt",
+      "name": "msgfmt",
+      "description": "Generates a binary message catalog from a translation catalog"
+    },
+    {
+      "id": "msggrep",
+      "name": "msggrep",
+      "description": "Extracts all messages of a translation catalog that match a given pattern or belong to some given source files"
+    },
+    {
+      "id": "msginit",
+      "name": "msginit",
+      "description": "Creates a new .po file, initializing the meta information with values from the user's environment"
+    },
+    {
+      "id": "msgmerge",
+      "name": "msgmerge",
+      "description": "Combines two raw translations into a single file"
+    },
+    {
+      "id": "msgunfmt",
+      "name": "msgunfmt",
+      "description": "Decompiles a binary message catalog into raw translation text"
+    },
+    {
+      "id": "msguniq",
+      "name": "msguniq",
+      "description": "Unifies duplicate translations in a translation catalog"
+    },
+    {
+      "id": "ngettext",
+      "name": "ngettext",
+      "description": "Displays native language translations of a textual message whose grammatical form depends on a number"
+    },
+    {
+      "id": "recode-sr-latin",
+      "name": "recode-sr-latin",
+      "description": "Recodes Serbian text from Cyrillic to Latin script"
+    },
+    {
+      "id": "xgettext",
+      "name": "xgettext",
+      "description": "Extracts the translatable message lines from the given source files to make the first translation template"
+    },
+    {
+      "id": "libasprintf",
+      "name": "libasprintf",
+      "description": "Defines the autosprintf class, which makes C formatted output routines usable in C++ programs, for use with the <string> strings and the <iostream> streams"
+    },
+    {
+      "id": "libgettextlib",
+      "name": "libgettextlib",
+      "description": "Contains common routines used by the various Gettext programs; these are not intended for general use"
+    },
+    {
+      "id": "libgettextpo",
+      "name": "libgettextpo",
+      "description": "Used to write specialized programs that process .po files; this library is used when the standard applications shipped with Gettext (such as msgcomm, msgcmp, msgattrib, and msgen) will not suffice"
+    },
+    {
+      "id": "libgettextsrc",
+      "name": "libgettextsrc",
+      "description": "Provides common routines used by the various Gettext programs; these are not intended for general use"
+    },
+    {
+      "id": "libtextstyle",
+      "name": "libtextstyle",
+      "description": "Text styling library"
+    },
+    {
+      "id": "preloadable_libintl",
+      "name": "preloadable_libintl",
+      "description": "A library, intended to be used by LD_PRELOAD, that helps libintl log untranslated messages"
+    }
+  ]
+}

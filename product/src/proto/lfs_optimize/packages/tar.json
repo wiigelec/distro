@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "name": "tar",
+  "reference": {
+    "lfs_section": "ch-system-tar"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "patch -Np1 -i ../tar-{version}-acl_fix-1.patch",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "FORCE_UNSAFE_CONFIGURE=1  \\\n./configure --prefix=/usr",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install\nmake -C doc install-html docdir=/usr/share/doc/tar-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "tar"
+    ],
+    "directories": [
+      "/usr/share/doc/tar-{version}"
+    ]
+  },
+  "description": "The Tar package provides the ability to create tar archives as well as perform various other kinds of archive manipulation. Tar can be used on previously created archives to extract files, to store additional files, or to update or list files which were already stored.",
+  "document": {
+    "section_id": "ch-system-tar",
+    "filename": "tar.html",
+    "contents_id": "contents-tar"
+  },
+  "dependencies": {
+    "build": [
+      "Acl",
+      "Attr",
+      "Bash",
+      "Binutils",
+      "Bison",
+      "Coreutils",
+      "GCC",
+      "Gettext",
+      "Glibc",
+      "Grep",
+      "Inetutils",
+      "Make",
+      "Sed",
+      "Texinfo"
+    ],
+    "runtime": [
+      "Acl",
+      "Attr",
+      "Bzip2",
+      "Glibc",
+      "Gzip",
+      "Xz"
+    ],
+    "test": [
+      "Autoconf",
+      "Diffutils",
+      "Findutils",
+      "Gawk",
+      "Gzip"
+    ],
+    "before": [],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "tar",
+      "name": "tar",
+      "description": "Creates, extracts files from, and lists the contents of archives, also known as tarballs"
+    }
+  ]
+}

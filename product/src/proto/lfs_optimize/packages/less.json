@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "name": "less",
+  "reference": {
+    "lfs_section": "ch-system-less"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr --sysconfdir=/etc",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "less",
+      "lessecho",
+      "lesskey"
+    ]
+  },
+  "description": "The Less package contains a text file viewer.",
+  "document": {
+    "section_id": "ch-system-less",
+    "filename": "less.html",
+    "contents_id": "contents-less"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Diffutils",
+      "GCC",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Ncurses",
+      "Pcre2",
+      "Sed"
+    ],
+    "runtime": [
+      "Glibc",
+      "Ncurses"
+    ],
+    "test": [],
+    "before": [
+      "Gzip"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "less",
+      "name": "less",
+      "description": "A file viewer or pager; it displays the contents of the given file, letting the user scroll, find strings, and jump to marks"
+    },
+    {
+      "id": "lessecho",
+      "name": "lessecho",
+      "description": "Needed to expand meta-characters, such as * and ?, in filenames on Unix systems"
+    },
+    {
+      "id": "lesskey",
+      "name": "lesskey",
+      "description": "Used to specify the key bindings for less"
+    }
+  ]
+}

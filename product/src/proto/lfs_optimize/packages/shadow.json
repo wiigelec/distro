@@ -1,0 +1,308 @@
+{
+  "schema_version": 1,
+  "name": "shadow",
+  "reference": {
+    "lfs_section": "ch-system-shadow"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "find man -name Makefile.in -exec sed -i 's/getspnam\\.3 / /' {{}} \\;\nfind man -name Makefile.in -exec sed -i 's/passwd\\.5 / /'   {{}} \\;",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "sed -e 's:#ENCRYPT_METHOD SHA512:ENCRYPT_METHOD YESCRYPT:' \\\n    -e 's:/var/spool/mail:/var/mail:'                      \\\n    -e '/PATH=/{{s@/sbin:@@;s@/bin:@@}}'                     \\\n    -i etc/login.defs",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "touch /usr/bin/passwd\n./configure --sysconfdir=/etc   \\\n            --disable-static    \\\n            --with-{{b,yes}}crypt \\\n            --without-libbsd    \\\n            --disable-logind    \\\n            --with-group-name-max-length=32",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make exec_prefix=/usr install\nmake -C man install-man",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "chage",
+      "chfn",
+      "chgpasswd",
+      "chpasswd",
+      "chsh",
+      "faillog",
+      "getsubids",
+      "gpasswd",
+      "groupadd",
+      "groupdel",
+      "groupmod",
+      "grpck",
+      "grpconv",
+      "grpunconv",
+      "login",
+      "newgidmap",
+      "newgrp",
+      "newuidmap",
+      "newusers",
+      "nologin",
+      "passwd",
+      "pwck",
+      "pwconv",
+      "pwunconv",
+      "sg (link to newgrp)",
+      "su",
+      "useradd",
+      "userdel",
+      "usermod",
+      "vigr (link to vipw)",
+      "vipw"
+    ],
+    "libraries": [
+      "libsubid.so"
+    ],
+    "directories": [
+      "/etc/default",
+      "/usr/include/shadow"
+    ]
+  },
+  "description": "The Shadow package contains programs for handling passwords in a secure way.",
+  "document": {
+    "section_id": "ch-system-shadow",
+    "filename": "shadow.html",
+    "contents_id": "contents-shadow"
+  },
+  "dependencies": {
+    "build": [
+      "Acl",
+      "Attr",
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Diffutils",
+      "Findutils",
+      "Gawk",
+      "GCC",
+      "Gettext",
+      "Glibc",
+      "Grep",
+      "Libcap",
+      "Libxcrypt",
+      "Make",
+      "Sed"
+    ],
+    "runtime": [
+      "Glibc",
+      "Libxcrypt"
+    ],
+    "test": [
+      "No test suite available"
+    ],
+    "before": [
+      "Coreutils"
+    ],
+    "optional": [
+      "CrackLib",
+      "Linux-PAM"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "chage",
+      "name": "chage",
+      "description": "Used to change the maximum number of days between obligatory password changes"
+    },
+    {
+      "id": "chfn",
+      "name": "chfn",
+      "description": "Used to change a user's full name and other information"
+    },
+    {
+      "id": "chgpasswd",
+      "name": "chgpasswd",
+      "description": "Used to update group passwords in batch mode"
+    },
+    {
+      "id": "chpasswd",
+      "name": "chpasswd",
+      "description": "Used to update user passwords in batch mode"
+    },
+    {
+      "id": "chsh",
+      "name": "chsh",
+      "description": "Used to change a user's default login shell"
+    },
+    {
+      "id": "faillog",
+      "name": "faillog",
+      "description": "Is used to examine the log of login failures, to set a maximum number of failures before an account is blocked, and to reset the failure count"
+    },
+    {
+      "id": "getsubids",
+      "name": "getsubids",
+      "description": "Is used to list the subordinate id ranges for a user"
+    },
+    {
+      "id": "gpasswd",
+      "name": "gpasswd",
+      "description": "Is used to add and delete members and administrators to groups"
+    },
+    {
+      "id": "groupadd",
+      "name": "groupadd",
+      "description": "Creates a group with the given name"
+    },
+    {
+      "id": "groupdel",
+      "name": "groupdel",
+      "description": "Deletes the group with the given name"
+    },
+    {
+      "id": "groupmod",
+      "name": "groupmod",
+      "description": "Is used to modify the given group's name or GID"
+    },
+    {
+      "id": "grpck",
+      "name": "grpck",
+      "description": "Verifies the integrity of the group files /etc/group and /etc/gshadow"
+    },
+    {
+      "id": "grpconv",
+      "name": "grpconv",
+      "description": "Creates or updates the shadow group file from the normal group file"
+    },
+    {
+      "id": "grpunconv",
+      "name": "grpunconv",
+      "description": "Updates /etc/group from /etc/gshadow and then deletes the latter"
+    },
+    {
+      "id": "login",
+      "name": "login",
+      "description": "Is used by the system to let users sign on"
+    },
+    {
+      "id": "newgidmap",
+      "name": "newgidmap",
+      "description": "Is used to set the gid mapping of a user namespace"
+    },
+    {
+      "id": "newgrp",
+      "name": "newgrp",
+      "description": "Is used to change the current GID during a login session"
+    },
+    {
+      "id": "newuidmap",
+      "name": "newuidmap",
+      "description": "Is used to set the uid mapping of a user namespace"
+    },
+    {
+      "id": "newusers",
+      "name": "newusers",
+      "description": "Is used to create or update an entire series of user accounts"
+    },
+    {
+      "id": "nologin",
+      "name": "nologin",
+      "description": "Displays a message saying an account is not available; it is designed to be used as the default shell for disabled accounts"
+    },
+    {
+      "id": "passwd",
+      "name": "passwd",
+      "description": "Is used to change the password for a user or group account"
+    },
+    {
+      "id": "pwck",
+      "name": "pwck",
+      "description": "Verifies the integrity of the password files /etc/passwd and /etc/shadow"
+    },
+    {
+      "id": "pwconv",
+      "name": "pwconv",
+      "description": "Creates or updates the shadow password file from the normal password file"
+    },
+    {
+      "id": "pwunconv",
+      "name": "pwunconv",
+      "description": "Updates /etc/passwd from /etc/shadow and then deletes the latter"
+    },
+    {
+      "id": "sg",
+      "name": "sg",
+      "description": "Executes a given command while the user's GID is set to that of the given group"
+    },
+    {
+      "id": "su",
+      "name": "su",
+      "description": "Runs a shell with substitute user and group IDs"
+    },
+    {
+      "id": "useradd",
+      "name": "useradd",
+      "description": "Creates a new user with the given name, or updates the default new-user information"
+    },
+    {
+      "id": "userdel",
+      "name": "userdel",
+      "description": "Deletes the specified user account"
+    },
+    {
+      "id": "usermod",
+      "name": "usermod",
+      "description": "Is used to modify the given user's login name, user identification (UID), shell, initial group, home directory, etc."
+    },
+    {
+      "id": "vigr",
+      "name": "vigr",
+      "description": "Edits the /etc/group or /etc/gshadow files"
+    },
+    {
+      "id": "vipw",
+      "name": "vipw",
+      "description": "Edits the /etc/passwd or /etc/shadow files"
+    },
+    {
+      "id": "libsubid",
+      "name": "libsubid",
+      "description": "library to handle subordinate id ranges for users and groups"
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "name": "diffutils",
+  "reference": {
+    "lfs_section": "ch-system-diffutils"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "cmp",
+      "diff",
+      "diff3",
+      "sdiff"
+    ]
+  },
+  "description": "The Diffutils package contains programs that show the differences between files or directories.",
+  "document": {
+    "section_id": "ch-system-diffutils",
+    "filename": "diffutils.html",
+    "contents_id": "contents-diffutils"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Gawk",
+      "GCC",
+      "Gettext",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Sed",
+      "Texinfo"
+    ],
+    "runtime": [
+      "Glibc"
+    ],
+    "test": [
+      "Perl"
+    ],
+    "before": [],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "cmp",
+      "name": "cmp",
+      "description": "Compares two files and reports any differences byte by byte"
+    },
+    {
+      "id": "diff",
+      "name": "diff",
+      "description": "Compares two files or directories and reports which lines in the files differ"
+    },
+    {
+      "id": "diff3",
+      "name": "diff3",
+      "description": "Compares three files line by line"
+    },
+    {
+      "id": "sdiff",
+      "name": "sdiff",
+      "description": "Merges two files and interactively outputs the results"
+    }
+  ]
+}

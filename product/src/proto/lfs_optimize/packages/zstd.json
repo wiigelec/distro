@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "name": "zstd",
+  "reference": {
+    "lfs_section": "ch-system-zstd"
+  },
+  "procedure": [
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make prefix=/usr",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make prefix=/usr install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "rm -v /usr/lib/libzstd.a",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "zstd",
+      "zstdcat (link to zstd)",
+      "zstdgrep",
+      "zstdless",
+      "zstdmt (link to zstd)",
+      "unzstd (link to zstd)"
+    ],
+    "libraries": [
+      "libzstd.so"
+    ]
+  },
+  "description": "Zstandard is a real-time compression algorithm, providing high compression ratios. It offers a very wide range of compression / speed trade-offs, while being backed by a very fast decoder.",
+  "document": {
+    "section_id": "ch-system-zstd",
+    "filename": "zstd.html",
+    "contents_id": "contents-zstd"
+  },
+  "dependencies": {
+    "build": [
+      "Binutils",
+      "Coreutils",
+      "GCC",
+      "Glibc",
+      "Gzip",
+      "Lz4",
+      "Make",
+      "Xz",
+      "Zlib"
+    ],
+    "runtime": [
+      "Glibc"
+    ],
+    "test": [],
+    "before": [
+      "Binutils",
+      "File",
+      "GCC",
+      "Kmod",
+      "Libelf",
+      "Python",
+      "Systemd"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "zstd",
+      "name": "zstd",
+      "description": "Compresses or decompresses files using the ZSTD format"
+    },
+    {
+      "id": "zstdgrep",
+      "name": "zstdgrep",
+      "description": "Runs grep on ZSTD compressed files"
+    },
+    {
+      "id": "zstdless",
+      "name": "zstdless",
+      "description": "Runs less on ZSTD compressed files"
+    },
+    {
+      "id": "libzstd",
+      "name": "libzstd",
+      "description": "The library implementing lossless data compression, using the ZSTD algorithm"
+    }
+  ]
+}

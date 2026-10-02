@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "name": "libtool",
+  "reference": {
+    "lfs_section": "ch-system-libtool"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "rm -fv /usr/lib/libltdl.a",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "libtool",
+      "libtoolize"
+    ],
+    "libraries": [
+      "libltdl.so"
+    ],
+    "directories": [
+      "/usr/include/libltdl",
+      "/usr/share/libtool"
+    ]
+  },
+  "description": "The Libtool package contains the GNU generic library support script. It makes the use of shared libraries simpler with a consistent, portable interface.",
+  "document": {
+    "section_id": "ch-system-libtool",
+    "filename": "libtool.html",
+    "contents_id": "contents-libtool"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Diffutils",
+      "Gawk",
+      "GCC",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Sed",
+      "Texinfo"
+    ],
+    "runtime": [
+      "Autoconf",
+      "Automake",
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "File",
+      "GCC",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Sed"
+    ],
+    "test": [
+      "Autoconf",
+      "Automake",
+      "Findutils"
+    ],
+    "before": [],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "libtool",
+      "name": "libtool",
+      "description": "Provides generalized library-building support services"
+    },
+    {
+      "id": "libtoolize",
+      "name": "libtoolize",
+      "description": "Provides a standard way to add libtool support to a package"
+    },
+    {
+      "id": "libltdl",
+      "name": "libltdl",
+      "description": "Hides the various difficulties of opening dynamically loaded libraries"
+    }
+  ]
+}

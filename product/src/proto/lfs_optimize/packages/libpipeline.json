@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "name": "libpipeline",
+  "reference": {
+    "lfs_section": "ch-system-libpipeline"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "libraries": [
+      "libpipeline.so"
+    ]
+  },
+  "description": "The Libpipeline package contains a library for manipulating pipelines of subprocesses in a flexible and convenient way.",
+  "document": {
+    "section_id": "ch-system-libpipeline",
+    "filename": "libpipeline.html",
+    "contents_id": "contents-libpipeline"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Diffutils",
+      "Gawk",
+      "GCC",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Sed",
+      "Texinfo"
+    ],
+    "runtime": [
+      "Glibc"
+    ],
+    "test": [
+      "Pkgconf"
+    ],
+    "before": [
+      "Man-DB"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "libpipeline",
+      "name": "libpipeline",
+      "description": "This library is used to safely construct pipelines between subprocesses"
+    }
+  ]
+}

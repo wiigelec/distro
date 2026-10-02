@@ -12,7 +12,7 @@ import tarfile
 import tempfile
 import urllib.request
 from contextlib import contextmanager
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 from artifact import (
@@ -28,7 +28,6 @@ from resolve import HERE, resolve
 
 USER_AGENT = "distro-lfs-optimize-prototype/0"
 CACHE_SCHEMA_VERSION = 4
-WORKING_DIRECTORIES = ("source", "build")
 
 
 def canonical_sha256(value: Any) -> str:
@@ -204,9 +203,19 @@ def prepare_sources(package: dict[str, Any], clone: Path, cache: Path) -> str:
 def resolve_working_directory(source_cwd: str, working_directory: str) -> str:
     if working_directory == "source":
         return source_cwd
-    if working_directory == "build":
-        return f"{source_cwd}/build"
-    raise RuntimeError(f"unsupported working directory: {working_directory}")
+
+    relative = PurePosixPath(working_directory)
+    if (
+        not working_directory
+        or relative.is_absolute()
+        or "." in relative.parts
+        or ".." in relative.parts
+    ):
+        raise RuntimeError(
+            f"invalid source-relative working directory: {working_directory}"
+        )
+
+    return str(PurePosixPath(source_cwd) / relative)
 
 
 def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,

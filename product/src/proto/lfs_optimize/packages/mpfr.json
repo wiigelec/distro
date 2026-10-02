@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "name": "mpfr",
+  "reference": {
+    "lfs_section": "ch-system-mpfr"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr        \\\n            --disable-static     \\\n            --enable-thread-safe \\\n            --docdir=/usr/share/doc/mpfr-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make\nmake html",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install\nmake install-html",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "libraries": [
+      "libmpfr.so"
+    ],
+    "directories": [
+      "/usr/share/doc/mpfr-{version}"
+    ]
+  },
+  "description": "The MPFR package contains functions for multiple precision math.",
+  "document": {
+    "section_id": "ch-system-mpfr",
+    "filename": "mpfr.html",
+    "contents_id": "contents-mpfr"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Diffutils",
+      "Gawk",
+      "GCC",
+      "Glibc",
+      "Grep",
+      "GMP",
+      "Make",
+      "Sed",
+      "Texinfo"
+    ],
+    "runtime": [
+      "Glibc",
+      "GMP"
+    ],
+    "test": [],
+    "before": [
+      "Gawk",
+      "GCC"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "libmpfr",
+      "name": "libmpfr",
+      "description": "Contains multiple-precision math functions"
+    }
+  ]
+}

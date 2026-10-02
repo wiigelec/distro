@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "name": "pcre2",
+  "reference": {
+    "lfs_section": "ch-system-pcre2"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr                       \\\n            --docdir=/usr/share/doc/pcre2-{version} \\\n            --enable-unicode                    \\\n            --enable-jit                        \\\n            --enable-pcre2-16                   \\\n            --enable-pcre2-32                   \\\n            --enable-pcre2grep-libz             \\\n            --enable-pcre2grep-libbz2           \\\n            --enable-pcre2test-libreadline      \\\n            --disable-static",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "pcre2grep",
+      "pcre2test"
+    ],
+    "libraries": [
+      "libpcre2-8.so",
+      "libpcre2-16.so",
+      "libpcre2-32.so",
+      "libpcre2-posix.so"
+    ]
+  },
+  "description": "The pcre2 package contains a new generation of the Perl Compatible Regular Expression libraries.",
+  "document": {
+    "section_id": "ch-system-pcre2",
+    "filename": "pcre2.html",
+    "contents_id": "contents-pcre2"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Bzip2",
+      "Coreutils",
+      "GCC",
+      "Glibc",
+      "GZip",
+      "Make",
+      "Readline"
+    ],
+    "runtime": [
+      "Glibc"
+    ],
+    "test": [
+      "Grep"
+    ],
+    "before": [
+      "Grep",
+      "Less"
+    ],
+    "optional": [
+      "Valgrind",
+      "libedit"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "pcre2grep",
+      "name": "pcre2grep",
+      "description": "is a version of grep that understands Perl compatible regular expressions"
+    },
+    {
+      "id": "pcre2test",
+      "name": "pcre2test",
+      "description": "can test a Perl compatible regular expression"
+    }
+  ]
+}

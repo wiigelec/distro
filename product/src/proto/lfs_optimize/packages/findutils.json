@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "name": "findutils",
+  "reference": {
+    "lfs_section": "ch-system-findutils"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr --localstatedir=/var/lib/locate",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "chown -R tester .\nsu tester -c \"PATH=$PATH make check -k\"",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "find",
+      "locate",
+      "updatedb",
+      "xargs"
+    ],
+    "directories": [
+      "/var/lib/locate"
+    ]
+  },
+  "description": "The Findutils package contains programs to find files. Programs are provided to search through all the files in a directory tree and to create, maintain, and search a database (often faster than the recursive find, but unreliable unless the database has been updated recently). Findutils also supplies the xargs program, which can be used to run a specified command on each file selected by a search.",
+  "document": {
+    "section_id": "ch-system-findutils",
+    "filename": "findutils.html",
+    "contents_id": "contents-findutils"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "GCC",
+      "Gettext",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Sed",
+      "Texinfo"
+    ],
+    "runtime": [
+      "Bash",
+      "Glibc"
+    ],
+    "test": [
+      "DejaGNU",
+      "Diffutils",
+      "Expect"
+    ],
+    "before": [],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "find",
+      "name": "find",
+      "description": "Searches given directory trees for files matching the specified criteria"
+    },
+    {
+      "id": "locate",
+      "name": "locate",
+      "description": "Searches through a database of file names and reports the names that contain a given string or match a given pattern"
+    },
+    {
+      "id": "updatedb",
+      "name": "updatedb",
+      "description": "Updates the locate database; it scans the entire file system (including other file systems that are currently mounted, unless told not to) and puts every file name it finds into the database"
+    },
+    {
+      "id": "xargs",
+      "name": "xargs",
+      "description": "Can be used to apply a given command to a list of files"
+    }
+  ]
+}

@@ -1,0 +1,575 @@
+{
+  "schema_version": 1,
+  "name": "systemd",
+  "reference": {
+    "lfs_section": "ch-system-systemd"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "sed -e 's/GROUP=\"render\"/GROUP=\"video\"/' \\\n    -e 's/GROUP=\"sgx\", //'               \\\n    -i rules.d/50-udev-default.rules.in",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "mkdir -p build\ncd       build\n\nmeson setup ..                \\\n      --prefix=/usr           \\\n      --buildtype=release     \\\n      -D default-dnssec=no    \\\n      -D firstboot=false      \\\n      -D install-tests=false  \\\n      -D ldconfig=false       \\\n      -D sysusers=false       \\\n      -D rpmmacrosdir=no      \\\n      -D homed=disabled       \\\n      -D man=disabled         \\\n      -D mode=release         \\\n      -D pamconfdir=no        \\\n      -D dev-kvm-mode=0660    \\\n      -D nobody-group=nogroup \\\n      -D sysupdate=disabled   \\\n      -D ukify=disabled       \\\n      -D docdir=/usr/share/doc/systemd-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "ninja",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "echo 'NAME=\"Linux From Scratch\"' > /etc/os-release\nunshare -m ninja test",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "ninja install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "tar -xf ../../systemd-man-pages-{version}.tar.xz \\\n    --no-same-owner --strip-components=1     \\\n    -C /usr/share/man",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "system",
+      "commands": [
+        {
+          "command": "systemd-machine-id-setup",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "system",
+      "commands": [
+        {
+          "command": "systemctl preset-all",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "bootctl",
+      "busctl",
+      "coredumpctl",
+      "halt (symlink to systemctl)",
+      "hostnamectl",
+      "init",
+      "journalctl",
+      "kernel-install",
+      "localectl",
+      "loginctl",
+      "machinectl",
+      "mount.ddi (symlink to systemd-dissect)",
+      "networkctl",
+      "oomctl",
+      "portablectl",
+      "poweroff (symlink to systemctl)",
+      "reboot (symlink to systemctl)",
+      "resolvconf (symlink to resolvectl)",
+      "resolvectl",
+      "run0 (symlink to systemd-run)",
+      "runlevel (symlink to systemctl)",
+      "shutdown (symlink to systemctl)",
+      "systemctl",
+      "systemd-ac-power",
+      "systemd-analyze",
+      "systemd-ask-password",
+      "systemd-cat",
+      "systemd-cgls",
+      "systemd-cgtop",
+      "systemd-confext (symlink to systemd-sysext)",
+      "systemd-creds",
+      "systemd-delta",
+      "systemd-detect-virt",
+      "systemd-dissect",
+      "systemd-escape",
+      "systemd-hwdb",
+      "systemd-id128",
+      "systemd-inhibit",
+      "systemd-machine-id-setup",
+      "systemd-mount",
+      "systemd-notify",
+      "systemd-nspawn",
+      "systemd-path",
+      "systemd-pty-forward",
+      "systemd-repart",
+      "systemd-resolve (symlink to resolvectl)",
+      "systemd-run",
+      "systemd-socket-activate",
+      "systemd-stdio-bridge",
+      "systemd-sysext",
+      "systemd-tmpfiles",
+      "systemd-tty-ask-password-agent",
+      "systemd-vpick",
+      "systemd-umount (symlink to systemd-mount)",
+      "timedatectl",
+      "udevadm",
+      "userdbctl",
+      "varlinkctl"
+    ],
+    "libraries": [
+      "libnss_myhostname.so.2",
+      "libnss_mymachines.so.2",
+      "libnss_resolve.so.2",
+      "libnss_systemd.so.2",
+      "libsystemd.so",
+      "libsystemd-shared-{version}.so (in /usr/lib/systemd)",
+      "libudev.so"
+    ],
+    "directories": [
+      "/etc/binfmt.d",
+      "/etc/init.d",
+      "/etc/kernel",
+      "/etc/modules-load.d",
+      "/etc/sysctl.d",
+      "/etc/systemd",
+      "/etc/tmpfiles.d",
+      "/etc/udev",
+      "/etc/xdg/systemd",
+      "/usr/include/systemd",
+      "/usr/lib/binfmt.d",
+      "/usr/lib/credstore",
+      "/usr/lib/environment.d",
+      "/usr/lib/kernel",
+      "/usr/lib/modprobe.d",
+      "/usr/lib/modules-load.d",
+      "/usr/lib/systemd",
+      "/usr/lib/udev",
+      "/usr/lib/sysctl.d",
+      "/usr/lib/systemd",
+      "/usr/lib/tmpfiles.d",
+      "/usr/share/doc/systemd-{version}",
+      "/usr/share/factory",
+      "/usr/share/systemd",
+      "/var/lib/systemd",
+      "/var/log/journal"
+    ]
+  },
+  "description": "The systemd package contains programs for controlling the startup, running, and shutdown of the system.",
+  "document": {
+    "section_id": "ch-system-systemd",
+    "filename": "systemd.html",
+    "contents_id": "contents-systemd"
+  },
+  "dependencies": {
+    "build": [
+      "Acl",
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Diffutils",
+      "Gawk",
+      "GCC",
+      "Glibc",
+      "Gperf",
+      "Grep",
+      "Jinja2",
+      "Libxcrypt",
+      "Lz4",
+      "Meson",
+      "OpenSSL",
+      "Pcre2",
+      "Pkgconf",
+      "Sed",
+      "Util-linux",
+      "Zstd"
+    ],
+    "runtime": [
+      "Acl",
+      "Glibc",
+      "Libxcrypt",
+      "OpenSSL",
+      "Util-linux",
+      "Xz",
+      "Zlib",
+      "Zstd"
+    ],
+    "test": [],
+    "before": [
+      "D-Bus",
+      "E2fsprogs",
+      "Man-DB",
+      "Procps-ng",
+      "Util-linux"
+    ],
+    "optional": [
+      "AppArmor",
+      "audit-userspace",
+      "bash-completion",
+      "btrfs-progs",
+      "cURL",
+      "cryptsetup",
+      "docbook-xml",
+      "docbook-xsl-nons",
+      "Git",
+      "GnuTLS",
+      "iptables",
+      "jekyll",
+      "kexec-tools",
+      "libbpf",
+      "libdw",
+      "libfido2",
+      "libgcrypt",
+      "libidn2",
+      "libmicrohttpd",
+      "libpwquality",
+      "libseccomp",
+      "libxkbcommon",
+      "libxslt",
+      "Linux-PAM",
+      "lxml",
+      "make-ca",
+      "p11-kit",
+      "pefile",
+      "Polkit",
+      "pyelftools",
+      "qemu",
+      "qrencode",
+      "quota-tools",
+      "rpm",
+      "rsync",
+      "SELinux",
+      "Sphinx",
+      "systemtap",
+      "tpm2-tss",
+      "Valgrind",
+      "Xen",
+      "zsh"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "bootctl",
+      "name": "bootctl",
+      "description": "Is used to control EFI firmware boot settings on a system"
+    },
+    {
+      "id": "busctl",
+      "name": "busctl",
+      "description": "Is used to introspect and monitor the D-Bus bus"
+    },
+    {
+      "id": "coredumpctl",
+      "name": "coredumpctl",
+      "description": "Is used to retrieve coredumps from the systemd journal"
+    },
+    {
+      "id": "halt",
+      "name": "halt",
+      "description": "Normally invokes shutdown with the -h option, except when already in run-level 0, when it tells the kernel to halt the system; it notes in the file /var/log/wtmp that the system is being brought down"
+    },
+    {
+      "id": "hostnamectl",
+      "name": "hostnamectl",
+      "description": "Is used to query and change the system hostname and related settings"
+    },
+    {
+      "id": "init",
+      "name": "init",
+      "description": "Is the first process to be started after the kernel has initialized the hardware; init takes over the boot process and starts the processes specified by its configuration files; in this case, it starts systemd"
+    },
+    {
+      "id": "journalctl",
+      "name": "journalctl",
+      "description": "Is used to query the contents of the systemd journal"
+    },
+    {
+      "id": "kernel-install",
+      "name": "kernel-install",
+      "description": "Is used to add and remove kernel and initramfs images to and from /boot; in LFS, this is done manually"
+    },
+    {
+      "id": "localectl",
+      "name": "localectl",
+      "description": "Is used to query and change the system locale and keyboard layout settings"
+    },
+    {
+      "id": "loginctl",
+      "name": "loginctl",
+      "description": "Is used to introspect and control the state of the systemd Login Manager"
+    },
+    {
+      "id": "machinectl",
+      "name": "machinectl",
+      "description": "Is used to introspect and control the state of the systemd Virtual Machine and Container Registration Manager"
+    },
+    {
+      "id": "networkctl",
+      "name": "networkctl",
+      "description": "Is used to introspect and configure the state of the network links configured by systemd-networkd"
+    },
+    {
+      "id": "oomctl",
+      "name": "oomctl",
+      "description": "Controls the systemd Out Of Memory daemon"
+    },
+    {
+      "id": "portablectl",
+      "name": "portablectl",
+      "description": "Is used to attach or detach portable services from the local system"
+    },
+    {
+      "id": "poweroff",
+      "name": "poweroff",
+      "description": "Instructs the kernel to halt the system and switch off the computer (see halt)"
+    },
+    {
+      "id": "reboot",
+      "name": "reboot",
+      "description": "Instructs the kernel to reboot the system (see halt)"
+    },
+    {
+      "id": "resolvconf",
+      "name": "resolvconf",
+      "description": "Registers DNS server and domain configuration with systemd-resolved"
+    },
+    {
+      "id": "resolvectl",
+      "name": "resolvectl",
+      "description": "Sends control commands to the network name resolution manager, or resolves domain names, IPv4 and IPv6 addresses, DNS records, and services"
+    },
+    {
+      "id": "run0",
+      "name": "run0",
+      "description": "Temporarily elevates or acquires different privileges, similar to sudo"
+    },
+    {
+      "id": "runlevel",
+      "name": "runlevel",
+      "description": "Outputs the previous and the current run-level, as noted in the last run-level record in /run/utmp"
+    },
+    {
+      "id": "shutdown",
+      "name": "shutdown",
+      "description": "Brings the system down in a safe and secure manner, signaling all processes and notifying all logged-in users"
+    },
+    {
+      "id": "systemctl",
+      "name": "systemctl",
+      "description": "Is used to introspect and control the state of the systemd system and service manager"
+    },
+    {
+      "id": "systemd-ac-power",
+      "name": "systemd-ac-power",
+      "description": "Reports whether the system is connected to an external power source."
+    },
+    {
+      "id": "systemd-analyze",
+      "name": "systemd-analyze",
+      "description": "Is used to analyze system startup performance, as well as identify troublesome systemd units"
+    },
+    {
+      "id": "systemd-ask-password",
+      "name": "systemd-ask-password",
+      "description": "Is used to query a system password or passphrase from the user, using a message specified on the Linux command line"
+    },
+    {
+      "id": "systemd-cat",
+      "name": "systemd-cat",
+      "description": "Is used to connect the STDOUT and STDERR outputs of a process with the systemd journal"
+    },
+    {
+      "id": "systemd-cgls",
+      "name": "systemd-cgls",
+      "description": "Recursively shows the contents of the selected Linux control group hierarchy in a tree"
+    },
+    {
+      "id": "systemd-cgtop",
+      "name": "systemd-cgtop",
+      "description": "Shows the top control groups of the local Linux control group hierarchy, ordered by their CPU, memory and disk I/O loads"
+    },
+    {
+      "id": "systemd-creds",
+      "name": "systemd-creds",
+      "description": "Displays and processes credentials"
+    },
+    {
+      "id": "systemd-delta",
+      "name": "systemd-delta",
+      "description": "Is used to identify and compare configuration files in /etc that override the defaults in /usr"
+    },
+    {
+      "id": "systemd-detect-virt",
+      "name": "systemd-detect-virt",
+      "description": "Detects whether the system is being run in a virtual environment, and adjusts udev accordingly"
+    },
+    {
+      "id": "systemd-dissect",
+      "name": "systemd-dissect",
+      "description": "Is used to inspect OS disk images"
+    },
+    {
+      "id": "systemd-escape",
+      "name": "systemd-escape",
+      "description": "Is used to escape strings for inclusion in systemd unit names"
+    },
+    {
+      "id": "systemd-hwdb",
+      "name": "systemd-hwdb",
+      "description": "Is used to manage the hardware database (hwdb)"
+    },
+    {
+      "id": "systemd-id128",
+      "name": "systemd-id128",
+      "description": "Generates and prints id128 (UUID) strings"
+    },
+    {
+      "id": "systemd-inhibit",
+      "name": "systemd-inhibit",
+      "description": "Is used to execute a program with a shutdown, sleep or idle inhibitor lock taken, preventing an action such as a system shutdown until the process is completed"
+    },
+    {
+      "id": "systemd-machine-id-setup",
+      "name": "systemd-machine-id-setup",
+      "description": "Is used by system installer tools to initialize the machine ID stored in /etc/machine-id at install time with a randomly generated ID"
+    },
+    {
+      "id": "systemd-mount",
+      "name": "systemd-mount",
+      "description": "Is used to temporarily mount or automount disks"
+    },
+    {
+      "id": "systemd-notify",
+      "name": "systemd-notify",
+      "description": "Is used by daemon scripts to notify the init system of status changes"
+    },
+    {
+      "id": "systemd-nspawn",
+      "name": "systemd-nspawn",
+      "description": "Is used to run a command, or an entire OS, in a light-weight namespace container"
+    },
+    {
+      "id": "systemd-path",
+      "name": "systemd-path",
+      "description": "Is used to query system and user paths"
+    },
+    {
+      "id": "systemd-pty-forward",
+      "name": "systemd-pty-forward",
+      "description": "Is used to run a command with a custom terminal background color or title"
+    },
+    {
+      "id": "systemd-repart",
+      "name": "systemd-repart",
+      "description": "Is used to grow and add partitions to a partition table when systemd is used with an OS image (e.g. a container)"
+    },
+    {
+      "id": "systemd-resolve",
+      "name": "systemd-resolve",
+      "description": "Is used to resolve domain names, IPV4 and IPv6 addresses, DNS resource records, and services"
+    },
+    {
+      "id": "systemd-run",
+      "name": "systemd-run",
+      "description": "Is used to create and start a transient .service or a .scope unit and run the specified command in it; this is useful for validating systemd units"
+    },
+    {
+      "id": "systemd-socket-activate",
+      "name": "systemd-socket-activate",
+      "description": "Is used to listen on socket devices and launch a process upon a successful connection to the socket"
+    },
+    {
+      "id": "systemd-sysext",
+      "name": "systemd-sysext",
+      "description": "Activates system extension images"
+    },
+    {
+      "id": "systemd-tmpfiles",
+      "name": "systemd-tmpfiles",
+      "description": "Creates, deletes, and cleans up volatile and temporary files and directories, based on the configuration file format and location specified in tmpfiles.d directories"
+    },
+    {
+      "id": "systemd-umount",
+      "name": "systemd-umount",
+      "description": "Unmounts mount points"
+    },
+    {
+      "id": "systemd-tty-ask-password-agent",
+      "name": "systemd-tty-ask-password-agent",
+      "description": "Is used to list and/or process pending systemd password requests"
+    },
+    {
+      "id": "systemd-vpick",
+      "name": "systemd-vpick",
+      "description": "Is used to resolve paths to a \".v/\" versioned directory"
+    },
+    {
+      "id": "timedatectl",
+      "name": "timedatectl",
+      "description": "Is used to query and change the system clock and its settings"
+    },
+    {
+      "id": "udevadm",
+      "name": "udevadm",
+      "description": "Is a generic udev administration tool which controls the udevd daemon, provides info from the udev hardware database, monitors uevents, waits for uevents to finish, tests udev configuration, and triggers uevents for a given device"
+    },
+    {
+      "id": "userdbctl",
+      "name": "userdbctl",
+      "description": "Is used to inspect users, groups, and group memberships"
+    },
+    {
+      "id": "varlinkctl",
+      "name": "varlinkctl",
+      "description": "Is used to interact with and invoke Varlink services"
+    },
+    {
+      "id": "libsystemd",
+      "name": "libsystemd",
+      "description": "Is the main systemd utility library"
+    },
+    {
+      "id": "libudev",
+      "name": "libudev",
+      "description": "Is a library to access Udev device information"
+    }
+  ]
+}

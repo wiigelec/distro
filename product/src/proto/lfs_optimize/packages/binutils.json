@@ -1,0 +1,282 @@
+{
+  "schema_version": 1,
+  "name": "binutils",
+  "reference": {
+    "lfs_section": "ch-system-binutils"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "mkdir -v build\ncd       build",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "../configure --prefix=/usr       \\\n             --sysconfdir=/etc   \\\n             --enable-ld=default \\\n             --enable-plugins    \\\n             --enable-shared     \\\n             --disable-werror    \\\n             --enable-64-bit-bfd \\\n             --enable-new-dtags  \\\n             --with-system-zlib  \\\n             --with-lib-path=/usr/lib \\\n             --enable-default-hash-style=gnu",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make tooldir=/usr",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make -k check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "grep '^FAIL:' $(find -name '*.log')",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make tooldir=/usr install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "rm -rfv /usr/lib/lib{{bfd,ctf,ctf-nobfd,gprofng,opcodes,sframe}}.a \\\n        /usr/share/doc/gprofng/",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "addr2line",
+      "ar",
+      "as",
+      "c++filt",
+      "dwp",
+      "elfedit",
+      "gprof",
+      "gprofng",
+      "ld",
+      "ld.bfd",
+      "nm",
+      "objcopy",
+      "objdump",
+      "ranlib",
+      "readelf",
+      "size",
+      "strings",
+      "strip"
+    ],
+    "libraries": [
+      "libbfd.so",
+      "libctf.so",
+      "libctf-nobfd.so",
+      "libgprofng.so",
+      "libopcodes.so",
+      "libsframe.so"
+    ],
+    "directories": [
+      "/usr/lib/ldscripts"
+    ]
+  },
+  "description": "The Binutils package contains a linker, an assembler, and other tools for handling object files.",
+  "document": {
+    "section_id": "ch-system-binutils",
+    "filename": "binutils.html",
+    "contents_id": "contents-binutils"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Diffutils",
+      "File",
+      "Flex",
+      "Gawk",
+      "GCC",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Perl",
+      "Pkgconf",
+      "Sed",
+      "Texinfo",
+      "Zlib",
+      "Zstd"
+    ],
+    "runtime": [
+      "Glibc",
+      "Zlib",
+      "Zstd"
+    ],
+    "test": [
+      "DejaGNU",
+      "Expect"
+    ],
+    "before": [],
+    "optional": [
+      "Elfutils",
+      "Jansson"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "addr2line",
+      "name": "addr2line",
+      "description": "Translates program addresses to file names and line numbers; given an address and the name of an executable, it uses the debugging information in the executable to determine which source file and line number are associated with the address"
+    },
+    {
+      "id": "ar",
+      "name": "ar",
+      "description": "Creates, modifies, and extracts from archives"
+    },
+    {
+      "id": "as",
+      "name": "as",
+      "description": "An assembler that assembles the output of gcc into object files"
+    },
+    {
+      "id": "c-filt",
+      "name": "c++filt",
+      "description": "Used by the linker to de-mangle C++ and Java symbols and to keep overloaded functions from clashing"
+    },
+    {
+      "id": "dwp",
+      "name": "dwp",
+      "description": "The DWARF packaging utility"
+    },
+    {
+      "id": "elfedit",
+      "name": "elfedit",
+      "description": "Updates the ELF headers of ELF files"
+    },
+    {
+      "id": "gprof",
+      "name": "gprof",
+      "description": "Displays call graph profile data"
+    },
+    {
+      "id": "gprofng",
+      "name": "gprofng",
+      "description": "Gathers and analyzes performance data"
+    },
+    {
+      "id": "ld",
+      "name": "ld",
+      "description": "A linker that combines a number of object and archive files into a single file, relocating their data and tying up symbol references"
+    },
+    {
+      "id": "ld.bfd",
+      "name": "ld.bfd",
+      "description": "A hard link to ld"
+    },
+    {
+      "id": "nm",
+      "name": "nm",
+      "description": "Lists the symbols occurring in a given object file"
+    },
+    {
+      "id": "objcopy",
+      "name": "objcopy",
+      "description": "Translates one type of object file into another"
+    },
+    {
+      "id": "objdump",
+      "name": "objdump",
+      "description": "Displays information about the given object file, with options controlling the particular information to display; the information shown is useful to programmers who are working on the compilation tools"
+    },
+    {
+      "id": "ranlib",
+      "name": "ranlib",
+      "description": "Generates an index of the contents of an archive and stores it in the archive; the index lists all of the symbols defined by archive members that are relocatable object files"
+    },
+    {
+      "id": "readelf",
+      "name": "readelf",
+      "description": "Displays information about ELF type binaries"
+    },
+    {
+      "id": "size",
+      "name": "size",
+      "description": "Lists the section sizes and the total size for the given object files"
+    },
+    {
+      "id": "strings",
+      "name": "strings",
+      "description": "Outputs, for each given file, the sequences of printable characters that are of at least the specified length (defaulting to four); for object files, it prints, by default, only the strings from the initializing and loading sections while for other types of files, it scans the entire file"
+    },
+    {
+      "id": "strip",
+      "name": "strip",
+      "description": "Discards symbols from object files"
+    },
+    {
+      "id": "libbfd",
+      "name": "libbfd",
+      "description": "The Binary File Descriptor library"
+    },
+    {
+      "id": "libctf",
+      "name": "libctf",
+      "description": "The Compat ANSI-C Type Format debugging support library"
+    },
+    {
+      "id": "libctf-nobfd",
+      "name": "libctf-nobfd",
+      "description": "A libctf variant which does not use libbfd functionality"
+    },
+    {
+      "id": "libgprofng",
+      "name": "libgprofng",
+      "description": "A library containing most routines used by gprofng"
+    },
+    {
+      "id": "libopcodes",
+      "name": "libopcodes",
+      "description": "A library for dealing with opcodes\u2014the readable text versions of instructions for the processor; it is used for building utilities like objdump"
+    },
+    {
+      "id": "libsframe",
+      "name": "libsframe",
+      "description": "A library to support online backtracing using a simple unwinder"
+    }
+  ]
+}

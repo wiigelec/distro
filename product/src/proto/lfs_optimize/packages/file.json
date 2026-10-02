@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "name": "file",
+  "reference": {
+    "lfs_section": "ch-system-file"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "file"
+    ],
+    "libraries": [
+      "libmagic.so"
+    ]
+  },
+  "description": "The File package contains a utility for determining the type of a given file or files.",
+  "document": {
+    "section_id": "ch-system-file",
+    "filename": "file.html",
+    "contents_id": "contents-file"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Bzip2",
+      "Coreutils",
+      "Diffutils",
+      "Gawk",
+      "GCC",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Sed",
+      "Xz",
+      "Zlib",
+      "Zstd"
+    ],
+    "runtime": [
+      "Glibc",
+      "Bzip2",
+      "Xz",
+      "Zlib"
+    ],
+    "test": [],
+    "before": [],
+    "optional": [
+      "libseccomp"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "file",
+      "name": "file",
+      "description": "Tries to classify each given file; it does this by performing several tests\u2014file system tests, magic number tests, and language tests"
+    },
+    {
+      "id": "libmagic",
+      "name": "libmagic",
+      "description": "Contains routines for magic number recognition, used by the file program"
+    }
+  ]
+}

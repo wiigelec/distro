@@ -1,0 +1,338 @@
+{
+  "schema_version": 1,
+  "name": "grub",
+  "reference": {
+    "lfs_section": "ch-system-grub"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "sed 's/--image-base/--nonexist-linker-option/' -i configure",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr     \\\n            --sysconfdir=/etc \\\n            --disable-efiemu  \\\n            --disable-werror",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "make clean",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr       \\\n            --sysconfdir=/etc   \\\n            --target=x86_64     \\\n            --with-platform=efi \\\n            --disable-efiemu    \\\n            --disable-werror",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "make clean",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr       \\\n            --sysconfdir=/etc   \\\n            --target=i386       \\\n            --with-platform=efi \\\n            --disable-efiemu    \\\n            --disable-werror",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "grub-bios-setup",
+      "grub-editenv",
+      "grub-file",
+      "grub-fstest",
+      "grub-glue-efi",
+      "grub-install",
+      "grub-kbdcomp",
+      "grub-macbless",
+      "grub-menulst2cfg",
+      "grub-mkconfig",
+      "grub-mkimage",
+      "grub-mklayout",
+      "grub-mknetdir",
+      "grub-mkpasswd-pbkdf2",
+      "grub-mkrelpath",
+      "grub-mkrescue",
+      "grub-mkstandalone",
+      "grub-ofpathname",
+      "grub-probe",
+      "grub-reboot",
+      "grub-render-label",
+      "grub-script-check",
+      "grub-set-default",
+      "grub-sparc64-setup",
+      "grub-syslinux2cfg"
+    ],
+    "directories": [
+      "/usr/lib/grub",
+      "/etc/grub.d",
+      "/usr/share/grub",
+      "/boot/grub (when grub-install is first run)"
+    ]
+  },
+  "description": "The GRUB package contains the GRand Unified Bootloader.",
+  "document": {
+    "section_id": "ch-system-grub",
+    "filename": "grub.html",
+    "contents_id": "contents-gRUB"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Bison",
+      "Coreutils",
+      "Diffutils",
+      "GCC",
+      "Gettext",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Ncurses",
+      "Sed",
+      "Texinfo",
+      "Xz"
+    ],
+    "runtime": [
+      "Bash",
+      "GCC",
+      "Gettext",
+      "Glibc",
+      "Xz",
+      "Sed"
+    ],
+    "test": [],
+    "before": [],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "grub-bios-setup",
+      "name": "grub-bios-setup",
+      "description": "Is a helper program for grub-install"
+    },
+    {
+      "id": "grub-editenv",
+      "name": "grub-editenv",
+      "description": "Is a tool to edit the environment block"
+    },
+    {
+      "id": "grub-file",
+      "name": "grub-file",
+      "description": "Checks to see if the given file is of the specified type"
+    },
+    {
+      "id": "grub-fstest",
+      "name": "grub-fstest",
+      "description": "Is a tool to debug the file system driver"
+    },
+    {
+      "id": "grub-glue-efi",
+      "name": "grub-glue-efi",
+      "description": "Glues 32-bit and 64-bit binaries into a single file (for Apple machines)"
+    },
+    {
+      "id": "grub-install",
+      "name": "grub-install",
+      "description": "Installs GRUB on your drive"
+    },
+    {
+      "id": "grub-kbdcomp",
+      "name": "grub-kbdcomp",
+      "description": "Is a script that converts an xkb layout into one recognized by GRUB"
+    },
+    {
+      "id": "grub-macbless",
+      "name": "grub-macbless",
+      "description": "Is the Mac-style bless for HFS or HFS+ file systems (bless is peculiar to Apple machines; it makes a device bootable)"
+    },
+    {
+      "id": "grub-menulst2cfg",
+      "name": "grub-menulst2cfg",
+      "description": "Converts a GRUB Legacy menu.lst into a grub.cfg for use with GRUB 2"
+    },
+    {
+      "id": "grub-mkconfig",
+      "name": "grub-mkconfig",
+      "description": "Generates a grub.cfg file"
+    },
+    {
+      "id": "grub-mkimage",
+      "name": "grub-mkimage",
+      "description": "Makes a bootable image of GRUB"
+    },
+    {
+      "id": "grub-mklayout",
+      "name": "grub-mklayout",
+      "description": "Generates a GRUB keyboard layout file"
+    },
+    {
+      "id": "grub-mknetdir",
+      "name": "grub-mknetdir",
+      "description": "Prepares a GRUB netboot directory"
+    },
+    {
+      "id": "grub-mkpasswd-pbkdf2",
+      "name": "grub-mkpasswd-pbkdf2",
+      "description": "Generates an encrypted PBKDF2 password for use in the boot menu"
+    },
+    {
+      "id": "grub-mkrelpath",
+      "name": "grub-mkrelpath",
+      "description": "Makes a system pathname relative to its root"
+    },
+    {
+      "id": "grub-mkrescue",
+      "name": "grub-mkrescue",
+      "description": "Makes a bootable image of GRUB suitable for a floppy disk, CDROM/DVD, or a USB drive"
+    },
+    {
+      "id": "grub-mkstandalone",
+      "name": "grub-mkstandalone",
+      "description": "Generates a standalone image"
+    },
+    {
+      "id": "grub-ofpathname",
+      "name": "grub-ofpathname",
+      "description": "Is a helper program that prints the path to a GRUB device"
+    },
+    {
+      "id": "grub-probe",
+      "name": "grub-probe",
+      "description": "Probes device information for a given path or device"
+    },
+    {
+      "id": "grub-reboot",
+      "name": "grub-reboot",
+      "description": "Sets the default boot entry for GRUB for the next boot only"
+    },
+    {
+      "id": "grub-render-label",
+      "name": "grub-render-label",
+      "description": "Renders Apple .disk_label for Apple Macs"
+    },
+    {
+      "id": "grub-script-check",
+      "name": "grub-script-check",
+      "description": "Checks the GRUB configuration script for syntax errors"
+    },
+    {
+      "id": "grub-set-default",
+      "name": "grub-set-default",
+      "description": "Sets the default boot entry for GRUB"
+    },
+    {
+      "id": "grub-sparc64-setup",
+      "name": "grub-sparc64-setup",
+      "description": "Is a helper program for grub-setup"
+    },
+    {
+      "id": "grub-syslinux2cfg",
+      "name": "grub-syslinux2cfg",
+      "description": "Transforms a syslinux config file into grub.cfg format"
+    }
+  ]
+}

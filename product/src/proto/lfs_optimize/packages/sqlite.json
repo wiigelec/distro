@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "name": "sqlite",
+  "reference": {
+    "lfs_section": "ch-system-sqlite"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "python3 -m zipfile -e ../sqlite-doc-{version}.zip .",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr     \\\n            --disable-static  \\\n            --enable-fts{{4,5}} \\\n            CPPFLAGS=\"-D SQLITE_ENABLE_COLUMN_METADATA=1 \\\n                      -D SQLITE_ENABLE_UNLOCK_NOTIFY=1   \\\n                      -D SQLITE_ENABLE_DBSTAT_VTAB=1     \\\n                      -D SQLITE_SECURE_DELETE=1\"",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make LDFLAGS.rpath=\"\"",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "cp -v -R sqlite-doc-{version} -T /usr/share/doc/sqlite-3.53.4",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "sqlite3"
+    ],
+    "libraries": [
+      "libsqlite3.so"
+    ],
+    "directories": [
+      "/usr/share/doc/sqlite-3.53.4"
+    ]
+  },
+  "description": "The Sqlite package is a software library that implements a self-contained, serverless, zero-configuration, transactional SQL database engine.",
+  "document": {
+    "section_id": "ch-system-sqlite",
+    "filename": "sqlite.html",
+    "contents_id": "contents-sqlite"
+  },
+  "dependencies": {
+    "build": [],
+    "runtime": [],
+    "test": [],
+    "before": [],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "sqlite3",
+      "name": "sqlite3",
+      "description": "is a terminal-based front-end to the SQLite library that can evaluate queries interactively and display the results"
+    },
+    {
+      "id": "libsqlite3.so",
+      "name": "libsqlite3.so",
+      "description": "contains the SQLite API functions"
+    }
+  ],
+  "dependency_source_note": "No dependency entry for this package is present in the book dependency appendix."
+}

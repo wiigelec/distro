@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "name": "inetutils",
+  "reference": {
+    "lfs_section": "ch-system-inetutils"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "sed -i 's/def HAVE_TERMCAP_TGETENT/ 1/' telnet/telnet.c",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr        \\\n            --bindir=/usr/bin    \\\n            --localstatedir=/var \\\n            --disable-logger     \\\n            --disable-whois      \\\n            --disable-rcp        \\\n            --disable-rexec      \\\n            --disable-rlogin     \\\n            --disable-rsh        \\\n            --disable-servers",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "mv -v /usr/{{,s}}bin/ifconfig",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "dnsdomainname",
+      "ftp",
+      "ifconfig",
+      "hostname",
+      "ping",
+      "ping6",
+      "talk",
+      "telnet",
+      "tftp",
+      "traceroute"
+    ]
+  },
+  "description": "The Inetutils package contains programs for basic networking.",
+  "document": {
+    "section_id": "ch-system-inetutils",
+    "filename": "inetutils.html",
+    "contents_id": "contents-inetutils"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "GCC",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Ncurses",
+      "Patch",
+      "Sed",
+      "Texinfo",
+      "Zlib"
+    ],
+    "runtime": [
+      "GCC",
+      "Glibc",
+      "Ncurses",
+      "Readline"
+    ],
+    "test": [],
+    "before": [
+      "Tar"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "dnsdomainname",
+      "name": "dnsdomainname",
+      "description": "Show the system's DNS domain name"
+    },
+    {
+      "id": "ftp",
+      "name": "ftp",
+      "description": "Is the file transfer protocol program"
+    },
+    {
+      "id": "hostname",
+      "name": "hostname",
+      "description": "Reports or sets the name of the host"
+    },
+    {
+      "id": "ifconfig",
+      "name": "ifconfig",
+      "description": "Manages network interfaces"
+    },
+    {
+      "id": "ping",
+      "name": "ping",
+      "description": "Sends echo-request packets and reports how long the replies take"
+    },
+    {
+      "id": "ping6",
+      "name": "ping6",
+      "description": "A version of ping for IPv6 networks"
+    },
+    {
+      "id": "talk",
+      "name": "talk",
+      "description": "Is used to chat with another user"
+    },
+    {
+      "id": "telnet",
+      "name": "telnet",
+      "description": "An interface to the TELNET protocol"
+    },
+    {
+      "id": "tftp",
+      "name": "tftp",
+      "description": "A trivial file transfer program"
+    },
+    {
+      "id": "traceroute",
+      "name": "traceroute",
+      "description": "Traces the route your packets take from the host you are working on to another host on a network, showing all the intermediate hops (gateways) along the way"
+    }
+  ]
+}

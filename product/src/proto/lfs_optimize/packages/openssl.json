@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "name": "openssl",
+  "reference": {
+    "lfs_section": "ch-system-openssl"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./config --prefix=/usr         \\\n         --openssldir=/etc/ssl \\\n         --libdir=lib          \\\n         shared                \\\n         zlib-dynamic",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make test",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make INSTALL_LIBS= MANSUFFIX=ssl install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "mv -v /usr/share/doc/openssl /usr/share/doc/openssl-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "cp -vfr doc/* /usr/share/doc/openssl-{version}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "c_rehash",
+      "openssl"
+    ],
+    "libraries": [
+      "libcrypto.so",
+      "libssl.so"
+    ],
+    "directories": [
+      "/etc/ssl",
+      "/usr/include/openssl",
+      "/usr/lib/engines",
+      "/usr/share/doc/openssl-{version}"
+    ]
+  },
+  "description": "The OpenSSL package contains management tools and libraries relating to cryptography. These are useful for providing cryptographic functions to other packages, such as OpenSSH, email applications, and web browsers (for accessing HTTPS sites).",
+  "document": {
+    "section_id": "ch-system-openssl",
+    "filename": "openssl.html",
+    "contents_id": "contents-openssl"
+  },
+  "dependencies": {
+    "build": [
+      "Binutils",
+      "Coreutils",
+      "GCC",
+      "Make",
+      "Perl"
+    ],
+    "runtime": [
+      "Glibc",
+      "Perl"
+    ],
+    "test": [],
+    "before": [
+      "Coreutils",
+      "Kmod",
+      "Linux",
+      "Systemd"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "c_rehash",
+      "name": "c_rehash",
+      "description": "is a Perl script that scans all files in a directory and adds symbolic links to their hash values. Use of c_rehash is considered obsolete and should be replaced by openssl rehash command"
+    },
+    {
+      "id": "openssl-prog",
+      "name": "openssl",
+      "description": "is a command-line tool for using the various cryptography functions of OpenSSL's crypto library from the shell. It can be used for various functions which are documented in openssl(1)"
+    },
+    {
+      "id": "libcrypto",
+      "name": "libcrypto.so",
+      "description": "implements a wide range of cryptographic algorithms used in various Internet standards. The services provided by this library are used by the OpenSSL implementations of SSL, TLS and S/MIME, and they have also been used to implement OpenSSH, OpenPGP, and other cryptographic standards"
+    },
+    {
+      "id": "libssl",
+      "name": "libssl.so",
+      "description": "implements the Transport Layer Security (TLS v1) protocol. It provides a rich API, documentation on which can be found in ssl(7)"
+    }
+  ]
+}

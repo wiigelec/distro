@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "name": "gdbm",
+  "reference": {
+    "lfs_section": "ch-system-gdbm"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr    \\\n            --disable-static \\\n            --enable-libgdbm-compat",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "gdbm_dump",
+      "gdbm_load",
+      "gdbmtool"
+    ],
+    "libraries": [
+      "libgdbm.so",
+      "libgdbm_compat.so"
+    ]
+  },
+  "description": "The GDBM package contains the GNU Database Manager. It is a library of database functions that uses extensible hashing and works like the standard UNIX dbm. The library provides primitives for storing key/data pairs, searching and retrieving the data by its key and deleting a key along with its data.",
+  "document": {
+    "section_id": "ch-system-gdbm",
+    "filename": "gdbm.html",
+    "contents_id": "contents-gdbm"
+  },
+  "dependencies": {
+    "build": [],
+    "runtime": [],
+    "test": [],
+    "before": [],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "gdbm_dump",
+      "name": "gdbm_dump",
+      "description": "Dumps a GDBM database to a file"
+    },
+    {
+      "id": "gdbm_load",
+      "name": "gdbm_load",
+      "description": "Recreates a GDBM database from a dump file"
+    },
+    {
+      "id": "gdbmtool",
+      "name": "gdbmtool",
+      "description": "Tests and modifies a GDBM database"
+    },
+    {
+      "id": "libgdbm",
+      "name": "libgdbm",
+      "description": "Contains functions to manipulate a hashed database"
+    },
+    {
+      "id": "libgdbm_compat",
+      "name": "libgdbm_compat",
+      "description": "Compatibility library containing older DBM functions"
+    }
+  ],
+  "dependency_source_note": "No dependency entry for this package is present in the book dependency appendix."
+}

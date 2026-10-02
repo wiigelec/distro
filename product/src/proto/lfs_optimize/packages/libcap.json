@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "name": "libcap",
+  "reference": {
+    "lfs_section": "ch-system-libcap"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "sed -i '/install -m.*STA/d' libcap/Makefile",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make prefix=/usr lib=lib",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make test",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make prefix=/usr lib=lib install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "capsh",
+      "getcap",
+      "getpcaps",
+      "setcap"
+    ],
+    "libraries": [
+      "libcap.so",
+      "libpsx.so"
+    ]
+  },
+  "description": "The Libcap package implements the userspace interface to the POSIX 1003.1e capabilities available in Linux kernels. These capabilities partition the all-powerful root privilege into a set of distinct privileges.",
+  "document": {
+    "section_id": "ch-system-libcap",
+    "filename": "libcap.html",
+    "contents_id": "contents-libcap"
+  },
+  "dependencies": {
+    "build": [
+      "Attr",
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "GCC",
+      "Glibc",
+      "Perl",
+      "Make",
+      "Sed"
+    ],
+    "runtime": [
+      "Glibc"
+    ],
+    "test": [],
+    "before": [
+      "IProute2",
+      "Shadow"
+    ],
+    "optional": [
+      "Linux-PAM"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "capsh",
+      "name": "capsh",
+      "description": "A shell wrapper to explore and constrain capability support"
+    },
+    {
+      "id": "getcap",
+      "name": "getcap",
+      "description": "Examines file capabilities"
+    },
+    {
+      "id": "getpcaps",
+      "name": "getpcaps",
+      "description": "Displays the capabilities of the queried process(es)"
+    },
+    {
+      "id": "setcap",
+      "name": "setcap",
+      "description": "Sets file capabilities"
+    },
+    {
+      "id": "libcap",
+      "name": "libcap",
+      "description": "Contains the library functions for manipulating POSIX 1003.1e capabilities"
+    },
+    {
+      "id": "libpsx",
+      "name": "libpsx",
+      "description": "Contains functions to support POSIX semantics for syscalls associated with the pthread library"
+    }
+  ]
+}

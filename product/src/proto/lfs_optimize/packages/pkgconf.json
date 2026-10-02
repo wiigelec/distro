@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "name": "pkgconf",
+  "reference": {
+    "lfs_section": "ch-system-pkgconf"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "tar -xf ../meson-1.12.1.tar.gz",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "mkdir build\ncd    build\n\npython3 ../meson-1.12.1/meson.py setup --prefix=/usr --buildtype=release ..",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "ninja",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "ninja test",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "ninja install\nmv /usr/share/doc/pkgconf{{,-{version}}}",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "ln -sv pkgconf   /usr/bin/pkg-config\nln -sv pkgconf.1 /usr/share/man/man1/pkg-config.1",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "pkgconf",
+      "pkg-config (link to pkgconf)",
+      "bomtool"
+    ],
+    "libraries": [
+      "libpkgconf.so"
+    ],
+    "directories": [
+      "/usr/share/doc/pkgconf-{version}"
+    ]
+  },
+  "description": "The pkgconf package is a successor to pkg-config and contains a tool for passing the include path and/or library paths to build tools during the configure and make phases of package installations.",
+  "document": {
+    "section_id": "ch-system-pkgconf",
+    "filename": "pkgconf.html",
+    "contents_id": "contents-pkgconf"
+  },
+  "dependencies": {
+    "build": [
+      "Binutils",
+      "GCC",
+      "Glibc",
+      "Meson",
+      "Ninja",
+      "Python"
+    ],
+    "runtime": [
+      "Glibc"
+    ],
+    "test": [],
+    "before": [
+      "Binutils",
+      "D-Bus",
+      "E2fsprogs",
+      "IProute2",
+      "Kmod",
+      "Man-DB",
+      "Procps-ng",
+      "Python",
+      "Systemd",
+      "Util-linux"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "pkgconf",
+      "name": "pkgconf",
+      "description": "Returns meta information for the specified library or package"
+    },
+    {
+      "id": "bomtool",
+      "name": "bomtool",
+      "description": "Generates a Software Bill Of Materials from pkg-config .pc files"
+    },
+    {
+      "id": "libpkgconf",
+      "name": "libpkgconf.so",
+      "description": "Contains most of pkgconf's functionality, while allowing other tools like IDEs and compilers to use its frameworks"
+    }
+  ]
+}

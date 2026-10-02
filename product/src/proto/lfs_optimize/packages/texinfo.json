@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "name": "texinfo",
+  "reference": {
+    "lfs_section": "ch-system-texinfo"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make TEXMF=/usr/share/texmf install-tex",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "info",
+      "install-info",
+      "makeinfo (link to texi2any)",
+      "pdftexi2dvi",
+      "pod2texi",
+      "texi2any",
+      "texi2dvi",
+      "texi2pdf",
+      "texindex"
+    ],
+    "libraries": [
+      "MiscXS.so",
+      "Parsetexi.so",
+      "XSParagraph.so (all in /usr/lib/texinfo)"
+    ],
+    "directories": [
+      "/usr/share/texinfo",
+      "/usr/lib/texinfo"
+    ]
+  },
+  "description": "The Texinfo package contains programs for reading, writing, and converting info pages.",
+  "document": {
+    "section_id": "ch-system-texinfo",
+    "filename": "texinfo.html",
+    "contents_id": "contents-texinfo"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "GCC",
+      "Gettext",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Ncurses",
+      "Patch",
+      "Sed"
+    ],
+    "runtime": [
+      "Glibc",
+      "Ncurses"
+    ],
+    "test": [],
+    "before": [],
+    "optional": [
+      "SWIG"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "info",
+      "name": "info",
+      "description": "Used to read info pages which are similar to man pages, but often go much deeper than just explaining all the available command line options [For example, compare man bison and info bison.]"
+    },
+    {
+      "id": "install-info",
+      "name": "install-info",
+      "description": "Used to install info pages; it updates entries in the info index file"
+    },
+    {
+      "id": "makeinfo",
+      "name": "makeinfo",
+      "description": "Translates the given Texinfo source documents into info pages, plain text, or HTML"
+    },
+    {
+      "id": "pdftexi2dvi",
+      "name": "pdftexi2dvi",
+      "description": "Used to format the given Texinfo document into a Portable Document Format (PDF) file"
+    },
+    {
+      "id": "pod2texi",
+      "name": "pod2texi",
+      "description": "Converts Pod to Texinfo format"
+    },
+    {
+      "id": "texi2any",
+      "name": "texi2any",
+      "description": "Translate Texinfo source documentation to various other formats"
+    },
+    {
+      "id": "texi2dvi",
+      "name": "texi2dvi",
+      "description": "Used to format the given Texinfo document into a device-independent file that can be printed"
+    },
+    {
+      "id": "texi2pdf",
+      "name": "texi2pdf",
+      "description": "Used to format the given Texinfo document into a Portable Document Format (PDF) file"
+    },
+    {
+      "id": "texindex",
+      "name": "texindex",
+      "description": "Used to sort Texinfo index files"
+    }
+  ]
+}

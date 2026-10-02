@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "name": "expect",
+  "reference": {
+    "lfs_section": "ch-system-expect"
+  },
+  "procedure": [
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "python3 -c 'from pty import spawn; spawn([\"echo\", \"ok\"])'",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "prepare",
+      "commands": [
+        {
+          "command": "patch -Np1 -i ../expect-{version}-gcc15-1.patch",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr           \\\n            --with-tcl=/usr/lib     \\\n            --enable-shared         \\\n            --disable-rpath         \\\n            --mandir=/usr/share/man \\\n            --with-tclinclude=/usr/include",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make test",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install\nln -svf expect{version}/libexpect{version}.so /usr/lib",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "expect"
+    ],
+    "libraries": [
+      "libexpect{version}.so"
+    ]
+  },
+  "description": "The Expect package contains tools for automating, via scripted dialogues, interactive applications such as telnet, ftp, passwd, fsck, rlogin, and tip. Expect is also useful for testing these same applications as well as easing all sorts of tasks that are prohibitively difficult with anything else. The DejaGnu framework is written in Expect.",
+  "document": {
+    "section_id": "ch-system-expect",
+    "filename": "expect.html",
+    "contents_id": "contents-expect"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Diffutils",
+      "GCC",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Patch",
+      "Sed",
+      "Tcl"
+    ],
+    "runtime": [
+      "Glibc",
+      "Tcl"
+    ],
+    "test": [],
+    "before": [],
+    "optional": [
+      "Tk"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "expect",
+      "name": "expect",
+      "description": "Communicates with other interactive programs according to a script"
+    },
+    {
+      "id": "libexpect",
+      "name": "libexpect-{version}.so",
+      "description": "Contains functions that allow Expect to be used as a Tcl extension or to be used directly from C or C++ (without Tcl)"
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "name": "libffi",
+  "reference": {
+    "lfs_section": "ch-system-libffi"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr    \\\n            --disable-static \\\n            --with-gcc-arch=native",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "make",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "make check",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "make install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "libraries": [
+      "libffi.so"
+    ]
+  },
+  "description": "The Libffi library provides a portable, high level programming interface to various calling conventions. This allows a programmer to call any function specified by a call interface description at run time.",
+  "document": {
+    "section_id": "ch-system-libffi",
+    "filename": "libffi.html",
+    "contents_id": "contents-libffi"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "GCC",
+      "Glibc",
+      "Make",
+      "Sed"
+    ],
+    "runtime": [
+      "Glibc"
+    ],
+    "test": [
+      "DejaGnu"
+    ],
+    "before": [
+      "Python"
+    ],
+    "optional": []
+  },
+  "installed_descriptions": [
+    {
+      "id": "libffi",
+      "name": "libffi",
+      "description": "Contains the foreign function interface API functions"
+    }
+  ]
+}

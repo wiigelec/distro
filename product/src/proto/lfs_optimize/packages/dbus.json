@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "name": "dbus",
+  "reference": {
+    "lfs_section": "ch-system-dbus"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "commands": [
+        {
+          "command": "mkdir build\ncd    build\n\nmeson setup --prefix=/usr --buildtype=release --wrap-mode=nofallback ..",
+          "user": "root"
+        }
+      ],
+      "working_directory": "source",
+      "condition": "always"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        {
+          "command": "ninja",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        {
+          "command": "ninja test",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "tests-enabled"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "ninja install",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        {
+          "command": "ln -sfv /etc/machine-id /var/lib/dbus",
+          "user": "root"
+        }
+      ],
+      "working_directory": "build",
+      "condition": "always"
+    }
+  ],
+  "installed": {
+    "programs": [
+      "dbus-cleanup-sockets",
+      "dbus-daemon",
+      "dbus-launch",
+      "dbus-monitor",
+      "dbus-run-session",
+      "dbus-send",
+      "dbus-test-tool",
+      "dbus-update-activation-environment",
+      "dbus-uuidgen"
+    ],
+    "libraries": [
+      "libdbus-1.so"
+    ],
+    "directories": [
+      "/etc/dbus-1",
+      "/usr/include/dbus-1.0",
+      "/usr/lib/dbus-1.0",
+      "/usr/share/dbus-1",
+      "/usr/share/doc/dbus-{version}",
+      "/var/lib/dbus"
+    ]
+  },
+  "description": "D-Bus is a message bus system, a simple way for applications to talk to one another. D-Bus supplies both a system daemon (for events such as \"new hardware device added\" or \"printer queue changed\") and a per-user-login-session daemon (for general IPC needs among user applications). Also, the message bus is built on top of a general one-to-one message passing framework, which can be used by any two applications to communicate directly (without going through the message bus daemon).",
+  "document": {
+    "section_id": "ch-system-dbus",
+    "filename": "dbus.html",
+    "contents_id": "contents-dbus"
+  },
+  "dependencies": {
+    "build": [
+      "Bash",
+      "Binutils",
+      "Coreutils",
+      "Diffutils",
+      "Gawk",
+      "GCC",
+      "Glibc",
+      "Grep",
+      "Make",
+      "Pkgconf",
+      "Sed",
+      "Systemd",
+      "Util-linux"
+    ],
+    "runtime": [
+      "Glibc",
+      "Systemd"
+    ],
+    "test": [
+      "Several packages in BLFS"
+    ],
+    "before": [],
+    "optional": [
+      "Xorg Libraries"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "dbus-cleanup-sockets",
+      "name": "dbus-cleanup-sockets",
+      "description": "is used to remove leftover sockets in a directory"
+    },
+    {
+      "id": "dbus-daemon",
+      "name": "dbus-daemon",
+      "description": "is the D-Bus message bus daemon"
+    },
+    {
+      "id": "dbus-launch",
+      "name": "dbus-launch",
+      "description": "starts dbus-daemon from a shell script"
+    },
+    {
+      "id": "dbus-monitor",
+      "name": "dbus-monitor",
+      "description": "monitors messages passing through a D-Bus message bus"
+    },
+    {
+      "id": "dbus-run-session",
+      "name": "dbus-run-session",
+      "description": "starts a session bus instance of dbus-daemon from a shell script and starts a specified program in that session"
+    },
+    {
+      "id": "dbus-send",
+      "name": "dbus-send",
+      "description": "sends a message to a D-Bus message bus"
+    },
+    {
+      "id": "dbus-test-tool",
+      "name": "dbus-test-tool",
+      "description": "is a tool to help packages test D-Bus"
+    },
+    {
+      "id": "dbus-update-activation-environment",
+      "name": "dbus-update-activation-environment",
+      "description": "updates environment variables that will be set for D-Bus session services"
+    },
+    {
+      "id": "dbus-uuidgen",
+      "name": "dbus-uuidgen",
+      "description": "Generates a universally unique ID"
+    },
+    {
+      "id": "libdbus-1",
+      "name": "libdbus-1",
+      "description": "Contains API functions used to communicate with the D-Bus message bus"
+    }
+  ]
+}
