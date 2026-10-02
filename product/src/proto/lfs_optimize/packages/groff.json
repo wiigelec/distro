@@ -9,7 +9,7 @@
       "phase": "configure",
       "commands": [
         {
-          "command": "PAGE=<paper_size> ./configure --prefix=/usr",
+          "command": "PAGE=letter ./configure --prefix=/usr",
           "user": "root"
         }
       ],
