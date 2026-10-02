@@ -121,10 +121,14 @@ id tester
 """
 
     try:
-        run_checked([
-            backend, "run", "--name", container_name,
+        run_args = [backend, "run"]
+        if backend_name == "podman":
+            run_args.extend(["--network", "host"])
+        run_args.extend([
+            "--name", container_name,
             IMAGE, "/bin/sh", "-c", setup,
         ])
+        run_checked(run_args)
 
         export = subprocess.Popen(
             [backend, "export", container_name],
