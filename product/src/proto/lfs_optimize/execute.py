@@ -27,6 +27,7 @@ from artifact import (
 from resolve import HERE, resolve
 
 USER_AGENT = "distro-lfs-optimize-prototype/0"
+LFS_SOURCE_MIRROR = "https://ftp.osuosl.org/pub/lfs/lfs-packages/13.1/"
 CACHE_SCHEMA_VERSION = 4
 
 
@@ -65,13 +66,14 @@ def cached_download(item: dict[str, Any], cache_root: Path) -> Path:
     expected = item["md5"]
     suffix = Path(item["url"]).name
     path = cache_root / "sources" / f"{expected}-{suffix}"
+    mirror_url = LFS_SOURCE_MIRROR + suffix
     if not path.is_file():
-        download(item["url"], path)
+        download(mirror_url, path)
     actual = md5_file(path)
     if actual != expected:
         path.unlink(missing_ok=True)
         raise RuntimeError(
-            f"source checksum mismatch for {item['url']}: {actual} != {expected}"
+            f"source checksum mismatch for {mirror_url}: {actual} != {expected}"
         )
     return path
 

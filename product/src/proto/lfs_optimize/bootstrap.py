@@ -18,6 +18,7 @@ from typing import Any
 HERE = Path(__file__).resolve().parent
 PLAN_PATH = HERE / "bootstrap-13.1.json"
 USER_AGENT = "distro-lfs-bootstrap/0"
+LFS_SOURCE_MIRROR = "https://ftp.osuosl.org/pub/lfs/lfs-packages/13.1/"
 
 
 def require_root() -> None:
@@ -191,7 +192,11 @@ def copy_source_inputs(plan: dict[str, Any], root: Path, cache: Path) -> dict[st
     archives: dict[str, Path] = {}
     for key, item in plan["sources"].items():
         filename = item["filename"]
-        cached = download(item["url"], cache / "bootstrap-sources" / filename, item["md5"])
+        cached = download(
+            LFS_SOURCE_MIRROR + filename,
+            cache / "bootstrap-sources" / filename,
+            item["md5"],
+        )
         destination = sources_dir / filename
         if not destination.exists():
             shutil.copy2(cached, destination)
@@ -199,7 +204,9 @@ def copy_source_inputs(plan: dict[str, Any], root: Path, cache: Path) -> dict[st
         for resource in item.get("resources", {}).values():
             rname = resource["filename"]
             rcached = download(
-                resource["url"], cache / "bootstrap-sources" / rname, resource["md5"]
+                LFS_SOURCE_MIRROR + rname,
+                cache / "bootstrap-sources" / rname,
+                resource["md5"]
             )
             rdest = sources_dir / rname
             if not rdest.exists():

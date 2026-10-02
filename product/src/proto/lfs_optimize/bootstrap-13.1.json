@@ -111,9 +111,9 @@
     },
     "linux": {
       "version": "7.1.8",
-      "url": "https://www.kernel.org/pub/linux/kernel/v6.x/patch-7.1.8.xz",
+      "url": "https://www.kernel.org/pub/linux/kernel/v7.x/linux-7.1.8.tar.xz",
       "md5": "807584f564568b40162e9e4a72bf191f",
-      "filename": "patch-7.1.8.xz"
+      "filename": "linux-7.1.8.tar.xz"
     },
     "m4": {
       "version": "1.4.21",
