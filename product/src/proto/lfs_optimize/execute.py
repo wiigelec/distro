@@ -30,6 +30,16 @@ USER_AGENT = "distro-lfs-optimize-prototype/0"
 CACHE_SCHEMA_VERSION = 4
 
 
+def effective_jobs() -> int:
+    completed = subprocess.run(
+        ["nproc"], check=True, capture_output=True, text=True
+    )
+    jobs = int(completed.stdout.strip())
+    if jobs < 1:
+        raise RuntimeError(f"nproc returned invalid job count: {jobs}")
+    return jobs
+
+
 def canonical_sha256(value: Any) -> str:
     payload = json.dumps(value, sort_keys=True, separators=(",", ":")).encode()
     return hashlib.sha256(payload).hexdigest()
@@ -146,11 +156,12 @@ def virtual_mounts(root: Path):
 
 
 def chroot_command(root: Path, command: dict[str, Any], cwd: str,
-                   log, index: int) -> dict[str, Any]:
+                   log, index: int, jobs: int) -> dict[str, Any]:
     user = command["user"]
     env = {
         "HOME": "/root" if user == "root" else f"/home/{user}",
         "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+        "MAKEFLAGS": f"-j{jobs}",
     }
     env.update(command.get("environment", {}))
     exports = " ".join(
@@ -225,6 +236,7 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
     if not (root / "usr/bin/bash").is_file():
         raise RuntimeError(f"{root}: execution root lacks /usr/bin/bash")
 
+    jobs = effective_jobs()
     before = snapshot(root)
     base_digest = snapshot_digest(before)
     definition_digest = canonical_sha256(package)
@@ -233,6 +245,7 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
         "resolved_package_sha256": definition_digest,
         "baseline_root_sha256": base_digest,
         "tests": run_tests,
+        "jobs": jobs,
     })
     artifact = cache / "artifacts" / f"{package['name']}-{package['version']}-{cache_key}.tar.xz"
     result_path = work / package["name"] / "result.json"
@@ -252,6 +265,7 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
             "artifact_sha256": sha256_file(artifact),
             "baseline_root_sha256": base_digest,
             "cache_schema_version": CACHE_SCHEMA_VERSION,
+            "jobs": jobs,
             "realization_verified": True,
             "resolved_package_sha256": definition_digest,
         }
@@ -314,7 +328,7 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
                 else:
                     with virtual_mounts(execution_root):
                         item = chroot_command(
-                            execution_root, command, step_cwd, log, index
+                            execution_root, command, step_cwd, log, index, jobs
                         )
                     item["executed"] = True
                 item["phase"] = step["phase"]
@@ -328,6 +342,7 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
                         "failed_command": item,
                         "commands": command_results,
                         "build_log": str(log_path),
+                        "jobs": jobs,
                     }
                     result_path.write_text(
                         json.dumps(result, indent=2, sort_keys=True) + "\n"
@@ -376,6 +391,7 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
         "artifact_sha256": sha256_file(artifact),
         "baseline_root_sha256": base_digest,
         "cache_schema_version": CACHE_SCHEMA_VERSION,
+        "jobs": jobs,
         "realization_verified": True,
         "resolved_package_sha256": definition_digest,
         "changed_paths": changed,
