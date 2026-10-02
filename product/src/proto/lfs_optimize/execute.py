@@ -83,24 +83,33 @@ def mirror_md5_index(cache_root: Path) -> dict[str, str]:
     return index
 
 
-def cached_download(item: dict[str, Any], cache_root: Path) -> Path:
+def cached_download(
+    item: dict[str, Any], cache_root: Path, *, mirror_required: bool
+) -> Path:
     expected = item["md5"]
     suffix = mirror_md5_index(cache_root).get(expected)
-    if suffix is None:
+
+    if suffix is not None:
+        url = LFS_SOURCE_MIRROR + suffix
+    elif mirror_required:
         raise RuntimeError(
             f"LFS 13.1 mirror does not list expected md5 {expected} "
-            f"for {item['url']}"
+            f"for package source {item['url']}"
         )
+    else:
+        url = item["url"]
+        suffix = Path(url).name
+        if not suffix:
+            raise RuntimeError(f"resource URL has no filename: {url}")
 
     path = cache_root / "sources" / f"{expected}-{suffix}"
-    mirror_url = LFS_SOURCE_MIRROR + suffix
     if not path.is_file():
-        download(mirror_url, path)
+        download(url, path)
     actual = md5_file(path)
     if actual != expected:
         path.unlink(missing_ok=True)
         raise RuntimeError(
-            f"source checksum mismatch for {mirror_url}: {actual} != {expected}"
+            f"source checksum mismatch for {url}: {actual} != {expected}"
         )
     return path
 
@@ -227,14 +236,14 @@ def prepare_sources(package: dict[str, Any], clone: Path, cache: Path) -> str:
         shutil.rmtree(host_build_root)
     host_build_root.mkdir(parents=True)
 
-    source_archive = cached_download(package["source"], cache)
+    source_archive = cached_download(package["source"], cache, mirror_required=True)
     extracted = safe_extract_source(source_archive, host_build_root / "unpack")
     host_source = host_build_root / "source"
     extracted.rename(host_source)
     shutil.rmtree(host_build_root / "unpack")
 
     for resource in package.get("resources", {}).values():
-        resource_path = cached_download(resource, cache)
+        resource_path = cached_download(resource, cache, mirror_required=False)
         shutil.copy2(resource_path, host_build_root / Path(resource["url"]).name)
 
     return f"/tmp/distro-lfs-optimize/{name}-{version}/source"
