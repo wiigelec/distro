@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 import os
 import shutil
@@ -9,10 +10,11 @@ import stat
 import tarfile
 import tempfile
 import posixpath
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 IGNORED_TOP_LEVEL = {"dev", "proc", "sys", "run"}
+DELETION_MANIFEST = ".__distro_lfs_optimize_deletions__.json"
 
 
 def sha256_file(path: Path) -> str:
@@ -154,11 +156,28 @@ def materialize_delta(
             raise RuntimeError(f"unsupported changed filesystem object: {relative}")
 
 
-def create_tar_xz(stage_root: Path, artifact: Path) -> None:
+def create_tar_xz(
+    stage_root: Path, artifact: Path, deleted: list[str] | None = None
+) -> None:
     artifact.parent.mkdir(parents=True, exist_ok=True)
+    deletions = deleted or []
+    payload = json.dumps(
+        {"schema_version": 1, "deleted": deletions},
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode()
     with tarfile.open(artifact, "w:xz") as tar:
+        info = tarfile.TarInfo(DELETION_MANIFEST)
+        info.size = len(payload)
+        info.mode = 0o600
+        tar.addfile(info, io.BytesIO(payload))
         for path in sorted(stage_root.rglob("*")):
-            tar.add(path, arcname=path.relative_to(stage_root), recursive=False)
+            relative = path.relative_to(stage_root).as_posix()
+            if relative == DELETION_MANIFEST:
+                raise RuntimeError(
+                    f"artifact payload collides with reserved member: {relative}"
+                )
+            tar.add(path, arcname=relative, recursive=False)
 
 
 def _validate_artifact_member(member: tarfile.TarInfo) -> None:
@@ -179,24 +198,65 @@ def _validate_artifact_member(member: tarfile.TarInfo) -> None:
             )
 
 
+def _validate_deleted_path(path: str) -> str:
+    normalized = posixpath.normpath(path)
+    if (
+        not path
+        or path.startswith("/")
+        or normalized in {".", ".."}
+        or normalized.startswith("../")
+    ):
+        raise RuntimeError(f"artifact deletion escapes target root: {path}")
+    return normalized
+
+
 def extract_tar_xz(artifact: Path, target_root: Path) -> None:
     target_root.mkdir(parents=True, exist_ok=True)
     with tarfile.open(artifact, "r:xz") as tar:
         members = tar.getmembers()
-        for member in members:
+        manifests = [member for member in members if member.name == DELETION_MANIFEST]
+        if len(manifests) > 1:
+            raise RuntimeError("artifact contains multiple deletion manifests")
+
+        deleted: list[str] = []
+        if manifests:
+            manifest_file = tar.extractfile(manifests[0])
+            if manifest_file is None:
+                raise RuntimeError("artifact deletion manifest is unreadable")
+            manifest = json.load(manifest_file)
+            if (
+                not isinstance(manifest, dict)
+                or manifest.get("schema_version") != 1
+                or not isinstance(manifest.get("deleted"), list)
+                or not all(isinstance(path, str) for path in manifest["deleted"])
+            ):
+                raise RuntimeError("artifact deletion manifest is invalid")
+            deleted = [_validate_deleted_path(path) for path in manifest["deleted"]]
+
+        payload_members = [
+            member for member in members if member.name != DELETION_MANIFEST
+        ]
+        for member in payload_members:
             _validate_artifact_member(member)
+
+        for relative in sorted(
+            set(deleted), key=lambda path: len(PurePosixPath(path).parts), reverse=True
+        ):
+            target = target_root / relative
+            if target.is_symlink() or target.exists():
+                if target.is_dir():
+                    shutil.rmtree(target)
+                else:
+                    target.unlink()
 
         # Artifact members define the final topology. Remove existing
         # non-directory targets first so extraction cannot preserve stale
         # baseline hardlinks when a package replaces one side of a link.
-        for member in members:
+        for member in payload_members:
             target = target_root / member.name
             if member.isdir():
                 if target.exists() and not target.is_dir():
-                    if target.is_symlink():
-                        target.unlink()
-                    else:
-                        target.unlink()
+                    target.unlink()
                 continue
             if target.is_symlink() or target.exists():
                 if target.is_dir():
@@ -206,10 +266,15 @@ def extract_tar_xz(artifact: Path, target_root: Path) -> None:
 
         try:
             tar.extractall(
-                target_root, numeric_owner=True, filter="fully_trusted"
+                target_root,
+                members=payload_members,
+                numeric_owner=True,
+                filter="fully_trusted",
             )
         except TypeError:
-            tar.extractall(target_root, numeric_owner=True)
+            tar.extractall(
+                target_root, members=payload_members, numeric_owner=True
+            )
 
 
 def self_test() -> None:
@@ -225,6 +290,13 @@ def self_test() -> None:
         (before_root / "var/cache/private").chmod(0o700)
         (before_root / "var/cache/private/keep").write_text("same\n", encoding="utf-8")
         (before_root / "usr/bin/keep").write_text("same\n", encoding="utf-8")
+        (before_root / "usr/bin/remove-me").write_text(
+            "remove\n", encoding="utf-8"
+        )
+        (before_root / "usr/share/remove-tree").mkdir(parents=True)
+        (before_root / "usr/share/remove-tree/old").write_text(
+            "old\n", encoding="utf-8"
+        )
         (before_root / "usr/target/bin").mkdir(parents=True)
         (before_root / "usr/bin/split-link").write_text(
             "baseline\n", encoding="utf-8"
@@ -234,6 +306,8 @@ def self_test() -> None:
             before_root / "usr/target/bin/split-link",
         )
         shutil.copytree(before_root, after_root, dirs_exist_ok=True)
+        (after_root / "usr/bin/remove-me").unlink()
+        shutil.rmtree(after_root / "usr/share/remove-tree")
         (after_root / "usr/bin/new").write_text("new\n", encoding="utf-8")
         (after_root / "var/cache/private/new").write_text("new\n", encoding="utf-8")
         (after_root / "usr/bin/keep").write_text("changed\n", encoding="utf-8")
@@ -255,12 +329,10 @@ def self_test() -> None:
         before = snapshot(before_root)
         after = snapshot(after_root)
         changed, deleted = delta(before, after)
-        if deleted:
-            raise RuntimeError(f"self-test unexpected deletion: {deleted}")
         materialize_delta(after_root, stage, changed, after)
 
         artifact = base / "proof.tar.xz"
-        create_tar_xz(stage, artifact)
+        create_tar_xz(stage, artifact, deleted)
         shutil.copytree(before_root, realized)
         extract_tar_xz(artifact, realized)
 

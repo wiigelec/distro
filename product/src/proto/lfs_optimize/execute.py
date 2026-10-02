@@ -392,16 +392,11 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
 
     after = snapshot(clone)
     changed, deleted = delta(before, after)
-    if deleted:
-        raise RuntimeError(
-            f"{package['name']}: tar-only artifact cannot represent deletion "
-            f"of baseline paths: {deleted[:20]}"
-        )
-    if not changed:
+    if not changed and not deleted:
         raise RuntimeError(f"{package['name']}: build produced no filesystem delta")
 
     materialize_delta(clone, stage, changed, after)
-    create_tar_xz(stage, artifact)
+    create_tar_xz(stage, artifact, deleted)
 
     clone_root(root, realized)
     extract_tar_xz(artifact, realized)
@@ -433,6 +428,7 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
         "realization_verified": True,
         "resolved_package_sha256": definition_digest,
         "changed_paths": changed,
+        "deleted_paths": deleted,
         "commands": command_results,
         "build_log": str(log_path),
     }
