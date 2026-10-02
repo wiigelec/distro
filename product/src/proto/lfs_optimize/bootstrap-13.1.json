@@ -1,0 +1,587 @@
+{
+  "schema_version": 1,
+  "basis": {
+    "project": "Linux From Scratch",
+    "version": "13.1-systemd",
+    "published": "2026-09-01"
+  },
+  "target": "x86_64-lfs-linux-gnu",
+  "sources": {
+    "Python": {
+      "version": "3.14.7",
+      "url": "https://www.python.org/ftp/python/3.14.7/Python-3.14.7.tar.xz",
+      "md5": "a4c4c2991b4126e227073c2d9445f432",
+      "filename": "Python-3.14.7.tar.xz"
+    },
+    "bash": {
+      "version": "5.3",
+      "url": "https://ftpmirror.gnu.org/bash/bash-5.3.tar.gz",
+      "md5": "977c8c0c5ae6309191e7768e28ebc951",
+      "filename": "bash-5.3.tar.gz"
+    },
+    "binutils": {
+      "version": "2.47",
+      "url": "https://sourceware.org/pub/binutils/releases/binutils-2.47.tar.xz",
+      "md5": "d772acfbd55a81644e9fe7b8189cd2a5",
+      "filename": "binutils-2.47.tar.xz"
+    },
+    "bison": {
+      "version": "3.8.2",
+      "url": "https://ftpmirror.gnu.org/bison/bison-3.8.2.tar.xz",
+      "md5": "c28f119f405a2304ff0a7ccdcc629713",
+      "filename": "bison-3.8.2.tar.xz"
+    },
+    "coreutils": {
+      "version": "9.11",
+      "url": "https://ftpmirror.gnu.org/coreutils/coreutils-9.11.tar.xz",
+      "md5": "e52e9857e4aa9ae38ef32f8ed6a27604",
+      "filename": "coreutils-9.11.tar.xz"
+    },
+    "diffutils": {
+      "version": "3.12",
+      "url": "https://ftpmirror.gnu.org/diffutils/diffutils-3.12.tar.xz",
+      "md5": "d1b18b20868fb561f77861cd90b05de4",
+      "filename": "diffutils-3.12.tar.xz"
+    },
+    "file": {
+      "version": "5.48",
+      "url": "https://astron.com/pub/file/file-5.48.tar.gz",
+      "md5": "423686e97f731d8c24e9cd1a22b03dec",
+      "filename": "file-5.48.tar.gz"
+    },
+    "findutils": {
+      "version": "4.11.0",
+      "url": "https://ftpmirror.gnu.org/findutils/findutils-4.11.0.tar.xz",
+      "md5": "512c6875ed84034dca240c4bc9380b96",
+      "filename": "findutils-4.11.0.tar.xz"
+    },
+    "gawk": {
+      "version": "5.4.1",
+      "url": "https://ftpmirror.gnu.org/gawk/gawk-5.4.1.tar.xz",
+      "md5": "d379c2110e7a3e15347dd5559a41ad64",
+      "filename": "gawk-5.4.1.tar.xz"
+    },
+    "gcc": {
+      "version": "16.2.0",
+      "url": "https://ftpmirror.gnu.org/gcc/gcc-16.2.0/gcc-16.2.0.tar.xz",
+      "md5": "19b777fb19ea4982731392481306f0d3",
+      "filename": "gcc-16.2.0.tar.xz"
+    },
+    "gettext": {
+      "version": "1.0",
+      "url": "https://ftpmirror.gnu.org/gettext/gettext-1.0.tar.xz",
+      "md5": "dc8b2911535929cec1e263706b0a13a1",
+      "filename": "gettext-1.0.tar.xz"
+    },
+    "glibc": {
+      "version": "2.44",
+      "url": "https://sourceware.org/git/?p=glibc.git;a=shortlog;h=refs/heads/release/2.44/master",
+      "md5": "7677da43ef759c68e005f5d4c37986a6",
+      "filename": "master",
+      "resources": {
+        "fhs": {
+          "url": "https://www.linuxfromscratch.org/patches/lfs/13.1/glibc-fhs-1.patch",
+          "md5": "9a5997c3452909b1769918c759eff8a2",
+          "filename": "glibc-fhs-1.patch"
+        },
+        "upstream-fixes": {
+          "url": "https://www.linuxfromscratch.org/patches/lfs/13.1/glibc-2.44-upstream_fixes-1.patch",
+          "md5": "990574184b25aa3029a2444e81865098",
+          "filename": "glibc-2.44-upstream_fixes-1.patch"
+        }
+      }
+    },
+    "gmp": {
+      "version": "6.3.0",
+      "url": "https://ftpmirror.gnu.org/gmp/gmp-6.3.0.tar.xz",
+      "md5": "956dc04e864001a9c22429f761f2c283",
+      "filename": "gmp-6.3.0.tar.xz"
+    },
+    "grep": {
+      "version": "3.12",
+      "url": "https://ftpmirror.gnu.org/grep/grep-3.12.tar.xz",
+      "md5": "5d9301ed9d209c4a88c8d3a6fd08b9ac",
+      "filename": "grep-3.12.tar.xz"
+    },
+    "gzip": {
+      "version": "1.14",
+      "url": "https://ftpmirror.gnu.org/gzip/gzip-1.14.tar.xz",
+      "md5": "4bf5a10f287501ee8e8ebe00ef62b2c2",
+      "filename": "gzip-1.14.tar.xz"
+    },
+    "linux": {
+      "version": "7.1.8",
+      "url": "https://www.kernel.org/pub/linux/kernel/v6.x/patch-7.1.8.xz",
+      "md5": "807584f564568b40162e9e4a72bf191f",
+      "filename": "patch-7.1.8.xz"
+    },
+    "m4": {
+      "version": "1.4.21",
+      "url": "https://ftpmirror.gnu.org/m4/m4-1.4.21.tar.xz",
+      "md5": "8051eef7239b2f187791f2ab0034d6b7",
+      "filename": "m4-1.4.21.tar.xz"
+    },
+    "make": {
+      "version": "4.4.1",
+      "url": "https://ftpmirror.gnu.org/make/make-4.4.1.tar.gz",
+      "md5": "c8469a3713cbbe04d955d4ae4be23eeb",
+      "filename": "make-4.4.1.tar.gz"
+    },
+    "mpc": {
+      "version": "1.4.1",
+      "url": "https://ftpmirror.gnu.org/mpc/mpc-1.4.1.tar.xz",
+      "md5": "40c5fba305125279ea46041160e81daf",
+      "filename": "mpc-1.4.1.tar.xz"
+    },
+    "mpdecimal": {
+      "version": "4.0.1",
+      "url": "https://www.bytereef.org/software/mpdecimal/releases/mpdecimal-4.0.1.tar.gz",
+      "md5": "3d4412579b1edc1047efab151889cca9",
+      "filename": "mpdecimal-4.0.1.tar.gz"
+    },
+    "mpfr": {
+      "version": "4.2.2",
+      "url": "https://ftpmirror.gnu.org/mpfr/mpfr-4.2.2.tar.xz",
+      "md5": "7c32c39b8b6e3ae85f25156228156061",
+      "filename": "mpfr-4.2.2.tar.xz"
+    },
+    "ncurses": {
+      "version": "6.6",
+      "url": "https://invisible-mirror.net/archives/ncurses/ncurses-6.6.tar.gz",
+      "md5": "dd45bf6854430af403452a7a6a40652c",
+      "filename": "ncurses-6.6.tar.gz"
+    },
+    "patch": {
+      "version": "2.8",
+      "url": "https://ftpmirror.gnu.org/patch/patch-2.8.tar.xz",
+      "md5": "149327a021d41c8f88d034eab41c039f",
+      "filename": "patch-2.8.tar.xz"
+    },
+    "perl": {
+      "version": "5.44.0",
+      "url": "https://www.cpan.org/src/5.0/perl-5.44.0.tar.xz",
+      "md5": "55761cf1543af326492fd194647796d1",
+      "filename": "perl-5.44.0.tar.xz"
+    },
+    "sed": {
+      "version": "4.10",
+      "url": "https://ftpmirror.gnu.org/sed/sed-4.10.tar.xz",
+      "md5": "c70dc5372db95c816442ffedf77a0d0f",
+      "filename": "sed-4.10.tar.xz"
+    },
+    "tar": {
+      "version": "1.35",
+      "url": "https://ftpmirror.gnu.org/tar/tar-1.35.tar.xz",
+      "md5": "a2d8042658cfd8ea939e6d911eaf4152",
+      "filename": "tar-1.35.tar.xz"
+    },
+    "texinfo": {
+      "version": "7.3",
+      "url": "https://ftpmirror.gnu.org/texinfo/texinfo-7.3.tar.xz",
+      "md5": "915a09fcdfc2bf0f5ecf9e556d5698ff",
+      "filename": "texinfo-7.3.tar.xz"
+    },
+    "util-linux": {
+      "version": "2.42.2",
+      "url": "https://www.kernel.org/pub/linux/utils/util-linux/v2.42/util-linux-2.42.2.tar.xz",
+      "md5": "1d70131b70abda3dec3b37e282a20c96",
+      "filename": "util-linux-2.42.2.tar.xz"
+    },
+    "xz": {
+      "version": "5.8.3",
+      "url": "https://github.com//tukaani-project/xz/releases/download/v5.8.3/xz-5.8.3.tar.xz",
+      "md5": "a02753f34e5546d20213b87f876a0933",
+      "filename": "xz-5.8.3.tar.xz"
+    },
+    "zlib": {
+      "version": "1.3.2",
+      "url": "https://zlib.net/fossils/zlib-1.3.2.tar.gz",
+      "md5": "a1e6c958597af3c67d162995a342138a",
+      "filename": "zlib-1.3.2.tar.gz"
+    }
+  },
+  "stages": [
+    {
+      "id": "ch-tools-binutils-pass1",
+      "package": "binutils",
+      "context": "host-builder",
+      "title": "Binutils-2.47 - Pass 1",
+      "commands": [
+        "mkdir -v build\ncd       build",
+        "../configure --prefix=$LFS/tools \\\n             --with-sysroot=$LFS \\\n             --target=$LFS_TGT   \\\n             --disable-nls       \\\n             --enable-gprofng=no \\\n             --disable-werror    \\\n             --enable-new-dtags  \\\n             --enable-default-hash-style=gnu",
+        "make",
+        "make install"
+      ]
+    },
+    {
+      "id": "ch-tools-gcc-pass1",
+      "package": "gcc",
+      "context": "host-builder",
+      "title": "GCC-16.2.0 - Pass 1",
+      "commands": [
+        "tar -xf ../mpfr-4.2.2.tar.xz\nmv -v mpfr-4.2.2 mpfr\ntar -xf ../gmp-6.3.0.tar.xz\nmv -v gmp-6.3.0 gmp\ntar -xf ../mpc-1.4.1.tar.xz\nmv -v mpc-1.4.1 mpc",
+        "case $(uname -m) in\n  x86_64)\n    sed -e '/m64=/s/lib64/lib/' \\\n        -i.orig gcc/config/i386/t-linux64\n ;;\nesac",
+        "mkdir -v build\ncd       build",
+        "../configure                  \\\n    --target=$LFS_TGT         \\\n    --prefix=$LFS/tools       \\\n    --with-glibc-version=2.44 \\\n    --with-sysroot=$LFS       \\\n    --with-newlib             \\\n    --without-headers         \\\n    --enable-default-pie      \\\n    --enable-default-ssp      \\\n    --disable-fixincludes     \\\n    --disable-nls             \\\n    --disable-shared          \\\n    --disable-multilib        \\\n    --disable-threads         \\\n    --disable-libatomic       \\\n    --disable-libgomp         \\\n    --disable-libquadmath     \\\n    --disable-libssp          \\\n    --disable-libvtv          \\\n    --disable-libstdcxx       \\\n    --enable-languages=c,c++",
+        "make",
+        "make install",
+        "cat ../gcc/{limitx,glimits,limity}.h  > \\\n  $($LFS_TGT-gcc -print-file-name=include)/limits.h"
+      ]
+    },
+    {
+      "id": "ch-tools-linux-headers",
+      "package": "linux",
+      "context": "host-builder",
+      "title": "Linux-7.1.8 API Headers",
+      "commands": [
+        "make mrproper",
+        "make headers\nfind usr/include -type f ! -name '*.h' -delete",
+        "cp -rv usr/include $LFS/usr"
+      ]
+    },
+    {
+      "id": "ch-tools-glibc",
+      "package": "glibc",
+      "context": "host-builder",
+      "title": "Glibc-2.44",
+      "commands": [
+        "case $(uname -m) in\n    i?86)   ln -sfv ld-linux.so.2 $LFS/lib/ld-lsb.so.3\n    ;;\n    x86_64) ln -sfv ../lib/ld-linux-x86-64.so.2 $LFS/lib64\n            ln -sfv ../lib/ld-linux-x86-64.so.2 $LFS/lib64/ld-lsb-x86-64.so.3\n    ;;\nesac",
+        "patch -Np1 -i ../glibc-fhs-1.patch",
+        "patch -Np1 -i ../glibc-2.44-upstream_fixes-1.patch",
+        "mkdir -v build\ncd       build",
+        "echo \"rootsbindir=/usr/sbin\" > configparms",
+        "../configure                             \\\n      --prefix=/usr                      \\\n      --host=$LFS_TGT                    \\\n      --build=$(../scripts/config.guess) \\\n      --disable-nscd                     \\\n      libc_cv_slibdir=/usr/lib           \\\n      --enable-kernel=5.10",
+        "make",
+        "make DESTDIR=$LFS install",
+        "sed '/RTLDLIST=/s@/usr@@g' -i $LFS/usr/bin/ldd",
+        "echo 'int main(){}' | $LFS_TGT-gcc -x c - -v -Wl,--verbose &> dummy.log\n$LFS_TGT-readelf -l a.out | grep ': /lib'",
+        "grep -E -o \"$LFS/lib.*/S?crt[1in].*succeeded\" dummy.log",
+        "grep -B3 \"^ $LFS/usr/include\" dummy.log",
+        "grep 'SEARCH.*/usr/lib' dummy.log |sed 's|; |\\n|g'",
+        "grep \"/lib.*/libc.so.6 \" dummy.log",
+        "grep found dummy.log",
+        "rm -v a.out dummy.log"
+      ]
+    },
+    {
+      "id": "ch-tools-libstdcpp",
+      "package": "gcc",
+      "context": "host-builder",
+      "title": "Libstdc++ from GCC-16.2.0",
+      "commands": [
+        "mkdir -v build\ncd       build",
+        "../libstdc++-v3/configure      \\\n    --host=$LFS_TGT            \\\n    --build=$(../config.guess) \\\n    CXX=$LFS_TGT-gcc           \\\n    --prefix=/usr              \\\n    --disable-multilib         \\\n    --disable-nls              \\\n    --disable-libstdcxx-pch    \\\n    --with-gxx-include-dir=/tools/$LFS_TGT/include/c++/16.2.0",
+        "make",
+        "make DESTDIR=$LFS install",
+        "rm -v $LFS/usr/lib/lib{stdc++{,exp,fs},supc++}.la"
+      ]
+    },
+    {
+      "id": "ch-tools-m4",
+      "package": "m4",
+      "context": "host-builder",
+      "title": "M4-1.4.21",
+      "commands": [
+        "cat > $LFS/usr/share/config.site << EOF\nac_cv_func_posix_spawn_file_actions_addchdir=yes\nac_cv_func_posix_spawn_file_actions_addfchdir=yes\nEOF",
+        "./configure --prefix=/usr   \\\n            --host=$LFS_TGT \\\n            --build=$(build-aux/config.guess)",
+        "make",
+        "make DESTDIR=$LFS install"
+      ]
+    },
+    {
+      "id": "ch-tools-ncurses",
+      "package": "ncurses",
+      "context": "host-builder",
+      "title": "Ncurses-6.6",
+      "commands": [
+        "mkdir build\npushd build\n  ../configure --prefix=$LFS/tools AWK=gawk\n  make -C include\n  make -C progs tic\n  install progs/tic $LFS/tools/bin\npopd",
+        "./configure --prefix=/usr                \\\n            --host=$LFS_TGT              \\\n            --build=$(./config.guess)    \\\n            --mandir=/usr/share/man      \\\n            --with-manpage-format=normal \\\n            --with-shared                \\\n            --without-normal             \\\n            --with-cxx-shared            \\\n            --without-debug              \\\n            --without-ada                \\\n            --disable-stripping          \\\n            AWK=gawk",
+        "make",
+        "make DESTDIR=$LFS install\nln -sv libncursesw.so $LFS/usr/lib/libncurses.so\nsed -e 's/^#if.*XOPEN.*$/#if 1/' \\\n    -i $LFS/usr/include/curses.h"
+      ]
+    },
+    {
+      "id": "ch-tools-bash",
+      "package": "bash",
+      "context": "host-builder",
+      "title": "Bash-5.3",
+      "commands": [
+        "./configure --prefix=/usr                      \\\n            --build=$(sh support/config.guess) \\\n            --host=$LFS_TGT                    \\\n            --without-bash-malloc              \\\n            --docdir=/usr/share/doc/bash-5.3",
+        "make",
+        "make DESTDIR=$LFS install",
+        "ln -sv bash $LFS/bin/sh"
+      ]
+    },
+    {
+      "id": "ch-tools-coreutils",
+      "package": "coreutils",
+      "context": "host-builder",
+      "title": "Coreutils-9.11",
+      "commands": [
+        "./configure --prefix=/usr                     \\\n            --host=$LFS_TGT                   \\\n            --build=$(build-aux/config.guess) \\\n            --enable-install-program=hostname",
+        "make",
+        "make DESTDIR=$LFS install",
+        "mv -v $LFS/usr/bin/chroot              $LFS/usr/sbin\nmkdir -pv $LFS/usr/share/man/man8\nmv -v $LFS/usr/share/man/man1/chroot.1 $LFS/usr/share/man/man8/chroot.8\nsed -i 's/\"1\"/\"8\"/'                    $LFS/usr/share/man/man8/chroot.8"
+      ]
+    },
+    {
+      "id": "ch-tools-diffutils",
+      "package": "diffutils",
+      "context": "host-builder",
+      "title": "Diffutils-3.12",
+      "commands": [
+        "./configure --prefix=/usr   \\\n            --host=$LFS_TGT \\\n            gl_cv_func_strcasecmp_works=yes \\\n            --build=$(./build-aux/config.guess)",
+        "make",
+        "make DESTDIR=$LFS install"
+      ]
+    },
+    {
+      "id": "ch-tools-file",
+      "package": "file",
+      "context": "host-builder",
+      "title": "File-5.48",
+      "commands": [
+        "mkdir build\npushd build\n  ../configure --disable-bzlib      \\\n               --disable-libseccomp \\\n               --disable-xzlib      \\\n               --disable-zlib\n  make\npopd",
+        "./configure --prefix=/usr --host=$LFS_TGT --build=$(./config.guess)",
+        "make FILE_COMPILE=$(pwd)/build/src/file",
+        "make DESTDIR=$LFS install",
+        "rm -v $LFS/usr/lib/libmagic.la"
+      ]
+    },
+    {
+      "id": "ch-tools-findutils",
+      "package": "findutils",
+      "context": "host-builder",
+      "title": "Findutils-4.11.0",
+      "commands": [
+        "./configure --prefix=/usr                   \\\n            --localstatedir=/var/lib/locate \\\n            --host=$LFS_TGT                 \\\n            --build=$(build-aux/config.guess)",
+        "make",
+        "make DESTDIR=$LFS install"
+      ]
+    },
+    {
+      "id": "ch-tools-gawk",
+      "package": "gawk",
+      "context": "host-builder",
+      "title": "Gawk-5.4.1",
+      "commands": [
+        "sed -i 's/extras//' Makefile.in",
+        "./configure --prefix=/usr   \\\n            --host=$LFS_TGT \\\n            --build=$(build-aux/config.guess)",
+        "make",
+        "make DESTDIR=$LFS install"
+      ]
+    },
+    {
+      "id": "ch-tools-grep",
+      "package": "grep",
+      "context": "host-builder",
+      "title": "Grep-3.12",
+      "commands": [
+        "./configure --prefix=/usr   \\\n            --host=$LFS_TGT \\\n            --build=$(./build-aux/config.guess)",
+        "make",
+        "make DESTDIR=$LFS install"
+      ]
+    },
+    {
+      "id": "ch-tools-gzip",
+      "package": "gzip",
+      "context": "host-builder",
+      "title": "Gzip-1.14",
+      "commands": [
+        "./configure --prefix=/usr --host=$LFS_TGT",
+        "make",
+        "make DESTDIR=$LFS install"
+      ]
+    },
+    {
+      "id": "ch-tools-make",
+      "package": "make",
+      "context": "host-builder",
+      "title": "Make-4.4.1",
+      "commands": [
+        "./configure --prefix=/usr   \\\n            --host=$LFS_TGT \\\n            --build=$(build-aux/config.guess)",
+        "make",
+        "make DESTDIR=$LFS install"
+      ]
+    },
+    {
+      "id": "ch-tools-patch",
+      "package": "patch",
+      "context": "host-builder",
+      "title": "Patch-2.8",
+      "commands": [
+        "./configure --prefix=/usr   \\\n            --host=$LFS_TGT \\\n            --build=$(build-aux/config.guess)",
+        "make",
+        "make DESTDIR=$LFS install"
+      ]
+    },
+    {
+      "id": "ch-tools-sed",
+      "package": "sed",
+      "context": "host-builder",
+      "title": "Sed-4.10",
+      "commands": [
+        "./configure --prefix=/usr   \\\n            --host=$LFS_TGT \\\n            --build=$(./build-aux/config.guess)",
+        "make",
+        "make DESTDIR=$LFS install"
+      ]
+    },
+    {
+      "id": "ch-tools-tar",
+      "package": "tar",
+      "context": "host-builder",
+      "title": "Tar-1.35",
+      "commands": [
+        "./configure --prefix=/usr   \\\n            --host=$LFS_TGT \\\n            --build=$(build-aux/config.guess)",
+        "make",
+        "make DESTDIR=$LFS install"
+      ]
+    },
+    {
+      "id": "ch-tools-xz",
+      "package": "xz",
+      "context": "host-builder",
+      "title": "Xz-5.8.3",
+      "commands": [
+        "./configure --prefix=/usr                     \\\n            --host=$LFS_TGT                   \\\n            --build=$(build-aux/config.guess) \\\n            --disable-static                  \\\n            --docdir=/usr/share/doc/xz-5.8.3",
+        "make",
+        "make DESTDIR=$LFS install",
+        "rm -v $LFS/usr/lib/liblzma.la"
+      ]
+    },
+    {
+      "id": "ch-tools-binutils-pass2",
+      "package": "binutils",
+      "context": "host-builder",
+      "title": "Binutils-2.47 - Pass 2",
+      "commands": [
+        "sed '6031s/$add_dir//' -i ltmain.sh",
+        "mkdir -v build\ncd       build",
+        "../configure                   \\\n    --prefix=/usr              \\\n    --build=$(../config.guess) \\\n    --host=$LFS_TGT            \\\n    --disable-nls              \\\n    --enable-shared            \\\n    --enable-gprofng=no        \\\n    --disable-werror           \\\n    --enable-64-bit-bfd        \\\n    --enable-new-dtags         \\\n    --enable-default-hash-style=gnu",
+        "make",
+        "make DESTDIR=$LFS install",
+        "rm -v $LFS/usr/lib/lib{bfd,ctf,ctf-nobfd,opcodes,sframe}.{a,la}"
+      ]
+    },
+    {
+      "id": "ch-tools-gcc-pass2",
+      "package": "gcc",
+      "context": "host-builder",
+      "title": "GCC-16.2.0 - Pass 2",
+      "commands": [
+        "tar -xf ../mpfr-4.2.2.tar.xz\nmv -v mpfr-4.2.2 mpfr\ntar -xf ../gmp-6.3.0.tar.xz\nmv -v gmp-6.3.0 gmp\ntar -xf ../mpc-1.4.1.tar.xz\nmv -v mpc-1.4.1 mpc",
+        "case $(uname -m) in\n  x86_64)\n    sed -e '/m64=/s/lib64/lib/' \\\n        -i.orig gcc/config/i386/t-linux64\n  ;;\nesac",
+        "mkdir -v build\ncd       build",
+        "../configure                   \\\n    --build=$(../config.guess) \\\n    --host=$LFS_TGT            \\\n    --target=$LFS_TGT          \\\n    --prefix=/usr              \\\n    --with-build-sysroot=$LFS  \\\n    --enable-default-pie       \\\n    --enable-default-ssp       \\\n    --disable-fixincludes      \\\n    --disable-nls              \\\n    --disable-multilib         \\\n    --disable-libatomic        \\\n    --disable-libgomp          \\\n    --disable-libquadmath      \\\n    --disable-libsanitizer     \\\n    --disable-libssp           \\\n    --disable-libvtv           \\\n    --enable-languages=c,c++   \\\n    CXX_FOR_TARGET=\"$LFS_TGT-gcc -nostdinc++\" \\\n    LDFLAGS_FOR_TARGET=-L$PWD/$LFS_TGT/libgcc \\\n    target_configargs=gcc_cv_target_thread_file=posix",
+        "make",
+        "make DESTDIR=$LFS install",
+        "ln -sv gcc $LFS/usr/bin/cc"
+      ]
+    },
+    {
+      "id": "ch-tools-gettext",
+      "package": "gettext",
+      "context": "chroot-root",
+      "title": "Gettext-1.0",
+      "commands": [
+        "./configure --disable-shared",
+        "make",
+        "cp -v gettext-tools/src/{msgfmt,msgmerge,xgettext} /usr/bin"
+      ]
+    },
+    {
+      "id": "ch-tools-bison",
+      "package": "bison",
+      "context": "chroot-root",
+      "title": "Bison-3.8.2",
+      "commands": [
+        "./configure --prefix=/usr \\\n            --docdir=/usr/share/doc/bison-3.8.2",
+        "make",
+        "make install"
+      ]
+    },
+    {
+      "id": "ch-tools-perl",
+      "package": "perl",
+      "context": "chroot-root",
+      "title": "Perl-5.44.0",
+      "commands": [
+        "sh Configure -des                                         \\\n             -D prefix=/usr                               \\\n             -D vendorprefix=/usr                         \\\n             -D useshrplib                                \\\n             -D privlib=/usr/lib/perl5/5.44/core_perl     \\\n             -D archlib=/usr/lib/perl5/5.44/core_perl     \\\n             -D sitelib=/usr/lib/perl5/5.44/site_perl     \\\n             -D sitearch=/usr/lib/perl5/5.44/site_perl    \\\n             -D vendorlib=/usr/lib/perl5/5.44/vendor_perl \\\n             -D vendorarch=/usr/lib/perl5/5.44/vendor_perl",
+        "make",
+        "make install"
+      ]
+    },
+    {
+      "id": "ch-tools-zlib",
+      "package": "zlib",
+      "context": "chroot-root",
+      "title": "Zlib-1.3.2",
+      "commands": [
+        "./configure --prefix=/usr",
+        "make",
+        "make install",
+        "rm -fv /usr/lib/libz.a"
+      ]
+    },
+    {
+      "id": "ch-tools-mpdecimal",
+      "package": "mpdecimal",
+      "context": "chroot-root",
+      "title": "mpdecimal-4.0.1",
+      "commands": [
+        "./configure --prefix=/usr    \\\n            --disable-static \\\n            --docdir=/usr/share/doc/mpdecimal-4.0.1",
+        "make",
+        "make install"
+      ]
+    },
+    {
+      "id": "ch-tools-Python",
+      "package": "Python",
+      "context": "chroot-root",
+      "title": "Python-3.14.7",
+      "commands": [
+        "./configure --prefix=/usr       \\\n            --enable-shared     \\\n            --without-ensurepip \\\n            --without-static-libpython",
+        "make",
+        "make install"
+      ]
+    },
+    {
+      "id": "ch-tools-texinfo",
+      "package": "texinfo",
+      "context": "chroot-root",
+      "title": "Texinfo-7.3",
+      "commands": [
+        "./configure --prefix=/usr",
+        "make",
+        "make install"
+      ]
+    },
+    {
+      "id": "ch-tools-util-linux",
+      "package": "util-linux",
+      "context": "chroot-root",
+      "title": "Util-linux-2.42.2",
+      "commands": [
+        "mkdir -pv /var/lib/hwclock",
+        "./configure --libdir=/usr/lib     \\\n            --runstatedir=/run    \\\n            --disable-chfn-chsh   \\\n            --disable-login       \\\n            --disable-nologin     \\\n            --disable-su          \\\n            --disable-setpriv     \\\n            --disable-runuser     \\\n            --disable-pylibmount  \\\n            --disable-static      \\\n            --disable-liblastlog2 \\\n            --without-python      \\\n            ADJTIME_PATH=/var/lib/hwclock/adjtime \\\n            --docdir=/usr/share/doc/util-linux-2.42.2",
+        "make",
+        "make install"
+      ]
+    }
+  ],
+  "chroot_setup": [
+    "mkdir -pv /{boot,home,mnt,opt,srv}",
+    "mkdir -pv /etc/{opt,sysconfig}\nmkdir -pv /lib/firmware\nmkdir -pv /media/{floppy,cdrom}\nmkdir -pv /usr/{,local/}{include,src}\nmkdir -pv /usr/lib/locale\nmkdir -pv /usr/local/{bin,lib,sbin}\nmkdir -pv /usr/{,local/}share/{color,dict,doc,info,locale,man}\nmkdir -pv /usr/{,local/}share/{misc,terminfo,zoneinfo}\nmkdir -pv /usr/{,local/}share/man/man{1..8}\nmkdir -pv /var/{cache,local,log,mail,opt,spool}\nmkdir -pv /var/lib/{color,misc,locate}\n\nln -sfv /run /var/run\nln -sfv /run/lock /var/lock\n\ninstall -dv -m 0750 /root\ninstall -dv -m 1777 /tmp /var/tmp",
+    "ln -sv /proc/self/mounts /etc/mtab",
+    "cat > /etc/hosts << EOF\n127.0.0.1  localhost $(hostname)\n::1        localhost\nEOF",
+    "cat > /etc/passwd << \"EOF\"\nroot:x:0:0:root:/root:/bin/bash\nbin:x:1:1:bin:/dev/null:/usr/bin/false\ndaemon:x:6:6:Daemon User:/dev/null:/usr/bin/false\nmessagebus:x:18:18:D-Bus Message Daemon User:/run/dbus:/usr/bin/false\nsystemd-journal-gateway:x:73:73:systemd Journal Gateway:/:/usr/bin/false\nsystemd-journal-remote:x:74:74:systemd Journal Remote:/:/usr/bin/false\nsystemd-journal-upload:x:75:75:systemd Journal Upload:/:/usr/bin/false\nsystemd-network:x:76:76:systemd Network Management:/:/usr/bin/false\nsystemd-resolve:x:77:77:systemd Resolver:/:/usr/bin/false\nsystemd-timesync:x:78:78:systemd Time Synchronization:/:/usr/bin/false\nsystemd-coredump:x:79:79:systemd Core Dumper:/:/usr/bin/false\nuuidd:x:80:80:UUID Generation Daemon User:/dev/null:/usr/bin/false\nsystemd-oom:x:81:81:systemd Out Of Memory Daemon:/:/usr/bin/false\nnobody:x:65534:65534:Unprivileged User:/dev/null:/usr/bin/false\nEOF",
+    "cat > /etc/group << \"EOF\"\nroot:x:0:\nbin:x:1:daemon\nsys:x:2:\nkmem:x:3:\ntape:x:4:\ntty:x:5:\ndaemon:x:6:\nfloppy:x:7:\ndisk:x:8:\nlp:x:9:\ndialout:x:10:\naudio:x:11:\nvideo:x:12:\nutmp:x:13:\nclock:x:14:\ncdrom:x:15:\nadm:x:16:\nmessagebus:x:18:\nsystemd-journal:x:23:\ninput:x:24:\nmail:x:34:\nkvm:x:61:\nsystemd-journal-gateway:x:73:\nsystemd-journal-remote:x:74:\nsystemd-journal-upload:x:75:\nsystemd-network:x:76:\nsystemd-resolve:x:77:\nsystemd-timesync:x:78:\nsystemd-coredump:x:79:\nuuidd:x:80:\nsystemd-oom:x:81:\nwheel:x:97:\nusers:x:999:\nnogroup:x:65534:\nEOF",
+    "echo \"tester:x:101:101::/home/tester:/bin/bash\" >> /etc/passwd\necho \"tester:x:101:\" >> /etc/group\ninstall -o tester -d /home/tester",
+    "touch /var/log/{btmp,lastlog,faillog,wtmp}\nchgrp -v utmp /var/log/lastlog\nchmod -v 664  /var/log/lastlog\nchmod -v 600  /var/log/btmp"
+  ],
+  "cleanup": [
+    "rm -rf /usr/share/{info,man,doc}/*",
+    "find /usr/{lib,libexec} -name \\*.la -delete",
+    "rm -rf /tools"
+  ]
+}

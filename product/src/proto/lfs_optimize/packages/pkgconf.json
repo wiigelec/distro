@@ -9,7 +9,7 @@
       "phase": "prepare",
       "commands": [
         {
-          "command": "tar -xf ../meson-1.12.1.tar.gz",
+          "command": "tar -xf ../meson-1.12.0.tar.gz",
           "user": "root"
         }
       ],
@@ -20,7 +20,7 @@
       "phase": "configure",
       "commands": [
         {
-          "command": "mkdir build\ncd    build\n\npython3 ../meson-1.12.1/meson.py setup --prefix=/usr --buildtype=release ..",
+          "command": "mkdir build\ncd    build\n\npython3 ../meson-1.12.0/meson.py setup --prefix=/usr --buildtype=release ..",
           "user": "root"
         }
       ],

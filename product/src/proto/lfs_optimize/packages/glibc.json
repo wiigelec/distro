@@ -22,7 +22,7 @@
       "resource": "upstream-fixes",
       "commands": [
         {
-          "command": "patch -Np1 -i ../glibc-2.44-upstream_fixes-3.patch",
+          "command": "patch -Np1 -i ../glibc-2.44-upstream_fixes-1.patch",
           "user": "root"
         },
         {
@@ -98,7 +98,7 @@
     "The Glibc test suite is critical and must not be skipped.",
     "io/tst-lchmod is known to fail in the LFS chroot environment.",
     "Some tests may time out on slow systems or with parallel make jobs.",
-    "Some tests may fail with relatively old CPU models, older host kernels, or a host kernel newer than 7.2.8."
+    "Some tests may fail with relatively old CPU models, older host kernels, or a host kernel newer than 7.1.8."
   ],
   "installed": {
     "programs": [
