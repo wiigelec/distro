@@ -267,6 +267,13 @@ def resolve_working_directory(source_cwd: str, working_directory: str) -> str:
     return str(PurePosixPath(source_cwd) / relative)
 
 
+def cleanup_success_work(package_work: Path) -> None:
+    for name in ("root-after", "root-test", "root-realized", "stage"):
+        path = package_work / name
+        if path.exists():
+            shutil.rmtree(path)
+
+
 def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
                   run_tests: bool, realize_to: Path | None) -> dict[str, Any]:
     require_root()
@@ -304,7 +311,8 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
             "baseline_root_sha256": base_digest,
             "cache_schema_version": CACHE_SCHEMA_VERSION,
             "jobs": jobs,
-            "realization_verified": True,
+            "realization_verified": False,
+            "artifact_reused": True,
             "resolved_package_sha256": definition_digest,
         }
         result_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
@@ -396,19 +404,30 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
         raise RuntimeError(f"{package['name']}: build produced no filesystem delta")
 
     materialize_delta(clone, stage, changed, after)
-    create_tar_xz(stage, artifact, deleted)
+    artifact.parent.mkdir(parents=True, exist_ok=True)
+    fd, temp_name = tempfile.mkstemp(
+        prefix=f".{artifact.name}.", suffix=".tmp", dir=artifact.parent
+    )
+    os.close(fd)
+    temp_artifact = Path(temp_name)
+    temp_artifact.unlink()
+    try:
+        create_tar_xz(stage, temp_artifact, deleted)
 
-    clone_root(root, realized)
-    extract_tar_xz(artifact, realized)
-    realized_snapshot = snapshot(realized)
-    if realized_snapshot != after:
-        expected_digest = snapshot_digest(after)
-        realized_digest = snapshot_digest(realized_snapshot)
-        raise RuntimeError(
-            f"{package['name']}: artifact realization mismatch: "
-            f"{realized_digest} != {expected_digest}"
-        )
-    shutil.rmtree(realized)
+        clone_root(root, realized)
+        extract_tar_xz(temp_artifact, realized)
+        realized_snapshot = snapshot(realized)
+        if realized_snapshot != after:
+            expected_digest = snapshot_digest(after)
+            realized_digest = snapshot_digest(realized_snapshot)
+            raise RuntimeError(
+                f"{package['name']}: artifact realization mismatch: "
+                f"{realized_digest} != {expected_digest}"
+            )
+
+        os.replace(temp_artifact, artifact)
+    finally:
+        temp_artifact.unlink(missing_ok=True)
 
     if realize_to is not None:
         extract_tar_xz(artifact, realize_to)
@@ -433,6 +452,7 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
         "build_log": str(log_path),
     }
     result_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
+    cleanup_success_work(package_work)
     return result
 
 
