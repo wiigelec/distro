@@ -187,8 +187,15 @@ def _validate_artifact_member(member: tarfile.TarInfo) -> None:
         raise RuntimeError(f"artifact member escapes target root: {name}")
     if member.issym():
         link = member.linkname
-        resolved = posixpath.normpath(posixpath.join(posixpath.dirname(name), link))
-        if link.startswith("/") or resolved == ".." or resolved.startswith("../"):
+        if link.startswith("/"):
+            resolved = posixpath.normpath(link)
+        else:
+            resolved = posixpath.normpath(
+                posixpath.join(posixpath.dirname(name), link)
+            )
+        if not link.startswith("/") and (
+            resolved == ".." or resolved.startswith("../")
+        ):
             raise RuntimeError(f"artifact symlink escapes target root: {name} -> {link}")
     if member.islnk():
         link = posixpath.normpath(member.linkname)
@@ -313,6 +320,9 @@ def self_test() -> None:
         (after_root / "usr/bin/keep").write_text("changed\n", encoding="utf-8")
         (after_root / "usr/lib").mkdir(parents=True)
         os.symlink("../bin/new", after_root / "usr/lib/new-link")
+        os.symlink(
+            "/usr/bin/new", after_root / "usr/lib/absolute-new-link"
+        )
         (after_root / "usr/bin/hard-a").write_text("hard\n", encoding="utf-8")
         os.link(after_root / "usr/bin/hard-a", after_root / "usr/bin/hard-b")
         (after_root / "usr/bin/independent-a").write_text(
