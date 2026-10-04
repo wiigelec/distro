@@ -65,8 +65,7 @@ def build_system(root: Path, work: Path, cache: Path,
                 "packages": package_results,
             }
             result_path.write_text(
-                json.dumps(system_result, indent=2, sort_keys=True) + "
-"
+                json.dumps(system_result, indent=2, sort_keys=True) + "\n"
             )
             return system_result
 
@@ -82,8 +81,7 @@ def build_system(root: Path, work: Path, cache: Path,
         "packages": package_results,
     }
     result_path.write_text(
-        json.dumps(system_result, indent=2, sort_keys=True) + "
-"
+        json.dumps(system_result, indent=2, sort_keys=True) + "\n"
     )
     return system_result
 

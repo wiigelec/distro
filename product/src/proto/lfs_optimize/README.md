@@ -146,7 +146,11 @@ python3 product/src/proto/lfs_optimize/execute.py --package grep --plan
 Execute against an LFS-compatible root:
 
 ```sh
-sudo python3 product/src/proto/lfs_optimize/execute.py   --package grep   --root /path/to/lfs-root   --work /tmp/lfs-optimize-work   --cache /tmp/lfs-optimize-cache
+sudo python3 product/src/proto/lfs_optimize/execute.py \
+  --package grep \
+  --root /path/to/lfs-root \
+  --work /tmp/lfs-optimize-work \
+  --cache /tmp/lfs-optimize-cache
 ```
 
 Use `--realize-to` to extract the resulting cached filesystem artifact into a
@@ -190,7 +194,10 @@ python3 product/src/proto/lfs_optimize/system.py --plan
 Execute the currently modeled package set:
 
 ```sh
-sudo python3 product/src/proto/lfs_optimize/system.py   --root /path/to/lfs-root   --work /tmp/lfs-optimize-work   --cache /tmp/lfs-optimize-cache
+sudo python3 product/src/proto/lfs_optimize/system.py \
+  --root /path/to/lfs-root \
+  --work /tmp/lfs-optimize-work \
+  --cache /tmp/lfs-optimize-cache
 ```
 
 The next Milestone 3 work is package-model expansion until every normal LFS
