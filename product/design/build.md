@@ -27,6 +27,22 @@ following categories of behavior as they are designed:
 - producing package artifacts;
 - reporting build success or failure.
 
+## Test outcome semantics
+
+Test execution produces validation evidence; it does not define package-build
+success by itself.
+
+A nonzero exit from a command in a test phase must be recorded with the
+command, exit status, log, and package/build identity and surfaced for later
+maintainer review. Unless an explicit accepted policy classifies that test
+outcome as blocking, the executor continues with the remaining procedure,
+including installation, staging, artifact production, and later packages.
+
+Build failure is reserved for failures that prevent the declared package
+procedure from producing its artifact, such as failed prepare, configure,
+build, install, or system commands. A successful build may therefore carry
+`review_required` test evidence without becoming a failed build.
+
 ## Boundary with Manage
 
 Build creates packages; it does not install them into the authoritative package

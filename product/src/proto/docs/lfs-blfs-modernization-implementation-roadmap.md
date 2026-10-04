@@ -167,6 +167,14 @@ Execution semantics include:
 - expected result
 - test expectations
 
+Test outcomes are evidence rather than an unconditional execution gate. A
+nonzero test command is recorded and surfaced as review-required evidence, but
+does not by itself terminate the package build, prevent installation/artifact
+production, or stop later packages. Non-test procedure failures remain fatal.
+An explicit accepted policy may later classify a particular test outcome as
+blocking; absent such policy, test failure is notification for maintainer
+review.
+
 The executor must know nothing about DocBook, book chapters, or presentation order.
 
 Its result should include:
@@ -259,6 +267,17 @@ observed failures
 installed contents
 result status
 ```
+
+`ValidationResult` separates build status from test-review status. A package or
+system may have:
+
+```text
+status: success
+review_required: true
+observed test failures: [...]
+```
+
+without treating those observed test failures as build termination.
 
 Promotion flow:
 

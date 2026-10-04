@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 
 from artifact import self_test as artifact_self_test
-from execute import plan
+from execute import command_failure_disposition, plan
 from resolve import HERE, load_json, resolve
 from system import plan_system
 
@@ -148,6 +148,11 @@ def main() -> int:
                 f"{package['name']}: execution plan failed")
         require(execution_plan["commands"],
                 f"{package['name']}: execution plan is empty")
+
+    require(command_failure_disposition("test") == "review",
+            "test command failures must be review evidence")
+    require(command_failure_disposition("build") == "fatal",
+            "non-test command failures must remain fatal")
 
     system_plan = plan_system(run_tests=True)
     require(system_plan["status"] == "success",

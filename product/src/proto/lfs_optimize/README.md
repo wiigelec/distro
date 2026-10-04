@@ -220,3 +220,10 @@ system executor.
 Plan-only validation is intentionally non-promotable. Promotion requires a
 successful full system build with tests enabled, and also requires the
 development/package-set hashes observed during discovery to remain unchanged.
+
+Test failures are review evidence, not automatic build termination. The
+executor records the failed test command and exit status, marks the package,
+system, and candidate validation `review_required`, and continues through
+installation and subsequent packages. Prepare/configure/build/install/system
+command failures remain fatal. Promotion may therefore carry unresolved test
+review evidence for later maintainer review.

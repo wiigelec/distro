@@ -170,6 +170,8 @@ def validate_candidate(candidate_path: Path, root: Path | None, work: Path,
         "mode": mode,
         "tests_enabled": run_tests,
         "system_result": system_result,
+        "review_required": system_result.get("review_required", False),
+        "test_review": system_result.get("test_review", []),
     }
     write_json(candidate_path.parent / "validation.json", result)
     return result
@@ -207,6 +209,8 @@ def promote(candidate_path: Path, validation_path: Path,
         "candidate_id": candidate["candidate_id"],
         "development_sha256": digest(development_path),
         "package_set_sha256": digest(package_set_path),
+        "review_required": validation.get("review_required", False),
+        "test_review": validation.get("test_review", []),
     }
     write_json(candidate_path.parent / "promotion.json", result)
     return result

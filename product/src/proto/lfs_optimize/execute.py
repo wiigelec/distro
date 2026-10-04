@@ -28,7 +28,7 @@ from resolve import HERE, resolve
 
 USER_AGENT = "distro-lfs-optimize-prototype/0"
 LFS_SOURCE_MIRROR = "https://ftp.osuosl.org/pub/lfs/lfs-packages/13.1/"
-CACHE_SCHEMA_VERSION = 4
+CACHE_SCHEMA_VERSION = 5
 
 
 def effective_jobs() -> int:
@@ -44,6 +44,10 @@ def effective_jobs() -> int:
 def canonical_sha256(value: Any) -> str:
     payload = json.dumps(value, sort_keys=True, separators=(",", ":")).encode()
     return hashlib.sha256(payload).hexdigest()
+
+
+def command_failure_disposition(phase: str) -> str:
+    return "review" if phase == "test" else "fatal"
 
 
 def md5_file(path: Path) -> str:
@@ -293,10 +297,13 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
         "jobs": jobs,
     })
     artifact = cache / "artifacts" / f"{package['name']}-{package['version']}-{cache_key}.tar.xz"
+    evidence_path = cache / "evidence" / f"{package['name']}-{package['version']}-{cache_key}.json"
     result_path = work / package["name"] / "result.json"
     result_path.parent.mkdir(parents=True, exist_ok=True)
 
-    if artifact.is_file():
+    if artifact.is_file() and evidence_path.is_file():
+        evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+        test_failures = evidence.get("test_failures", [])
         if realize_to is not None:
             extract_tar_xz(artifact, realize_to)
         result = {
@@ -314,6 +321,10 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
             "realization_verified": False,
             "artifact_reused": True,
             "resolved_package_sha256": definition_digest,
+            "tests_enabled": run_tests,
+            "test_status": "review" if test_failures else ("passed" if run_tests else "not-run"),
+            "test_failures": test_failures,
+            "review_required": bool(test_failures),
         }
         result_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
         return result
@@ -328,6 +339,7 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
     source_cwd = prepare_sources(package, clone, cache)
 
     command_results = []
+    test_failures = []
     test_ready = False
     with log_path.open("w", encoding="utf-8") as log:
         index = 0
@@ -380,6 +392,11 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
                 item["phase"] = step["phase"]
                 command_results.append(item)
                 if item["exit_code"] != 0:
+                    item["disposition"] = command_failure_disposition(item["phase"])
+                    if item["disposition"] == "review":
+                        test_failures.append(item.copy())
+                        continue
+
                     result = {
                         "schema_version": 1,
                         "status": "failure",
@@ -389,6 +406,10 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
                         "commands": command_results,
                         "build_log": str(log_path),
                         "jobs": jobs,
+                        "tests_enabled": run_tests,
+                        "test_status": "review" if test_failures else ("passed" if run_tests else "not-run"),
+                        "test_failures": test_failures,
+                        "review_required": bool(test_failures),
                     }
                     result_path.write_text(
                         json.dumps(result, indent=2, sort_keys=True) + "\n"
@@ -450,8 +471,21 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
         "deleted_paths": deleted,
         "commands": command_results,
         "build_log": str(log_path),
+        "tests_enabled": run_tests,
+        "test_status": "review" if test_failures else ("passed" if run_tests else "not-run"),
+        "test_failures": test_failures,
+        "review_required": bool(test_failures),
     }
     result_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
+    evidence_path.parent.mkdir(parents=True, exist_ok=True)
+    evidence_path.write_text(json.dumps({
+        "schema_version": 1,
+        "package": package["name"],
+        "version": package["version"],
+        "cache_key": cache_key,
+        "tests_enabled": run_tests,
+        "test_failures": test_failures,
+    }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     cleanup_success_work(package_work)
     return result
 

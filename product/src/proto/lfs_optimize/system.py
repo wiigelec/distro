@@ -11,6 +11,17 @@ from execute import build_package, clone_root, plan, require_root
 from resolve import HERE, resolve
 
 
+def test_review_summary(package_results: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        {
+            "package": item["package"],
+            "version": item["version"],
+            "test_failures": item.get("test_failures", []),
+        }
+        for item in package_results if item.get("review_required")
+    ]
+
+
 def plan_system(run_tests: bool, versions_path: Path | None = None,
                 package_set_path: Path | None = None) -> dict[str, Any]:
     resolved = resolve(versions_path=versions_path, package_set_path=package_set_path)
@@ -55,6 +66,7 @@ def build_system(root: Path, work: Path, cache: Path,
         )
         package_results.append(result)
         if result["status"] != "success":
+            test_review = test_review_summary(package_results)
             system_result = {
                 "schema_version": 1,
                 "status": "failure",
@@ -63,6 +75,8 @@ def build_system(root: Path, work: Path, cache: Path,
                 "initial_root_sha256": initial_digest,
                 "failed_package": package["name"],
                 "packages": package_results,
+                "review_required": bool(test_review),
+                "test_review": test_review,
             }
             result_path.write_text(
                 json.dumps(system_result, indent=2, sort_keys=True) + "\n"
@@ -70,6 +84,7 @@ def build_system(root: Path, work: Path, cache: Path,
             return system_result
 
     final_digest = snapshot_digest(snapshot(system_root))
+    test_review = test_review_summary(package_results)
     system_result = {
         "schema_version": 1,
         "status": "success",
@@ -79,6 +94,8 @@ def build_system(root: Path, work: Path, cache: Path,
         "final_root_sha256": final_digest,
         "root": str(system_root),
         "packages": package_results,
+        "review_required": bool(test_review),
+        "test_review": test_review,
     }
     result_path.write_text(
         json.dumps(system_result, indent=2, sort_keys=True) + "\n"
