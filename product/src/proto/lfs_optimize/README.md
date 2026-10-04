@@ -146,11 +146,7 @@ python3 product/src/proto/lfs_optimize/execute.py --package grep --plan
 Execute against an LFS-compatible root:
 
 ```sh
-sudo python3 product/src/proto/lfs_optimize/execute.py \
-  --package grep \
-  --root /path/to/lfs-root \
-  --work /tmp/lfs-optimize-work \
-  --cache /tmp/lfs-optimize-cache
+sudo python3 product/src/proto/lfs_optimize/execute.py   --package grep   --root /path/to/lfs-root   --work /tmp/lfs-optimize-work   --cache /tmp/lfs-optimize-cache
 ```
 
 Use `--realize-to` to extract the resulting cached filesystem artifact into a
@@ -194,11 +190,26 @@ python3 product/src/proto/lfs_optimize/system.py --plan
 Execute the currently modeled package set:
 
 ```sh
-sudo python3 product/src/proto/lfs_optimize/system.py \
-  --root /path/to/lfs-root \
-  --work /tmp/lfs-optimize-work \
-  --cache /tmp/lfs-optimize-cache
+sudo python3 product/src/proto/lfs_optimize/system.py   --root /path/to/lfs-root   --work /tmp/lfs-optimize-work   --cache /tmp/lfs-optimize-cache
 ```
 
 The next Milestone 3 work is package-model expansion until every normal LFS
 final-system package participates in this same ordered execution path.
+
+## Milestone 5 — development proof
+
+`development.py` adds an explicit development-state workflow without changing
+the normal build engine:
+
+```text
+accepted development -> discovery -> candidate -> validation -> promote/fail
+```
+
+The first proof uses LFS 13.0-systemd as historical accepted state and the
+current LFS 13.1-systemd state as the candidate. The 13.0 fixture is state
+input only; candidate validation uses the existing normalized resolver and
+system executor.
+
+Plan-only validation is intentionally non-promotable. Promotion requires a
+successful full system build with tests enabled, and also requires the
+development/package-set hashes observed during discovery to remain unchanged.

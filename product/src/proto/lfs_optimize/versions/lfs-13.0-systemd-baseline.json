@@ -1,0 +1,340 @@
+{
+  "schema_version": 1,
+  "name": "lfs-13.0-systemd-baseline",
+  "basis": {
+    "project": "Linux From Scratch",
+    "version": "13.0-systemd",
+    "published": "2026-03-05"
+  },
+  "package_set": {
+    "name": "lfs-normal-proof",
+    "packages": [
+      "man-pages",
+      "iana-etc",
+      "glibc",
+      "zlib",
+      "bzip2",
+      "xz",
+      "lz4",
+      "zstd",
+      "file",
+      "readline",
+      "pcre2",
+      "m4",
+      "bc",
+      "flex",
+      "tcl",
+      "expect",
+      "dejagnu",
+      "pkgconf",
+      "binutils",
+      "gmp",
+      "mpfr",
+      "mpc",
+      "attr",
+      "acl",
+      "libcap",
+      "libxcrypt",
+      "shadow",
+      "gcc",
+      "ncurses",
+      "sed",
+      "psmisc",
+      "gettext",
+      "bison",
+      "grep",
+      "bash",
+      "libtool",
+      "gdbm",
+      "gperf",
+      "expat",
+      "inetutils",
+      "less",
+      "perl",
+      "xml-parser",
+      "intltool",
+      "autoconf",
+      "automake",
+      "openssl",
+      "libelf",
+      "libffi",
+      "sqlite",
+      "Python",
+      "flit-core",
+      "packaging",
+      "wheel",
+      "setuptools",
+      "ninja",
+      "meson",
+      "kmod",
+      "coreutils",
+      "diffutils",
+      "gawk",
+      "findutils",
+      "groff",
+      "grub",
+      "gzip",
+      "iproute2",
+      "kbd",
+      "libpipeline",
+      "make",
+      "patch",
+      "tar",
+      "texinfo",
+      "vim",
+      "markupsafe",
+      "jinja2",
+      "systemd",
+      "dbus",
+      "man-db",
+      "procps",
+      "util-linux",
+      "e2fsprogs"
+    ]
+  },
+  "packages": {
+    "man-pages": {
+      "version": "6.17"
+    },
+    "iana-etc": {
+      "version": "20260202"
+    },
+    "glibc": {
+      "version": "2.43"
+    },
+    "zlib": {
+      "version": "1.3.2"
+    },
+    "bzip2": {
+      "version": "1.0.8"
+    },
+    "xz": {
+      "version": "5.8.2"
+    },
+    "lz4": {
+      "version": "1.10.0"
+    },
+    "zstd": {
+      "version": "1.5.7"
+    },
+    "file": {
+      "version": "5.46"
+    },
+    "readline": {
+      "version": "8.3"
+    },
+    "pcre2": {
+      "version": "10.47"
+    },
+    "m4": {
+      "version": "1.4.21"
+    },
+    "bc": {
+      "version": "7.0.3"
+    },
+    "flex": {
+      "version": "2.6.4"
+    },
+    "tcl": {
+      "version": "8.6.17"
+    },
+    "expect": {
+      "version": "5.45.4"
+    },
+    "dejagnu": {
+      "version": "1.6.3"
+    },
+    "pkgconf": {
+      "version": "2.5.1"
+    },
+    "binutils": {
+      "version": "2.46.0"
+    },
+    "gmp": {
+      "version": "6.3.0"
+    },
+    "mpfr": {
+      "version": "4.2.2"
+    },
+    "mpc": {
+      "version": "1.3.1"
+    },
+    "attr": {
+      "version": "2.5.2"
+    },
+    "acl": {
+      "version": "2.3.2"
+    },
+    "libcap": {
+      "version": "2.77"
+    },
+    "libxcrypt": {
+      "version": "4.5.2"
+    },
+    "shadow": {
+      "version": "4.19.3"
+    },
+    "gcc": {
+      "version": "15.2.0"
+    },
+    "ncurses": {
+      "version": "6.6"
+    },
+    "sed": {
+      "version": "4.9"
+    },
+    "psmisc": {
+      "version": "23.7"
+    },
+    "gettext": {
+      "version": "1.0"
+    },
+    "bison": {
+      "version": "3.8.2"
+    },
+    "grep": {
+      "version": "3.12"
+    },
+    "bash": {
+      "version": "5.3"
+    },
+    "libtool": {
+      "version": "2.5.4"
+    },
+    "gdbm": {
+      "version": "1.26"
+    },
+    "gperf": {
+      "version": "3.3"
+    },
+    "expat": {
+      "version": "2.7.4"
+    },
+    "inetutils": {
+      "version": "2.7"
+    },
+    "less": {
+      "version": "692"
+    },
+    "perl": {
+      "version": "5.42.0"
+    },
+    "xml-parser": {
+      "version": "2.47"
+    },
+    "intltool": {
+      "version": "0.51.0"
+    },
+    "autoconf": {
+      "version": "2.72"
+    },
+    "automake": {
+      "version": "1.18.1"
+    },
+    "openssl": {
+      "version": "3.6.1"
+    },
+    "libelf": {
+      "version": "0.194"
+    },
+    "libffi": {
+      "version": "3.5.2"
+    },
+    "sqlite": {
+      "version": "3510200"
+    },
+    "Python": {
+      "version": "3.14.3"
+    },
+    "flit-core": {
+      "version": "3.12.0"
+    },
+    "packaging": {
+      "version": "26.0"
+    },
+    "wheel": {
+      "version": "0.46.3"
+    },
+    "setuptools": {
+      "version": "82.0.0"
+    },
+    "ninja": {
+      "version": "1.13.2"
+    },
+    "meson": {
+      "version": "1.10.1"
+    },
+    "kmod": {
+      "version": "34.2"
+    },
+    "coreutils": {
+      "version": "9.10"
+    },
+    "diffutils": {
+      "version": "3.12"
+    },
+    "gawk": {
+      "version": "5.3.2"
+    },
+    "findutils": {
+      "version": "4.10.0"
+    },
+    "groff": {
+      "version": "1.23.0"
+    },
+    "grub": {
+      "version": "2.14"
+    },
+    "gzip": {
+      "version": "1.14"
+    },
+    "iproute2": {
+      "version": "6.18.0"
+    },
+    "kbd": {
+      "version": "2.9.0"
+    },
+    "libpipeline": {
+      "version": "1.5.8"
+    },
+    "make": {
+      "version": "4.4.1"
+    },
+    "patch": {
+      "version": "2.8"
+    },
+    "tar": {
+      "version": "1.35"
+    },
+    "texinfo": {
+      "version": "7.2"
+    },
+    "vim": {
+      "version": "9.2.0078"
+    },
+    "markupsafe": {
+      "version": "3.0.3"
+    },
+    "jinja2": {
+      "version": "3.1.6"
+    },
+    "systemd": {
+      "version": "259.1"
+    },
+    "dbus": {
+      "version": "1.16.2"
+    },
+    "man-db": {
+      "version": "2.13.1"
+    },
+    "procps": {
+      "version": "4.0.6"
+    },
+    "util-linux": {
+      "version": "2.41.3"
+    },
+    "e2fsprogs": {
+      "version": "1.47.3"
+    }
+  }
+}

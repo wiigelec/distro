@@ -8,11 +8,12 @@ from typing import Any
 
 from artifact import snapshot, snapshot_digest
 from execute import build_package, clone_root, plan, require_root
-from resolve import resolve
+from resolve import HERE, resolve
 
 
-def plan_system(run_tests: bool) -> dict[str, Any]:
-    resolved = resolve()
+def plan_system(run_tests: bool, versions_path: Path | None = None,
+                package_set_path: Path | None = None) -> dict[str, Any]:
+    resolved = resolve(versions_path=versions_path, package_set_path=package_set_path)
     packages = resolved["packages"]
     return {
         "schema_version": 1,
@@ -25,13 +26,14 @@ def plan_system(run_tests: bool) -> dict[str, Any]:
 
 
 def build_system(root: Path, work: Path, cache: Path,
-                 run_tests: bool) -> dict[str, Any]:
+                 run_tests: bool, versions_path: Path | None = None,
+                 package_set_path: Path | None = None) -> dict[str, Any]:
     require_root()
     root = root.resolve()
     if not (root / "usr/bin/bash").is_file():
         raise RuntimeError(f"{root}: execution root lacks /usr/bin/bash")
 
-    resolved = resolve()
+    resolved = resolve(versions_path=versions_path, package_set_path=package_set_path)
     system_work = work / "system"
     system_root = system_work / "root"
     package_work = work / "packages"
@@ -63,7 +65,8 @@ def build_system(root: Path, work: Path, cache: Path,
                 "packages": package_results,
             }
             result_path.write_text(
-                json.dumps(system_result, indent=2, sort_keys=True) + "\n"
+                json.dumps(system_result, indent=2, sort_keys=True) + "
+"
             )
             return system_result
 
@@ -79,7 +82,8 @@ def build_system(root: Path, work: Path, cache: Path,
         "packages": package_results,
     }
     result_path.write_text(
-        json.dumps(system_result, indent=2, sort_keys=True) + "\n"
+        json.dumps(system_result, indent=2, sort_keys=True) + "
+"
     )
     return system_result
 
@@ -92,16 +96,20 @@ def main() -> int:
     parser.add_argument("--work", type=Path, default=Path("/tmp/lfs-optimize-work"))
     parser.add_argument("--cache", type=Path, default=Path("/tmp/lfs-optimize-cache"))
     parser.add_argument("--skip-tests", action="store_true")
+    parser.add_argument("--versions", type=Path, default=HERE / "versions" / "development.json")
+    parser.add_argument("--package-set", type=Path, default=HERE / "package-set.json")
     parser.add_argument("--plan", action="store_true")
     args = parser.parse_args()
 
     run_tests = not args.skip_tests
     if args.plan:
-        result = plan_system(run_tests)
+        result = plan_system(run_tests, args.versions, args.package_set)
     else:
         if args.root is None:
             parser.error("--root is required unless --plan is used")
-        result = build_system(args.root, args.work, args.cache, run_tests)
+        result = build_system(
+            args.root, args.work, args.cache, run_tests, args.versions, args.package_set
+        )
 
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0 if result["status"] == "success" else 1

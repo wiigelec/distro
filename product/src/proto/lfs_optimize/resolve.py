@@ -56,21 +56,38 @@ def resolve_package(name: str, versions: dict[str, Any]) -> dict[str, Any]:
 
 
 def resolve(package_names: list[str] | None = None,
-            versions_path: Path | None = None) -> dict[str, Any]:
-    package_set = load_json(HERE / "package-set.json")
+            versions_path: Path | None = None,
+            package_set_path: Path | None = None) -> dict[str, Any]:
+    package_set = load_json(package_set_path or HERE / "package-set.json")
     versions_doc = load_json(versions_path or HERE / "versions" / "development.json")
     versions = versions_doc.get("packages")
     if not isinstance(versions, dict):
         raise RuntimeError("version manifest packages must be an object")
 
-    selected = package_names or package_set.get("packages")
+    package_set_names = package_set.get("packages")
+    if not isinstance(package_set_names, list) or not package_set_names:
+        raise RuntimeError("package set must contain packages")
+    if len(package_set_names) != len(set(package_set_names)):
+        raise RuntimeError("package set contains duplicate packages")
+
+    selected = package_names or package_set_names
     if not isinstance(selected, list) or not selected:
         raise RuntimeError("package set must contain packages")
 
-    known = set(package_set["packages"])
+    known = set(package_set_names)
     unknown = [name for name in selected if name not in known]
     if unknown:
         raise RuntimeError("unknown package(s): " + ", ".join(unknown))
+
+    missing_versions = [name for name in package_set_names if name not in versions]
+    extra_versions = [name for name in versions if name not in known]
+    if missing_versions or extra_versions:
+        details = []
+        if missing_versions:
+            details.append("missing versions: " + ", ".join(missing_versions))
+        if extra_versions:
+            details.append("unmanaged versions: " + ", ".join(extra_versions))
+        raise RuntimeError("package set/version manifest mismatch (" + "; ".join(details) + ")")
 
     return {
         "schema_version": 1,
@@ -91,10 +108,15 @@ def main() -> int:
         type=Path,
         default=HERE / "versions" / "development.json",
     )
+    parser.add_argument(
+        "--package-set",
+        type=Path,
+        default=HERE / "package-set.json",
+    )
     args = parser.parse_args()
 
     try:
-        result = resolve(args.packages, args.versions)
+        result = resolve(args.packages, args.versions, args.package_set)
     except RuntimeError as exc:
         parser.error(str(exc))
 
