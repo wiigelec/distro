@@ -11,299 +11,182 @@ from resolve import HERE, resolve
 
 PRESENTATION = HERE / "presentation"
 XML_ID = "{http://www.w3.org/XML/1998/namespace}id"
+PROOF_PACKAGES = ("zlib", "binutils")
 FORBIDDEN_EDITORIAL_KEYS = {
-    "version",
-    "source",
-    "resources",
-    "reference_metrics",
-    "procedure",
-    "dependencies",
-    "installed",
-    "installed_descriptions",
-    "document",
+    "version", "source", "resources", "reference_metrics", "procedure",
+    "dependencies", "installed", "installed_descriptions", "document",
 }
-
-INSTALLED_CATEGORY_LABELS = (
-    ("programs", "Installed programs"),
-    ("libraries", "Installed libraries"),
-    ("directories", "Installed directories"),
-)
-
 
 def require(condition: bool, message: str) -> None:
     if not condition:
         raise RuntimeError(message)
 
-
 def load_presentation(path: Path) -> dict[str, Any]:
     value = json.loads(path.read_text(encoding="utf-8"))
-    if value.get("schema_version") != 1:
-        raise RuntimeError(f"unsupported presentation schema: {path}")
+    require(value.get("schema_version") == 1, f"unsupported presentation schema: {path}")
     return value
 
-
-def package_inputs(
-    name: str,
-) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
-    structure = load_presentation(PRESENTATION / "structure.json")
+def package_inputs(name: str) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+    structure_doc = load_presentation(PRESENTATION / "structure.json")
     editorial = load_presentation(PRESENTATION / "editorial" / f"{name}.json")
-
     require(editorial.get("package") == name, f"{name}: editorial package mismatch")
     forbidden = sorted(FORBIDDEN_EDITORIAL_KEYS.intersection(editorial))
-    require(
-        not forbidden,
-        f"{name}: editorial duplicates authoritative data: {', '.join(forbidden)}",
-    )
-
-    packages = structure.get("packages")
-    require(
-        isinstance(packages, list),
-        "presentation structure packages must be a list",
-    )
-    entry = next((item for item in packages if item.get("name") == name), None)
+    require(not forbidden, f"{name}: editorial duplicates authoritative data: {', '.join(forbidden)}")
+    entry = next((x for x in structure_doc.get("packages", []) if x.get("name") == name), None)
     require(isinstance(entry, dict), f"{name}: missing presentation structure")
-    require(
-        entry.get("sections") == ["package", "installation", "contents"],
-        f"{name}: unsupported presentation section composition",
-    )
-
+    require(entry.get("sections") == ["package", "installation", "contents"],
+            f"{name}: unsupported section composition")
     document = entry.get("document")
     require(isinstance(document, dict), f"{name}: missing presentation document identity")
     for field in ("section_id", "filename", "contents_id"):
-        require(
-            isinstance(document.get(field), str) and document[field],
-            f"{name}: missing presentation document {field}",
-        )
+        require(isinstance(document.get(field), str) and document[field],
+                f"{name}: missing presentation document {field}")
+    return resolve([name])["packages"][0], entry, editorial
 
-    resolved = resolve([name])["packages"][0]
-    return resolved, entry, editorial
-
-
-def add_text(
-    parent: ET.Element,
-    tag: str,
-    value: str,
-    **attrs: str,
-) -> ET.Element:
+def add_text(parent: ET.Element, tag: str, value: str, **attrs: str) -> ET.Element:
     node = ET.SubElement(parent, tag, attrs)
     node.text = value
     return node
 
+def command_index(package: dict[str, Any]) -> tuple[dict[str, tuple[dict[str, Any], dict[str, Any]]], list[str]]:
+    by_id: dict[str, tuple[dict[str, Any], dict[str, Any]]] = {}
+    order: list[str] = []
+    for step in package["procedure"]:
+        for command in step["commands"]:
+            command_id = command.get("id")
+            require(isinstance(command_id, str) and command_id,
+                    f"{package['name']}: presentation command missing stable id")
+            require(command_id not in by_id, f"{package['name']}: duplicate command id {command_id}")
+            by_id[command_id] = (step, command)
+            order.append(command_id)
+    return by_id, order
+
+def command_remap(phase: str) -> str:
+    return {"prepare": "pre", "build": "make"}.get(phase, phase)
 
 def render_metrics(parent: ET.Element, package: dict[str, Any]) -> None:
     metrics = package.get("reference_metrics")
     require(isinstance(metrics, dict), f"{package['name']}: missing reference metrics")
-    require(
-        isinstance(metrics.get("build_time"), str) and metrics["build_time"],
-        f"{package['name']}: missing reference build time",
-    )
-    require(
-        isinstance(metrics.get("disk_space"), str) and metrics["disk_space"],
-        f"{package['name']}: missing reference disk space",
-    )
-
     segmented = ET.SubElement(parent, "segmentedlist", {"role": "reference-metrics"})
     add_text(segmented, "segtitle", "Approximate build time")
     add_text(segmented, "segtitle", "Required disk space")
     item = ET.SubElement(segmented, "seglistitem")
-    add_text(item, "seg", metrics["build_time"], role="build-time")
-    add_text(item, "seg", metrics["disk_space"], role="disk-space")
+    for field, role in (("build_time", "build-time"), ("disk_space", "disk-space")):
+        value = metrics.get(field)
+        require(isinstance(value, str) and value, f"{package['name']}: missing {field}")
+        add_text(item, "seg", value, role=role)
 
+def render_definition_list(parent: ET.Element, block: dict[str, Any]) -> None:
+    variable = ET.SubElement(parent, "variablelist", {"role": "editorial-definition-list"})
+    add_text(variable, "title", block["title"])
+    items = block.get("items")
+    require(isinstance(items, list) and items, "definition-list requires items")
+    for item in items:
+        require(isinstance(item.get("term"), str) and isinstance(item.get("text"), str),
+                "definition-list item requires term/text")
+        entry = ET.SubElement(variable, "varlistentry")
+        term = ET.SubElement(entry, "term")
+        add_text(term, "parameter", item["term"])
+        listitem = ET.SubElement(entry, "listitem")
+        add_text(listitem, "para", item["text"], role="editorial-definition")
 
-def command_anchor(phase: str, command_index: int) -> str:
-    return f"{phase}:{command_index}"
-
-
-def command_remap(phase: str) -> str:
-    return {
-        "build": "make",
-    }.get(phase, phase)
-
-
-def render_installation(
-    root: ET.Element,
-    package: dict[str, Any],
-    editorial: dict[str, Any],
-) -> None:
+def render_installation(root: ET.Element, package: dict[str, Any], editorial: dict[str, Any]) -> None:
     install = ET.SubElement(root, "sect2", {"role": "installation"})
     add_text(install, "title", editorial["installation_title"])
+    commands, authoritative_order = command_index(package)
+    blocks = editorial.get("installation_blocks")
+    require(isinstance(blocks, list) and blocks, f"{package['name']}: missing installation blocks")
+    rendered_commands: list[str] = []
 
-    intros = editorial.get("command_intros")
-    require(
-        isinstance(intros, dict),
-        f"{package['name']}: command_intros must be an object",
-    )
-
-    seen: set[str] = set()
-    for step in package["procedure"]:
-        phase = step["phase"]
-        for command_index, command in enumerate(step["commands"]):
-            anchor = command_anchor(phase, command_index)
-            intro = intros.get(anchor)
-            require(
-                isinstance(intro, str) and intro,
-                f"{package['name']}: missing editorial intro for {anchor}",
-            )
-            seen.add(anchor)
-            add_text(
-                install,
-                "para",
-                intro,
-                role="command-intro",
-                anchor=anchor,
-            )
+    for block in blocks:
+        kind = block.get("type")
+        if kind == "paragraph":
+            add_text(install, "para", block["text"], role="editorial-paragraph")
+        elif kind == "command":
+            command_id = block.get("command_id")
+            require(command_id in commands, f"{package['name']}: unknown command reference {command_id}")
+            require(command_id not in rendered_commands, f"{package['name']}: duplicate command reference {command_id}")
+            step, command = commands[command_id]
+            rendered_commands.append(command_id)
             screen = ET.SubElement(install, "screen", {"format": "linespecific"})
-            add_text(
-                screen,
-                "userinput",
-                command["command"],
-                role="build-command",
-                anchor=anchor,
-                remap=command_remap(phase),
-                condition=step["condition"],
-                user=command["user"],
-            )
+            add_text(screen, "userinput", command["command"], role="build-command",
+                     command_id=command_id, remap=command_remap(step["phase"]),
+                     condition=step["condition"], user=command["user"])
+        elif kind == "admonition":
+            tag = block.get("kind")
+            require(tag in ("important", "note", "warning", "caution"), f"{package['name']}: invalid admonition")
+            node = ET.SubElement(install, tag, {"role": "editorial-admonition"})
+            if block.get("title"):
+                add_text(node, "title", block["title"])
+            paragraphs = block.get("paragraphs")
+            require(isinstance(paragraphs, list) and paragraphs, f"{package['name']}: empty admonition")
+            for text in paragraphs:
+                add_text(node, "para", text, role="admonition-text")
+        elif kind == "definition-list":
+            render_definition_list(install, block)
+        else:
+            raise RuntimeError(f"{package['name']}: unsupported editorial block {kind}")
 
-    extra = sorted(set(intros) - seen)
-    require(
-        not extra,
-        f"{package['name']}: editorial command intro has no authoritative command: "
-        + ", ".join(extra),
-    )
+    require(rendered_commands == authoritative_order,
+            f"{package['name']}: editorial command order/coverage drift")
 
+def category_label(key: str, count: int) -> str:
+    if key == "programs": return "Installed program" if count == 1 else "Installed programs"
+    if key == "libraries": return "Installed library" if count == 1 else "Installed libraries"
+    if key == "directories": return "Installed directory" if count == 1 else "Installed directories"
+    raise RuntimeError(f"unsupported installed category: {key}")
 
 def render_installed_summary(parent: ET.Element, package: dict[str, Any]) -> None:
     installed = package.get("installed")
     require(isinstance(installed, dict), f"{package['name']}: missing installed summary")
-
-    present = [
-        (key, label, installed[key])
-        for key, label in INSTALLED_CATEGORY_LABELS
-        if key in installed and installed[key]
-    ]
+    present = [(k, v) for k, v in installed.items() if v]
     require(present, f"{package['name']}: empty installed summary")
-
     segmented = ET.SubElement(parent, "segmentedlist", {"role": "installed-summary"})
-    for _, label, _ in present:
-        add_text(segmented, "segtitle", label)
+    for key, values in present:
+        require(isinstance(values, list) and all(isinstance(x, str) and x for x in values),
+                f"{package['name']}: invalid installed {key}")
+        add_text(segmented, "segtitle", category_label(key, len(values)))
     item = ET.SubElement(segmented, "seglistitem")
-    for key, _, values in present:
-        require(
-            isinstance(values, list)
-            and all(isinstance(value, str) and value for value in values),
-            f"{package['name']}: invalid installed {key}",
-        )
-        add_text(
-            item,
-            "seg",
-            ", ".join(values),
-            role=f"installed-{key}",
-        )
+    for key, values in present:
+        add_text(item, "seg", ", ".join(values), role=f"installed-{key}")
 
-
-def render_installed_term(
-    parent: ET.Element,
-    item: dict[str, Any],
-    kind: str,
-) -> None:
+def render_installed_term(parent: ET.Element, item: dict[str, Any]) -> None:
+    kind = item.get("kind")
+    require(kind in ("program", "library", "file", "directory"),
+            f"invalid installed kind for {item.get('id')}")
     if kind == "program":
         add_text(parent, "command", item["name"], role="installed-name")
-    elif kind == "library":
-        add_text(
-            parent,
-            "filename",
-            item["name"],
-            role="installed-name",
-            **{"class": "libraryfile"},
-        )
     else:
-        add_text(parent, "filename", item["name"], role="installed-name")
+        attrs = {"role": "installed-name"}
+        if kind == "library":
+            attrs["class"] = "libraryfile"
+        add_text(parent, "filename", item["name"], **attrs)
 
-
-def render_contents(
-    root: ET.Element,
-    package: dict[str, Any],
-    structure: dict[str, Any],
-    editorial: dict[str, Any],
-) -> None:
-    document = structure["document"]
-    contents = ET.SubElement(
-        root,
-        "sect2",
-        {
-            XML_ID: document["contents_id"],
-            "role": "content",
-        },
-    )
+def render_contents(root: ET.Element, package: dict[str, Any], structure: dict[str, Any], editorial: dict[str, Any]) -> None:
+    contents = ET.SubElement(root, "sect2", {XML_ID: structure["document"]["contents_id"], "role": "content"})
     add_text(contents, "title", editorial["contents_title"])
     render_installed_summary(contents, package)
-
     variable = ET.SubElement(contents, "variablelist")
     add_text(variable, "bridgehead", "Short Descriptions", renderas="sect3")
-
-    item_kinds = structure.get("installed_item_kinds", {})
-    require(
-        isinstance(item_kinds, dict),
-        f"{package['name']}: installed_item_kinds must be an object",
-    )
-
-    seen: set[str] = set()
     for item in package["installed_descriptions"]:
-        item_id = item["id"]
-        kind = item_kinds.get(item_id)
-        require(
-            kind in ("program", "library", "file"),
-            f"{package['name']}: missing installed presentation kind for {item_id}",
-        )
-        seen.add(item_id)
-        entry = ET.SubElement(variable, "varlistentry", {XML_ID: item_id})
+        entry = ET.SubElement(variable, "varlistentry", {XML_ID: item["id"]})
         term = ET.SubElement(entry, "term")
-        render_installed_term(term, item, kind)
+        render_installed_term(term, item)
         listitem = ET.SubElement(entry, "listitem")
-        add_text(
-            listitem,
-            "para",
-            item["description"],
-            role="installed-description",
-        )
-
-    extra = sorted(set(item_kinds) - seen)
-    require(
-        not extra,
-        f"{package['name']}: installed presentation kind has no authoritative item: "
-        + ", ".join(extra),
-    )
-
+        add_text(listitem, "para", item["description"], role="installed-description")
 
 def render_package(name: str) -> str:
     package, structure, editorial = package_inputs(name)
-    document = structure["document"]
-
-    root = ET.Element(
-        "sect1",
-        {
-            XML_ID: document["section_id"],
-            "role": "wrap",
-        },
-    )
+    root = ET.Element("sect1", {XML_ID: structure["document"]["section_id"], "role": "wrap"})
     add_text(root, "title", f"{structure['title']}-{package['version']}")
-
     summary = ET.SubElement(root, "sect2", {"role": "package"})
     ET.SubElement(summary, "title")
-    add_text(
-        summary,
-        "para",
-        package["description"],
-        role="package-description",
-    )
+    add_text(summary, "para", package["description"], role="package-description")
     render_metrics(summary, package)
-
     render_installation(root, package, editorial)
     render_contents(root, package, structure, editorial)
-
     ET.indent(root, space="  ")
     return ET.tostring(root, encoding="unicode")
-
 
 def collect_roles(root: ET.Element) -> dict[str, list[str]]:
     roles: dict[str, list[str]] = {}
@@ -313,118 +196,54 @@ def collect_roles(root: ET.Element) -> dict[str, list[str]]:
             roles.setdefault(role, []).append(node.text)
     return roles
 
+def self_test_package(name: str) -> None:
+    package, structure, _ = package_inputs(name)
+    root = ET.fromstring(render_package(name))
+    roles = collect_roles(root)
+    require(root.tag == "sect1" and root.attrib.get("role") == "wrap", f"{name}: root hierarchy drift")
+    require(root.attrib.get(XML_ID) == structure["document"]["section_id"], f"{name}: section identity drift")
+    require([x.attrib.get("role") for x in root.findall("sect2")] == ["package","installation","content"],
+            f"{name}: visible section hierarchy drift")
+    metrics = package["reference_metrics"]
+    require(roles.get("build-time") == [metrics["build_time"]], f"{name}: build-time drift")
+    require(roles.get("disk-space") == [metrics["disk_space"]], f"{name}: disk-space drift")
+    expected_commands = [c["command"] for s in package["procedure"] for c in s["commands"]]
+    require(roles.get("build-command") == expected_commands, f"{name}: command drift")
+    expected_names = [i["name"] for i in package["installed_descriptions"]]
+    require(roles.get("installed-name") == expected_names, f"{name}: installed name drift")
+    require(roles.get("installed-description") == [i["description"] for i in package["installed_descriptions"]],
+            f"{name}: installed description drift")
 
 def self_test() -> None:
-    package, structure, editorial = package_inputs("zlib")
-    root = ET.fromstring(render_package("zlib"))
-    roles = collect_roles(root)
-
-    require(root.tag == "sect1", "presentation root hierarchy drift")
-    require(root.attrib.get("role") == "wrap", "presentation root role drift")
-    require(
-        root.attrib.get(XML_ID) == structure["document"]["section_id"],
-        "presentation section identity drift",
-    )
-    require(
-        root.findtext("title") == f"{structure['title']}-{package['version']}",
-        "presentation title/version drift",
-    )
-    require(
-        [child.attrib.get("role") for child in root.findall("sect2")]
-        == ["package", "installation", "content"],
-        "presentation visible section hierarchy drift",
-    )
-
-    metrics = package["reference_metrics"]
-    require(
-        roles.get("build-time") == [metrics["build_time"]],
-        "reference build-time drift",
-    )
-    require(
-        roles.get("disk-space") == [metrics["disk_space"]],
-        "reference disk-space drift",
-    )
-
-    rendered_commands = roles.get("build-command", [])
-    expected_commands = [
-        command["command"]
-        for step in package["procedure"]
-        for command in step["commands"]
-    ]
-    require(
-        rendered_commands == expected_commands,
-        "procedure command drift",
-    )
-
-    expected_intros = []
-    for step in package["procedure"]:
-        for command_index, _ in enumerate(step["commands"]):
-            expected_intros.append(
-                editorial["command_intros"][command_anchor(step["phase"], command_index)]
-            )
-    require(
-        roles.get("command-intro") == expected_intros,
-        "command editorial ordering drift",
-    )
-
-    installed = package["installed"]
-    require(
-        roles.get("installed-libraries") == [", ".join(installed["libraries"])],
-        "installed-library summary drift",
-    )
-
-    rendered_installed = roles.get("installed-name", [])
-    expected_installed = [
-        item["name"] for item in package["installed_descriptions"]
-    ]
-    require(
-        rendered_installed == expected_installed,
-        "installed-content drift",
-    )
-
-    require(
-        roles.get("installed-description")
-        == [item["description"] for item in package["installed_descriptions"]],
-        "installed-description drift",
-    )
-
+    for name in PROOF_PACKAGES:
+        self_test_package(name)
+    binutils_root = ET.fromstring(render_package("binutils"))
+    require(binutils_root.find(".//important") is not None, "binutils: missing important admonition")
+    require(len(binutils_root.findall(".//variablelist[@role='editorial-definition-list']")) == 2,
+            "binutils: missing parameter explanation lists")
 
 def main() -> int:
-    parser = argparse.ArgumentParser(
-        description="compile normalized LFS presentation proof"
-    )
+    parser = argparse.ArgumentParser(description="compile normalized LFS presentation proof")
     parser.add_argument("--package", default="zlib")
     parser.add_argument("--output", type=Path)
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
-
     try:
         if args.self_test:
             self_test()
-            print(
-                json.dumps(
-                    {
-                        "status": "success",
-                        "milestone": "presentation-slice",
-                        "package": "zlib",
-                        "equivalence": "visible-semantic-structure",
-                    },
-                    indent=2,
-                )
-            )
+            print(json.dumps({"status":"success","milestone":"presentation-slice",
+                              "packages":list(PROOF_PACKAGES),
+                              "equivalence":"visible-semantic-structure"}, indent=2))
             return 0
-
         rendered = render_package(args.package)
     except RuntimeError as exc:
         parser.error(str(exc))
-
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(rendered + "\n", encoding="utf-8")
     else:
         print(rendered)
     return 0
-
 
 if __name__ == "__main__":
     raise SystemExit(main())

@@ -9,6 +9,7 @@
       "phase": "prepare",
       "commands": [
         {
+          "id": "prepare-build-dir",
           "command": "mkdir -v build\ncd       build",
           "user": "root"
         }
@@ -20,6 +21,7 @@
       "phase": "configure",
       "commands": [
         {
+          "id": "configure",
           "command": "../configure --prefix=/usr       \\\n             --sysconfdir=/etc   \\\n             --enable-ld=default \\\n             --enable-plugins    \\\n             --enable-shared     \\\n             --disable-werror    \\\n             --enable-64-bit-bfd \\\n             --enable-new-dtags  \\\n             --with-system-zlib  \\\n             --with-lib-path=/usr/lib \\\n             --enable-default-hash-style=gnu",
           "user": "root"
         }
@@ -31,6 +33,7 @@
       "phase": "build",
       "commands": [
         {
+          "id": "build",
           "command": "make tooldir=/usr",
           "user": "root"
         }
@@ -42,6 +45,7 @@
       "phase": "test",
       "commands": [
         {
+          "id": "run-tests",
           "command": "make -k check",
           "user": "root"
         }
@@ -53,6 +57,7 @@
       "phase": "test",
       "commands": [
         {
+          "id": "report-test-failures",
           "command": "grep '^FAIL:' $(find -name '*.log')",
           "user": "root"
         }
@@ -64,6 +69,7 @@
       "phase": "install",
       "commands": [
         {
+          "id": "install",
           "command": "make tooldir=/usr install",
           "user": "root"
         }
@@ -75,6 +81,7 @@
       "phase": "install",
       "commands": [
         {
+          "id": "cleanup",
           "command": "rm -rfv /usr/lib/lib{{bfd,ctf,ctf-nobfd,gprofng,opcodes,sframe}}.a \\\n        /usr/share/doc/gprofng/",
           "user": "root"
         }
@@ -161,121 +168,145 @@
     {
       "id": "addr2line",
       "name": "addr2line",
+      "kind": "program",
       "description": "Translates program addresses to file names and line numbers; given an address and the name of an executable, it uses the debugging information in the executable to determine which source file and line number are associated with the address"
     },
     {
       "id": "ar",
       "name": "ar",
+      "kind": "program",
       "description": "Creates, modifies, and extracts from archives"
     },
     {
       "id": "as",
       "name": "as",
+      "kind": "program",
       "description": "An assembler that assembles the output of gcc into object files"
     },
     {
       "id": "c-filt",
       "name": "c++filt",
+      "kind": "program",
       "description": "Used by the linker to de-mangle C++ and Java symbols and to keep overloaded functions from clashing"
     },
     {
       "id": "dwp",
       "name": "dwp",
+      "kind": "program",
       "description": "The DWARF packaging utility"
     },
     {
       "id": "elfedit",
       "name": "elfedit",
+      "kind": "program",
       "description": "Updates the ELF headers of ELF files"
     },
     {
       "id": "gprof",
       "name": "gprof",
+      "kind": "program",
       "description": "Displays call graph profile data"
     },
     {
       "id": "gprofng",
       "name": "gprofng",
+      "kind": "program",
       "description": "Gathers and analyzes performance data"
     },
     {
       "id": "ld",
       "name": "ld",
+      "kind": "program",
       "description": "A linker that combines a number of object and archive files into a single file, relocating their data and tying up symbol references"
     },
     {
       "id": "ld.bfd",
       "name": "ld.bfd",
+      "kind": "program",
       "description": "A hard link to ld"
     },
     {
       "id": "nm",
       "name": "nm",
+      "kind": "program",
       "description": "Lists the symbols occurring in a given object file"
     },
     {
       "id": "objcopy",
       "name": "objcopy",
+      "kind": "program",
       "description": "Translates one type of object file into another"
     },
     {
       "id": "objdump",
       "name": "objdump",
+      "kind": "program",
       "description": "Displays information about the given object file, with options controlling the particular information to display; the information shown is useful to programmers who are working on the compilation tools"
     },
     {
       "id": "ranlib",
       "name": "ranlib",
+      "kind": "program",
       "description": "Generates an index of the contents of an archive and stores it in the archive; the index lists all of the symbols defined by archive members that are relocatable object files"
     },
     {
       "id": "readelf",
       "name": "readelf",
+      "kind": "program",
       "description": "Displays information about ELF type binaries"
     },
     {
       "id": "size",
       "name": "size",
+      "kind": "program",
       "description": "Lists the section sizes and the total size for the given object files"
     },
     {
       "id": "strings",
       "name": "strings",
+      "kind": "program",
       "description": "Outputs, for each given file, the sequences of printable characters that are of at least the specified length (defaulting to four); for object files, it prints, by default, only the strings from the initializing and loading sections while for other types of files, it scans the entire file"
     },
     {
       "id": "strip",
       "name": "strip",
+      "kind": "program",
       "description": "Discards symbols from object files"
     },
     {
       "id": "libbfd",
       "name": "libbfd",
+      "kind": "library",
       "description": "The Binary File Descriptor library"
     },
     {
       "id": "libctf",
       "name": "libctf",
+      "kind": "library",
       "description": "The Compat ANSI-C Type Format debugging support library"
     },
     {
       "id": "libctf-nobfd",
       "name": "libctf-nobfd",
+      "kind": "library",
       "description": "A libctf variant which does not use libbfd functionality"
     },
     {
       "id": "libgprofng",
       "name": "libgprofng",
+      "kind": "library",
       "description": "A library containing most routines used by gprofng"
     },
     {
       "id": "libopcodes",
       "name": "libopcodes",
-      "description": "A library for dealing with opcodes\u2014the readable text versions of instructions for the processor; it is used for building utilities like objdump"
+      "kind": "library",
+      "description": "A library for dealing with opcodes—the readable text versions of instructions for the processor; it is used for building utilities like objdump"
     },
     {
       "id": "libsframe",
       "name": "libsframe",
+      "kind": "library",
       "description": "A library to support online backtracing using a simple unwinder"
     }
   ]

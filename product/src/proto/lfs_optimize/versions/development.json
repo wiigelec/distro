@@ -227,6 +227,10 @@
         "md5": "d772acfbd55a81644e9fe7b8189cd2a5",
         "size": "28,355 KB",
         "home": "https://www.gnu.org/software/binutils/"
+      },
+      "reference_metrics": {
+        "build_time": "1.7 SBU",
+        "disk_space": "817 MB"
       }
     },
     "gmp": {

@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "package": "binutils",
+  "installation_title": "Installation of Binutils",
+  "contents_title": "Contents of Binutils",
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "text": "The Binutils documentation recommends building Binutils in a dedicated build directory:"
+    },
+    {
+      "type": "command",
+      "command_id": "prepare-build-dir"
+    },
+    {
+      "type": "paragraph",
+      "text": "Prepare Binutils for compilation:"
+    },
+    {
+      "type": "command",
+      "command_id": "configure"
+    },
+    {
+      "type": "definition-list",
+      "title": "The meaning of the new configure parameters:",
+      "items": [
+        {
+          "term": "--enable-ld=default",
+          "text": "Build the original bfd linker and install it as both ld (the default linker) and ld.bfd."
+        },
+        {
+          "term": "--enable-plugins",
+          "text": "Enable plugin support for the linker."
+        },
+        {
+          "term": "--with-system-zlib",
+          "text": "Use the installed zlib library instead of building the included version."
+        },
+        {
+          "term": "--with-lib-path=/usr/lib",
+          "text": "Specify the path for the linker (ld) to search. By default it searches several directories that do not exist on LFS besides /usr/lib, especially the /usr/lib64 directory that we deliberately avoid. In the case where /usr/lib64 has been mistakenly created and populated with some libraries, making ld not search the path can highlight the issue earlier with a failure to find those libraries at build time instead of run time."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Compile the package:"
+    },
+    {
+      "type": "command",
+      "command_id": "build"
+    },
+    {
+      "type": "definition-list",
+      "title": "The meaning of the make parameter:",
+      "items": [
+        {
+          "term": "tooldir=/usr",
+          "text": "Normally, the tooldir (the directory where the executables will ultimately be located) is set to $(exec_prefix)/$(target_alias). For example, x86_64 machines would expand that to /usr/x86_64-pc-linux-gnu. Because this is a custom system, this target-specific directory in /usr is not required. $(exec_prefix)/$(target_alias) would be used if the system were used to cross-compile (for example, compiling a package on an Intel machine that generates code that can be executed on PowerPC machines)."
+        }
+      ]
+    },
+    {
+      "type": "admonition",
+      "kind": "important",
+      "title": "Important",
+      "paragraphs": [
+        "The test suite for Binutils in this section is considered critical. Do not skip it under any circumstances."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Test the results:"
+    },
+    {
+      "type": "command",
+      "command_id": "run-tests"
+    },
+    {
+      "type": "paragraph",
+      "text": "For a list of failed tests, run:"
+    },
+    {
+      "type": "command",
+      "command_id": "report-test-failures"
+    },
+    {
+      "type": "paragraph",
+      "text": "One test related to gprofng is known to fail."
+    },
+    {
+      "type": "paragraph",
+      "text": "Install the package:"
+    },
+    {
+      "type": "command",
+      "command_id": "install"
+    },
+    {
+      "type": "paragraph",
+      "text": "Remove useless static libraries and other files:"
+    },
+    {
+      "type": "command",
+      "command_id": "cleanup"
+    }
+  ]
+}

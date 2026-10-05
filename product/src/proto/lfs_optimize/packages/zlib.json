@@ -9,6 +9,7 @@
       "phase": "configure",
       "commands": [
         {
+          "id": "configure",
           "command": "./configure --prefix=/usr",
           "user": "root"
         }
@@ -20,6 +21,7 @@
       "phase": "build",
       "commands": [
         {
+          "id": "build",
           "command": "make",
           "user": "root"
         }
@@ -31,6 +33,7 @@
       "phase": "test",
       "commands": [
         {
+          "id": "run-tests",
           "command": "make check",
           "user": "root"
         }
@@ -42,10 +45,12 @@
       "phase": "install",
       "commands": [
         {
+          "id": "install",
           "command": "make install",
           "user": "root"
         },
         {
+          "id": "cleanup-static",
           "command": "rm -fv /usr/lib/libz.a",
           "user": "root"
         }
@@ -93,6 +98,7 @@
     {
       "id": "libz",
       "name": "libz",
+      "kind": "library",
       "description": "Contains compression and decompression functions used by some programs"
     }
   ]

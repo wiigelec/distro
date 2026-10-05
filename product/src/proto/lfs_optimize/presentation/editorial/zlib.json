@@ -3,11 +3,46 @@
   "package": "zlib",
   "installation_title": "Installation of Zlib",
   "contents_title": "Contents of Zlib",
-  "command_intros": {
-    "configure:0": "Prepare Zlib for compilation:",
-    "build:0": "Compile the package:",
-    "test:0": "To test the results, issue:",
-    "install:0": "Install the package:",
-    "install:1": "Remove a useless static library:"
-  }
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "text": "Prepare Zlib for compilation:"
+    },
+    {
+      "type": "command",
+      "command_id": "configure"
+    },
+    {
+      "type": "paragraph",
+      "text": "Compile the package:"
+    },
+    {
+      "type": "command",
+      "command_id": "build"
+    },
+    {
+      "type": "paragraph",
+      "text": "To test the results, issue:"
+    },
+    {
+      "type": "command",
+      "command_id": "run-tests"
+    },
+    {
+      "type": "paragraph",
+      "text": "Install the package:"
+    },
+    {
+      "type": "command",
+      "command_id": "install"
+    },
+    {
+      "type": "paragraph",
+      "text": "Remove a useless static library:"
+    },
+    {
+      "type": "command",
+      "command_id": "cleanup-static"
+    }
+  ]
 }

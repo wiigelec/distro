@@ -17,10 +17,21 @@
         "package",
         "installation",
         "contents"
-      ],
-      "installed_item_kinds": {
-        "libz": "library"
-      }
+      ]
+    },
+    {
+      "name": "binutils",
+      "title": "Binutils",
+      "document": {
+        "section_id": "ch-system-binutils",
+        "filename": "binutils.html",
+        "contents_id": "contents-binutils"
+      },
+      "sections": [
+        "package",
+        "installation",
+        "contents"
+      ]
     }
   ]
 }
