@@ -92,6 +92,22 @@ def delta(before: dict[str, dict[str, Any]],
     return sorted(changed_set), deleted
 
 
+def _copy_directory_metadata(source: Path, destination: Path) -> None:
+    st = source.lstat()
+    os.chown(destination, st.st_uid, st.st_gid, follow_symlinks=False)
+    shutil.copystat(source, destination, follow_symlinks=False)
+
+
+def _sync_stage_parents(
+    source_root: Path, stage_root: Path, path: Path
+) -> None:
+    parent = path.parent
+    while parent != stage_root:
+        parent_relative = parent.relative_to(stage_root)
+        _copy_directory_metadata(source_root / parent_relative, parent)
+        parent = parent.parent
+
+
 def materialize_delta(
     source_root: Path,
     stage_root: Path,
@@ -115,23 +131,15 @@ def materialize_delta(
         src = source_root / relative
         dst = stage_root / relative
         dst.mkdir(parents=True, exist_ok=True)
-        st = src.lstat()
-        os.chown(dst, st.st_uid, st.st_gid, follow_symlinks=False)
-        shutil.copystat(src, dst, follow_symlinks=False)
+        _sync_stage_parents(source_root, stage_root, dst)
+        _copy_directory_metadata(src, dst)
 
     for relative in payloads:
         src = source_root / relative
         dst = stage_root / relative
         dst.parent.mkdir(parents=True, exist_ok=True)
 
-        parent = dst.parent
-        while parent != stage_root:
-            parent_relative = parent.relative_to(stage_root)
-            source_parent = source_root / parent_relative
-            st = source_parent.lstat()
-            os.chown(parent, st.st_uid, st.st_gid, follow_symlinks=False)
-            shutil.copystat(source_parent, parent, follow_symlinks=False)
-            parent = parent.parent
+        _sync_stage_parents(source_root, stage_root, dst)
         if src.is_symlink():
             if dst.exists() or dst.is_symlink():
                 dst.unlink()
@@ -316,6 +324,16 @@ def self_test() -> None:
             before_root / "usr/target/bin/split-link",
         )
         shutil.copytree(before_root, after_root, dirs_exist_ok=True)
+
+        # Regression: changed child directories must not overwrite metadata on
+        # an unchanged synthetic parent directory in the staged artifact.
+        (before_root / "etc").mkdir()
+        os.chown(before_root / "etc", 1000, 1000)
+        (after_root / "etc").mkdir()
+        os.chown(after_root / "etc", 1000, 1000)
+        (after_root / "etc/depmod.d").mkdir()
+        (after_root / "etc/modprobe.d").mkdir()
+
         (after_root / "usr/bin/remove-me").unlink()
         shutil.rmtree(after_root / "usr/share/remove-tree")
         (after_root / "usr/bin/new").write_text("new\n", encoding="utf-8")
