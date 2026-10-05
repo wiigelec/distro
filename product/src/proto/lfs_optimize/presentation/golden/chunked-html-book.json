@@ -4,7 +4,7 @@
     "project": "Linux From Scratch",
     "version": "13.1-systemd",
     "published": "2026-09-01",
-    "surface": "chunked HTML routes"
+    "surface": "chunked HTML routes, navigation, and head titles"
   },
   "document_count": 199,
   "documents": [
@@ -101,29 +101,29 @@
       "navigation": {
         "home": "../index.html",
         "previous": "typography.html",
-        "next": "../chapter01/errata.html",
+        "next": "errata.html",
         "up": "preface.html"
       }
     },
     {
       "section_id": "pre-errata",
-      "output_path": "chapter01/errata.html",
+      "output_path": "prologue/errata.html",
       "title": "Errata and Security Advisories",
       "navigation": {
         "home": "../index.html",
-        "previous": "../prologue/organization.html",
-        "next": "part1.html",
-        "up": "../prologue/preface.html"
+        "previous": "organization.html",
+        "next": "../part1.html",
+        "up": "preface.html"
       }
     },
     {
       "section_id": "part1",
-      "output_path": "chapter01/part1.html",
+      "output_path": "part1.html",
       "title": "Part I. Introduction",
       "navigation": {
-        "home": "../index.html",
-        "previous": "errata.html",
-        "next": "chapter01.html"
+        "home": "index.html",
+        "previous": "prologue/errata.html",
+        "next": "chapter01/chapter01.html"
       }
     },
     {
@@ -132,9 +132,9 @@
       "title": "Chapter 1. Introduction",
       "navigation": {
         "home": "../index.html",
-        "previous": "part1.html",
+        "previous": "../part1.html",
         "next": "how.html",
-        "up": "part1.html"
+        "up": "../part1.html"
       }
     },
     {
@@ -188,18 +188,18 @@
       "navigation": {
         "home": "../index.html",
         "previous": "resources.html",
-        "next": "../chapter02/part2.html",
+        "next": "../part2.html",
         "up": "chapter01.html"
       }
     },
     {
       "section_id": "part2",
-      "output_path": "chapter02/part2.html",
+      "output_path": "part2.html",
       "title": "Part II. Preparing for the Build",
       "navigation": {
-        "home": "../index.html",
-        "previous": "../chapter01/askforhelp.html",
-        "next": "chapter02.html"
+        "home": "index.html",
+        "previous": "chapter01/askforhelp.html",
+        "next": "chapter02/chapter02.html"
       }
     },
     {
@@ -208,9 +208,9 @@
       "title": "Chapter 2. Preparing the Host System",
       "navigation": {
         "home": "../index.html",
-        "previous": "part2.html",
+        "previous": "../part2.html",
         "next": "introduction.html",
-        "up": "part2.html"
+        "up": "../part2.html"
       }
     },
     {
@@ -298,7 +298,7 @@
         "home": "../index.html",
         "previous": "../chapter02/mounting.html",
         "next": "introduction.html",
-        "up": "../chapter02/part2.html"
+        "up": "../part2.html"
       }
     },
     {
@@ -342,7 +342,7 @@
         "home": "../index.html",
         "previous": "../chapter03/patches.html",
         "next": "introduction.html",
-        "up": "../chapter02/part2.html"
+        "up": "../part2.html"
       }
     },
     {
@@ -407,18 +407,18 @@
       "navigation": {
         "home": "../index.html",
         "previous": "aboutsbus.html",
-        "next": "../partintro/part3.html",
+        "next": "../part3.html",
         "up": "chapter04.html"
       }
     },
     {
       "section_id": "part3",
-      "output_path": "partintro/part3.html",
+      "output_path": "part3.html",
       "title": "Part III. Building the LFS Cross Toolchain and Temporary Tools",
       "navigation": {
-        "home": "../index.html",
-        "previous": "../chapter04/abouttestsuites.html",
-        "next": "partintro.html"
+        "home": "index.html",
+        "previous": "chapter04/abouttestsuites.html",
+        "next": "partintro/partintro.html"
       }
     },
     {
@@ -427,9 +427,9 @@
       "title": "Important Preliminary Material",
       "navigation": {
         "home": "../index.html",
-        "previous": "part3.html",
+        "previous": "../part3.html",
         "next": "introduction.html",
-        "up": "part3.html"
+        "up": "../part3.html"
       }
     },
     {
@@ -473,7 +473,7 @@
         "home": "../index.html",
         "previous": "../partintro/generalinstructions.html",
         "next": "introduction.html",
-        "up": "../partintro/part3.html"
+        "up": "../part3.html"
       }
     },
     {
@@ -550,7 +550,7 @@
         "home": "../index.html",
         "previous": "../chapter05/gcc-libstdc++.html",
         "next": "introduction.html",
-        "up": "../partintro/part3.html"
+        "up": "../part3.html"
       }
     },
     {
@@ -759,7 +759,7 @@
         "home": "../index.html",
         "previous": "../chapter06/gcc-pass2.html",
         "next": "introduction.html",
-        "up": "../partintro/part3.html"
+        "up": "../part3.html"
       }
     },
     {
@@ -923,18 +923,18 @@
       "navigation": {
         "home": "../index.html",
         "previous": "util-linux.html",
-        "next": "../chapter08/part4.html",
+        "next": "../part4.html",
         "up": "chapter07.html"
       }
     },
     {
       "section_id": "part4",
-      "output_path": "chapter08/part4.html",
+      "output_path": "part4.html",
       "title": "Part IV. Building the LFS System",
       "navigation": {
-        "home": "../index.html",
-        "previous": "../chapter07/cleanup.html",
-        "next": "chapter08.html"
+        "home": "index.html",
+        "previous": "chapter07/cleanup.html",
+        "next": "chapter08/chapter08.html"
       }
     },
     {
@@ -943,9 +943,9 @@
       "title": "Chapter 8. Installing Basic System Software",
       "navigation": {
         "home": "../index.html",
-        "previous": "part4.html",
+        "previous": "../part4.html",
         "next": "introduction.html",
-        "up": "part4.html"
+        "up": "../part4.html"
       }
     },
     {
@@ -1891,7 +1891,7 @@
         "home": "../index.html",
         "previous": "../chapter08/cleanup.html",
         "next": "introduction.html",
-        "up": "../chapter08/part4.html"
+        "up": "../part4.html"
       }
     },
     {
@@ -2012,7 +2012,7 @@
         "home": "../index.html",
         "previous": "../chapter09/systemd-custom.html",
         "next": "introduction.html",
-        "up": "../chapter08/part4.html"
+        "up": "../part4.html"
       }
     },
     {
@@ -2067,7 +2067,7 @@
         "home": "../index.html",
         "previous": "../chapter10/grub.html",
         "next": "theend.html",
-        "up": "../chapter08/part4.html"
+        "up": "../part4.html"
       }
     },
     {
@@ -2121,18 +2121,18 @@
       "navigation": {
         "home": "../index.html",
         "previous": "whatnow.html",
-        "next": "../appendices/part5.html",
+        "next": "../part5.html",
         "up": "chapter11.html"
       }
     },
     {
       "section_id": "part5",
-      "output_path": "appendices/part5.html",
+      "output_path": "part5.html",
       "title": "Part V. Appendices",
       "navigation": {
-        "home": "../index.html",
-        "previous": "../chapter11/afterlfs.html",
-        "next": "acronymlist.html"
+        "home": "index.html",
+        "previous": "chapter11/afterlfs.html",
+        "next": "appendices/acronymlist.html"
       }
     },
     {
@@ -2141,9 +2141,9 @@
       "title": "Appendix A. Acronyms and Terms",
       "navigation": {
         "home": "../index.html",
-        "previous": "part5.html",
+        "previous": "../part5.html",
         "next": "acknowledgments.html",
-        "up": "part5.html"
+        "up": "../part5.html"
       }
     },
     {
@@ -2154,7 +2154,7 @@
         "home": "../index.html",
         "previous": "acronymlist.html",
         "next": "dependencies.html",
-        "up": "part5.html"
+        "up": "../part5.html"
       }
     },
     {
@@ -2165,7 +2165,7 @@
         "home": "../index.html",
         "previous": "acknowledgments.html",
         "next": "licenses.html",
-        "up": "part5.html"
+        "up": "../part5.html"
       }
     },
     {
@@ -2176,7 +2176,7 @@
         "home": "../index.html",
         "previous": "dependencies.html",
         "next": "creat-comm.html",
-        "up": "part5.html"
+        "up": "../part5.html"
       }
     },
     {

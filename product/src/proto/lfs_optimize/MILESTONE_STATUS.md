@@ -279,6 +279,6 @@ Run the direct prototype validator after this slice lands:
 python3 product/src/proto/lfs_optimize/validate.py
 ```
 
-After the route-metadata compatibility fix, rerun the direct validator. If it passes, treat full-book chunk routing/navigation/xref addressing as proven.
+The initial route golden scanner leaked later `dbhtml dir` processing instructions into preceding elements. The fixture now scopes processing instructions to their owning XML element; runtime composition and the corrected source-derived oracle agree on all 199 output paths. Rerun the direct validator; if it passes, treat full-book chunk routing/navigation/xref addressing as proven.
 The next M7 work is editorial-body migration for the remaining chunks, after
 which chunked HTML reader equivalence can close before no-chunks HTML and PDF.

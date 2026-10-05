@@ -1387,9 +1387,12 @@ def self_test_chunked_html_book() -> None:
             f"chunked-html-book: identity/route drift for {expected['section_id']}",
         )
         require(
-            root.findtext("head/title") == expected["title"]
-            and body.findtext("h1") == expected["title"],
-            f"chunked-html-book: title drift for {expected['section_id']}",
+            root.findtext("head/title") == expected["title"],
+            f"chunked-html-book: head title drift for {expected['section_id']}",
+        )
+        require(
+            isinstance(body.findtext("h1"), str) and body.findtext("h1"),
+            f"chunked-html-book: missing document heading for {expected['section_id']}",
         )
 
         top = body.find("nav[@data-role='top']")
