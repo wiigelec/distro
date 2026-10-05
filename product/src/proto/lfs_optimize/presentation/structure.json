@@ -4,7 +4,549 @@
     "name": "lfs-presentation-proof",
     "format": "docbook-semantic-xml"
   },
+  "book": {
+    "title": "Linux From Scratch",
+    "frontmatter": [
+      "preface"
+    ],
+    "parts": [
+      {
+        "name": "part1",
+        "document": {
+          "section_id": "part1",
+          "filename": "part1.html",
+          "title": "Introduction"
+        },
+        "children": [
+          "chapter01"
+        ]
+      },
+      {
+        "name": "part2",
+        "document": {
+          "section_id": "part2",
+          "filename": "part2.html",
+          "title": "Preparing for the Build"
+        },
+        "children": [
+          "chapter02",
+          "chapter03",
+          "chapter04"
+        ]
+      },
+      {
+        "name": "part3",
+        "document": {
+          "section_id": "part3",
+          "filename": "part3.html",
+          "title": "Building the LFS Cross Toolchain and Temporary Tools"
+        },
+        "children": [
+          "part3intro",
+          "chapter05",
+          "chapter06",
+          "chapter07"
+        ]
+      },
+      {
+        "name": "part4",
+        "document": {
+          "section_id": "part4",
+          "filename": "part4.html",
+          "title": "Building the LFS System"
+        },
+        "children": [
+          "chapter08",
+          "chapter09",
+          "chapter10",
+          "chapter11"
+        ]
+      },
+      {
+        "name": "part5",
+        "document": {
+          "section_id": "part5",
+          "filename": "part5.html",
+          "title": "Appendices"
+        },
+        "children": [
+          "appendixA",
+          "appendixB",
+          "appendixC",
+          "appendixE"
+        ]
+      }
+    ]
+  },
   "chapters": [
+    {
+      "name": "preface",
+      "kind": "preface",
+      "number": null,
+      "document": {
+        "section_id": "preface",
+        "filename": "preface.html",
+        "title": "Preface"
+      },
+      "pages": [
+        {
+          "section_id": "pre-foreword",
+          "filename": "foreword.html",
+          "title": "Foreword"
+        },
+        {
+          "section_id": "pre-audience",
+          "filename": "audience.html",
+          "title": "Audience"
+        },
+        {
+          "section_id": "pre-architecture",
+          "filename": "architecture.html",
+          "title": "LFS Target Architectures"
+        },
+        {
+          "section_id": "pre-prerequisites",
+          "filename": "prerequisites.html",
+          "title": "Prerequisites"
+        },
+        {
+          "section_id": "pre-standards",
+          "filename": "standards.html",
+          "title": "LFS and Standards"
+        },
+        {
+          "section_id": "pre-why",
+          "filename": "package-choices.html",
+          "title": "Rationale for Packages in the Book"
+        },
+        {
+          "section_id": "pre-typography",
+          "filename": "typography.html",
+          "title": "Typography"
+        },
+        {
+          "section_id": "pre-organization",
+          "filename": "organization.html",
+          "title": "Structure"
+        },
+        {
+          "section_id": "pre-errata",
+          "filename": "errata.html",
+          "title": "Errata and Security Advisories"
+        }
+      ]
+    },
+    {
+      "name": "chapter01",
+      "kind": "chapter",
+      "number": 1,
+      "document": {
+        "section_id": "chapter-intro",
+        "filename": "chapter01.html",
+        "title": "Introduction"
+      },
+      "pages": [
+        {
+          "section_id": "ch-intro-how",
+          "filename": "how.html",
+          "title": "How to Build an LFS System"
+        },
+        {
+          "section_id": "ch-intro-whatsnew",
+          "filename": "whatsnew.html",
+          "title": "What's new since the last release"
+        },
+        {
+          "section_id": "ch-intro-changelog",
+          "filename": "changelog.html",
+          "title": "Changelog"
+        },
+        {
+          "section_id": "ch-intro-resources",
+          "filename": "resources.html",
+          "title": "Resources"
+        },
+        {
+          "section_id": "ch-intro-askforhelp",
+          "filename": "askforhelp.html",
+          "title": "Help"
+        }
+      ]
+    },
+    {
+      "name": "chapter02",
+      "kind": "chapter",
+      "number": 2,
+      "document": {
+        "section_id": "chapter-partitioning",
+        "filename": "chapter02.html",
+        "title": "Preparing the Host System"
+      },
+      "pages": [
+        {
+          "section_id": "ch-partitioning-introduction",
+          "filename": "introduction.html",
+          "title": "Introduction"
+        },
+        {
+          "section_id": "ch-partitioning-hostreqs",
+          "filename": "hostreqs.html",
+          "title": "Host System Requirements"
+        },
+        {
+          "section_id": "ch-partitioning-stages",
+          "filename": "stages.html",
+          "title": "Building LFS in Stages"
+        },
+        {
+          "section_id": "ch-partitioning-creatingpartition",
+          "filename": "creatingpartition.html",
+          "title": "Creating a New Partition"
+        },
+        {
+          "section_id": "ch-partitioning-creatingfilesystem",
+          "filename": "creatingfilesystem.html",
+          "title": "Creating a File System on the Partition"
+        },
+        {
+          "section_id": "ch-partitioning-aboutlfs",
+          "filename": "aboutlfs.html",
+          "title": "Setting the $LFS Variable and the Umask"
+        },
+        {
+          "section_id": "ch-partitioning-mounting",
+          "filename": "mounting.html",
+          "title": "Mounting the New Partition"
+        }
+      ]
+    },
+    {
+      "name": "chapter03",
+      "kind": "chapter",
+      "number": 3,
+      "document": {
+        "section_id": "chapter-getting-materials",
+        "filename": "chapter03.html",
+        "title": "Packages and Patches"
+      },
+      "pages": [
+        {
+          "section_id": "ch-materials-introduction",
+          "filename": "introduction.html",
+          "title": "Introduction"
+        },
+        {
+          "section_id": "ch-materials-packages",
+          "filename": "packages.html",
+          "title": "All Packages"
+        },
+        {
+          "section_id": "ch-materials-patches",
+          "filename": "patches.html",
+          "title": "Needed Patches"
+        }
+      ]
+    },
+    {
+      "name": "chapter04",
+      "kind": "chapter",
+      "number": 4,
+      "document": {
+        "section_id": "chapter-final-preps",
+        "filename": "chapter04.html",
+        "title": "Final Preparations"
+      },
+      "pages": [
+        {
+          "section_id": "ch-preps-introduction",
+          "filename": "introduction.html",
+          "title": "Introduction"
+        },
+        {
+          "section_id": "ch-tools-creatingminlayout",
+          "filename": "creatingminlayout.html",
+          "title": "Creating a Limited Directory Layout in the LFS Filesystem"
+        },
+        {
+          "section_id": "ch-preps-addinguser",
+          "filename": "addinguser.html",
+          "title": "Adding the LFS User"
+        },
+        {
+          "section_id": "ch-preps-settingenviron",
+          "filename": "settingenvironment.html",
+          "title": "Setting Up the Environment"
+        },
+        {
+          "section_id": "ch-preps-aboutsbus",
+          "filename": "aboutsbus.html",
+          "title": "About SBUs"
+        },
+        {
+          "section_id": "ch-preps-abouttestsuites",
+          "filename": "abouttestsuites.html",
+          "title": "About the Test Suites"
+        }
+      ]
+    },
+    {
+      "name": "part3intro",
+      "kind": "preface",
+      "number": null,
+      "document": {
+        "section_id": "partintro-cross-temp",
+        "filename": "partintro.html",
+        "title": "Important Preliminary Material"
+      },
+      "pages": [
+        {
+          "section_id": "ch-part3intro-intro",
+          "filename": "introduction.html",
+          "title": "Introduction"
+        },
+        {
+          "section_id": "ch-tools-toolchaintechnotes",
+          "filename": "toolchaintechnotes.html",
+          "title": "Toolchain Technical Notes"
+        },
+        {
+          "section_id": "ch-tools-generalinstructions",
+          "filename": "generalinstructions.html",
+          "title": "General Compilation Instructions"
+        }
+      ]
+    },
+    {
+      "name": "chapter05",
+      "kind": "chapter",
+      "number": 5,
+      "document": {
+        "section_id": "chapter-cross-tools",
+        "filename": "chapter05.html",
+        "title": "Compiling a Cross-Toolchain"
+      },
+      "pages": [
+        {
+          "section_id": "ch-tools-introduction",
+          "filename": "introduction.html",
+          "title": "Introduction"
+        },
+        {
+          "section_id": "ch-tools-binutils-pass1",
+          "filename": "binutils-pass1.html",
+          "title": "Binutils-2.47 - Pass 1"
+        },
+        {
+          "section_id": "ch-tools-gcc-pass1",
+          "filename": "gcc-pass1.html",
+          "title": "GCC-16.2.0 - Pass 1"
+        },
+        {
+          "section_id": "ch-tools-linux-headers",
+          "filename": "linux-headers.html",
+          "title": "Linux-7.1.8 API Headers"
+        },
+        {
+          "section_id": "ch-tools-glibc",
+          "filename": "glibc.html",
+          "title": "Glibc-2.44"
+        },
+        {
+          "section_id": "ch-tools-libstdcpp",
+          "filename": "gcc-libstdc++.html",
+          "title": "Libstdc++ from GCC-16.2.0"
+        }
+      ]
+    },
+    {
+      "name": "chapter06",
+      "kind": "chapter",
+      "number": 6,
+      "document": {
+        "section_id": "chapter-temporary-tools",
+        "filename": "chapter06.html",
+        "title": "Cross Compiling Temporary Tools"
+      },
+      "pages": [
+        {
+          "section_id": "ch-tools-introduction-cross",
+          "filename": "introduction.html",
+          "title": "Introduction"
+        },
+        {
+          "section_id": "ch-tools-m4",
+          "filename": "m4.html",
+          "title": "M4-1.4.21"
+        },
+        {
+          "section_id": "ch-tools-ncurses",
+          "filename": "ncurses.html",
+          "title": "Ncurses-6.6"
+        },
+        {
+          "section_id": "ch-tools-bash",
+          "filename": "bash.html",
+          "title": "Bash-5.3"
+        },
+        {
+          "section_id": "ch-tools-coreutils",
+          "filename": "coreutils.html",
+          "title": "Coreutils-9.11"
+        },
+        {
+          "section_id": "ch-tools-diffutils",
+          "filename": "diffutils.html",
+          "title": "Diffutils-3.12"
+        },
+        {
+          "section_id": "ch-tools-file",
+          "filename": "file.html",
+          "title": "File-5.48"
+        },
+        {
+          "section_id": "ch-tools-findutils",
+          "filename": "findutils.html",
+          "title": "Findutils-4.11.0"
+        },
+        {
+          "section_id": "ch-tools-gawk",
+          "filename": "gawk.html",
+          "title": "Gawk-5.4.1"
+        },
+        {
+          "section_id": "ch-tools-grep",
+          "filename": "grep.html",
+          "title": "Grep-3.12"
+        },
+        {
+          "section_id": "ch-tools-gzip",
+          "filename": "gzip.html",
+          "title": "Gzip-1.14"
+        },
+        {
+          "section_id": "ch-tools-make",
+          "filename": "make.html",
+          "title": "Make-4.4.1"
+        },
+        {
+          "section_id": "ch-tools-patch",
+          "filename": "patch.html",
+          "title": "Patch-2.8"
+        },
+        {
+          "section_id": "ch-tools-sed",
+          "filename": "sed.html",
+          "title": "Sed-4.10"
+        },
+        {
+          "section_id": "ch-tools-tar",
+          "filename": "tar.html",
+          "title": "Tar-1.35"
+        },
+        {
+          "section_id": "ch-tools-xz",
+          "filename": "xz.html",
+          "title": "Xz-5.8.3"
+        },
+        {
+          "section_id": "ch-tools-binutils-pass2",
+          "filename": "binutils-pass2.html",
+          "title": "Binutils-2.47 - Pass 2"
+        },
+        {
+          "section_id": "ch-tools-gcc-pass2",
+          "filename": "gcc-pass2.html",
+          "title": "GCC-16.2.0 - Pass 2"
+        }
+      ]
+    },
+    {
+      "name": "chapter07",
+      "kind": "chapter",
+      "number": 7,
+      "document": {
+        "section_id": "chapter-chroot-temporary-tools",
+        "filename": "chapter07.html",
+        "title": "Entering Chroot and Building Additional Temporary Tools"
+      },
+      "pages": [
+        {
+          "section_id": "ch-tools-introduction-chroot",
+          "filename": "introduction.html",
+          "title": "Introduction"
+        },
+        {
+          "section_id": "ch-tools-changingowner",
+          "filename": "changingowner.html",
+          "title": "Changing Ownership"
+        },
+        {
+          "section_id": "ch-tools-kernfs",
+          "filename": "kernfs.html",
+          "title": "Preparing Virtual Kernel File Systems"
+        },
+        {
+          "section_id": "ch-tools-chroot",
+          "filename": "chroot.html",
+          "title": "Entering the Chroot Environment"
+        },
+        {
+          "section_id": "ch-tools-creatingdirs",
+          "filename": "creatingdirs.html",
+          "title": "Creating Directories"
+        },
+        {
+          "section_id": "ch-tools-createfiles",
+          "filename": "createfiles.html",
+          "title": "Creating Essential Files and Symlinks"
+        },
+        {
+          "section_id": "ch-tools-gettext",
+          "filename": "gettext.html",
+          "title": "Gettext-1.0"
+        },
+        {
+          "section_id": "ch-tools-bison",
+          "filename": "bison.html",
+          "title": "Bison-3.8.2"
+        },
+        {
+          "section_id": "ch-tools-perl",
+          "filename": "perl.html",
+          "title": "Perl-5.44.0"
+        },
+        {
+          "section_id": "ch-tools-zlib",
+          "filename": "zlib.html",
+          "title": "Zlib-1.3.2"
+        },
+        {
+          "section_id": "ch-tools-mpdecimal",
+          "filename": "mpdecimal.html",
+          "title": "mpdecimal-4.0.1"
+        },
+        {
+          "section_id": "ch-tools-Python",
+          "filename": "Python.html",
+          "title": "Python-3.14.7"
+        },
+        {
+          "section_id": "ch-tools-texinfo",
+          "filename": "texinfo.html",
+          "title": "Texinfo-7.3"
+        },
+        {
+          "section_id": "ch-tools-util-linux",
+          "filename": "util-linux.html",
+          "title": "Util-linux-2.42.2"
+        },
+        {
+          "section_id": "ch-tools-cleanup",
+          "filename": "cleanup.html",
+          "title": "Cleaning up and Saving the Temporary System"
+        }
+      ]
+    },
     {
       "name": "chapter08",
       "number": 8,
@@ -447,6 +989,188 @@
           "section_id": "ch-system-cleanup",
           "filename": "cleanup.html",
           "title": "Cleaning Up"
+        }
+      ],
+      "kind": "chapter"
+    },
+    {
+      "name": "chapter09",
+      "kind": "chapter",
+      "number": 9,
+      "document": {
+        "section_id": "chapter-config",
+        "filename": "chapter09.html",
+        "title": "System Configuration"
+      },
+      "pages": [
+        {
+          "section_id": "ch-config-introduction",
+          "filename": "introduction.html",
+          "title": "Introduction"
+        },
+        {
+          "section_id": "ch-config-network",
+          "filename": "network.html",
+          "title": "General Network Configuration"
+        },
+        {
+          "section_id": "ch-config-udev",
+          "filename": "udev.html",
+          "title": "Overview of Device and Module Handling"
+        },
+        {
+          "section_id": "ch-config-symlinks",
+          "filename": "symlinks.html",
+          "title": "Managing Devices"
+        },
+        {
+          "section_id": "ch-config-clock",
+          "filename": "clock.html",
+          "title": "Configuring the System Clock"
+        },
+        {
+          "section_id": "ch-config-console",
+          "filename": "console.html",
+          "title": "Configuring the Linux Console"
+        },
+        {
+          "section_id": "ch-config-locale",
+          "filename": "locale.html",
+          "title": "Configuring the System Locale"
+        },
+        {
+          "section_id": "ch-config-inputrc",
+          "filename": "inputrc.html",
+          "title": "Creating the /etc/inputrc File"
+        },
+        {
+          "section_id": "ch-config-shells",
+          "filename": "etcshells.html",
+          "title": "Creating the /etc/shells File"
+        },
+        {
+          "section_id": "ch-config-systemd-custom",
+          "filename": "systemd-custom.html",
+          "title": "Systemd Usage and Configuration"
+        }
+      ]
+    },
+    {
+      "name": "chapter10",
+      "kind": "chapter",
+      "number": 10,
+      "document": {
+        "section_id": "chapter-bootable",
+        "filename": "chapter10.html",
+        "title": "Making the LFS System Bootable"
+      },
+      "pages": [
+        {
+          "section_id": "ch-bootable-introduction",
+          "filename": "introduction.html",
+          "title": "Introduction"
+        },
+        {
+          "section_id": "ch-bootable-fstab",
+          "filename": "fstab.html",
+          "title": "Creating the /etc/fstab File"
+        },
+        {
+          "section_id": "ch-bootable-kernel",
+          "filename": "kernel.html",
+          "title": "Linux-7.1.8"
+        },
+        {
+          "section_id": "ch-bootable-grub",
+          "filename": "grub.html",
+          "title": "Using GRUB to Set Up the Boot Process"
+        }
+      ]
+    },
+    {
+      "name": "chapter11",
+      "kind": "chapter",
+      "number": 11,
+      "document": {
+        "section_id": "chapter-finalizing",
+        "filename": "chapter11.html",
+        "title": "The End"
+      },
+      "pages": [
+        {
+          "section_id": "ch-finish-theend",
+          "filename": "theend.html",
+          "title": "The End"
+        },
+        {
+          "section_id": "ch-finish-getcounted",
+          "filename": "getcounted.html",
+          "title": "Get Counted"
+        },
+        {
+          "section_id": "ch-finish-reboot",
+          "filename": "reboot.html",
+          "title": "Rebooting the System"
+        },
+        {
+          "section_id": "ch-finish-whatnow",
+          "filename": "whatnow.html",
+          "title": "Additional Resources"
+        },
+        {
+          "section_id": "afterlfs",
+          "filename": "afterlfs.html",
+          "title": "Getting Started After LFS"
+        }
+      ]
+    },
+    {
+      "name": "appendixA",
+      "kind": "appendix",
+      "number": "A",
+      "document": {
+        "section_id": "appendixa",
+        "filename": "acronymlist.html",
+        "title": "Acronyms and Terms"
+      },
+      "pages": []
+    },
+    {
+      "name": "appendixB",
+      "kind": "appendix",
+      "number": "B",
+      "document": {
+        "section_id": "appendixb",
+        "filename": "acknowledgments.html",
+        "title": "Acknowledgments"
+      },
+      "pages": []
+    },
+    {
+      "name": "appendixC",
+      "kind": "appendix",
+      "number": "C",
+      "document": {
+        "section_id": "appendixc",
+        "filename": "dependencies.html",
+        "title": "Dependencies"
+      },
+      "pages": []
+    },
+    {
+      "name": "appendixE",
+      "kind": "appendix",
+      "number": "E",
+      "document": {
+        "section_id": "Licenses",
+        "filename": "licenses.html",
+        "title": "LFS Licenses"
+      },
+      "pages": [
+        {
+          "section_id": "CC",
+          "filename": "creat-comm.html",
+          "title": "Creative Commons License"
         }
       ]
     }

@@ -1,0 +1,806 @@
+{
+  "schema_version": 1,
+  "source": {
+    "project": "Linux From Scratch",
+    "version": "13.1-systemd",
+    "published": "2026-09-01"
+  },
+  "documents": [
+    {
+      "section_id": "preface",
+      "filename": "preface.html"
+    },
+    {
+      "section_id": "pre-foreword",
+      "filename": "foreword.html"
+    },
+    {
+      "section_id": "pre-audience",
+      "filename": "audience.html"
+    },
+    {
+      "section_id": "pre-architecture",
+      "filename": "architecture.html"
+    },
+    {
+      "section_id": "pre-prerequisites",
+      "filename": "prerequisites.html"
+    },
+    {
+      "section_id": "pre-standards",
+      "filename": "standards.html"
+    },
+    {
+      "section_id": "pre-why",
+      "filename": "package-choices.html"
+    },
+    {
+      "section_id": "pre-typography",
+      "filename": "typography.html"
+    },
+    {
+      "section_id": "pre-organization",
+      "filename": "organization.html"
+    },
+    {
+      "section_id": "pre-errata",
+      "filename": "errata.html"
+    },
+    {
+      "section_id": "part1",
+      "filename": "part1.html"
+    },
+    {
+      "section_id": "chapter-intro",
+      "filename": "chapter01.html"
+    },
+    {
+      "section_id": "ch-intro-how",
+      "filename": "how.html"
+    },
+    {
+      "section_id": "ch-intro-whatsnew",
+      "filename": "whatsnew.html"
+    },
+    {
+      "section_id": "ch-intro-changelog",
+      "filename": "changelog.html"
+    },
+    {
+      "section_id": "ch-intro-resources",
+      "filename": "resources.html"
+    },
+    {
+      "section_id": "ch-intro-askforhelp",
+      "filename": "askforhelp.html"
+    },
+    {
+      "section_id": "part2",
+      "filename": "part2.html"
+    },
+    {
+      "section_id": "chapter-partitioning",
+      "filename": "chapter02.html"
+    },
+    {
+      "section_id": "ch-partitioning-introduction",
+      "filename": "introduction.html"
+    },
+    {
+      "section_id": "ch-partitioning-hostreqs",
+      "filename": "hostreqs.html"
+    },
+    {
+      "section_id": "ch-partitioning-stages",
+      "filename": "stages.html"
+    },
+    {
+      "section_id": "ch-partitioning-creatingpartition",
+      "filename": "creatingpartition.html"
+    },
+    {
+      "section_id": "ch-partitioning-creatingfilesystem",
+      "filename": "creatingfilesystem.html"
+    },
+    {
+      "section_id": "ch-partitioning-aboutlfs",
+      "filename": "aboutlfs.html"
+    },
+    {
+      "section_id": "ch-partitioning-mounting",
+      "filename": "mounting.html"
+    },
+    {
+      "section_id": "chapter-getting-materials",
+      "filename": "chapter03.html"
+    },
+    {
+      "section_id": "ch-materials-introduction",
+      "filename": "introduction.html"
+    },
+    {
+      "section_id": "ch-materials-packages",
+      "filename": "packages.html"
+    },
+    {
+      "section_id": "ch-materials-patches",
+      "filename": "patches.html"
+    },
+    {
+      "section_id": "chapter-final-preps",
+      "filename": "chapter04.html"
+    },
+    {
+      "section_id": "ch-preps-introduction",
+      "filename": "introduction.html"
+    },
+    {
+      "section_id": "ch-tools-creatingminlayout",
+      "filename": "creatingminlayout.html"
+    },
+    {
+      "section_id": "ch-preps-addinguser",
+      "filename": "addinguser.html"
+    },
+    {
+      "section_id": "ch-preps-settingenviron",
+      "filename": "settingenvironment.html"
+    },
+    {
+      "section_id": "ch-preps-aboutsbus",
+      "filename": "aboutsbus.html"
+    },
+    {
+      "section_id": "ch-preps-abouttestsuites",
+      "filename": "abouttestsuites.html"
+    },
+    {
+      "section_id": "part3",
+      "filename": "part3.html"
+    },
+    {
+      "section_id": "partintro-cross-temp",
+      "filename": "partintro.html"
+    },
+    {
+      "section_id": "ch-part3intro-intro",
+      "filename": "introduction.html"
+    },
+    {
+      "section_id": "ch-tools-toolchaintechnotes",
+      "filename": "toolchaintechnotes.html"
+    },
+    {
+      "section_id": "ch-tools-generalinstructions",
+      "filename": "generalinstructions.html"
+    },
+    {
+      "section_id": "chapter-cross-tools",
+      "filename": "chapter05.html"
+    },
+    {
+      "section_id": "ch-tools-introduction",
+      "filename": "introduction.html"
+    },
+    {
+      "section_id": "ch-tools-binutils-pass1",
+      "filename": "binutils-pass1.html"
+    },
+    {
+      "section_id": "ch-tools-gcc-pass1",
+      "filename": "gcc-pass1.html"
+    },
+    {
+      "section_id": "ch-tools-linux-headers",
+      "filename": "linux-headers.html"
+    },
+    {
+      "section_id": "ch-tools-glibc",
+      "filename": "glibc.html"
+    },
+    {
+      "section_id": "ch-tools-libstdcpp",
+      "filename": "gcc-libstdc++.html"
+    },
+    {
+      "section_id": "chapter-temporary-tools",
+      "filename": "chapter06.html"
+    },
+    {
+      "section_id": "ch-tools-introduction-cross",
+      "filename": "introduction.html"
+    },
+    {
+      "section_id": "ch-tools-m4",
+      "filename": "m4.html"
+    },
+    {
+      "section_id": "ch-tools-ncurses",
+      "filename": "ncurses.html"
+    },
+    {
+      "section_id": "ch-tools-bash",
+      "filename": "bash.html"
+    },
+    {
+      "section_id": "ch-tools-coreutils",
+      "filename": "coreutils.html"
+    },
+    {
+      "section_id": "ch-tools-diffutils",
+      "filename": "diffutils.html"
+    },
+    {
+      "section_id": "ch-tools-file",
+      "filename": "file.html"
+    },
+    {
+      "section_id": "ch-tools-findutils",
+      "filename": "findutils.html"
+    },
+    {
+      "section_id": "ch-tools-gawk",
+      "filename": "gawk.html"
+    },
+    {
+      "section_id": "ch-tools-grep",
+      "filename": "grep.html"
+    },
+    {
+      "section_id": "ch-tools-gzip",
+      "filename": "gzip.html"
+    },
+    {
+      "section_id": "ch-tools-make",
+      "filename": "make.html"
+    },
+    {
+      "section_id": "ch-tools-patch",
+      "filename": "patch.html"
+    },
+    {
+      "section_id": "ch-tools-sed",
+      "filename": "sed.html"
+    },
+    {
+      "section_id": "ch-tools-tar",
+      "filename": "tar.html"
+    },
+    {
+      "section_id": "ch-tools-xz",
+      "filename": "xz.html"
+    },
+    {
+      "section_id": "ch-tools-binutils-pass2",
+      "filename": "binutils-pass2.html"
+    },
+    {
+      "section_id": "ch-tools-gcc-pass2",
+      "filename": "gcc-pass2.html"
+    },
+    {
+      "section_id": "chapter-chroot-temporary-tools",
+      "filename": "chapter07.html"
+    },
+    {
+      "section_id": "ch-tools-introduction-chroot",
+      "filename": "introduction.html"
+    },
+    {
+      "section_id": "ch-tools-changingowner",
+      "filename": "changingowner.html"
+    },
+    {
+      "section_id": "ch-tools-kernfs",
+      "filename": "kernfs.html"
+    },
+    {
+      "section_id": "ch-tools-chroot",
+      "filename": "chroot.html"
+    },
+    {
+      "section_id": "ch-tools-creatingdirs",
+      "filename": "creatingdirs.html"
+    },
+    {
+      "section_id": "ch-tools-createfiles",
+      "filename": "createfiles.html"
+    },
+    {
+      "section_id": "ch-tools-gettext",
+      "filename": "gettext.html"
+    },
+    {
+      "section_id": "ch-tools-bison",
+      "filename": "bison.html"
+    },
+    {
+      "section_id": "ch-tools-perl",
+      "filename": "perl.html"
+    },
+    {
+      "section_id": "ch-tools-zlib",
+      "filename": "zlib.html"
+    },
+    {
+      "section_id": "ch-tools-mpdecimal",
+      "filename": "mpdecimal.html"
+    },
+    {
+      "section_id": "ch-tools-Python",
+      "filename": "Python.html"
+    },
+    {
+      "section_id": "ch-tools-texinfo",
+      "filename": "texinfo.html"
+    },
+    {
+      "section_id": "ch-tools-util-linux",
+      "filename": "util-linux.html"
+    },
+    {
+      "section_id": "ch-tools-cleanup",
+      "filename": "cleanup.html"
+    },
+    {
+      "section_id": "part4",
+      "filename": "part4.html"
+    },
+    {
+      "section_id": "chapter-building-system",
+      "filename": "chapter08.html"
+    },
+    {
+      "section_id": "ch-system-introduction",
+      "filename": "introduction.html"
+    },
+    {
+      "section_id": "ch-system-pkgmgt",
+      "filename": "pkgmgt.html"
+    },
+    {
+      "section_id": "ch-system-man-pages",
+      "filename": "man-pages.html"
+    },
+    {
+      "section_id": "ch-system-iana-etc",
+      "filename": "iana-etc.html"
+    },
+    {
+      "section_id": "ch-system-glibc",
+      "filename": "glibc.html"
+    },
+    {
+      "section_id": "ch-system-zlib",
+      "filename": "zlib.html"
+    },
+    {
+      "section_id": "ch-system-bzip2",
+      "filename": "bzip2.html"
+    },
+    {
+      "section_id": "ch-system-xz",
+      "filename": "xz.html"
+    },
+    {
+      "section_id": "ch-system-lz4",
+      "filename": "lz4.html"
+    },
+    {
+      "section_id": "ch-system-zstd",
+      "filename": "zstd.html"
+    },
+    {
+      "section_id": "ch-system-file",
+      "filename": "file.html"
+    },
+    {
+      "section_id": "ch-system-readline",
+      "filename": "readline.html"
+    },
+    {
+      "section_id": "ch-system-pcre2",
+      "filename": "pcre2.html"
+    },
+    {
+      "section_id": "ch-system-m4",
+      "filename": "m4.html"
+    },
+    {
+      "section_id": "ch-system-bc",
+      "filename": "bc.html"
+    },
+    {
+      "section_id": "ch-system-flex",
+      "filename": "flex.html"
+    },
+    {
+      "section_id": "ch-system-tcl",
+      "filename": "tcl.html"
+    },
+    {
+      "section_id": "ch-system-expect",
+      "filename": "expect.html"
+    },
+    {
+      "section_id": "ch-system-dejagnu",
+      "filename": "dejagnu.html"
+    },
+    {
+      "section_id": "ch-system-ninja",
+      "filename": "ninja.html"
+    },
+    {
+      "section_id": "ch-system-pkgconf",
+      "filename": "pkgconf.html"
+    },
+    {
+      "section_id": "ch-system-binutils",
+      "filename": "binutils.html"
+    },
+    {
+      "section_id": "ch-system-gmp",
+      "filename": "gmp.html"
+    },
+    {
+      "section_id": "ch-system-mpfr",
+      "filename": "mpfr.html"
+    },
+    {
+      "section_id": "ch-system-mpc",
+      "filename": "mpc.html"
+    },
+    {
+      "section_id": "ch-system-attr",
+      "filename": "attr.html"
+    },
+    {
+      "section_id": "ch-system-acl",
+      "filename": "acl.html"
+    },
+    {
+      "section_id": "ch-system-libcap",
+      "filename": "libcap.html"
+    },
+    {
+      "section_id": "ch-system-libxcrypt",
+      "filename": "libxcrypt.html"
+    },
+    {
+      "section_id": "ch-system-shadow",
+      "filename": "shadow.html"
+    },
+    {
+      "section_id": "ch-system-gawk",
+      "filename": "gawk.html"
+    },
+    {
+      "section_id": "ch-system-gcc",
+      "filename": "gcc.html"
+    },
+    {
+      "section_id": "ch-system-ncurses",
+      "filename": "ncurses.html"
+    },
+    {
+      "section_id": "ch-system-sed",
+      "filename": "sed.html"
+    },
+    {
+      "section_id": "ch-system-psmisc",
+      "filename": "psmisc.html"
+    },
+    {
+      "section_id": "ch-system-gettext",
+      "filename": "gettext.html"
+    },
+    {
+      "section_id": "ch-system-bison",
+      "filename": "bison.html"
+    },
+    {
+      "section_id": "ch-system-grep",
+      "filename": "grep.html"
+    },
+    {
+      "section_id": "ch-system-bash",
+      "filename": "bash.html"
+    },
+    {
+      "section_id": "ch-system-libtool",
+      "filename": "libtool.html"
+    },
+    {
+      "section_id": "ch-system-gdbm",
+      "filename": "gdbm.html"
+    },
+    {
+      "section_id": "ch-system-gperf",
+      "filename": "gperf.html"
+    },
+    {
+      "section_id": "ch-system-expat",
+      "filename": "expat.html"
+    },
+    {
+      "section_id": "ch-system-inetutils",
+      "filename": "inetutils.html"
+    },
+    {
+      "section_id": "ch-system-less",
+      "filename": "less.html"
+    },
+    {
+      "section_id": "ch-system-perl",
+      "filename": "perl.html"
+    },
+    {
+      "section_id": "ch-system-autoconf",
+      "filename": "autoconf.html"
+    },
+    {
+      "section_id": "ch-system-automake",
+      "filename": "automake.html"
+    },
+    {
+      "section_id": "ch-system-openssl",
+      "filename": "openssl.html"
+    },
+    {
+      "section_id": "ch-system-libelf",
+      "filename": "libelf.html"
+    },
+    {
+      "section_id": "ch-system-libffi",
+      "filename": "libffi.html"
+    },
+    {
+      "section_id": "ch-system-sqlite",
+      "filename": "sqlite.html"
+    },
+    {
+      "section_id": "ch-system-mpdecimal",
+      "filename": "mpdecimal.html"
+    },
+    {
+      "section_id": "ch-system-Python",
+      "filename": "Python.html"
+    },
+    {
+      "section_id": "ch-system-flit-core",
+      "filename": "flit-core.html"
+    },
+    {
+      "section_id": "ch-system-packaging",
+      "filename": "packaging.html"
+    },
+    {
+      "section_id": "ch-system-wheel",
+      "filename": "wheel.html"
+    },
+    {
+      "section_id": "ch-system-setuptools",
+      "filename": "setuptools.html"
+    },
+    {
+      "section_id": "ch-system-meson",
+      "filename": "meson.html"
+    },
+    {
+      "section_id": "ch-system-kmod",
+      "filename": "kmod.html"
+    },
+    {
+      "section_id": "ch-system-coreutils",
+      "filename": "coreutils.html"
+    },
+    {
+      "section_id": "ch-system-diffutils",
+      "filename": "diffutils.html"
+    },
+    {
+      "section_id": "ch-system-findutils",
+      "filename": "findutils.html"
+    },
+    {
+      "section_id": "ch-system-groff",
+      "filename": "groff.html"
+    },
+    {
+      "section_id": "ch-system-grub",
+      "filename": "grub.html"
+    },
+    {
+      "section_id": "ch-system-gzip",
+      "filename": "gzip.html"
+    },
+    {
+      "section_id": "ch-system-iproute2",
+      "filename": "iproute2.html"
+    },
+    {
+      "section_id": "ch-system-kbd",
+      "filename": "kbd.html"
+    },
+    {
+      "section_id": "ch-system-libpipeline",
+      "filename": "libpipeline.html"
+    },
+    {
+      "section_id": "ch-system-make",
+      "filename": "make.html"
+    },
+    {
+      "section_id": "ch-system-patch",
+      "filename": "patch.html"
+    },
+    {
+      "section_id": "ch-system-tar",
+      "filename": "tar.html"
+    },
+    {
+      "section_id": "ch-system-texinfo",
+      "filename": "texinfo.html"
+    },
+    {
+      "section_id": "ch-system-vim",
+      "filename": "vim.html"
+    },
+    {
+      "section_id": "ch-system-markupsafe",
+      "filename": "markupsafe.html"
+    },
+    {
+      "section_id": "ch-system-jinja2",
+      "filename": "jinja2.html"
+    },
+    {
+      "section_id": "ch-system-systemd",
+      "filename": "systemd.html"
+    },
+    {
+      "section_id": "ch-system-dbus",
+      "filename": "dbus.html"
+    },
+    {
+      "section_id": "ch-system-man-db",
+      "filename": "man-db.html"
+    },
+    {
+      "section_id": "ch-system-procps",
+      "filename": "procps-ng.html"
+    },
+    {
+      "section_id": "ch-system-util-linux",
+      "filename": "util-linux.html"
+    },
+    {
+      "section_id": "ch-system-e2fsprogs",
+      "filename": "e2fsprogs.html"
+    },
+    {
+      "section_id": "ch-system-aboutdebug",
+      "filename": "aboutdebug.html"
+    },
+    {
+      "section_id": "ch-system-stripping",
+      "filename": "stripping.html"
+    },
+    {
+      "section_id": "ch-system-cleanup",
+      "filename": "cleanup.html"
+    },
+    {
+      "section_id": "chapter-config",
+      "filename": "chapter09.html"
+    },
+    {
+      "section_id": "ch-config-introduction",
+      "filename": "introduction.html"
+    },
+    {
+      "section_id": "ch-config-network",
+      "filename": "network.html"
+    },
+    {
+      "section_id": "ch-config-udev",
+      "filename": "udev.html"
+    },
+    {
+      "section_id": "ch-config-symlinks",
+      "filename": "symlinks.html"
+    },
+    {
+      "section_id": "ch-config-clock",
+      "filename": "clock.html"
+    },
+    {
+      "section_id": "ch-config-console",
+      "filename": "console.html"
+    },
+    {
+      "section_id": "ch-config-locale",
+      "filename": "locale.html"
+    },
+    {
+      "section_id": "ch-config-inputrc",
+      "filename": "inputrc.html"
+    },
+    {
+      "section_id": "ch-config-shells",
+      "filename": "etcshells.html"
+    },
+    {
+      "section_id": "ch-config-systemd-custom",
+      "filename": "systemd-custom.html"
+    },
+    {
+      "section_id": "chapter-bootable",
+      "filename": "chapter10.html"
+    },
+    {
+      "section_id": "ch-bootable-introduction",
+      "filename": "introduction.html"
+    },
+    {
+      "section_id": "ch-bootable-fstab",
+      "filename": "fstab.html"
+    },
+    {
+      "section_id": "ch-bootable-kernel",
+      "filename": "kernel.html"
+    },
+    {
+      "section_id": "ch-bootable-grub",
+      "filename": "grub.html"
+    },
+    {
+      "section_id": "chapter-finalizing",
+      "filename": "chapter11.html"
+    },
+    {
+      "section_id": "ch-finish-theend",
+      "filename": "theend.html"
+    },
+    {
+      "section_id": "ch-finish-getcounted",
+      "filename": "getcounted.html"
+    },
+    {
+      "section_id": "ch-finish-reboot",
+      "filename": "reboot.html"
+    },
+    {
+      "section_id": "ch-finish-whatnow",
+      "filename": "whatnow.html"
+    },
+    {
+      "section_id": "afterlfs",
+      "filename": "afterlfs.html"
+    },
+    {
+      "section_id": "part5",
+      "filename": "part5.html"
+    },
+    {
+      "section_id": "appendixa",
+      "filename": "acronymlist.html"
+    },
+    {
+      "section_id": "appendixb",
+      "filename": "acknowledgments.html"
+    },
+    {
+      "section_id": "appendixc",
+      "filename": "dependencies.html"
+    },
+    {
+      "section_id": "Licenses",
+      "filename": "licenses.html"
+    },
+    {
+      "section_id": "CC",
+      "filename": "creat-comm.html"
+    }
+  ]
+}

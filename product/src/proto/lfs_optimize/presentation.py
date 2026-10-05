@@ -343,7 +343,11 @@ def render_package(name: str) -> str:
 
 def compose_chapter(name: str) -> dict[str, Any]:
     chapter = chapter_structure(name)
-    require(isinstance(chapter.get("number"), int), f"{name}: missing chapter number")
+    chapter_number = chapter.get("number")
+    require(
+        chapter_number is None or isinstance(chapter_number, (int, str)),
+        f"{name}: invalid chapter number",
+    )
     document = chapter.get("document")
     require(isinstance(document, dict), f"{name}: missing chapter document")
     for field in ("section_id", "filename", "title"):
@@ -352,35 +356,50 @@ def compose_chapter(name: str) -> dict[str, Any]:
             f"{name}: missing chapter document {field}",
         )
 
-    package_set = load_json(HERE / "package-set.json")
-    packages = package_set.get("packages")
-    require(isinstance(packages, list) and packages, "package set must be a non-empty list")
-
-    package_documents = chapter.get("package_documents")
-    require(isinstance(package_documents, dict), f"{name}: package_documents must be an object")
-    require(
-        set(package_documents) == set(packages),
-        f"{name}: package document identities do not match authoritative package set",
-    )
-
     pages: list[dict[str, Any]] = []
-    for page in chapter.get("leading_pages", []):
-        page_copy = dict(page)
-        page_copy["kind"] = "editorial"
-        pages.append(page_copy)
+    if "package_documents" in chapter:
+        require(name == "chapter08", f"{name}: unexpected package-composed chapter")
+        package_set = load_json(HERE / "package-set.json")
+        packages = package_set.get("packages")
+        require(
+            isinstance(packages, list) and packages,
+            "package set must be a non-empty list",
+        )
 
-    for package_name in packages:
-        document_entry = dict(package_documents[package_name])
-        document_entry["kind"] = "package"
-        document_entry["package"] = package_name
-        pages.append(document_entry)
+        package_documents = chapter.get("package_documents")
+        require(
+            isinstance(package_documents, dict),
+            f"{name}: package_documents must be an object",
+        )
+        require(
+            set(package_documents) == set(packages),
+            f"{name}: package document identities do not match authoritative package set",
+        )
 
-    for page in chapter.get("trailing_pages", []):
-        page_copy = dict(page)
-        page_copy["kind"] = "editorial"
-        pages.append(page_copy)
+        for page in chapter.get("leading_pages", []):
+            page_copy = dict(page)
+            page_copy["kind"] = "editorial"
+            pages.append(page_copy)
 
-    chapter_number = chapter["number"]
+        for package_name in packages:
+            document_entry = dict(package_documents[package_name])
+            document_entry["kind"] = "package"
+            document_entry["package"] = package_name
+            pages.append(document_entry)
+
+        for page in chapter.get("trailing_pages", []):
+            page_copy = dict(page)
+            page_copy["kind"] = "editorial"
+            pages.append(page_copy)
+    else:
+        source_pages = chapter.get("pages")
+        require(isinstance(source_pages, list), f"{name}: pages must be a list")
+        for page in source_pages:
+            require(isinstance(page, dict), f"{name}: page must be an object")
+            page_copy = dict(page)
+            page_copy["kind"] = "editorial"
+            pages.append(page_copy)
+
     for index, page in enumerate(pages, start=1):
         require(
             isinstance(page.get("section_id"), str) and page["section_id"],
@@ -390,44 +409,241 @@ def compose_chapter(name: str) -> dict[str, Any]:
             isinstance(page.get("filename"), str) and page["filename"],
             f"{name}: page {index} missing filename",
         )
-        page["number"] = f"{chapter_number}.{index}"
+        page["number"] = (
+            f"{chapter_number}.{index}" if chapter_number is not None else None
+        )
         page["previous"] = pages[index - 2]["section_id"] if index > 1 else None
         page["next"] = pages[index]["section_id"] if index < len(pages) else None
 
     return {
         "name": name,
+        "kind": chapter.get("kind"),
         "number": chapter_number,
-        "document": document,
+        "document": dict(document),
         "pages": pages,
     }
+
+
+def _book_document(
+    document: dict[str, Any],
+    *,
+    kind: str,
+    owner: str,
+    number: str | int | None = None,
+) -> dict[str, Any]:
+    result = dict(document)
+    require(
+        isinstance(result.get("section_id"), str) and result["section_id"],
+        f"{owner}: missing document section_id",
+    )
+    require(
+        isinstance(result.get("filename"), str) and result["filename"],
+        f"{owner}: missing document filename",
+    )
+    result["kind"] = kind
+    result["owner"] = owner
+    result["number"] = str(number) if number is not None else None
+    return result
+
+
+def compose_book() -> dict[str, Any]:
+    structure = structure_document()
+    book = structure.get("book")
+    require(isinstance(book, dict), "missing book presentation structure")
+    require(
+        isinstance(book.get("title"), str) and book["title"],
+        "book: missing title",
+    )
+
+    chapters = {
+        entry.get("name"): entry
+        for entry in structure.get("chapters", [])
+        if isinstance(entry, dict) and isinstance(entry.get("name"), str)
+    }
+    require(
+        len(chapters) == len(structure.get("chapters", [])),
+        "book: invalid or duplicate chapter names",
+    )
+
+    documents: list[dict[str, Any]] = []
+
+    def append_unit(name: str) -> None:
+        require(name in chapters, f"book: unknown unit {name}")
+        compiled = compose_chapter(name)
+        documents.append(
+            _book_document(
+                compiled["document"],
+                kind=compiled["kind"] or "chapter",
+                owner=name,
+                number=compiled["number"],
+            )
+        )
+        for page in compiled["pages"]:
+            page_doc = _book_document(
+                page,
+                kind=page["kind"],
+                owner=name,
+                number=page["number"],
+            )
+            if page.get("package"):
+                page_doc["package"] = page["package"]
+            documents.append(page_doc)
+
+    frontmatter = book.get("frontmatter")
+    require(isinstance(frontmatter, list), "book: frontmatter must be a list")
+    for name in frontmatter:
+        require(
+            isinstance(name, str) and name,
+            "book: invalid frontmatter entry",
+        )
+        append_unit(name)
+
+    parts = book.get("parts")
+    require(
+        isinstance(parts, list) and parts,
+        "book: parts must be a non-empty list",
+    )
+    seen_parts: set[str] = set()
+    seen_units = set(frontmatter)
+    for part in parts:
+        require(isinstance(part, dict), "book: part must be an object")
+        part_name = part.get("name")
+        require(
+            isinstance(part_name, str)
+            and part_name
+            and part_name not in seen_parts,
+            "book: invalid or duplicate part name",
+        )
+        seen_parts.add(part_name)
+
+        part_document = part.get("document")
+        require(
+            isinstance(part_document, dict),
+            f"{part_name}: missing document",
+        )
+        documents.append(
+            _book_document(
+                part_document,
+                kind="part",
+                owner=part_name,
+            )
+        )
+
+        children = part.get("children")
+        require(
+            isinstance(children, list),
+            f"{part_name}: children must be a list",
+        )
+        for name in children:
+            require(
+                isinstance(name, str)
+                and name
+                and name not in seen_units,
+                f"{part_name}: invalid or duplicate child {name}",
+            )
+            seen_units.add(name)
+            append_unit(name)
+
+    require(
+        seen_units == set(chapters),
+        "book: chapter units do not match composed frontmatter/parts",
+    )
+
+    seen_ids: set[str] = set()
+    for index, document in enumerate(documents):
+        section_id = document["section_id"]
+        require(
+            section_id not in seen_ids,
+            f"book: duplicate document id {section_id}",
+        )
+        seen_ids.add(section_id)
+        document["previous"] = (
+            documents[index - 1]["section_id"] if index else None
+        )
+        document["next"] = (
+            documents[index + 1]["section_id"]
+            if index + 1 < len(documents)
+            else None
+        )
+
+    return {
+        "title": book["title"],
+        "documents": documents,
+    }
+
+
+def book_target_index() -> dict[str, dict[str, Any]]:
+    compiled = compose_book()
+    return {
+        document["section_id"]: document
+        for document in compiled["documents"]
+    }
+
+
+def resolve_book_xref(target: str) -> dict[str, Any]:
+    require(
+        isinstance(target, str) and target,
+        "xref target must be non-empty",
+    )
+    index = book_target_index()
+    require(
+        target in index,
+        f"unresolved book-graph xref: {target}",
+    )
+    return dict(index[target])
 
 
 def render_chapter_hierarchy(name: str) -> str:
     compiled = compose_chapter(name)
     document = compiled["document"]
-    root = ET.Element(
-        "chapter-map",
-        {
-            XML_ID: document["section_id"],
-            "number": str(compiled["number"]),
-            "filename": document["filename"],
-        },
-    )
+    attrs = {
+        XML_ID: document["section_id"],
+        "filename": document["filename"],
+        "kind": compiled["kind"] or "chapter",
+    }
+    if compiled["number"] is not None:
+        attrs["number"] = str(compiled["number"])
+    root = ET.Element("chapter-map", attrs)
     add_text(root, "title", document["title"])
     for page in compiled["pages"]:
-        attrs = {
+        page_attrs = {
             XML_ID: page["section_id"],
-            "number": page["number"],
             "filename": page["filename"],
             "kind": page["kind"],
         }
+        if page.get("number") is not None:
+            page_attrs["number"] = page["number"]
         if page.get("package"):
-            attrs["package"] = page["package"]
+            page_attrs["package"] = page["package"]
         if page.get("previous"):
-            attrs["previous"] = page["previous"]
+            page_attrs["previous"] = page["previous"]
         if page.get("next"):
-            attrs["next"] = page["next"]
-        ET.SubElement(root, "page", attrs)
+            page_attrs["next"] = page["next"]
+        ET.SubElement(root, "page", page_attrs)
+    ET.indent(root, space="  ")
+    return ET.tostring(root, encoding="unicode")
+
+
+def render_book_hierarchy() -> str:
+    compiled = compose_book()
+    root = ET.Element("book-map")
+    add_text(root, "title", compiled["title"])
+    for document in compiled["documents"]:
+        attrs = {
+            XML_ID: document["section_id"],
+            "filename": document["filename"],
+            "kind": document["kind"],
+            "owner": document["owner"],
+        }
+        if document.get("number") is not None:
+            attrs["number"] = document["number"]
+        if document.get("package"):
+            attrs["package"] = document["package"]
+        if document.get("previous"):
+            attrs["previous"] = document["previous"]
+        if document.get("next"):
+            attrs["next"] = document["next"]
+        ET.SubElement(root, "document", attrs)
     ET.indent(root, space="  ")
     return ET.tostring(root, encoding="unicode")
 
@@ -536,6 +752,86 @@ def self_test_chapter08() -> None:
     )
 
 
+def self_test_book() -> None:
+    compiled = compose_book()
+    documents = compiled["documents"]
+    golden = load_presentation(
+        PRESENTATION / "golden" / "book-hierarchy.json"
+    )
+
+    generated_identity = [
+        {
+            "section_id": document["section_id"],
+            "filename": document["filename"],
+        }
+        for document in documents
+    ]
+    require(
+        generated_identity == golden["documents"],
+        "book: generated document graph drifted from LFS 13.1-systemd golden fixture",
+    )
+    require(
+        len(documents) == 199,
+        "book: expected 199 chunked documents",
+    )
+
+    by_id = {
+        document["section_id"]: document
+        for document in documents
+    }
+    require(
+        by_id["ch-tools-cleanup"]["next"] == "part4"
+        and by_id["part4"]["previous"] == "ch-tools-cleanup"
+        and by_id["part4"]["next"] == "chapter-building-system",
+        "book: Chapter 7 -> Part IV navigation drift",
+    )
+    require(
+        by_id["chapter-building-system"]["previous"] == "part4"
+        and by_id["chapter-building-system"]["next"]
+        == "ch-system-introduction",
+        "book: Part IV -> Chapter 8 navigation drift",
+    )
+    require(
+        by_id["ch-system-cleanup"]["next"] == "chapter-config",
+        "book: Chapter 8 -> Chapter 9 navigation drift",
+    )
+    require(
+        by_id["chapter-config"]["previous"] == "ch-system-cleanup"
+        and by_id["chapter-config"]["next"] == "ch-config-introduction",
+        "book: Chapter 9 boundary navigation drift",
+    )
+
+    require(
+        resolve_book_xref("chapter-building-system")["filename"]
+        == "chapter08.html",
+        "book: chapter xref resolution drift",
+    )
+    zlib_target = resolve_book_xref("ch-system-zlib")
+    require(
+        zlib_target["filename"] == "zlib.html"
+        and zlib_target["number"] == "8.6",
+        "book: package-page xref resolution drift",
+    )
+    require(
+        resolve_book_xref("appendixc")["filename"]
+        == "dependencies.html",
+        "book: appendix xref resolution drift",
+    )
+
+    try:
+        resolve_book_xref("not-a-book-graph-target")
+    except RuntimeError:
+        pass
+    else:
+        raise RuntimeError("book: unresolved xref was accepted")
+
+    parsed = ET.fromstring(render_book_hierarchy())
+    require(
+        len(parsed.findall("document")) == 199,
+        "book: rendered document graph count drift",
+    )
+
+
 def self_test() -> None:
     for name in PROOF_PACKAGES:
         self_test_package(name)
@@ -561,12 +857,17 @@ def self_test() -> None:
     )
 
     self_test_chapter08()
+    self_test_book()
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="compile normalized LFS presentation proof")
+    parser = argparse.ArgumentParser(
+        description="compile normalized LFS presentation proof"
+    )
     parser.add_argument("--package")
     parser.add_argument("--chapter")
+    parser.add_argument("--book", action="store_true")
+    parser.add_argument("--xref")
     parser.add_argument("--output", type=Path)
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
@@ -581,15 +882,38 @@ def main() -> int:
                         "milestone": "presentation-slice",
                         "packages": list(PROOF_PACKAGES),
                         "chapter": "chapter08",
-                        "equivalence": "package-semantics-plus-chapter-hierarchy",
+                        "book_graph": True,
+                        "equivalence":
+                            "package-semantics-plus-book-hierarchy",
                     },
                     indent=2,
                 )
             )
             return 0
 
-        if args.chapter:
-            require(not args.package, "choose either --chapter or --package")
+        selected_modes = sum(
+            bool(value)
+            for value in (
+                args.package,
+                args.chapter,
+                args.book,
+                args.xref,
+            )
+        )
+        require(
+            selected_modes <= 1,
+            "choose only one presentation mode",
+        )
+
+        if args.book:
+            rendered = render_book_hierarchy()
+        elif args.xref:
+            rendered = json.dumps(
+                resolve_book_xref(args.xref),
+                indent=2,
+                sort_keys=True,
+            )
+        elif args.chapter:
             rendered = render_chapter_hierarchy(args.chapter)
         else:
             rendered = render_package(args.package or "zlib")

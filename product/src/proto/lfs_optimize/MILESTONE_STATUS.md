@@ -17,7 +17,7 @@ Roadmap:
 | M4 — Bootstrap proof | COMPLETE | Fresh Chapter 5–7 bootstrap hands directly to the normal executor; all 80 final-system packages build successfully without publication XML/book parsing. |
 | M5 — Development proof | COMPLETE | Accepted state, candidate identity, validation, definition binding/drift rejection, review evidence, and guarded transactional promotion are implemented. |
 | M6 — Release proof | SATISFIED BY COMPOSITION | M4 proves clean full-system realization from normalized state and M5 proves validated state identity and controlled promotion. Freezing accepted state under a release identity adds production plumbing but no unresolved prototype architecture question. |
-| M7 — Presentation proof | IN PROGRESS — PACKAGE-PAGE MODEL PROVEN; CHAPTER 8 HIERARCHY SLICE ADDED | Zlib and Binutils prove package-page semantics. Chapter 8 structure now composes five presentation-only pages around the authoritative 80-package package-set order and derives numbering/local navigation, with a source-derived 13.1-systemd golden hierarchy fixture used only for drift detection. Whole-book composition and golden rendering remain open. |
+| M7 — Presentation proof | IN PROGRESS — PACKAGE-PAGE MODEL PROVEN; CHAPTER 8 PROVEN; BOOK GRAPH SLICE ADDED | Zlib and Binutils prove package-page semantics. Chapter 8 derives its 80-package run from authoritative package order. The book graph now composes frontmatter, five parts, Chapters 1–11, the Part III preliminary-material preface, and Appendices A/B/C/E into one chunked-document graph with global navigation and graph-level xref resolution. Nested-anchor and golden-render equivalence remain open. |
 | M8+ | NOT STARTED | BLFS, hard-BLFS, and user-system proofs remain later roadmap milestones. |
 
 ## M5 closure
@@ -124,14 +124,51 @@ links across chapter boundaries, book-level numbering, cross references,
 indexes, aggregate pages, and rendered HTML/PDF equivalence remain subsequent
 M7 work.
 
+## M7 book graph slice
+
+The book graph extends presentation composition above Chapter 8:
+
+```text
+presentation-owned frontmatter
++ presentation-owned part/chapter/appendix hierarchy
++ Chapter 8 authoritative package-set composition
+        ↓
+199 chunked documents
+        ↓
+global previous/next navigation
++ graph-level xref target index
+```
+
+Part landing pages participate in navigation. For example, the Chapter 7 to
+Chapter 8 transition is:
+
+```text
+last Chapter 7 page
+        ↓
+Part IV landing page
+        ↓
+Chapter 8 landing page
+        ↓
+8.1 Introduction
+```
+
+`presentation/golden/book-hierarchy.json` is captured from the uploaded LFS
+13.1-systemd source and is validation-only. Runtime composition reads only
+presentation structure plus authoritative distro state.
+
+This slice resolves xrefs to graph-level chunk targets: part, chapter/appendix,
+and top-level page IDs. Nested anchors inside page bodies are intentionally not
+promoted into the graph yet; they belong with the subsequent editorial-content
+and rendered-output proof.
+
 ## Resume instruction
 
-Run the prototype presentation validator directly after this slice lands:
+Run the direct prototype validator after this slice lands:
 
 ```text
 python3 product/src/proto/lfs_optimize/validate.py
 ```
 
-If it passes, treat the Chapter 8 hierarchy model as proven and move next to
-book-level composition: chapter ordering, cross-chapter navigation, and
-cross-reference resolution before attempting full golden HTML/PDF comparison.
+If it passes, treat book-level hierarchy, cross-boundary navigation, and
+graph-level xref resolution as proven. Continue M7 with nested-anchor/xref
+coverage and then golden chunked-HTML/no-chunks/PDF rendering equivalence.
