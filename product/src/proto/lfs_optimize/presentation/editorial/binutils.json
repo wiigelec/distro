@@ -38,7 +38,36 @@
         },
         {
           "term": "--with-lib-path=/usr/lib",
-          "text": "Specify the path for the linker (ld) to search. By default it searches several directories that do not exist on LFS besides /usr/lib, especially the /usr/lib64 directory that we deliberately avoid. In the case where /usr/lib64 has been mistakenly created and populated with some libraries, making ld not search the path can highlight the issue earlier with a failure to find those libraries at build time instead of run time."
+          "content": [
+            {
+              "type": "text",
+              "text": "Specify the path for the linker (ld) to search. By default it searches several directories that do not exist on LFS besides "
+            },
+            {
+              "type": "filename",
+              "text": "/usr/lib"
+            },
+            {
+              "type": "text",
+              "text": ", especially the "
+            },
+            {
+              "type": "filename",
+              "text": "/usr/lib64"
+            },
+            {
+              "type": "text",
+              "text": " directory that we deliberately avoid. In the case where "
+            },
+            {
+              "type": "filename",
+              "text": "/usr/lib64"
+            },
+            {
+              "type": "text",
+              "text": " has been mistakenly created and populated with some libraries, making ld not search the path can highlight the issue earlier with a failure to find those libraries at build time instead of run time."
+            }
+          ]
         }
       ]
     },
@@ -56,7 +85,44 @@
       "items": [
         {
           "term": "tooldir=/usr",
-          "text": "Normally, the tooldir (the directory where the executables will ultimately be located) is set to $(exec_prefix)/$(target_alias). For example, x86_64 machines would expand that to /usr/x86_64-pc-linux-gnu. Because this is a custom system, this target-specific directory in /usr is not required. $(exec_prefix)/$(target_alias) would be used if the system were used to cross-compile (for example, compiling a package on an Intel machine that generates code that can be executed on PowerPC machines)."
+          "content": [
+            {
+              "type": "text",
+              "text": "Normally, the tooldir (the directory where the executables will ultimately be located) is set to "
+            },
+            {
+              "type": "literal",
+              "text": "$(exec_prefix)/$(target_alias)"
+            },
+            {
+              "type": "text",
+              "text": ". For example, x86_64 machines would expand that to "
+            },
+            {
+              "type": "filename",
+              "text": "/usr/x86_64-pc-linux-gnu"
+            },
+            {
+              "type": "text",
+              "text": ". Because this is a custom system, this target-specific directory in "
+            },
+            {
+              "type": "filename",
+              "text": "/usr"
+            },
+            {
+              "type": "text",
+              "text": " is not required. "
+            },
+            {
+              "type": "literal",
+              "text": "$(exec_prefix)/$(target_alias)"
+            },
+            {
+              "type": "text",
+              "text": " would be used if the system were used to cross-compile (for example, compiling a package on an Intel machine that generates code that can be executed on PowerPC machines)."
+            }
+          ]
         }
       ]
     },

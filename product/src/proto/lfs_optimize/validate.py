@@ -55,15 +55,6 @@ def main() -> int:
         require(isinstance(definition.get("description"), str) and definition["description"],
                 f"{name}: missing package description")
 
-        document = definition.get("document")
-        require(isinstance(document, dict), f"{name}: missing document identity")
-        require(document.get("section_id") == f"ch-system-{name}",
-                f"{name}: wrong document section identity")
-        require(isinstance(document.get("filename"), str) and document["filename"],
-                f"{name}: missing document filename")
-        require(isinstance(document.get("contents_id"), str) and document["contents_id"],
-                f"{name}: missing contents identity")
-
         dependencies = definition.get("dependencies")
         require(isinstance(dependencies, dict), f"{name}: missing dependency model")
         require(set(dependencies) == set(DEPENDENCY_CLASSES),
@@ -77,6 +68,7 @@ def main() -> int:
 
         procedure = definition.get("procedure")
         require(isinstance(procedure, list) and procedure, f"{name}: missing procedure")
+        seen_command_ids: set[str] = set()
         for index, step in enumerate(procedure):
             require(isinstance(step.get("phase"), str) and step["phase"],
                     f"{name}: step {index}: missing phase")
@@ -101,6 +93,13 @@ def main() -> int:
                         f"{name}: step {index}/{command_index}: missing command")
                 require(command.get("user") in ("root", "tester"),
                         f"{name}: step {index}/{command_index}: invalid user")
+                command_id = command.get("id")
+                if command_id is not None:
+                    require(isinstance(command_id, str) and command_id,
+                            f"{name}: step {index}/{command_index}: invalid command id")
+                    require(command_id not in seen_command_ids,
+                            f"{name}: duplicate command id {command_id}")
+                    seen_command_ids.add(command_id)
                 kind = command.get("kind")
                 require(kind in (None, "session-transition"),
                         f"{name}: step {index}/{command_index}: invalid command kind")
@@ -132,6 +131,10 @@ def main() -> int:
                 and isinstance(item.get("description"), str) and item["description"],
                 f"{name}: invalid installed-item description",
             )
+            item_kind = item.get("kind")
+            if item_kind is not None:
+                require(item_kind in ("program", "library", "file", "directory"),
+                        f"{name}: invalid installed-item kind")
 
         selected = versions[name]
         require(isinstance(selected.get("version"), str) and selected["version"],
@@ -188,7 +191,7 @@ def main() -> int:
             "version_independent_definitions": True,
             "structured_execution": True,
             "dependency_classes": list(DEPENDENCY_CLASSES),
-            "document_identity": True,
+            "presentation_document_identity_independent": True,
             "package_and_installed_descriptions": True,
             "ordered_system_execution": True,
         },

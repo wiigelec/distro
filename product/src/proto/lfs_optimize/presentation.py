@@ -16,6 +16,14 @@ FORBIDDEN_EDITORIAL_KEYS = {
     "version", "source", "resources", "reference_metrics", "procedure",
     "dependencies", "installed", "installed_descriptions", "document",
 }
+INLINE_TAGS = {
+    "filename": "filename",
+    "literal": "literal",
+    "command": "command",
+    "parameter": "parameter",
+    "quote": "quote",
+    "emphasis": "emphasis",
+}
 
 def require(condition: bool, message: str) -> None:
     if not condition:
@@ -46,6 +54,47 @@ def package_inputs(name: str) -> tuple[dict[str, Any], dict[str, Any], dict[str,
 def add_text(parent: ET.Element, tag: str, value: str, **attrs: str) -> ET.Element:
     node = ET.SubElement(parent, tag, attrs)
     node.text = value
+    return node
+
+def append_inline_text(parent: ET.Element, value: str) -> None:
+    require(isinstance(value, str), "inline text must be a string")
+    if len(parent):
+        parent[-1].tail = (parent[-1].tail or "") + value
+    else:
+        parent.text = (parent.text or "") + value
+
+def render_inline(parent: ET.Element, content: Any) -> None:
+    require(isinstance(content, list), "rich inline content must be a list")
+    for part in content:
+        require(isinstance(part, dict), "inline content part must be an object")
+        kind = part.get("type")
+        text = part.get("text")
+        require(isinstance(text, str), "inline content part requires text")
+        if kind == "text":
+            append_inline_text(parent, text)
+            continue
+        tag = INLINE_TAGS.get(kind)
+        require(tag is not None, f"unsupported inline content type: {kind}")
+        node = ET.SubElement(parent, tag)
+        node.text = text
+
+def add_rich_text(
+    parent: ET.Element,
+    tag: str,
+    source: dict[str, Any],
+    *,
+    role: str | None = None,
+) -> ET.Element:
+    attrs = {"role": role} if role else {}
+    node = ET.SubElement(parent, tag, attrs)
+    has_text = "text" in source
+    has_content = "content" in source
+    require(has_text != has_content, f"{tag}: exactly one of text/content is required")
+    if has_text:
+        require(isinstance(source["text"], str), f"{tag}: text must be a string")
+        node.text = source["text"]
+    else:
+        render_inline(node, source["content"])
     return node
 
 def command_index(package: dict[str, Any]) -> tuple[dict[str, tuple[dict[str, Any], dict[str, Any]]], list[str]]:
@@ -82,13 +131,12 @@ def render_definition_list(parent: ET.Element, block: dict[str, Any]) -> None:
     items = block.get("items")
     require(isinstance(items, list) and items, "definition-list requires items")
     for item in items:
-        require(isinstance(item.get("term"), str) and isinstance(item.get("text"), str),
-                "definition-list item requires term/text")
+        require(isinstance(item.get("term"), str), "definition-list item requires term")
         entry = ET.SubElement(variable, "varlistentry")
         term = ET.SubElement(entry, "term")
         add_text(term, "parameter", item["term"])
         listitem = ET.SubElement(entry, "listitem")
-        add_text(listitem, "para", item["text"], role="editorial-definition")
+        add_rich_text(listitem, "para", item, role="editorial-definition")
 
 def render_installation(root: ET.Element, package: dict[str, Any], editorial: dict[str, Any]) -> None:
     install = ET.SubElement(root, "sect2", {"role": "installation"})
@@ -101,7 +149,7 @@ def render_installation(root: ET.Element, package: dict[str, Any], editorial: di
     for block in blocks:
         kind = block.get("type")
         if kind == "paragraph":
-            add_text(install, "para", block["text"], role="editorial-paragraph")
+            add_rich_text(install, "para", block, role="editorial-paragraph")
         elif kind == "command":
             command_id = block.get("command_id")
             require(command_id in commands, f"{package['name']}: unknown command reference {command_id}")
@@ -120,8 +168,12 @@ def render_installation(root: ET.Element, package: dict[str, Any], editorial: di
                 add_text(node, "title", block["title"])
             paragraphs = block.get("paragraphs")
             require(isinstance(paragraphs, list) and paragraphs, f"{package['name']}: empty admonition")
-            for text in paragraphs:
-                add_text(node, "para", text, role="admonition-text")
+            for paragraph in paragraphs:
+                if isinstance(paragraph, str):
+                    add_text(node, "para", paragraph, role="admonition-text")
+                else:
+                    require(isinstance(paragraph, dict), f"{package['name']}: invalid admonition paragraph")
+                    add_rich_text(node, "para", paragraph, role="admonition-text")
         elif kind == "definition-list":
             render_definition_list(install, block)
         else:
@@ -221,6 +273,12 @@ def self_test() -> None:
     require(binutils_root.find(".//important") is not None, "binutils: missing important admonition")
     require(len(binutils_root.findall(".//variablelist[@role='editorial-definition-list']")) == 2,
             "binutils: missing parameter explanation lists")
+    filenames = [node.text for node in binutils_root.findall(".//filename")]
+    require("/usr/lib" in filenames and "/usr/lib64" in filenames,
+            "binutils: missing inline filename semantics")
+    literals = [node.text for node in binutils_root.findall(".//literal")]
+    require("$(exec_prefix)/$(target_alias)" in literals,
+            "binutils: missing inline literal semantics")
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="compile normalized LFS presentation proof")

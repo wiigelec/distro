@@ -17,7 +17,7 @@ Roadmap:
 | M4 — Bootstrap proof | COMPLETE | Fresh Chapter 5–7 bootstrap hands directly to the normal executor; all 80 final-system packages build successfully without publication XML/book parsing. |
 | M5 — Development proof | COMPLETE | Accepted state, candidate identity, validation, definition binding/drift rejection, review evidence, and guarded transactional promotion are implemented. |
 | M6 — Release proof | SATISFIED BY COMPOSITION | M4 proves clean full-system realization from normalized state and M5 proves validated state identity and controlled promotion. Freezing accepted state under a release identity adds production plumbing but no unresolved prototype architecture question. |
-| M7 — Presentation proof | IN PROGRESS | First slice compiles one LFS package section from structure + editorial prose + authoritative normalized package/version state. |
+| M7 — Presentation proof | IN PROGRESS — PACKAGE-PAGE MODEL PROVEN | Zlib and Binutils prove package-page composition from presentation structure + editorial blocks + authoritative normalized package/version state, including metrics, stable command references, admonitions, definition lists, rich inline semantics, and installed-content typing. Whole-book hierarchy and golden-render equivalence remain open. |
 | M8+ | NOT STARTED | BLFS, hard-BLFS, and user-system proofs remain later roadmap milestones. |
 
 ## M5 closure
@@ -60,14 +60,14 @@ fresh bootstrap + full build   M4
 Concrete release naming, retention, publication, and policy remain production
 implementation work rather than an unresolved architecture risk.
 
-## M7 first slice
+## M7 package-page proof
 
-The first presentation proof uses `zlib`:
+The package-page presentation proof uses `zlib` and `binutils`:
 
 ```text
 presentation/structure.json
         +
-presentation/editorial/zlib.json
+presentation/editorial/<package>.json
         +
 resolve.py authoritative package/version result
         ↓
@@ -76,16 +76,32 @@ presentation.py
 DocBook-compatible semantic XML
 ```
 
-Presentation data must not duplicate package version, source, dependencies,
-build commands, installed-content facts, or document identity. Those values flow
-from the same normalized state consumed by the build executor.
+The proof establishes these authority boundaries:
 
-The first slice proves the authority split and semantic compilation path. It is
-not yet the golden-book proof; exact hierarchy, prose, cross-reference, and
-rendered-output equivalence remain subsequent M7 work.
+- presentation structure owns document identity, page hierarchy, and section composition;
+- editorial data owns explanatory prose, admonitions, parameter explanations, and inline presentation semantics;
+- normalized package/version state owns versions, sources, build metrics, procedures, command text/order, installed-content facts, dependencies, and installed-item classification;
+- compiled XML is derived output.
+
+Legacy `document` fields may remain in package definitions during migration, but
+the presentation compiler does not consume them and validation no longer treats
+them as package identity. This preserves roadmap invariant 8: document identity
+is independent of package identity.
+
+Zlib proves the simple linear instructional case. Binutils proves repeated
+phases, stable command references, multiline commands, ordered editorial blocks,
+admonitions, definition lists, inline filename/literal semantics, multiple
+installed-content categories, and typed short descriptions.
+
+The remaining M7 work is above the individual package-page model: chapter/book
+hierarchy, package ordering and numbering, navigation, cross references,
+aggregate/derived pages, indexes, and continuous golden comparisons across
+chunked HTML, no-chunks HTML, and PDF.
 
 ## Resume instruction
 
-Run and review the `zlib` presentation slice, then expand only enough
-package/system-page coverage to expose missing semantic homes before attempting
-whole-book or golden-render equivalence.
+Move M7 from package-page semantics to chapter/book composition. Use Chapter 8
+as the first hierarchy proof: resolve package order from authoritative
+package-set/state, combine it with presentation-only chapter structure, derive
+section numbering/navigation, and compare generated hierarchy against the
+stable LFS Chapter 8 publication before broadening to the whole book.
