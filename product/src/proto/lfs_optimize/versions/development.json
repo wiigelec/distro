@@ -55,6 +55,10 @@
         "md5": "a1e6c958597af3c67d162995a342138a",
         "size": "1,468 KB",
         "home": "https://zlib.net/"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "5.4 MB"
       }
     },
     "bzip2": {

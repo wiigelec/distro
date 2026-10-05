@@ -8,12 +8,19 @@
     {
       "name": "zlib",
       "title": "Zlib",
+      "document": {
+        "section_id": "ch-system-zlib",
+        "filename": "zlib.html",
+        "contents_id": "contents-zlib"
+      },
       "sections": [
-        "summary",
-        "source",
+        "package",
         "installation",
         "contents"
-      ]
+      ],
+      "installed_item_kinds": {
+        "libz": "library"
+      }
     }
   ]
 }

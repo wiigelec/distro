@@ -1,14 +1,13 @@
 {
   "schema_version": 1,
   "package": "zlib",
-  "summary_title": "About Zlib",
-  "source_title": "Package Information",
   "installation_title": "Installation of Zlib",
   "contents_title": "Contents of Zlib",
-  "phase_intros": {
-    "configure": "Prepare Zlib for compilation:",
-    "build": "Compile the package:",
-    "test": "To test the results, issue:",
-    "install": "Install the package:"
+  "command_intros": {
+    "configure:0": "Prepare Zlib for compilation:",
+    "build:0": "Compile the package:",
+    "test:0": "To test the results, issue:",
+    "install:0": "Install the package:",
+    "install:1": "Remove a useless static library:"
   }
 }
