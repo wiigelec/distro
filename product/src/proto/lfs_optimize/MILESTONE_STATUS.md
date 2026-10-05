@@ -1,10 +1,8 @@
 # LFS optimize prototype — milestone status
 
-Last updated: 2026-10-03
+Last updated: 2026-10-05
 
 Authoritative branch: `proto/lfs-optimize`
-
-Recorded from HEAD: `b6d522100692e945fdec4869575c441e0e2b172f`
 
 Roadmap:
 `product/src/proto/docs/lfs-blfs-modernization-implementation-roadmap.md`
@@ -17,149 +15,77 @@ Roadmap:
 | M2 — Execution proof | COMPLETE | Normal package executor builds, captures filesystem deltas, creates artifacts, realizes them, and verifies equivalence. |
 | M3 — Normal-LFS proof | COMPLETE | All 80 final-system LFS packages execute through the same normal executor and can reconstruct a successful final filesystem. |
 | M4 — Bootstrap proof | COMPLETE | Fresh Chapter 5–7 bootstrap hands directly to the normal executor; all 80 final-system packages build successfully without publication XML/book parsing. |
-| M5 — Development proof | NEXT | Implement discovery → candidate → validation → promote/fail while leaving development unchanged on failure. |
-| M6 — Release proof | NOT STARTED | Freeze validated development manifest and perform a clean full release build. |
-| M7+ | NOT STARTED | Presentation, BLFS, hard-BLFS, and user-system proofs remain later roadmap milestones. |
+| M5 — Development proof | COMPLETE | Accepted state, candidate identity, validation, definition binding/drift rejection, review evidence, and guarded transactional promotion are implemented. |
+| M6 — Release proof | SATISFIED BY COMPOSITION | M4 proves clean full-system realization from normalized state and M5 proves validated state identity and controlled promotion. Freezing accepted state under a release identity adds production plumbing but no unresolved prototype architecture question. |
+| M7 — Presentation proof | IN PROGRESS | First slice compiles one LFS package section from structure + editorial prose + authoritative normalized package/version state. |
+| M8+ | NOT STARTED | BLFS, hard-BLFS, and user-system proofs remain later roadmap milestones. |
 
-## M4 proof evidence
+## M5 closure
 
-M4 is orchestrated by:
-
-`product/src/proto/lfs_optimize/lfs.py`
-
-The successful proof was run with:
-
-```sh
-sudo python3 product/src/proto/lfs_optimize/lfs.py \
-  --work /home/wiigelec/lfs-optimize/work-m4 \
-  --cache /home/wiigelec/lfs-optimize/cache \
-  --skip-tests \
-  --fresh-artifacts
-```
-
-Observed proof properties:
-
-- bootstrap completed from the normalized LFS 13.1-systemd bootstrap plan;
-- bootstrap output was handed directly to `system.py`;
-- the normal executor completed through `e2fsprogs`;
-- top-level M4 status was `success`;
-- final normal-system status was `success`;
-- the run used `--fresh-artifacts`;
-- `lfs.py` rejects a successful fresh-artifact proof if any normal package is a cache hit, so successful completion proves the normal package set was rebuilt rather than replayed from M3;
-- normal package artifacts were created under `cache/m4-proof/artifacts`;
-- successful package work directories were cleaned as packages completed.
-
-Tests were intentionally skipped for this prototype proof with `--skip-tests`.
-
-## Current architecture
-
-Bootstrap path:
+The development proof demonstrates:
 
 ```text
-bootstrap.py / bootstrap-13.1.json
-        ↓
-fresh Chapter 5–7 handoff root
-        ↓
-lfs.py
-        ↓
-system.py
-        ↓
-execute.py
-        ↓
-80 normal final-system packages
-```
-
-No publication XML is an execution input.
-
-The normal package executor remains the shared Chapter 8+ executor. Bootstrap logic is kept separate rather than folded into `system.py`.
-
-## Artifact/cache state
-
-`execute.py` currently:
-
-- snapshots filesystem state including file type, content, mode, numeric uid/gid, symlinks, and hardlink topology;
-- represents changed/added paths plus explicit baseline deletions;
-- preserves privileged mode bits;
-- handles hardlink topology and stale-baseline hardlink splitting;
-- allows legitimate absolute filesystem symlinks while rejecting relative symlink escapes;
-- writes new artifacts to a temporary cache file;
-- verifies realization equivalence before atomic cache promotion with `os.replace()`;
-- reports cache hits as reused artifacts rather than falsely claiming a fresh equivalence comparison;
-- cleans successful `root-after`, `root-test`, `root-realized`, and `stage` package work directories;
-- preserves failed package work directories for diagnosis.
-
-Cache schema version remains 4 so verified M3 artifacts were not invalidated unnecessarily.
-
-## Source acquisition
-
-Stable LFS 13.1 source acquisition uses the OSUOSL LFS package mirror MD5 index.
-
-Policy:
-
-- package source archives must resolve by MD5 in the stable LFS 13.1 mirror;
-- auxiliary resources use the mirror when their MD5 is indexed there;
-- otherwise auxiliary resources fall back to their canonical URL;
-- downloaded resources are MD5 verified.
-
-## Current authoritative development state
-
-Version manifest:
-
-`product/src/proto/lfs_optimize/versions/development.json`
-
-Package set:
-
-`product/src/proto/lfs_optimize/package-set.json`
-
-The package set contains all 80 normal final-system packages in execution order.
-
-Current development basis:
-
-- Linux From Scratch
-- `13.1-systemd`
-- published `2026-09-01`
-
-At this point there is only the authoritative development manifest. There is no candidate/discovery/promotion state yet.
-
-## M5 starting point
-
-Implement the first development-state vertical slice without changing the build engine:
-
-```text
-development manifest
+accepted development
         ↓
 discovery
         ↓
-candidate record/manifest
+candidate
         ↓
-candidate validation
-       / \
- success  failure
-   ↓        ↓
-promote   development unchanged
+validation
+        ↓
+promote / reject
 ```
 
-Recommended first implementation:
+Candidate identity binds the version manifest, package set, and package-definition
+state. Validation rejects live definition drift. Plan-only validation cannot
+promote. Test failures remain review evidence rather than being confused with
+non-test build failure. Promotion stages accepted-state replacements and rolls
+back already-replaced files after ordinary replacement failure.
 
-1. Add a deterministic/manual discovery provider first.
-2. Produce explicit candidate state rather than mutating `development.json`.
-3. Validate a candidate using the existing resolver/executor path.
-4. On success, promote candidate state into development explicitly.
-5. On failure, persist useful failure evidence and leave development unchanged.
-6. Prove both a successful promotion and a deliberate failure before adding scheduled or upstream-specific discovery providers.
+These properties are sufficient to prove that continuous-development state can
+sit above the normalized build model without changing build semantics.
 
-Do not begin with GitHub/PyPI/FTP scraping. First prove the state machine and authority boundaries; external discovery providers should plug into that interface afterward.
+## M6 disposition
 
-## Important recent commits
+M6 is intentionally not expanded into a separate prototype subsystem.
 
-- `b6d522100692e945fdec4869575c441e0e2b172f` — Add bootstrap-to-normal LFS proof driver.
-- `93f9c1d438b6436897d96fb996593c72d35ace3b` — Harden artifact cache publication and cleanup.
-- `5b59569688b4409639c65c28aee2844579c02aa5` — Allow root-relative absolute symlinks in artifacts.
-- `de461f3a428bafac09fe6ee60dd575359ed3b2e6` — Normalize Groff paper size.
-- `9b57a1ecf5187e73ed65e6917f154978b2431318` — Preserve privileged mode bits.
-- `489144e11ccee5afbc4cd9bb5832bbed00bf059b` — Break stale baseline hardlinks before extraction.
-- `61f151881238ff4ad26f82380467791ebbf613b5` — Preserve snapshot hardlink topology.
+```text
+validated accepted state       M5
+        ↓
+frozen state identity          naming/immutability boundary
+        ↓
+fresh bootstrap + full build   M4
+```
+
+Concrete release naming, retention, publication, and policy remain production
+implementation work rather than an unresolved architecture risk.
+
+## M7 first slice
+
+The first presentation proof uses `zlib`:
+
+```text
+presentation/structure.json
+        +
+presentation/editorial/zlib.json
+        +
+resolve.py authoritative package/version result
+        ↓
+presentation.py
+        ↓
+DocBook-compatible semantic XML
+```
+
+Presentation data must not duplicate package version, source, dependencies,
+build commands, installed-content facts, or document identity. Those values flow
+from the same normalized state consumed by the build executor.
+
+The first slice proves the authority split and semantic compilation path. It is
+not yet the golden-book proof; exact hierarchy, prose, cross-reference, and
+rendered-output equivalence remain subsequent M7 work.
 
 ## Resume instruction
 
-A fresh chat should begin by reading this file and the roadmap, verify the current `proto/lfs-optimize` HEAD, then proceed directly with M5 development-proof implementation using GVE for repository mutations.
+Run and review the `zlib` presentation slice, then expand only enough
+package/system-page coverage to expose missing semantic homes before attempting
+whole-book or golden-render equivalence.

@@ -11,6 +11,7 @@ from development import (
     verify_definition_state,
 )
 from execute import command_failure_disposition, plan
+from presentation import self_test as presentation_self_test
 from resolve import HERE, load_json, resolve
 from system import plan_system
 
@@ -156,6 +157,7 @@ def main() -> int:
             "resolver did not return full package set")
 
     artifact_self_test()
+    presentation_self_test()
     for package in result["packages"]:
         execution_plan = plan(package, run_tests=True)
         require(execution_plan["status"] == "success",

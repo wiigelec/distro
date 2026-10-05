@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "document": {
+    "name": "lfs-presentation-proof",
+    "format": "docbook-semantic-xml"
+  },
+  "packages": [
+    {
+      "name": "zlib",
+      "title": "Zlib",
+      "sections": [
+        "summary",
+        "source",
+        "installation",
+        "contents"
+      ]
+    }
+  ]
+}
