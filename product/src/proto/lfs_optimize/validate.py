@@ -4,6 +4,11 @@ from __future__ import annotations
 import json
 
 from artifact import self_test as artifact_self_test
+from development import (
+    definition_hashes,
+    definition_state_document,
+    verify_definition_state,
+)
 from execute import command_failure_disposition, plan
 from resolve import HERE, load_json, resolve
 from system import plan_system
@@ -28,6 +33,13 @@ def main() -> int:
     versions = versions_doc.get("packages")
     require(isinstance(versions, dict), "development packages must be an object")
     require(set(names) == set(versions), "package set/version manifest mismatch")
+
+    definition_state = definition_state_document(names)
+    require(
+        set(definition_hashes(definition_state)) == set(names),
+        "definition state/package set mismatch",
+    )
+    verify_definition_state(definition_state, names)
 
     for name in names:
         path = HERE / "packages" / f"{name}.json"

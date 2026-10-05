@@ -219,7 +219,8 @@ system executor.
 
 Plan-only validation is intentionally non-promotable. Promotion requires a
 successful full system build with tests enabled, and also requires the
-development/package-set hashes observed during discovery to remain unchanged.
+development/package-set/definition-state hashes observed during discovery to
+remain unchanged.
 
 Test failures are review evidence, not automatic build termination. The
 executor records the failed test command and exit status, marks the package,
@@ -227,3 +228,20 @@ system, and candidate validation `review_required`, and continues through
 installation and subsequent packages. Prepare/configure/build/install/system
 command failures remain fatal. Promotion may therefore carry unresolved test
 review evidence for later maintainer review.
+
+Accepted development also carries `definition-state.json`, which binds every
+managed package to the SHA-256 of the package definition that was actually
+validated. The SHA is an acceptance/review anchor, not the package revision.
+Candidate identity includes the version manifest, package set, and definition
+state. Validation rejects live package-definition drift after discovery, and
+promotion guards all three accepted-state files.
+
+For an existing accepted state created before definition binding was added,
+bind the definitions that were just validated before discovering another
+candidate:
+
+```sh
+python3 product/src/proto/lfs_optimize/development.py bind-definitions \
+  --package-set /path/to/state/package-set.json \
+  --output /path/to/state/definition-state.json
+```
