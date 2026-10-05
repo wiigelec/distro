@@ -236,6 +236,13 @@ Candidate identity includes the version manifest, package set, and definition
 state. Validation rejects live package-definition drift after discovery, and
 promotion guards all three accepted-state files.
 
+Promotion stages all three candidate state files before touching accepted state.
+If a replacement fails during the process, already-replaced files are restored
+from rollback copies before promotion reports failure. This provides
+transactional behavior for ordinary process/filesystem-operation failures; it
+does not claim crash-atomic multi-file replacement across a power loss or
+process termination.
+
 For an existing accepted state created before definition binding was added,
 bind the definitions that were just validated before discovering another
 candidate:

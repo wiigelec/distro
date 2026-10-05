@@ -4,7 +4,9 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import shutil
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -320,6 +322,102 @@ def validate_candidate(
     return result
 
 
+
+def _stage_file(source: Path, destination: Path, label: str) -> Path:
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    fd, raw_path = tempfile.mkstemp(
+        prefix=f".{destination.name}.promotion-{label}-",
+        dir=destination.parent,
+    )
+    os.close(fd)
+    staged = Path(raw_path)
+    try:
+        shutil.copyfile(source, staged)
+        if digest(staged) != digest(source):
+            raise RuntimeError(f"{destination.name}: staged promotion copy mismatch")
+        return staged
+    except Exception:
+        staged.unlink(missing_ok=True)
+        raise
+
+
+def replace_state_transactionally(
+    updates: list[tuple[Path, Path]], fail_after: int | None = None
+) -> None:
+    if not updates:
+        raise RuntimeError("promotion transaction has no state files")
+
+    staged: list[tuple[Path, Path]] = []
+    backups: list[tuple[Path, Path]] = []
+    replaced: list[tuple[Path, Path]] = []
+    try:
+        for source, destination in updates:
+            if not source.is_file():
+                raise RuntimeError(f"{source}: promotion source is missing")
+            if not destination.is_file():
+                raise RuntimeError(f"{destination}: accepted state file is missing")
+            staged.append((destination, _stage_file(source, destination, "new")))
+            backups.append(
+                (destination, _stage_file(destination, destination, "rollback"))
+            )
+
+        for index, ((destination, staged_path), (_, backup_path)) in enumerate(
+            zip(staged, backups)
+        ):
+            if fail_after is not None and index >= fail_after:
+                raise OSError("injected promotion replacement failure")
+            os.replace(staged_path, destination)
+            replaced.append((destination, backup_path))
+    except Exception as exc:
+        rollback_errors: list[str] = []
+        for destination, backup_path in reversed(replaced):
+            try:
+                os.replace(backup_path, destination)
+            except OSError as rollback_exc:
+                rollback_errors.append(f"{destination}: {rollback_exc}")
+        if rollback_errors:
+            raise RuntimeError(
+                "promotion failed and rollback was incomplete: "
+                + "; ".join(rollback_errors)
+            ) from exc
+        raise RuntimeError(f"promotion transaction failed: {exc}") from exc
+    finally:
+        for _, staged_path in staged:
+            staged_path.unlink(missing_ok=True)
+        for _, backup_path in backups:
+            backup_path.unlink(missing_ok=True)
+
+
+def promotion_transaction_self_test() -> None:
+    with tempfile.TemporaryDirectory(prefix="lfs-development-transaction-") as raw:
+        root = Path(raw)
+        destinations = [root / f"accepted-{index}.json" for index in range(3)]
+        sources = [root / f"candidate-{index}.json" for index in range(3)]
+        for index, destination in enumerate(destinations):
+            destination.write_text(f"old-{index}\n", encoding="utf-8")
+        for index, source in enumerate(sources):
+            source.write_text(f"new-{index}\n", encoding="utf-8")
+
+        before = [path.read_bytes() for path in destinations]
+        try:
+            replace_state_transactionally(
+                list(zip(sources, destinations)),
+                fail_after=1,
+            )
+        except RuntimeError:
+            pass
+        else:
+            raise RuntimeError("promotion transaction self-test did not fail")
+
+        if [path.read_bytes() for path in destinations] != before:
+            raise RuntimeError("promotion transaction rollback changed accepted state")
+
+        replace_state_transactionally(list(zip(sources, destinations)))
+        if [path.read_bytes() for path in destinations] != [
+            path.read_bytes() for path in sources
+        ]:
+            raise RuntimeError("promotion transaction did not commit all state files")
+
 def promote(
     candidate_path: Path,
     validation_path: Path,
@@ -352,9 +450,11 @@ def promote(
     if digest(definition_state_path) != baseline.get("definition_state_sha256"):
         raise RuntimeError("definition state changed since discovery")
 
-    shutil.copyfile(Path(proposal["versions"]), development_path)
-    shutil.copyfile(Path(proposal["package_set"]), package_set_path)
-    shutil.copyfile(Path(proposal["definition_state"]), definition_state_path)
+    replace_state_transactionally([
+        (Path(proposal["versions"]), development_path),
+        (Path(proposal["package_set"]), package_set_path),
+        (Path(proposal["definition_state"]), definition_state_path),
+    ])
 
     result = {
         "schema_version": 1,
@@ -364,6 +464,7 @@ def promote(
         "development_sha256": digest(development_path),
         "package_set_sha256": digest(package_set_path),
         "definition_state_sha256": digest(definition_state_path),
+        "promotion_transaction": "staged-with-rollback",
         "review_required": validation.get("review_required", False),
         "test_review": validation.get("test_review", []),
     }

@@ -7,6 +7,7 @@ from artifact import self_test as artifact_self_test
 from development import (
     definition_hashes,
     definition_state_document,
+    promotion_transaction_self_test,
     verify_definition_state,
 )
 from execute import command_failure_disposition, plan
@@ -40,6 +41,7 @@ def main() -> int:
         "definition state/package set mismatch",
     )
     verify_definition_state(definition_state, names)
+    promotion_transaction_self_test()
 
     for name in names:
         path = HERE / "packages" / f"{name}.json"
