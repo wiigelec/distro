@@ -276,8 +276,8 @@ def extract_tar_xz(artifact: Path, target_root: Path) -> None:
         for member in payload_members:
             target = target_root / member.name
             if member.isdir():
-                if target.exists() and not target.is_dir():
-                    target.unlink()
+                if target.is_symlink() or (target.exists() and not target.is_dir()):
+                    _remove_existing_path(target)
                 continue
             if target.is_symlink() or target.exists():
                 _remove_existing_path(target)
