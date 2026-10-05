@@ -1143,7 +1143,11 @@ def self_test_chapter08() -> None:
         "chapter08: generated hierarchy drifted from LFS 13.1-systemd golden fixture",
     )
     require(
-        compiled["document"] == golden["chapter"],
+        {
+            field: compiled["document"][field]
+            for field in ("section_id", "filename", "title")
+        }
+        == golden["chapter"],
         "chapter08: chapter document identity drift",
     )
 

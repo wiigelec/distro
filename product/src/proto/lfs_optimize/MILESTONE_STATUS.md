@@ -279,6 +279,6 @@ Run the direct prototype validator after this slice lands:
 python3 product/src/proto/lfs_optimize/validate.py
 ```
 
-If it passes, treat full-book chunk routing/navigation/xref addressing as proven.
+After the route-metadata compatibility fix, rerun the direct validator. If it passes, treat full-book chunk routing/navigation/xref addressing as proven.
 The next M7 work is editorial-body migration for the remaining chunks, after
 which chunked HTML reader equivalence can close before no-chunks HTML and PDF.
