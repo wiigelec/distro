@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import posixpath
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
@@ -436,6 +437,8 @@ def _book_document(
     kind: str,
     owner: str,
     number: str | int | None = None,
+    directory: str = "",
+    up: str | None = None,
 ) -> dict[str, Any]:
     result = dict(document)
     require(
@@ -446,9 +449,17 @@ def _book_document(
         isinstance(result.get("filename"), str) and result["filename"],
         f"{owner}: missing document filename",
     )
+    require(isinstance(directory, str), f"{owner}: invalid document directory")
     result["kind"] = kind
     result["owner"] = owner
     result["number"] = str(number) if number is not None else None
+    result["directory"] = directory
+    result["output_path"] = (
+        posixpath.join(directory, result["filename"])
+        if directory
+        else result["filename"]
+    )
+    result["up"] = up
     return result
 
 
@@ -473,15 +484,21 @@ def compose_book() -> dict[str, Any]:
 
     documents: list[dict[str, Any]] = []
 
-    def append_unit(name: str) -> None:
+    def append_unit(name: str, up: str | None) -> None:
         require(name in chapters, f"book: unknown unit {name}")
         compiled = compose_chapter(name)
+        unit_document = compiled["document"]
+        directory = unit_document.get("directory", "")
+        require(isinstance(directory, str), f"{name}: invalid document directory")
+        unit_id = unit_document["section_id"]
         documents.append(
             _book_document(
-                compiled["document"],
+                unit_document,
                 kind=compiled["kind"] or "chapter",
                 owner=name,
                 number=compiled["number"],
+                directory=directory,
+                up=up,
             )
         )
         for page in compiled["pages"]:
@@ -490,6 +507,8 @@ def compose_book() -> dict[str, Any]:
                 kind=page["kind"],
                 owner=name,
                 number=page["number"],
+                directory=directory,
+                up=unit_id,
             )
             if page.get("package"):
                 page_doc["package"] = page["package"]
@@ -498,20 +517,14 @@ def compose_book() -> dict[str, Any]:
     frontmatter = book.get("frontmatter")
     require(isinstance(frontmatter, list), "book: frontmatter must be a list")
     for name in frontmatter:
-        require(
-            isinstance(name, str) and name,
-            "book: invalid frontmatter entry",
-        )
-        append_unit(name)
+        require(isinstance(name, str) and name, "book: invalid frontmatter entry")
+        append_unit(name, None)
 
     parts = book.get("parts")
-    require(
-        isinstance(parts, list) and parts,
-        "book: parts must be a non-empty list",
-    )
+    require(isinstance(parts, list) and parts, "book: parts must be a non-empty list")
     seen_parts: set[str] = set()
     seen_units = set(frontmatter)
-    for part in parts:
+    for part_index, part in enumerate(parts, start=1):
         require(isinstance(part, dict), "book: part must be an object")
         part_name = part.get("name")
         require(
@@ -523,23 +536,26 @@ def compose_book() -> dict[str, Any]:
         seen_parts.add(part_name)
 
         part_document = part.get("document")
+        require(isinstance(part_document, dict), f"{part_name}: missing document")
+        part_id = part_document["section_id"]
+        part_number = part.get("number")
         require(
-            isinstance(part_document, dict),
-            f"{part_name}: missing document",
+            isinstance(part_number, str) and part_number,
+            f"{part_name}: missing part number",
         )
         documents.append(
             _book_document(
                 part_document,
                 kind="part",
                 owner=part_name,
+                number=part_number,
+                directory=part_document.get("directory", ""),
+                up=None,
             )
         )
 
         children = part.get("children")
-        require(
-            isinstance(children, list),
-            f"{part_name}: children must be a list",
-        )
+        require(isinstance(children, list), f"{part_name}: children must be a list")
         for name in children:
             require(
                 isinstance(name, str)
@@ -548,7 +564,7 @@ def compose_book() -> dict[str, Any]:
                 f"{part_name}: invalid or duplicate child {name}",
             )
             seen_units.add(name)
-            append_unit(name)
+            append_unit(name, part_id)
 
     require(
         seen_units == set(chapters),
@@ -556,27 +572,25 @@ def compose_book() -> dict[str, Any]:
     )
 
     seen_ids: set[str] = set()
+    seen_paths: set[str] = set()
     for index, document in enumerate(documents):
         section_id = document["section_id"]
+        output_path = document["output_path"]
+        require(section_id not in seen_ids, f"book: duplicate document id {section_id}")
         require(
-            section_id not in seen_ids,
-            f"book: duplicate document id {section_id}",
+            output_path not in seen_paths,
+            f"book: duplicate chunk output path {output_path}",
         )
         seen_ids.add(section_id)
-        document["previous"] = (
-            documents[index - 1]["section_id"] if index else None
-        )
+        seen_paths.add(output_path)
+        document["previous"] = documents[index - 1]["section_id"] if index else None
         document["next"] = (
             documents[index + 1]["section_id"]
             if index + 1 < len(documents)
             else None
         )
 
-    return {
-        "title": book["title"],
-        "documents": documents,
-    }
-
+    return {"title": book["title"], "documents": documents}
 
 def book_target_index() -> dict[str, dict[str, Any]]:
     compiled = compose_book()
@@ -707,6 +721,80 @@ def render_book_hierarchy() -> str:
     return ET.tostring(root, encoding="unicode")
 
 
+def book_document_index() -> dict[str, dict[str, Any]]:
+    return {
+        document["section_id"]: document
+        for document in compose_book()["documents"]
+    }
+
+
+def relative_chunk_href(source_path: str, target_path: str) -> str:
+    source_directory = posixpath.dirname(source_path) or "."
+    return posixpath.relpath(target_path, source_directory)
+
+
+def document_nav(document: dict[str, Any]) -> dict[str, str]:
+    index = book_document_index()
+    source_path = document["output_path"]
+    nav = {
+        "home": relative_chunk_href(source_path, "index.html"),
+    }
+    for relation in ("previous", "next", "up"):
+        target_id = document.get(relation)
+        if target_id:
+            require(target_id in index, f"{document['section_id']}: unknown {relation} target")
+            nav[relation] = relative_chunk_href(
+                source_path,
+                index[target_id]["output_path"],
+            )
+    return nav
+
+
+def resolve_chunked_xref(source_document_id: str, target: str) -> str:
+    index = book_document_index()
+    require(source_document_id in index, f"unknown source document: {source_document_id}")
+    resolved = resolve_book_xref(target)
+    target_document_id = resolved["document_id"]
+    require(target_document_id in index, f"xref target document missing: {target_document_id}")
+    source_path = index[source_document_id]["output_path"]
+    target_path = index[target_document_id]["output_path"]
+    href = relative_chunk_href(source_path, target_path)
+    if resolved["nested"]:
+        href += "#" + target
+    return href
+
+
+def document_display_title(document: dict[str, Any]) -> str:
+    title = document.get("title")
+    if document.get("package"):
+        package_name = document["package"]
+        package = resolve([package_name])["packages"][0]
+        title = document.get("title")
+        require(isinstance(title, str) and title, f"{package_name}: missing presentation title")
+        title = f"{title}-{package['version']}"
+    require(isinstance(title, str) and title, f"{document['section_id']}: missing title")
+
+    number = document.get("number")
+    if document["kind"] == "part" and number:
+        return f"Part {number}. {title}"
+    if document["kind"] == "chapter" and number:
+        return f"Chapter {number}. {title}"
+    if document["kind"] == "appendix" and number:
+        return f"Appendix {number}. {title}"
+    if number:
+        return f"{number}. {title}"
+    return title
+
+
+def document_h1(document: dict[str, Any]) -> str:
+    title = document_display_title(document)
+    if document.get("package") and document.get("number"):
+        prefix = f"{document['number']}."
+        if title.startswith(prefix):
+            return document["number"] + title[len(prefix):]
+    return title
+
+
 def package_book_document(name: str) -> dict[str, Any]:
     documents = compose_book()["documents"]
     matches = [
@@ -722,27 +810,7 @@ def package_book_document(name: str) -> dict[str, Any]:
 
 
 def package_nav(name: str) -> dict[str, str]:
-    document = package_book_document(name)
-    index = {
-        item["section_id"]: item
-        for item in compose_book()["documents"]
-    }
-    previous_id = document.get("previous")
-    next_id = document.get("next")
-    require(
-        isinstance(previous_id, str)
-        and previous_id in index
-        and isinstance(next_id, str)
-        and next_id in index,
-        f"{name}: missing package navigation",
-    )
-    return {
-        "previous": index[previous_id]["filename"],
-        "next": index[next_id]["filename"],
-        "up": chapter_structure("chapter08")["document"]["filename"],
-        "home": "../index.html",
-    }
-
+    return document_nav(package_book_document(name))
 
 def _html_inline(parent: ET.Element, source: ET.Element) -> None:
     if source.text:
@@ -780,19 +848,21 @@ def render_chunked_html_package(name: str) -> str:
         {
             "id": package_structure["document"]["section_id"],
             "data-filename": document["filename"],
+            "data-output-path": document["output_path"],
         },
     )
 
     def add_nav(role: str) -> None:
         nav_node = ET.SubElement(body, "nav", {"data-role": role})
         for relation in ("previous", "next", "up", "home"):
-            add_text(
-                nav_node,
-                "a",
-                relation.capitalize(),
-                rel=relation,
-                href=nav[relation],
-            )
+            if relation in nav:
+                add_text(
+                    nav_node,
+                    "a",
+                    relation.capitalize(),
+                    rel=relation,
+                    href=nav[relation],
+                )
 
     add_nav("top")
     add_text(
@@ -908,6 +978,65 @@ def render_chunked_html_package(name: str) -> str:
     add_nav("bottom")
     ET.indent(html, space="  ")
     return ET.tostring(html, encoding="unicode", method="html")
+
+
+def render_chunked_html_document(section_id: str) -> str:
+    index = book_document_index()
+    require(section_id in index, f"unknown book document: {section_id}")
+    document = index[section_id]
+
+    package_name = document.get("package")
+    if package_name in PROOF_PACKAGES:
+        return render_chunked_html_package(package_name)
+
+    html = ET.Element("html")
+    head = ET.SubElement(html, "head")
+    display_title = document_display_title(document)
+    add_text(head, "title", display_title)
+
+    body = ET.SubElement(
+        html,
+        "body",
+        {
+            "id": section_id,
+            "data-filename": document["filename"],
+            "data-output-path": document["output_path"],
+            "data-body-status": "pending-editorial-migration",
+        },
+    )
+    nav = document_nav(document)
+
+    def add_nav(role: str) -> None:
+        nav_node = ET.SubElement(body, "nav", {"data-role": role})
+        for relation in ("previous", "next", "up", "home"):
+            if relation in nav:
+                add_text(
+                    nav_node,
+                    "a",
+                    relation.capitalize(),
+                    rel=relation,
+                    href=nav[relation],
+                )
+
+    add_nav("top")
+    add_text(body, "h1", document_h1(document))
+    add_nav("bottom")
+    ET.indent(html, space="  ")
+    return ET.tostring(html, encoding="unicode", method="html")
+
+
+def render_chunked_html_book() -> dict[str, str]:
+    rendered: dict[str, str] = {}
+    for document in compose_book()["documents"]:
+        output_path = document["output_path"]
+        require(
+            output_path not in rendered,
+            f"duplicate rendered chunk path: {output_path}",
+        )
+        rendered[output_path] = render_chunked_html_document(
+            document["section_id"]
+        )
+    return rendered
 
 
 def chunked_html_snapshot(name: str) -> dict[str, Any]:
@@ -1222,6 +1351,83 @@ def self_test_book() -> None:
     )
 
 
+def self_test_chunked_html_book() -> None:
+    golden = load_presentation(
+        PRESENTATION / "golden" / "chunked-html-book.json"
+    )
+    documents = golden.get("documents")
+    require(
+        isinstance(documents, list)
+        and len(documents) == golden.get("document_count") == 199,
+        "chunked-html-book: invalid golden document set",
+    )
+
+    rendered = render_chunked_html_book()
+    expected_paths = [item["output_path"] for item in documents]
+    require(
+        list(rendered) == expected_paths,
+        "chunked-html-book: output path/order drift",
+    )
+    require(
+        len(rendered) == len(set(rendered)) == 199,
+        "chunked-html-book: output path collision",
+    )
+
+    for expected in documents:
+        root = ET.fromstring(rendered[expected["output_path"]])
+        body = root.find("body")
+        require(body is not None, "chunked-html-book: missing body")
+        require(
+            body.attrib.get("id") == expected["section_id"]
+            and body.attrib.get("data-output-path") == expected["output_path"],
+            f"chunked-html-book: identity/route drift for {expected['section_id']}",
+        )
+        require(
+            root.findtext("head/title") == expected["title"]
+            and body.findtext("h1") == expected["title"],
+            f"chunked-html-book: title drift for {expected['section_id']}",
+        )
+
+        top = body.find("nav[@data-role='top']")
+        bottom = body.find("nav[@data-role='bottom']")
+        require(top is not None and bottom is not None, "chunked-html-book: nav missing")
+        actual_nav = {
+            node.attrib["rel"]: node.attrib["href"]
+            for node in top.findall("a")
+        }
+        require(
+            actual_nav == expected["navigation"],
+            f"chunked-html-book: navigation drift for {expected['section_id']}",
+        )
+        require(
+            [
+                (node.attrib.get("rel"), node.attrib.get("href"))
+                for node in top.findall("a")
+            ]
+            == [
+                (node.attrib.get("rel"), node.attrib.get("href"))
+                for node in bottom.findall("a")
+            ],
+            f"chunked-html-book: top/bottom navigation mismatch for {expected['section_id']}",
+        )
+
+    require(
+        resolve_chunked_xref("ch-system-binutils", "contents-binutils")
+        == "binutils.html#contents-binutils",
+        "chunked-html-book: same-directory nested xref drift",
+    )
+    require(
+        resolve_chunked_xref("ch-tools-cleanup", "chapter-building-system")
+        == "../chapter08/chapter08.html",
+        "chunked-html-book: cross-directory chapter xref drift",
+    )
+    require(
+        resolve_chunked_xref("ch-system-zlib", "ch-partitioning-hostreqs")
+        == "../chapter02/hostreqs.html",
+        "chunked-html-book: cross-directory page xref drift",
+    )
+
+
 def self_test_chunked_html() -> None:
     golden = load_presentation(
         PRESENTATION / "golden" / "chunked-html-packages.json"
@@ -1291,6 +1497,7 @@ def self_test() -> None:
     self_test_book()
     self_test_nested_xrefs()
     self_test_chunked_html()
+    self_test_chunked_html_book()
 
 
 def main() -> int:
@@ -1302,6 +1509,7 @@ def main() -> int:
     parser.add_argument("--book", action="store_true")
     parser.add_argument("--xref")
     parser.add_argument("--html-package")
+    parser.add_argument("--html-book-dir", type=Path)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
@@ -1319,8 +1527,9 @@ def main() -> int:
                         "book_graph": True,
                         "nested_xrefs": True,
                         "chunked_html_packages": True,
+                        "chunked_html_book": True,
                         "equivalence":
-                            "package-semantics-plus-book-hierarchy-xrefs-and-chunked-html",
+                            "package-semantics-plus-book-hierarchy-xrefs-and-full-chunk-routing",
                     },
                     indent=2,
                 )
@@ -1335,6 +1544,7 @@ def main() -> int:
                 args.book,
                 args.xref,
                 args.html_package,
+                args.html_book_dir,
             )
         )
         require(
@@ -1342,6 +1552,23 @@ def main() -> int:
             "choose only one presentation mode",
         )
 
+        if args.html_book_dir:
+            rendered_book = render_chunked_html_book()
+            for relative_path, content in rendered_book.items():
+                target = args.html_book_dir / relative_path
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text(content + "\n", encoding="utf-8")
+            print(
+                json.dumps(
+                    {
+                        "status": "success",
+                        "documents": len(rendered_book),
+                        "output": str(args.html_book_dir),
+                    },
+                    indent=2,
+                )
+            )
+            return 0
         if args.html_package:
             rendered = render_chunked_html_package(args.html_package)
         elif args.book:

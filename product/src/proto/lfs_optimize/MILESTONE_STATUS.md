@@ -17,7 +17,7 @@ Roadmap:
 | M4 — Bootstrap proof | COMPLETE | Fresh Chapter 5–7 bootstrap hands directly to the normal executor; all 80 final-system packages build successfully without publication XML/book parsing. |
 | M5 — Development proof | COMPLETE | Accepted state, candidate identity, validation, definition binding/drift rejection, review evidence, and guarded transactional promotion are implemented. |
 | M6 — Release proof | SATISFIED BY COMPOSITION | M4 proves clean full-system realization from normalized state and M5 proves validated state identity and controlled promotion. Freezing accepted state under a release identity adds production plumbing but no unresolved prototype architecture question. |
-| M7 — Presentation proof | IN PROGRESS — PACKAGE/CHAPTER/BOOK/XREF PROVEN; CHUNKED-HTML PACKAGE SLICE ADDED | Package semantics, Chapter 8 composition, whole-book hierarchy/navigation, and all referenced internal xref targets are proven. The current slice renders Zlib and Binutils as chunked HTML from normalized/presentation state and validates reader-visible numbering, IDs, navigation, commands, metrics, and installed summaries against a 13.1-systemd golden semantic snapshot. Whole-book HTML, no-chunks HTML, and PDF remain open. |
+| M7 — Presentation proof | IN PROGRESS — PACKAGE/CHAPTER/BOOK/XREF + PACKAGE HTML PROVEN; FULL CHUNK ROUTING SLICE ADDED | Zlib/Binutils package HTML is proven. The current slice adds collision-free output paths for all 199 chunks, hierarchy-derived up links, relative prev/next/home navigation, and chunked xref href resolution across directories. Unmigrated page bodies render as explicit structural shells; full editorial-body migration, no-chunks HTML, and PDF remain open. |
 | M8+ | NOT STARTED | BLFS, hard-BLFS, and user-system proofs remain later roadmap milestones. |
 
 ## M5 closure
@@ -233,6 +233,44 @@ the reference book rather than a raw comma join.
 `presentation/golden/chunked-html-packages.json` is a validation oracle only.
 Runtime rendering does not consume it.
 
+## M7 full chunk-routing slice
+
+The two-package HTML proof exposed a full-book requirement that local filenames
+alone cannot represent: many chunks share names such as `introduction.html`.
+
+Presentation document identity now includes a route directory at the unit level.
+Pages inherit that route, producing collision-free paths such as:
+
+```text
+prologue/preface.html
+chapter02/introduction.html
+chapter08/zlib.html
+chapter09/introduction.html
+appendices/licenses.html
+```
+
+The composed book derives:
+
+- all 199 output paths;
+- hierarchy-owned `up` targets;
+- relative previous/next/up/home links;
+- relative cross-chunk xref hrefs; and
+- nested fragment hrefs.
+
+The source-derived `presentation/golden/chunked-html-book.json` validates route,
+title, and navigation identity only. Runtime rendering never consumes it.
+
+Zlib and Binutils retain their fully modeled package bodies. Documents whose
+editorial bodies have not yet been migrated render as explicit structural shells
+with `data-body-status="pending-editorial-migration"`. No prose or commands are
+fabricated to fill those gaps.
+
+The CLI can materialize the complete browser-navigable chunk tree:
+
+```text
+python3 product/src/proto/lfs_optimize/presentation.py   --html-book-dir /tmp/lfs-html
+```
+
 ## Resume instruction
 
 Run the direct prototype validator after this slice lands:
@@ -241,6 +279,6 @@ Run the direct prototype validator after this slice lands:
 python3 product/src/proto/lfs_optimize/validate.py
 ```
 
-If it passes, treat package-level chunked HTML rendering as proven and expand
-the renderer to the full 199-document chunk set before moving to no-chunks HTML
-and PDF.
+If it passes, treat full-book chunk routing/navigation/xref addressing as proven.
+The next M7 work is editorial-body migration for the remaining chunks, after
+which chunked HTML reader equivalence can close before no-chunks HTML and PDF.

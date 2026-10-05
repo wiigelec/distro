@@ -1,0 +1,2193 @@
+{
+  "schema_version": 1,
+  "source": {
+    "project": "Linux From Scratch",
+    "version": "13.1-systemd",
+    "published": "2026-09-01",
+    "surface": "chunked HTML routes"
+  },
+  "document_count": 199,
+  "documents": [
+    {
+      "section_id": "preface",
+      "output_path": "prologue/preface.html",
+      "title": "Preface",
+      "navigation": {
+        "home": "../index.html",
+        "next": "foreword.html"
+      }
+    },
+    {
+      "section_id": "pre-foreword",
+      "output_path": "prologue/foreword.html",
+      "title": "Foreword",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "preface.html",
+        "next": "audience.html",
+        "up": "preface.html"
+      }
+    },
+    {
+      "section_id": "pre-audience",
+      "output_path": "prologue/audience.html",
+      "title": "Audience",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "foreword.html",
+        "next": "architecture.html",
+        "up": "preface.html"
+      }
+    },
+    {
+      "section_id": "pre-architecture",
+      "output_path": "prologue/architecture.html",
+      "title": "LFS Target Architectures",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "audience.html",
+        "next": "prerequisites.html",
+        "up": "preface.html"
+      }
+    },
+    {
+      "section_id": "pre-prerequisites",
+      "output_path": "prologue/prerequisites.html",
+      "title": "Prerequisites",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "architecture.html",
+        "next": "standards.html",
+        "up": "preface.html"
+      }
+    },
+    {
+      "section_id": "pre-standards",
+      "output_path": "prologue/standards.html",
+      "title": "LFS and Standards",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "prerequisites.html",
+        "next": "package-choices.html",
+        "up": "preface.html"
+      }
+    },
+    {
+      "section_id": "pre-why",
+      "output_path": "prologue/package-choices.html",
+      "title": "Rationale for Packages in the Book",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "standards.html",
+        "next": "typography.html",
+        "up": "preface.html"
+      }
+    },
+    {
+      "section_id": "pre-typography",
+      "output_path": "prologue/typography.html",
+      "title": "Typography",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "package-choices.html",
+        "next": "organization.html",
+        "up": "preface.html"
+      }
+    },
+    {
+      "section_id": "pre-organization",
+      "output_path": "prologue/organization.html",
+      "title": "Structure",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "typography.html",
+        "next": "../chapter01/errata.html",
+        "up": "preface.html"
+      }
+    },
+    {
+      "section_id": "pre-errata",
+      "output_path": "chapter01/errata.html",
+      "title": "Errata and Security Advisories",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "../prologue/organization.html",
+        "next": "part1.html",
+        "up": "../prologue/preface.html"
+      }
+    },
+    {
+      "section_id": "part1",
+      "output_path": "chapter01/part1.html",
+      "title": "Part I. Introduction",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "errata.html",
+        "next": "chapter01.html"
+      }
+    },
+    {
+      "section_id": "chapter-intro",
+      "output_path": "chapter01/chapter01.html",
+      "title": "Chapter 1. Introduction",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "part1.html",
+        "next": "how.html",
+        "up": "part1.html"
+      }
+    },
+    {
+      "section_id": "ch-intro-how",
+      "output_path": "chapter01/how.html",
+      "title": "1.1. How to Build an LFS System",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "chapter01.html",
+        "next": "whatsnew.html",
+        "up": "chapter01.html"
+      }
+    },
+    {
+      "section_id": "ch-intro-whatsnew",
+      "output_path": "chapter01/whatsnew.html",
+      "title": "1.2. What's new since the last release",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "how.html",
+        "next": "changelog.html",
+        "up": "chapter01.html"
+      }
+    },
+    {
+      "section_id": "ch-intro-changelog",
+      "output_path": "chapter01/changelog.html",
+      "title": "1.3. Changelog",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "whatsnew.html",
+        "next": "resources.html",
+        "up": "chapter01.html"
+      }
+    },
+    {
+      "section_id": "ch-intro-resources",
+      "output_path": "chapter01/resources.html",
+      "title": "1.4. Resources",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "changelog.html",
+        "next": "askforhelp.html",
+        "up": "chapter01.html"
+      }
+    },
+    {
+      "section_id": "ch-intro-askforhelp",
+      "output_path": "chapter01/askforhelp.html",
+      "title": "1.5. Help",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "resources.html",
+        "next": "../chapter02/part2.html",
+        "up": "chapter01.html"
+      }
+    },
+    {
+      "section_id": "part2",
+      "output_path": "chapter02/part2.html",
+      "title": "Part II. Preparing for the Build",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "../chapter01/askforhelp.html",
+        "next": "chapter02.html"
+      }
+    },
+    {
+      "section_id": "chapter-partitioning",
+      "output_path": "chapter02/chapter02.html",
+      "title": "Chapter 2. Preparing the Host System",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "part2.html",
+        "next": "introduction.html",
+        "up": "part2.html"
+      }
+    },
+    {
+      "section_id": "ch-partitioning-introduction",
+      "output_path": "chapter02/introduction.html",
+      "title": "2.1. Introduction",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "chapter02.html",
+        "next": "hostreqs.html",
+        "up": "chapter02.html"
+      }
+    },
+    {
+      "section_id": "ch-partitioning-hostreqs",
+      "output_path": "chapter02/hostreqs.html",
+      "title": "2.2. Host System Requirements",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "introduction.html",
+        "next": "stages.html",
+        "up": "chapter02.html"
+      }
+    },
+    {
+      "section_id": "ch-partitioning-stages",
+      "output_path": "chapter02/stages.html",
+      "title": "2.3. Building LFS in Stages",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "hostreqs.html",
+        "next": "creatingpartition.html",
+        "up": "chapter02.html"
+      }
+    },
+    {
+      "section_id": "ch-partitioning-creatingpartition",
+      "output_path": "chapter02/creatingpartition.html",
+      "title": "2.4. Creating a New Partition",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "stages.html",
+        "next": "creatingfilesystem.html",
+        "up": "chapter02.html"
+      }
+    },
+    {
+      "section_id": "ch-partitioning-creatingfilesystem",
+      "output_path": "chapter02/creatingfilesystem.html",
+      "title": "2.5. Creating a File System on the Partition",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "creatingpartition.html",
+        "next": "aboutlfs.html",
+        "up": "chapter02.html"
+      }
+    },
+    {
+      "section_id": "ch-partitioning-aboutlfs",
+      "output_path": "chapter02/aboutlfs.html",
+      "title": "2.6. Setting the $LFS Variable and the Umask",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "creatingfilesystem.html",
+        "next": "mounting.html",
+        "up": "chapter02.html"
+      }
+    },
+    {
+      "section_id": "ch-partitioning-mounting",
+      "output_path": "chapter02/mounting.html",
+      "title": "2.7. Mounting the New Partition",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "aboutlfs.html",
+        "next": "../chapter03/chapter03.html",
+        "up": "chapter02.html"
+      }
+    },
+    {
+      "section_id": "chapter-getting-materials",
+      "output_path": "chapter03/chapter03.html",
+      "title": "Chapter 3. Packages and Patches",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "../chapter02/mounting.html",
+        "next": "introduction.html",
+        "up": "../chapter02/part2.html"
+      }
+    },
+    {
+      "section_id": "ch-materials-introduction",
+      "output_path": "chapter03/introduction.html",
+      "title": "3.1. Introduction",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "chapter03.html",
+        "next": "packages.html",
+        "up": "chapter03.html"
+      }
+    },
+    {
+      "section_id": "ch-materials-packages",
+      "output_path": "chapter03/packages.html",
+      "title": "3.2. All Packages",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "introduction.html",
+        "next": "patches.html",
+        "up": "chapter03.html"
+      }
+    },
+    {
+      "section_id": "ch-materials-patches",
+      "output_path": "chapter03/patches.html",
+      "title": "3.3. Needed Patches",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "packages.html",
+        "next": "../chapter04/chapter04.html",
+        "up": "chapter03.html"
+      }
+    },
+    {
+      "section_id": "chapter-final-preps",
+      "output_path": "chapter04/chapter04.html",
+      "title": "Chapter 4. Final Preparations",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "../chapter03/patches.html",
+        "next": "introduction.html",
+        "up": "../chapter02/part2.html"
+      }
+    },
+    {
+      "section_id": "ch-preps-introduction",
+      "output_path": "chapter04/introduction.html",
+      "title": "4.1. Introduction",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "chapter04.html",
+        "next": "creatingminlayout.html",
+        "up": "chapter04.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-creatingminlayout",
+      "output_path": "chapter04/creatingminlayout.html",
+      "title": "4.2. Creating a Limited Directory Layout in the LFS Filesystem",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "introduction.html",
+        "next": "addinguser.html",
+        "up": "chapter04.html"
+      }
+    },
+    {
+      "section_id": "ch-preps-addinguser",
+      "output_path": "chapter04/addinguser.html",
+      "title": "4.3. Adding the LFS User",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "creatingminlayout.html",
+        "next": "settingenvironment.html",
+        "up": "chapter04.html"
+      }
+    },
+    {
+      "section_id": "ch-preps-settingenviron",
+      "output_path": "chapter04/settingenvironment.html",
+      "title": "4.4. Setting Up the Environment",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "addinguser.html",
+        "next": "aboutsbus.html",
+        "up": "chapter04.html"
+      }
+    },
+    {
+      "section_id": "ch-preps-aboutsbus",
+      "output_path": "chapter04/aboutsbus.html",
+      "title": "4.5. About SBUs",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "settingenvironment.html",
+        "next": "abouttestsuites.html",
+        "up": "chapter04.html"
+      }
+    },
+    {
+      "section_id": "ch-preps-abouttestsuites",
+      "output_path": "chapter04/abouttestsuites.html",
+      "title": "4.6. About the Test Suites",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "aboutsbus.html",
+        "next": "../partintro/part3.html",
+        "up": "chapter04.html"
+      }
+    },
+    {
+      "section_id": "part3",
+      "output_path": "partintro/part3.html",
+      "title": "Part III. Building the LFS Cross Toolchain and Temporary Tools",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "../chapter04/abouttestsuites.html",
+        "next": "partintro.html"
+      }
+    },
+    {
+      "section_id": "partintro-cross-temp",
+      "output_path": "partintro/partintro.html",
+      "title": "Important Preliminary Material",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "part3.html",
+        "next": "introduction.html",
+        "up": "part3.html"
+      }
+    },
+    {
+      "section_id": "ch-part3intro-intro",
+      "output_path": "partintro/introduction.html",
+      "title": "Introduction",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "partintro.html",
+        "next": "toolchaintechnotes.html",
+        "up": "partintro.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-toolchaintechnotes",
+      "output_path": "partintro/toolchaintechnotes.html",
+      "title": "Toolchain Technical Notes",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "introduction.html",
+        "next": "generalinstructions.html",
+        "up": "partintro.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-generalinstructions",
+      "output_path": "partintro/generalinstructions.html",
+      "title": "General Compilation Instructions",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "toolchaintechnotes.html",
+        "next": "../chapter05/chapter05.html",
+        "up": "partintro.html"
+      }
+    },
+    {
+      "section_id": "chapter-cross-tools",
+      "output_path": "chapter05/chapter05.html",
+      "title": "Chapter 5. Compiling a Cross-Toolchain",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "../partintro/generalinstructions.html",
+        "next": "introduction.html",
+        "up": "../partintro/part3.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-introduction",
+      "output_path": "chapter05/introduction.html",
+      "title": "5.1. Introduction",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "chapter05.html",
+        "next": "binutils-pass1.html",
+        "up": "chapter05.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-binutils-pass1",
+      "output_path": "chapter05/binutils-pass1.html",
+      "title": "5.2. Binutils-2.47 - Pass 1",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "introduction.html",
+        "next": "gcc-pass1.html",
+        "up": "chapter05.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-gcc-pass1",
+      "output_path": "chapter05/gcc-pass1.html",
+      "title": "5.3. GCC-16.2.0 - Pass 1",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "binutils-pass1.html",
+        "next": "linux-headers.html",
+        "up": "chapter05.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-linux-headers",
+      "output_path": "chapter05/linux-headers.html",
+      "title": "5.4. Linux-7.1.8 API Headers",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "gcc-pass1.html",
+        "next": "glibc.html",
+        "up": "chapter05.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-glibc",
+      "output_path": "chapter05/glibc.html",
+      "title": "5.5. Glibc-2.44",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "linux-headers.html",
+        "next": "gcc-libstdc++.html",
+        "up": "chapter05.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-libstdcpp",
+      "output_path": "chapter05/gcc-libstdc++.html",
+      "title": "5.6. Libstdc++ from GCC-16.2.0",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "glibc.html",
+        "next": "../chapter06/chapter06.html",
+        "up": "chapter05.html"
+      }
+    },
+    {
+      "section_id": "chapter-temporary-tools",
+      "output_path": "chapter06/chapter06.html",
+      "title": "Chapter 6. Cross Compiling Temporary Tools",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "../chapter05/gcc-libstdc++.html",
+        "next": "introduction.html",
+        "up": "../partintro/part3.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-introduction-cross",
+      "output_path": "chapter06/introduction.html",
+      "title": "6.1. Introduction",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "chapter06.html",
+        "next": "m4.html",
+        "up": "chapter06.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-m4",
+      "output_path": "chapter06/m4.html",
+      "title": "6.2. M4-1.4.21",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "introduction.html",
+        "next": "ncurses.html",
+        "up": "chapter06.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-ncurses",
+      "output_path": "chapter06/ncurses.html",
+      "title": "6.3. Ncurses-6.6",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "m4.html",
+        "next": "bash.html",
+        "up": "chapter06.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-bash",
+      "output_path": "chapter06/bash.html",
+      "title": "6.4. Bash-5.3",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "ncurses.html",
+        "next": "coreutils.html",
+        "up": "chapter06.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-coreutils",
+      "output_path": "chapter06/coreutils.html",
+      "title": "6.5. Coreutils-9.11",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "bash.html",
+        "next": "diffutils.html",
+        "up": "chapter06.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-diffutils",
+      "output_path": "chapter06/diffutils.html",
+      "title": "6.6. Diffutils-3.12",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "coreutils.html",
+        "next": "file.html",
+        "up": "chapter06.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-file",
+      "output_path": "chapter06/file.html",
+      "title": "6.7. File-5.48",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "diffutils.html",
+        "next": "findutils.html",
+        "up": "chapter06.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-findutils",
+      "output_path": "chapter06/findutils.html",
+      "title": "6.8. Findutils-4.11.0",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "file.html",
+        "next": "gawk.html",
+        "up": "chapter06.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-gawk",
+      "output_path": "chapter06/gawk.html",
+      "title": "6.9. Gawk-5.4.1",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "findutils.html",
+        "next": "grep.html",
+        "up": "chapter06.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-grep",
+      "output_path": "chapter06/grep.html",
+      "title": "6.10. Grep-3.12",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "gawk.html",
+        "next": "gzip.html",
+        "up": "chapter06.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-gzip",
+      "output_path": "chapter06/gzip.html",
+      "title": "6.11. Gzip-1.14",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "grep.html",
+        "next": "make.html",
+        "up": "chapter06.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-make",
+      "output_path": "chapter06/make.html",
+      "title": "6.12. Make-4.4.1",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "gzip.html",
+        "next": "patch.html",
+        "up": "chapter06.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-patch",
+      "output_path": "chapter06/patch.html",
+      "title": "6.13. Patch-2.8",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "make.html",
+        "next": "sed.html",
+        "up": "chapter06.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-sed",
+      "output_path": "chapter06/sed.html",
+      "title": "6.14. Sed-4.10",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "patch.html",
+        "next": "tar.html",
+        "up": "chapter06.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-tar",
+      "output_path": "chapter06/tar.html",
+      "title": "6.15. Tar-1.35",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "sed.html",
+        "next": "xz.html",
+        "up": "chapter06.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-xz",
+      "output_path": "chapter06/xz.html",
+      "title": "6.16. Xz-5.8.3",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "tar.html",
+        "next": "binutils-pass2.html",
+        "up": "chapter06.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-binutils-pass2",
+      "output_path": "chapter06/binutils-pass2.html",
+      "title": "6.17. Binutils-2.47 - Pass 2",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "xz.html",
+        "next": "gcc-pass2.html",
+        "up": "chapter06.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-gcc-pass2",
+      "output_path": "chapter06/gcc-pass2.html",
+      "title": "6.18. GCC-16.2.0 - Pass 2",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "binutils-pass2.html",
+        "next": "../chapter07/chapter07.html",
+        "up": "chapter06.html"
+      }
+    },
+    {
+      "section_id": "chapter-chroot-temporary-tools",
+      "output_path": "chapter07/chapter07.html",
+      "title": "Chapter 7. Entering Chroot and Building Additional Temporary Tools",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "../chapter06/gcc-pass2.html",
+        "next": "introduction.html",
+        "up": "../partintro/part3.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-introduction-chroot",
+      "output_path": "chapter07/introduction.html",
+      "title": "7.1. Introduction",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "chapter07.html",
+        "next": "changingowner.html",
+        "up": "chapter07.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-changingowner",
+      "output_path": "chapter07/changingowner.html",
+      "title": "7.2. Changing Ownership",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "introduction.html",
+        "next": "kernfs.html",
+        "up": "chapter07.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-kernfs",
+      "output_path": "chapter07/kernfs.html",
+      "title": "7.3. Preparing Virtual Kernel File Systems",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "changingowner.html",
+        "next": "chroot.html",
+        "up": "chapter07.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-chroot",
+      "output_path": "chapter07/chroot.html",
+      "title": "7.4. Entering the Chroot Environment",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "kernfs.html",
+        "next": "creatingdirs.html",
+        "up": "chapter07.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-creatingdirs",
+      "output_path": "chapter07/creatingdirs.html",
+      "title": "7.5. Creating Directories",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "chroot.html",
+        "next": "createfiles.html",
+        "up": "chapter07.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-createfiles",
+      "output_path": "chapter07/createfiles.html",
+      "title": "7.6. Creating Essential Files and Symlinks",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "creatingdirs.html",
+        "next": "gettext.html",
+        "up": "chapter07.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-gettext",
+      "output_path": "chapter07/gettext.html",
+      "title": "7.7. Gettext-1.0",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "createfiles.html",
+        "next": "bison.html",
+        "up": "chapter07.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-bison",
+      "output_path": "chapter07/bison.html",
+      "title": "7.8. Bison-3.8.2",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "gettext.html",
+        "next": "perl.html",
+        "up": "chapter07.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-perl",
+      "output_path": "chapter07/perl.html",
+      "title": "7.9. Perl-5.44.0",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "bison.html",
+        "next": "zlib.html",
+        "up": "chapter07.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-zlib",
+      "output_path": "chapter07/zlib.html",
+      "title": "7.10. Zlib-1.3.2",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "perl.html",
+        "next": "mpdecimal.html",
+        "up": "chapter07.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-mpdecimal",
+      "output_path": "chapter07/mpdecimal.html",
+      "title": "7.11. mpdecimal-4.0.1",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "zlib.html",
+        "next": "Python.html",
+        "up": "chapter07.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-Python",
+      "output_path": "chapter07/Python.html",
+      "title": "7.12. Python-3.14.7",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "mpdecimal.html",
+        "next": "texinfo.html",
+        "up": "chapter07.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-texinfo",
+      "output_path": "chapter07/texinfo.html",
+      "title": "7.13. Texinfo-7.3",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "Python.html",
+        "next": "util-linux.html",
+        "up": "chapter07.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-util-linux",
+      "output_path": "chapter07/util-linux.html",
+      "title": "7.14. Util-linux-2.42.2",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "texinfo.html",
+        "next": "cleanup.html",
+        "up": "chapter07.html"
+      }
+    },
+    {
+      "section_id": "ch-tools-cleanup",
+      "output_path": "chapter07/cleanup.html",
+      "title": "7.15. Cleaning up and Saving the Temporary System",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "util-linux.html",
+        "next": "../chapter08/part4.html",
+        "up": "chapter07.html"
+      }
+    },
+    {
+      "section_id": "part4",
+      "output_path": "chapter08/part4.html",
+      "title": "Part IV. Building the LFS System",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "../chapter07/cleanup.html",
+        "next": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "chapter-building-system",
+      "output_path": "chapter08/chapter08.html",
+      "title": "Chapter 8. Installing Basic System Software",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "part4.html",
+        "next": "introduction.html",
+        "up": "part4.html"
+      }
+    },
+    {
+      "section_id": "ch-system-introduction",
+      "output_path": "chapter08/introduction.html",
+      "title": "8.1. Introduction",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "chapter08.html",
+        "next": "pkgmgt.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-pkgmgt",
+      "output_path": "chapter08/pkgmgt.html",
+      "title": "8.2. Package Management",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "introduction.html",
+        "next": "man-pages.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-man-pages",
+      "output_path": "chapter08/man-pages.html",
+      "title": "8.3. Man-pages-6.18",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "pkgmgt.html",
+        "next": "iana-etc.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-iana-etc",
+      "output_path": "chapter08/iana-etc.html",
+      "title": "8.4. Iana-Etc-20260805",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "man-pages.html",
+        "next": "glibc.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-glibc",
+      "output_path": "chapter08/glibc.html",
+      "title": "8.5. Glibc-2.44",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "iana-etc.html",
+        "next": "zlib.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-zlib",
+      "output_path": "chapter08/zlib.html",
+      "title": "8.6. Zlib-1.3.2",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "glibc.html",
+        "next": "bzip2.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-bzip2",
+      "output_path": "chapter08/bzip2.html",
+      "title": "8.7. Bzip2-1.0.8",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "zlib.html",
+        "next": "xz.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-xz",
+      "output_path": "chapter08/xz.html",
+      "title": "8.8. Xz-5.8.3",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "bzip2.html",
+        "next": "lz4.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-lz4",
+      "output_path": "chapter08/lz4.html",
+      "title": "8.9. Lz4-1.10.0",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "xz.html",
+        "next": "zstd.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-zstd",
+      "output_path": "chapter08/zstd.html",
+      "title": "8.10. Zstd-1.5.7",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "lz4.html",
+        "next": "file.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-file",
+      "output_path": "chapter08/file.html",
+      "title": "8.11. File-5.48",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "zstd.html",
+        "next": "readline.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-readline",
+      "output_path": "chapter08/readline.html",
+      "title": "8.12. Readline-8.3",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "file.html",
+        "next": "pcre2.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-pcre2",
+      "output_path": "chapter08/pcre2.html",
+      "title": "8.13. Pcre2-10.47",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "readline.html",
+        "next": "m4.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-m4",
+      "output_path": "chapter08/m4.html",
+      "title": "8.14. M4-1.4.21",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "pcre2.html",
+        "next": "bc.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-bc",
+      "output_path": "chapter08/bc.html",
+      "title": "8.15. Bc-7.0.3",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "m4.html",
+        "next": "flex.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-flex",
+      "output_path": "chapter08/flex.html",
+      "title": "8.16. Flex-2.6.4",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "bc.html",
+        "next": "tcl.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-tcl",
+      "output_path": "chapter08/tcl.html",
+      "title": "8.17. Tcl-8.6.18",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "flex.html",
+        "next": "expect.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-expect",
+      "output_path": "chapter08/expect.html",
+      "title": "8.18. Expect-5.45.4",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "tcl.html",
+        "next": "dejagnu.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-dejagnu",
+      "output_path": "chapter08/dejagnu.html",
+      "title": "8.19. DejaGNU-1.6.3",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "expect.html",
+        "next": "ninja.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-ninja",
+      "output_path": "chapter08/ninja.html",
+      "title": "8.20. Ninja-1.13.2",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "dejagnu.html",
+        "next": "pkgconf.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-pkgconf",
+      "output_path": "chapter08/pkgconf.html",
+      "title": "8.21. Pkgconf-3.0.5",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "ninja.html",
+        "next": "binutils.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-binutils",
+      "output_path": "chapter08/binutils.html",
+      "title": "8.22. Binutils-2.47",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "pkgconf.html",
+        "next": "gmp.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-gmp",
+      "output_path": "chapter08/gmp.html",
+      "title": "8.23. GMP-6.3.0",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "binutils.html",
+        "next": "mpfr.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-mpfr",
+      "output_path": "chapter08/mpfr.html",
+      "title": "8.24. MPFR-4.2.2",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "gmp.html",
+        "next": "mpc.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-mpc",
+      "output_path": "chapter08/mpc.html",
+      "title": "8.25. MPC-1.4.1",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "mpfr.html",
+        "next": "attr.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-attr",
+      "output_path": "chapter08/attr.html",
+      "title": "8.26. Attr-2.6.0",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "mpc.html",
+        "next": "acl.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-acl",
+      "output_path": "chapter08/acl.html",
+      "title": "8.27. Acl-2.4.0",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "attr.html",
+        "next": "libcap.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-libcap",
+      "output_path": "chapter08/libcap.html",
+      "title": "8.28. Libcap-2.78",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "acl.html",
+        "next": "libxcrypt.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-libxcrypt",
+      "output_path": "chapter08/libxcrypt.html",
+      "title": "8.29. Libxcrypt-4.5.2",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "libcap.html",
+        "next": "shadow.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-shadow",
+      "output_path": "chapter08/shadow.html",
+      "title": "8.30. Shadow-4.20.2",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "libxcrypt.html",
+        "next": "gawk.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-gawk",
+      "output_path": "chapter08/gawk.html",
+      "title": "8.31. Gawk-5.4.1",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "shadow.html",
+        "next": "gcc.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-gcc",
+      "output_path": "chapter08/gcc.html",
+      "title": "8.32. GCC-16.2.0",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "gawk.html",
+        "next": "ncurses.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-ncurses",
+      "output_path": "chapter08/ncurses.html",
+      "title": "8.33. Ncurses-6.6",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "gcc.html",
+        "next": "sed.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-sed",
+      "output_path": "chapter08/sed.html",
+      "title": "8.34. Sed-4.10",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "ncurses.html",
+        "next": "psmisc.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-psmisc",
+      "output_path": "chapter08/psmisc.html",
+      "title": "8.35. Psmisc-23.7",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "sed.html",
+        "next": "gettext.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-gettext",
+      "output_path": "chapter08/gettext.html",
+      "title": "8.36. Gettext-1.0",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "psmisc.html",
+        "next": "bison.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-bison",
+      "output_path": "chapter08/bison.html",
+      "title": "8.37. Bison-3.8.2",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "gettext.html",
+        "next": "grep.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-grep",
+      "output_path": "chapter08/grep.html",
+      "title": "8.38. Grep-3.12",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "bison.html",
+        "next": "bash.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-bash",
+      "output_path": "chapter08/bash.html",
+      "title": "8.39. Bash-5.3",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "grep.html",
+        "next": "libtool.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-libtool",
+      "output_path": "chapter08/libtool.html",
+      "title": "8.40. Libtool-2.6.2",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "bash.html",
+        "next": "gdbm.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-gdbm",
+      "output_path": "chapter08/gdbm.html",
+      "title": "8.41. GDBM-1.26",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "libtool.html",
+        "next": "gperf.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-gperf",
+      "output_path": "chapter08/gperf.html",
+      "title": "8.42. Gperf-3.3",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "gdbm.html",
+        "next": "expat.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-expat",
+      "output_path": "chapter08/expat.html",
+      "title": "8.43. Expat-2.8.3",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "gperf.html",
+        "next": "inetutils.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-inetutils",
+      "output_path": "chapter08/inetutils.html",
+      "title": "8.44. Inetutils-2.8",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "expat.html",
+        "next": "less.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-less",
+      "output_path": "chapter08/less.html",
+      "title": "8.45. Less-704",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "inetutils.html",
+        "next": "perl.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-perl",
+      "output_path": "chapter08/perl.html",
+      "title": "8.46. Perl-5.44.0",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "less.html",
+        "next": "autoconf.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-autoconf",
+      "output_path": "chapter08/autoconf.html",
+      "title": "8.47. Autoconf-2.73",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "perl.html",
+        "next": "automake.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-automake",
+      "output_path": "chapter08/automake.html",
+      "title": "8.48. Automake-1.18.1",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "autoconf.html",
+        "next": "openssl.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-openssl",
+      "output_path": "chapter08/openssl.html",
+      "title": "8.49. OpenSSL-4.0.1",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "automake.html",
+        "next": "libelf.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-libelf",
+      "output_path": "chapter08/libelf.html",
+      "title": "8.50. Libelf from Elfutils-0.195",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "openssl.html",
+        "next": "libffi.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-libffi",
+      "output_path": "chapter08/libffi.html",
+      "title": "8.51. Libffi-3.8.0",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "libelf.html",
+        "next": "sqlite.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-sqlite",
+      "output_path": "chapter08/sqlite.html",
+      "title": "8.52. Sqlite-3530400",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "libffi.html",
+        "next": "mpdecimal.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-mpdecimal",
+      "output_path": "chapter08/mpdecimal.html",
+      "title": "8.53. mpdecimal-4.0.1",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "sqlite.html",
+        "next": "Python.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-Python",
+      "output_path": "chapter08/Python.html",
+      "title": "8.54. Python-3.14.7",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "mpdecimal.html",
+        "next": "flit-core.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-flit-core",
+      "output_path": "chapter08/flit-core.html",
+      "title": "8.55. Flit-Core-4.0.2",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "Python.html",
+        "next": "packaging.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-packaging",
+      "output_path": "chapter08/packaging.html",
+      "title": "8.56. Packaging-26.3",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "flit-core.html",
+        "next": "wheel.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-wheel",
+      "output_path": "chapter08/wheel.html",
+      "title": "8.57. Wheel-0.48.0",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "packaging.html",
+        "next": "setuptools.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-setuptools",
+      "output_path": "chapter08/setuptools.html",
+      "title": "8.58. Setuptools-84.0.0",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "wheel.html",
+        "next": "meson.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-meson",
+      "output_path": "chapter08/meson.html",
+      "title": "8.59. Meson-1.12.0",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "setuptools.html",
+        "next": "kmod.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-kmod",
+      "output_path": "chapter08/kmod.html",
+      "title": "8.60. Kmod-34.2",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "meson.html",
+        "next": "coreutils.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-coreutils",
+      "output_path": "chapter08/coreutils.html",
+      "title": "8.61. Coreutils-9.11",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "kmod.html",
+        "next": "diffutils.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-diffutils",
+      "output_path": "chapter08/diffutils.html",
+      "title": "8.62. Diffutils-3.12",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "coreutils.html",
+        "next": "findutils.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-findutils",
+      "output_path": "chapter08/findutils.html",
+      "title": "8.63. Findutils-4.11.0",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "diffutils.html",
+        "next": "groff.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-groff",
+      "output_path": "chapter08/groff.html",
+      "title": "8.64. Groff-1.24.1",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "findutils.html",
+        "next": "grub.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-grub",
+      "output_path": "chapter08/grub.html",
+      "title": "8.65. GRUB-2.14",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "groff.html",
+        "next": "gzip.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-gzip",
+      "output_path": "chapter08/gzip.html",
+      "title": "8.66. Gzip-1.14",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "grub.html",
+        "next": "iproute2.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-iproute2",
+      "output_path": "chapter08/iproute2.html",
+      "title": "8.67. IPRoute2-7.1.0",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "gzip.html",
+        "next": "kbd.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-kbd",
+      "output_path": "chapter08/kbd.html",
+      "title": "8.68. Kbd-2.10.0",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "iproute2.html",
+        "next": "libpipeline.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-libpipeline",
+      "output_path": "chapter08/libpipeline.html",
+      "title": "8.69. Libpipeline-1.5.8",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "kbd.html",
+        "next": "make.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-make",
+      "output_path": "chapter08/make.html",
+      "title": "8.70. Make-4.4.1",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "libpipeline.html",
+        "next": "patch.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-patch",
+      "output_path": "chapter08/patch.html",
+      "title": "8.71. Patch-2.8",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "make.html",
+        "next": "tar.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-tar",
+      "output_path": "chapter08/tar.html",
+      "title": "8.72. Tar-1.35",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "patch.html",
+        "next": "texinfo.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-texinfo",
+      "output_path": "chapter08/texinfo.html",
+      "title": "8.73. Texinfo-7.3",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "tar.html",
+        "next": "vim.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-vim",
+      "output_path": "chapter08/vim.html",
+      "title": "8.74. Vim-9.2.1025",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "texinfo.html",
+        "next": "markupsafe.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-markupsafe",
+      "output_path": "chapter08/markupsafe.html",
+      "title": "8.75. MarkupSafe-3.0.3",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "vim.html",
+        "next": "jinja2.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-jinja2",
+      "output_path": "chapter08/jinja2.html",
+      "title": "8.76. Jinja2-3.1.6",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "markupsafe.html",
+        "next": "systemd.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-systemd",
+      "output_path": "chapter08/systemd.html",
+      "title": "8.77. Systemd-261.2",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "jinja2.html",
+        "next": "dbus.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-dbus",
+      "output_path": "chapter08/dbus.html",
+      "title": "8.78. D-Bus-1.16.2",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "systemd.html",
+        "next": "man-db.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-man-db",
+      "output_path": "chapter08/man-db.html",
+      "title": "8.79. Man-DB-2.13.1",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "dbus.html",
+        "next": "procps-ng.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-procps",
+      "output_path": "chapter08/procps-ng.html",
+      "title": "8.80. Procps-ng-4.0.7",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "man-db.html",
+        "next": "util-linux.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-util-linux",
+      "output_path": "chapter08/util-linux.html",
+      "title": "8.81. Util-linux-2.42.2",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "procps-ng.html",
+        "next": "e2fsprogs.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-e2fsprogs",
+      "output_path": "chapter08/e2fsprogs.html",
+      "title": "8.82. E2fsprogs-1.47.4",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "util-linux.html",
+        "next": "aboutdebug.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-aboutdebug",
+      "output_path": "chapter08/aboutdebug.html",
+      "title": "8.83. About Debugging Symbols",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "e2fsprogs.html",
+        "next": "stripping.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-stripping",
+      "output_path": "chapter08/stripping.html",
+      "title": "8.84. Stripping",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "aboutdebug.html",
+        "next": "cleanup.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "ch-system-cleanup",
+      "output_path": "chapter08/cleanup.html",
+      "title": "8.85. Cleaning Up",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "stripping.html",
+        "next": "../chapter09/chapter09.html",
+        "up": "chapter08.html"
+      }
+    },
+    {
+      "section_id": "chapter-config",
+      "output_path": "chapter09/chapter09.html",
+      "title": "Chapter 9. System Configuration",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "../chapter08/cleanup.html",
+        "next": "introduction.html",
+        "up": "../chapter08/part4.html"
+      }
+    },
+    {
+      "section_id": "ch-config-introduction",
+      "output_path": "chapter09/introduction.html",
+      "title": "9.1. Introduction",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "chapter09.html",
+        "next": "network.html",
+        "up": "chapter09.html"
+      }
+    },
+    {
+      "section_id": "ch-config-network",
+      "output_path": "chapter09/network.html",
+      "title": "9.2. General Network Configuration",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "introduction.html",
+        "next": "udev.html",
+        "up": "chapter09.html"
+      }
+    },
+    {
+      "section_id": "ch-config-udev",
+      "output_path": "chapter09/udev.html",
+      "title": "9.3. Overview of Device and Module Handling",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "network.html",
+        "next": "symlinks.html",
+        "up": "chapter09.html"
+      }
+    },
+    {
+      "section_id": "ch-config-symlinks",
+      "output_path": "chapter09/symlinks.html",
+      "title": "9.4. Managing Devices",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "udev.html",
+        "next": "clock.html",
+        "up": "chapter09.html"
+      }
+    },
+    {
+      "section_id": "ch-config-clock",
+      "output_path": "chapter09/clock.html",
+      "title": "9.5. Configuring the System Clock",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "symlinks.html",
+        "next": "console.html",
+        "up": "chapter09.html"
+      }
+    },
+    {
+      "section_id": "ch-config-console",
+      "output_path": "chapter09/console.html",
+      "title": "9.6. Configuring the Linux Console",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "clock.html",
+        "next": "locale.html",
+        "up": "chapter09.html"
+      }
+    },
+    {
+      "section_id": "ch-config-locale",
+      "output_path": "chapter09/locale.html",
+      "title": "9.7. Configuring the System Locale",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "console.html",
+        "next": "inputrc.html",
+        "up": "chapter09.html"
+      }
+    },
+    {
+      "section_id": "ch-config-inputrc",
+      "output_path": "chapter09/inputrc.html",
+      "title": "9.8. Creating the /etc/inputrc File",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "locale.html",
+        "next": "etcshells.html",
+        "up": "chapter09.html"
+      }
+    },
+    {
+      "section_id": "ch-config-shells",
+      "output_path": "chapter09/etcshells.html",
+      "title": "9.9. Creating the /etc/shells File",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "inputrc.html",
+        "next": "systemd-custom.html",
+        "up": "chapter09.html"
+      }
+    },
+    {
+      "section_id": "ch-config-systemd-custom",
+      "output_path": "chapter09/systemd-custom.html",
+      "title": "9.10. Systemd Usage and Configuration",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "etcshells.html",
+        "next": "../chapter10/chapter10.html",
+        "up": "chapter09.html"
+      }
+    },
+    {
+      "section_id": "chapter-bootable",
+      "output_path": "chapter10/chapter10.html",
+      "title": "Chapter 10. Making the LFS System Bootable",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "../chapter09/systemd-custom.html",
+        "next": "introduction.html",
+        "up": "../chapter08/part4.html"
+      }
+    },
+    {
+      "section_id": "ch-bootable-introduction",
+      "output_path": "chapter10/introduction.html",
+      "title": "10.1. Introduction",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "chapter10.html",
+        "next": "fstab.html",
+        "up": "chapter10.html"
+      }
+    },
+    {
+      "section_id": "ch-bootable-fstab",
+      "output_path": "chapter10/fstab.html",
+      "title": "10.2. Creating the /etc/fstab File",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "introduction.html",
+        "next": "kernel.html",
+        "up": "chapter10.html"
+      }
+    },
+    {
+      "section_id": "ch-bootable-kernel",
+      "output_path": "chapter10/kernel.html",
+      "title": "10.3. Linux-7.1.8",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "fstab.html",
+        "next": "grub.html",
+        "up": "chapter10.html"
+      }
+    },
+    {
+      "section_id": "ch-bootable-grub",
+      "output_path": "chapter10/grub.html",
+      "title": "10.4. Using GRUB to Set Up the Boot Process",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "kernel.html",
+        "next": "../chapter11/chapter11.html",
+        "up": "chapter10.html"
+      }
+    },
+    {
+      "section_id": "chapter-finalizing",
+      "output_path": "chapter11/chapter11.html",
+      "title": "Chapter 11. The End",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "../chapter10/grub.html",
+        "next": "theend.html",
+        "up": "../chapter08/part4.html"
+      }
+    },
+    {
+      "section_id": "ch-finish-theend",
+      "output_path": "chapter11/theend.html",
+      "title": "11.1. The End",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "chapter11.html",
+        "next": "getcounted.html",
+        "up": "chapter11.html"
+      }
+    },
+    {
+      "section_id": "ch-finish-getcounted",
+      "output_path": "chapter11/getcounted.html",
+      "title": "11.2. Get Counted",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "theend.html",
+        "next": "reboot.html",
+        "up": "chapter11.html"
+      }
+    },
+    {
+      "section_id": "ch-finish-reboot",
+      "output_path": "chapter11/reboot.html",
+      "title": "11.3. Rebooting the System",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "getcounted.html",
+        "next": "whatnow.html",
+        "up": "chapter11.html"
+      }
+    },
+    {
+      "section_id": "ch-finish-whatnow",
+      "output_path": "chapter11/whatnow.html",
+      "title": "11.4. Additional Resources",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "reboot.html",
+        "next": "afterlfs.html",
+        "up": "chapter11.html"
+      }
+    },
+    {
+      "section_id": "afterlfs",
+      "output_path": "chapter11/afterlfs.html",
+      "title": "11.5. Getting Started After LFS",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "whatnow.html",
+        "next": "../appendices/part5.html",
+        "up": "chapter11.html"
+      }
+    },
+    {
+      "section_id": "part5",
+      "output_path": "appendices/part5.html",
+      "title": "Part V. Appendices",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "../chapter11/afterlfs.html",
+        "next": "acronymlist.html"
+      }
+    },
+    {
+      "section_id": "appendixa",
+      "output_path": "appendices/acronymlist.html",
+      "title": "Appendix A. Acronyms and Terms",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "part5.html",
+        "next": "acknowledgments.html",
+        "up": "part5.html"
+      }
+    },
+    {
+      "section_id": "appendixb",
+      "output_path": "appendices/acknowledgments.html",
+      "title": "Appendix B. Acknowledgments",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "acronymlist.html",
+        "next": "dependencies.html",
+        "up": "part5.html"
+      }
+    },
+    {
+      "section_id": "appendixc",
+      "output_path": "appendices/dependencies.html",
+      "title": "Appendix C. Dependencies",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "acknowledgments.html",
+        "next": "licenses.html",
+        "up": "part5.html"
+      }
+    },
+    {
+      "section_id": "Licenses",
+      "output_path": "appendices/licenses.html",
+      "title": "Appendix E. LFS Licenses",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "dependencies.html",
+        "next": "creat-comm.html",
+        "up": "part5.html"
+      }
+    },
+    {
+      "section_id": "CC",
+      "output_path": "appendices/creat-comm.html",
+      "title": "E.1. Creative Commons License",
+      "navigation": {
+        "home": "../index.html",
+        "previous": "licenses.html",
+        "up": "licenses.html"
+      }
+    }
+  ]
+}
