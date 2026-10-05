@@ -217,6 +217,15 @@ def _validate_deleted_path(path: str) -> str:
     return normalized
 
 
+def _remove_existing_path(path: Path) -> None:
+    if path.is_symlink():
+        path.unlink()
+    elif path.is_dir():
+        shutil.rmtree(path)
+    elif path.exists():
+        path.unlink()
+
+
 def extract_tar_xz(artifact: Path, target_root: Path) -> None:
     target_root.mkdir(parents=True, exist_ok=True)
     with tarfile.open(artifact, "r:xz") as tar:
@@ -251,10 +260,7 @@ def extract_tar_xz(artifact: Path, target_root: Path) -> None:
         ):
             target = target_root / relative
             if target.is_symlink() or target.exists():
-                if target.is_dir():
-                    shutil.rmtree(target)
-                else:
-                    target.unlink()
+                _remove_existing_path(target)
 
         # Artifact members define the final topology. Remove existing
         # non-directory targets first so extraction cannot preserve stale
@@ -266,10 +272,7 @@ def extract_tar_xz(artifact: Path, target_root: Path) -> None:
                     target.unlink()
                 continue
             if target.is_symlink() or target.exists():
-                if target.is_dir():
-                    shutil.rmtree(target)
-                else:
-                    target.unlink()
+                _remove_existing_path(target)
 
         try:
             tar.extractall(
@@ -323,6 +326,16 @@ def self_test() -> None:
         os.symlink(
             "/usr/bin/new", after_root / "usr/lib/absolute-new-link"
         )
+
+        # Regression: the baseline may contain a symlink to a directory while
+        # the package artifact replaces that path with a real directory.
+        (before_root / "usr/lib").mkdir(parents=True, exist_ok=True)
+        (before_root / "usr/share/terminfo").mkdir(parents=True)
+        os.symlink("../share/terminfo", before_root / "usr/lib/terminfo")
+        (after_root / "usr/share/terminfo").mkdir(parents=True, exist_ok=True)
+        (after_root / "usr/lib/terminfo").mkdir()
+        (after_root / "usr/lib/terminfo/x").write_text("x\n", encoding="utf-8")
+
         (after_root / "usr/bin/hard-a").write_text("hard\n", encoding="utf-8")
         os.link(after_root / "usr/bin/hard-a", after_root / "usr/bin/hard-b")
         (after_root / "usr/bin/independent-a").write_text(
@@ -343,7 +356,7 @@ def self_test() -> None:
 
         artifact = base / "proof.tar.xz"
         create_tar_xz(stage, artifact, deleted)
-        shutil.copytree(before_root, realized)
+        shutil.copytree(before_root, realized, symlinks=True)
         extract_tar_xz(artifact, realized)
 
         if snapshot(realized) != after:
