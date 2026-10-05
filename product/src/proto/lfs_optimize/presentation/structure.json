@@ -76,6 +76,198 @@
           "appendixE"
         ]
       }
+    ],
+    "nested_targets": [
+      {
+        "target_id": "MIT",
+        "kind": "sect1",
+        "document_id": "Licenses"
+      },
+      {
+        "target_id": "version-check",
+        "kind": "bridgehead",
+        "document_id": "ch-partitioning-hostreqs"
+      },
+      {
+        "target_id": "ch-tools-bindmount",
+        "kind": "sect2",
+        "document_id": "ch-tools-kernfs"
+      },
+      {
+        "target_id": "ch-tools-kernfsmount",
+        "kind": "sect2",
+        "document_id": "ch-tools-kernfs"
+      },
+      {
+        "target_id": "systemd-no-tmpfs",
+        "kind": "sect2",
+        "document_id": "ch-config-systemd-custom"
+      },
+      {
+        "target_id": "contents-binutils",
+        "kind": "sect2",
+        "document_id": "ch-system-binutils"
+      },
+      {
+        "target_id": "buildinstr",
+        "kind": "listitem",
+        "document_id": "ch-tools-generalinstructions"
+      },
+      {
+        "target_id": "pie-ssp-info",
+        "kind": "anchor",
+        "document_id": "ch-system-gcc"
+      },
+      {
+        "target_id": "contents-gcc",
+        "kind": "sect2",
+        "document_id": "ch-system-gcc"
+      },
+      {
+        "target_id": "contents-glibc",
+        "kind": "sect2",
+        "document_id": "ch-system-glibc"
+      },
+      {
+        "target_id": "contents-m4",
+        "kind": "sect2",
+        "document_id": "ch-system-m4"
+      },
+      {
+        "target_id": "contents-ncurses",
+        "kind": "sect2",
+        "document_id": "ch-system-ncurses"
+      },
+      {
+        "target_id": "contents-bash",
+        "kind": "sect2",
+        "document_id": "ch-system-bash"
+      },
+      {
+        "target_id": "contents-coreutils",
+        "kind": "sect2",
+        "document_id": "ch-system-coreutils"
+      },
+      {
+        "target_id": "contents-diffutils",
+        "kind": "sect2",
+        "document_id": "ch-system-diffutils"
+      },
+      {
+        "target_id": "contents-file",
+        "kind": "sect2",
+        "document_id": "ch-system-file"
+      },
+      {
+        "target_id": "contents-findutils",
+        "kind": "sect2",
+        "document_id": "ch-system-findutils"
+      },
+      {
+        "target_id": "contents-gawk",
+        "kind": "sect2",
+        "document_id": "ch-system-gawk"
+      },
+      {
+        "target_id": "contents-grep",
+        "kind": "sect2",
+        "document_id": "ch-system-grep"
+      },
+      {
+        "target_id": "contents-gzip",
+        "kind": "sect2",
+        "document_id": "ch-system-gzip"
+      },
+      {
+        "target_id": "contents-make",
+        "kind": "sect2",
+        "document_id": "ch-system-make"
+      },
+      {
+        "target_id": "contents-patch",
+        "kind": "sect2",
+        "document_id": "ch-system-patch"
+      },
+      {
+        "target_id": "contents-sed",
+        "kind": "sect2",
+        "document_id": "ch-system-sed"
+      },
+      {
+        "target_id": "contents-tar",
+        "kind": "sect2",
+        "document_id": "ch-system-tar"
+      },
+      {
+        "target_id": "contents-xz",
+        "kind": "sect2",
+        "document_id": "ch-system-xz"
+      },
+      {
+        "target_id": "ch-config-udev-device-node-creation",
+        "kind": "sect3",
+        "document_id": "ch-config-udev"
+      },
+      {
+        "target_id": "contents-gettext",
+        "kind": "sect2",
+        "document_id": "ch-system-gettext"
+      },
+      {
+        "target_id": "contents-bison",
+        "kind": "sect2",
+        "document_id": "ch-system-bison"
+      },
+      {
+        "target_id": "contents-perl",
+        "kind": "sect2",
+        "document_id": "ch-system-perl"
+      },
+      {
+        "target_id": "contents-zlib",
+        "kind": "sect2",
+        "document_id": "ch-system-zlib"
+      },
+      {
+        "target_id": "contents-mpdecimal",
+        "kind": "sect2",
+        "document_id": "ch-system-mpdecimal"
+      },
+      {
+        "target_id": "contents-python",
+        "kind": "sect2",
+        "document_id": "ch-system-Python"
+      },
+      {
+        "target_id": "contents-texinfo",
+        "kind": "sect2",
+        "document_id": "ch-system-texinfo"
+      },
+      {
+        "target_id": "contents-utillinux",
+        "kind": "sect2",
+        "document_id": "ch-system-util-linux"
+      },
+      {
+        "target_id": "pkgmgmt-upgrade-issues",
+        "kind": "sect2",
+        "document_id": "ch-system-pkgmgt"
+      },
+      {
+        "target_id": "ch-config-hostname",
+        "kind": "sect2",
+        "document_id": "ch-config-network"
+      },
+      {
+        "target_id": "ch-config-hosts",
+        "kind": "sect2",
+        "document_id": "ch-config-network"
+      },
+      {
+        "target_id": "ch-intro-maillists",
+        "kind": "sect2",
+        "document_id": "ch-intro-resources"
+      }
     ]
   },
   "chapters": [

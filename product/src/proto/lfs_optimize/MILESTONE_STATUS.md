@@ -17,7 +17,7 @@ Roadmap:
 | M4 — Bootstrap proof | COMPLETE | Fresh Chapter 5–7 bootstrap hands directly to the normal executor; all 80 final-system packages build successfully without publication XML/book parsing. |
 | M5 — Development proof | COMPLETE | Accepted state, candidate identity, validation, definition binding/drift rejection, review evidence, and guarded transactional promotion are implemented. |
 | M6 — Release proof | SATISFIED BY COMPOSITION | M4 proves clean full-system realization from normalized state and M5 proves validated state identity and controlled promotion. Freezing accepted state under a release identity adds production plumbing but no unresolved prototype architecture question. |
-| M7 — Presentation proof | IN PROGRESS — PACKAGE-PAGE MODEL PROVEN; CHAPTER 8 PROVEN; BOOK GRAPH SLICE ADDED | Zlib and Binutils prove package-page semantics. Chapter 8 derives its 80-package run from authoritative package order. The book graph now composes frontmatter, five parts, Chapters 1–11, the Part III preliminary-material preface, and Appendices A/B/C/E into one chunked-document graph with global navigation and graph-level xref resolution. Nested-anchor and golden-render equivalence remain open. |
+| M7 — Presentation proof | IN PROGRESS — PACKAGE-PAGE MODEL PROVEN; CHAPTER 8 PROVEN; BOOK GRAPH PROVEN; NESTED XREF SLICE ADDED | Zlib and Binutils prove package-page semantics. Chapter 8 derives its 80-package run from authoritative package order. Whole-book hierarchy and cross-boundary navigation are proven. The current slice adds presentation-owned bindings for all 38 referenced intra-document targets in LFS 13.1-systemd so the same resolver covers all 86 distinct internal reference targets without consulting source XML. Golden-render equivalence remains open. |
 | M8+ | NOT STARTED | BLFS, hard-BLFS, and user-system proofs remain later roadmap milestones. |
 
 ## M5 closure
@@ -161,6 +161,41 @@ and top-level page IDs. Nested anchors inside page bodies are intentionally not
 promoted into the graph yet; they belong with the subsequent editorial-content
 and rendered-output proof.
 
+## M7 nested xref slice
+
+The source inventory contains 161 internal references to 86 distinct targets.
+Forty-eight targets are already chunk-level book-graph documents. The remaining
+38 are intra-document targets:
+
+```text
+33 sect2
+ 1 sect3
+ 1 bridgehead
+ 1 listitem
+ 1 explicit anchor
+ 1 unchunked sect1
+```
+
+Presentation structure owns the binding from each nested target ID to its
+containing chunk document. Runtime xref resolution therefore requires only:
+
+```text
+presentation structure
+        +
+composed book graph
+        ↓
+target ID
+        ↓
+chunk filename + target fragment
+```
+
+`presentation/golden/xref-targets.json` records the LFS 13.1-systemd reference
+inventory for validation only. It is not used by runtime composition.
+
+This slice deliberately models only anchors that are actually referenced by the
+source book. Other incidental IDs remain renderer details until a semantic need
+for them is demonstrated.
+
 ## Resume instruction
 
 Run the direct prototype validator after this slice lands:
@@ -169,6 +204,6 @@ Run the direct prototype validator after this slice lands:
 python3 product/src/proto/lfs_optimize/validate.py
 ```
 
-If it passes, treat book-level hierarchy, cross-boundary navigation, and
-graph-level xref resolution as proven. Continue M7 with nested-anchor/xref
-coverage and then golden chunked-HTML/no-chunks/PDF rendering equivalence.
+If it passes, treat internal xref target coverage as proven for the reference
+book and move M7 to rendered-output equivalence: chunked HTML first, then
+no-chunks HTML and PDF.

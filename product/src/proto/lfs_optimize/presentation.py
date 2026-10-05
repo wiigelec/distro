@@ -574,10 +574,63 @@ def compose_book() -> dict[str, Any]:
 
 def book_target_index() -> dict[str, dict[str, Any]]:
     compiled = compose_book()
-    return {
-        document["section_id"]: document
+    index = {
+        document["section_id"]: {
+            **document,
+            "target_id": document["section_id"],
+            "nested": False,
+            "document_id": document["section_id"],
+        }
         for document in compiled["documents"]
     }
+
+    structure = structure_document()
+    book = structure.get("book")
+    require(isinstance(book, dict), "missing book presentation structure")
+    nested_targets = book.get("nested_targets")
+    require(
+        isinstance(nested_targets, list),
+        "book: nested_targets must be a list",
+    )
+
+    for item in nested_targets:
+        require(
+            isinstance(item, dict),
+            "book: nested target must be an object",
+        )
+        target_id = item.get("target_id")
+        kind = item.get("kind")
+        document_id = item.get("document_id")
+        require(
+            isinstance(target_id, str)
+            and target_id
+            and isinstance(kind, str)
+            and kind
+            and isinstance(document_id, str)
+            and document_id,
+            "book: invalid nested target",
+        )
+        require(
+            target_id not in index,
+            f"book: duplicate xref target {target_id}",
+        )
+        require(
+            document_id in index and not index[document_id]["nested"],
+            f"book: nested target {target_id} has unknown document {document_id}",
+        )
+        document = index[document_id]
+        index[target_id] = {
+            "target_id": target_id,
+            "section_id": target_id,
+            "kind": kind,
+            "nested": True,
+            "document_id": document_id,
+            "filename": document["filename"],
+            "owner": document["owner"],
+            "number": document.get("number"),
+        }
+
+    return index
 
 
 def resolve_book_xref(target: str) -> dict[str, Any]:
@@ -752,6 +805,99 @@ def self_test_chapter08() -> None:
     )
 
 
+def self_test_nested_xrefs() -> None:
+    golden = load_presentation(
+        PRESENTATION / "golden" / "xref-targets.json"
+    )
+    require(
+        golden.get("reference_count") == 161,
+        "xref: source reference count drift",
+    )
+    require(
+        golden.get("distinct_target_count") == 86,
+        "xref: source target count drift",
+    )
+
+    targets = golden.get("targets")
+    require(
+        isinstance(targets, list) and len(targets) == 86,
+        "xref: invalid golden target set",
+    )
+    expected_nested = {
+        item["target_id"]: item
+        for item in targets
+        if item.get("nested")
+    }
+    require(
+        len(expected_nested) == 38,
+        "xref: expected 38 nested targets",
+    )
+
+    index = book_target_index()
+    for item in targets:
+        target_id = item["target_id"]
+        resolved = resolve_book_xref(target_id)
+        require(
+            resolved["target_id"] == target_id,
+            f"xref: target identity drift for {target_id}",
+        )
+        require(
+            resolved["nested"] == item["nested"],
+            f"xref: nesting classification drift for {target_id}",
+        )
+        require(
+            resolved["document_id"] == item["document_id"],
+            f"xref: document binding drift for {target_id}",
+        )
+
+    structure = structure_document()
+    configured = structure["book"]["nested_targets"]
+    require(
+        {
+            item["target_id"]: {
+                "kind": item["kind"],
+                "document_id": item["document_id"],
+            }
+            for item in configured
+        }
+        == {
+            target_id: {
+                "kind": item["kind"],
+                "document_id": item["document_id"],
+            }
+            for target_id, item in expected_nested.items()
+        },
+        "xref: presentation nested target configuration drift",
+    )
+
+    contents = resolve_book_xref("contents-binutils")
+    require(
+        contents["nested"]
+        and contents["filename"] == "binutils.html"
+        and contents["document_id"] == "ch-system-binutils",
+        "xref: package contents target drift",
+    )
+    bridgehead = resolve_book_xref("version-check")
+    require(
+        bridgehead["kind"] == "bridgehead"
+        and bridgehead["filename"] == "hostreqs.html",
+        "xref: bridgehead target drift",
+    )
+    anchor = resolve_book_xref("pie-ssp-info")
+    require(
+        anchor["kind"] == "anchor"
+        and anchor["filename"] == "gcc.html",
+        "xref: explicit anchor target drift",
+    )
+    license_target = resolve_book_xref("MIT")
+    require(
+        license_target["kind"] == "sect1"
+        and license_target["document_id"] == "Licenses"
+        and license_target["filename"] == "licenses.html",
+        "xref: unchunked license section target drift",
+    )
+
+
 def self_test_book() -> None:
     compiled = compose_book()
     documents = compiled["documents"]
@@ -858,6 +1004,7 @@ def self_test() -> None:
 
     self_test_chapter08()
     self_test_book()
+    self_test_nested_xrefs()
 
 
 def main() -> int:
@@ -883,8 +1030,9 @@ def main() -> int:
                         "packages": list(PROOF_PACKAGES),
                         "chapter": "chapter08",
                         "book_graph": True,
+                        "nested_xrefs": True,
                         "equivalence":
-                            "package-semantics-plus-book-hierarchy",
+                            "package-semantics-plus-book-hierarchy-and-xrefs",
                     },
                     indent=2,
                 )
