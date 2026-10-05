@@ -17,7 +17,7 @@ Roadmap:
 | M4 — Bootstrap proof | COMPLETE | Fresh Chapter 5–7 bootstrap hands directly to the normal executor; all 80 final-system packages build successfully without publication XML/book parsing. |
 | M5 — Development proof | COMPLETE | Accepted state, candidate identity, validation, definition binding/drift rejection, review evidence, and guarded transactional promotion are implemented. |
 | M6 — Release proof | SATISFIED BY COMPOSITION | M4 proves clean full-system realization from normalized state and M5 proves validated state identity and controlled promotion. Freezing accepted state under a release identity adds production plumbing but no unresolved prototype architecture question. |
-| M7 — Presentation proof | IN PROGRESS — PACKAGE-PAGE MODEL PROVEN; CHAPTER 8 PROVEN; BOOK GRAPH PROVEN; NESTED XREF SLICE ADDED | Zlib and Binutils prove package-page semantics. Chapter 8 derives its 80-package run from authoritative package order. Whole-book hierarchy and cross-boundary navigation are proven. The current slice adds presentation-owned bindings for all 38 referenced intra-document targets in LFS 13.1-systemd so the same resolver covers all 86 distinct internal reference targets without consulting source XML. Golden-render equivalence remains open. |
+| M7 — Presentation proof | IN PROGRESS — PACKAGE/CHAPTER/BOOK/XREF PROVEN; CHUNKED-HTML PACKAGE SLICE ADDED | Package semantics, Chapter 8 composition, whole-book hierarchy/navigation, and all referenced internal xref targets are proven. The current slice renders Zlib and Binutils as chunked HTML from normalized/presentation state and validates reader-visible numbering, IDs, navigation, commands, metrics, and installed summaries against a 13.1-systemd golden semantic snapshot. Whole-book HTML, no-chunks HTML, and PDF remain open. |
 | M8+ | NOT STARTED | BLFS, hard-BLFS, and user-system proofs remain later roadmap milestones. |
 
 ## M5 closure
@@ -196,6 +196,43 @@ This slice deliberately models only anchors that are actually referenced by the
 source book. Other incidental IDs remain renderer details until a semantic need
 for them is demonstrated.
 
+## M7 chunked HTML package slice
+
+The first rendered-output proof covers the two package pages already used for
+semantic composition: Zlib and Binutils.
+
+The renderer consumes the semantic package model plus the composed book graph:
+
+```text
+normalized package/version state
++ presentation editorial/structure
++ composed book graph
+        ↓
+semantic package XML
+        ↓
+chunked HTML package page
+```
+
+The golden comparison is semantic, not byte-for-byte. It validates:
+
+- chunk filename and page ID;
+- reader-visible section numbering and headings;
+- previous/next/up/home navigation destinations;
+- authoritative command text and order;
+- build-time and disk-space metrics;
+- contents fragment identity; and
+- installed-summary labels and reader-visible list punctuation.
+
+Stylesheet classes, CSS, whitespace, and incidental serialization are explicitly
+not authority.
+
+This slice also closes a small reader-visible gap in installed summaries: lists
+of three or more entries now use the same natural-language final `and` form as
+the reference book rather than a raw comma join.
+
+`presentation/golden/chunked-html-packages.json` is a validation oracle only.
+Runtime rendering does not consume it.
+
 ## Resume instruction
 
 Run the direct prototype validator after this slice lands:
@@ -204,6 +241,6 @@ Run the direct prototype validator after this slice lands:
 python3 product/src/proto/lfs_optimize/validate.py
 ```
 
-If it passes, treat internal xref target coverage as proven for the reference
-book and move M7 to rendered-output equivalence: chunked HTML first, then
-no-chunks HTML and PDF.
+If it passes, treat package-level chunked HTML rendering as proven and expand
+the renderer to the full 199-document chunk set before moving to no-chunks HTML
+and PDF.

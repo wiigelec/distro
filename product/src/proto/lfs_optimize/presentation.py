@@ -277,7 +277,13 @@ def render_installed_summary(parent: ET.Element, package: dict[str, Any]) -> Non
         add_text(segmented, "segtitle", category_label(key, len(values)))
     item = ET.SubElement(segmented, "seglistitem")
     for key, values in present:
-        add_text(item, "seg", ", ".join(values), role=f"installed-{key}")
+        if len(values) == 1:
+            rendered_values = values[0]
+        elif len(values) == 2:
+            rendered_values = " and ".join(values)
+        else:
+            rendered_values = ", ".join(values[:-1]) + ", and " + values[-1]
+        add_text(item, "seg", rendered_values, role=f"installed-{key}")
 
 
 def render_installed_term(parent: ET.Element, item: dict[str, Any]) -> None:
@@ -701,6 +707,244 @@ def render_book_hierarchy() -> str:
     return ET.tostring(root, encoding="unicode")
 
 
+def package_book_document(name: str) -> dict[str, Any]:
+    documents = compose_book()["documents"]
+    matches = [
+        document
+        for document in documents
+        if document.get("package") == name
+    ]
+    require(
+        len(matches) == 1,
+        f"{name}: expected exactly one package document in book graph",
+    )
+    return matches[0]
+
+
+def package_nav(name: str) -> dict[str, str]:
+    document = package_book_document(name)
+    index = {
+        item["section_id"]: item
+        for item in compose_book()["documents"]
+    }
+    previous_id = document.get("previous")
+    next_id = document.get("next")
+    require(
+        isinstance(previous_id, str)
+        and previous_id in index
+        and isinstance(next_id, str)
+        and next_id in index,
+        f"{name}: missing package navigation",
+    )
+    return {
+        "previous": index[previous_id]["filename"],
+        "next": index[next_id]["filename"],
+        "up": chapter_structure("chapter08")["document"]["filename"],
+        "home": "../index.html",
+    }
+
+
+def _html_inline(parent: ET.Element, source: ET.Element) -> None:
+    if source.text:
+        parent.text = source.text
+    for child in source:
+        if child.tag in ("filename", "literal", "command", "parameter"):
+            target = ET.SubElement(parent, "code")
+        elif child.tag == "quote":
+            target = ET.SubElement(parent, "q")
+        elif child.tag == "emphasis":
+            target = ET.SubElement(parent, "em")
+        else:
+            target = ET.SubElement(parent, "span")
+        target.text = child.text
+        target.tail = child.tail
+
+
+def render_chunked_html_package(name: str) -> str:
+    semantic = ET.fromstring(render_package(name))
+    package, package_structure, editorial = package_inputs(name)
+    document = package_book_document(name)
+    nav = package_nav(name)
+    number = document.get("number")
+    require(
+        isinstance(number, str) and number,
+        f"{name}: missing package page number",
+    )
+
+    html = ET.Element("html")
+    head = ET.SubElement(html, "head")
+    add_text(head, "title", f"{number}. {package_structure['title']}-{package['version']}")
+    body = ET.SubElement(
+        html,
+        "body",
+        {
+            "id": package_structure["document"]["section_id"],
+            "data-filename": document["filename"],
+        },
+    )
+
+    def add_nav(role: str) -> None:
+        nav_node = ET.SubElement(body, "nav", {"data-role": role})
+        for relation in ("previous", "next", "up", "home"):
+            add_text(
+                nav_node,
+                "a",
+                relation.capitalize(),
+                rel=relation,
+                href=nav[relation],
+            )
+
+    add_nav("top")
+    add_text(
+        body,
+        "h1",
+        f"{number} {package_structure['title']}-{package['version']}",
+    )
+
+    summary = semantic.find("sect2[@role='package']")
+    require(summary is not None, f"{name}: semantic summary missing")
+    description = summary.find("para[@role='package-description']")
+    require(description is not None, f"{name}: package description missing")
+    add_text(
+        body,
+        "p",
+        description.text or "",
+        **{"data-role": "package-description"},
+    )
+
+    metrics = summary.find("segmentedlist[@role='reference-metrics']")
+    require(metrics is not None, f"{name}: reference metrics missing")
+    metric_titles = [node.text or "" for node in metrics.findall("segtitle")]
+    metric_values = [node.text or "" for node in metrics.findall("seglistitem/seg")]
+    require(len(metric_titles) == len(metric_values) == 2, f"{name}: invalid metrics")
+    metric_dl = ET.SubElement(body, "dl", {"data-role": "reference-metrics"})
+    for title, value in zip(metric_titles, metric_values):
+        add_text(metric_dl, "dt", title)
+        add_text(metric_dl, "dd", value)
+
+    install = semantic.find("sect2[@role='installation']")
+    require(install is not None, f"{name}: semantic installation missing")
+    add_text(body, "h2", f"{number}.1 {editorial['installation_title']}")
+
+    for child in install:
+        if child.tag == "title":
+            continue
+        if child.tag == "para":
+            p = ET.SubElement(body, "p", {"data-role": child.attrib.get("role", "")})
+            _html_inline(p, child)
+        elif child.tag == "screen":
+            pre = ET.SubElement(body, "pre")
+            command = child.find("userinput")
+            require(command is not None, f"{name}: command payload missing")
+            add_text(
+                pre,
+                "code",
+                command.text or "",
+                **{
+                    "data-command-id": command.attrib["command_id"],
+                    "data-phase": command.attrib["remap"],
+                },
+            )
+        elif child.tag == "variablelist":
+            title = child.findtext("title")
+            if title:
+                add_text(body, "h3", title)
+            dl = ET.SubElement(body, "dl", {"data-role": "editorial-definition-list"})
+            for entry in child.findall("varlistentry"):
+                term = entry.find("term/parameter")
+                require(term is not None, f"{name}: definition term missing")
+                add_text(dl, "dt", term.text or "")
+                para = entry.find("listitem/para")
+                require(para is not None, f"{name}: definition text missing")
+                dd = ET.SubElement(dl, "dd")
+                _html_inline(dd, para)
+        elif child.tag in ("important", "note", "warning", "caution"):
+            aside = ET.SubElement(body, "aside", {"data-kind": child.tag})
+            title = child.findtext("title")
+            if title:
+                add_text(aside, "h3", title)
+            for para in child.findall("para"):
+                p = ET.SubElement(aside, "p")
+                _html_inline(p, para)
+        else:
+            raise RuntimeError(f"{name}: unsupported HTML source node {child.tag}")
+
+    contents = semantic.find("sect2[@role='content']")
+    require(contents is not None, f"{name}: semantic contents missing")
+    add_text(
+        body,
+        "h2",
+        f"{number}.2 {editorial['contents_title']}",
+        id=package_structure["document"]["contents_id"],
+    )
+
+    installed = contents.find("segmentedlist[@role='installed-summary']")
+    require(installed is not None, f"{name}: installed summary missing")
+    installed_titles = [node.text or "" for node in installed.findall("segtitle")]
+    installed_values = [node.text or "" for node in installed.findall("seglistitem/seg")]
+    require(
+        len(installed_titles) == len(installed_values),
+        f"{name}: installed summary arity drift",
+    )
+    installed_dl = ET.SubElement(body, "dl", {"data-role": "installed-summary"})
+    for title, value in zip(installed_titles, installed_values):
+        add_text(installed_dl, "dt", title)
+        add_text(installed_dl, "dd", value)
+
+    add_text(body, "h3", "Short Descriptions")
+    descriptions = ET.SubElement(body, "dl", {"data-role": "short-descriptions"})
+    for entry in contents.findall("variablelist/varlistentry"):
+        item_id = entry.attrib.get(XML_ID)
+        require(isinstance(item_id, str) and item_id, f"{name}: installed item id missing")
+        dt = ET.SubElement(descriptions, "dt", {"id": item_id})
+        term = entry.find("term")
+        require(term is not None and len(term) == 1, f"{name}: installed term missing")
+        _html_inline(dt, term)
+        para = entry.find("listitem/para")
+        require(para is not None, f"{name}: installed description missing")
+        dd = ET.SubElement(descriptions, "dd")
+        _html_inline(dd, para)
+
+    add_nav("bottom")
+    ET.indent(html, space="  ")
+    return ET.tostring(html, encoding="unicode", method="html")
+
+
+def chunked_html_snapshot(name: str) -> dict[str, Any]:
+    root = ET.fromstring(render_chunked_html_package(name))
+    body = root.find("body")
+    require(body is not None, f"{name}: HTML body missing")
+
+    nav = body.find("nav[@data-role='top']")
+    require(nav is not None, f"{name}: top navigation missing")
+    navigation = {
+        link.attrib["rel"]: link.attrib["href"]
+        for link in nav.findall("a")
+    }
+
+    metrics = body.find("dl[@data-role='reference-metrics']")
+    installed = body.find("dl[@data-role='installed-summary']")
+    require(metrics is not None and installed is not None, f"{name}: HTML summaries missing")
+
+    return {
+        "filename": body.attrib["data-filename"],
+        "page_id": body.attrib["id"],
+        "title": root.findtext("head/title"),
+        "h1": body.findtext("h1"),
+        "h2": [node.text or "" for node in body.findall("h2")],
+        "navigation": navigation,
+        "commands": [node.text or "" for node in body.findall("pre/code")],
+        "metrics": {
+            dt.text or "": dd.text or ""
+            for dt, dd in zip(metrics.findall("dt"), metrics.findall("dd"))
+        },
+        "installed_summary": {
+            dt.text or "": dd.text or ""
+            for dt, dd in zip(installed.findall("dt"), installed.findall("dd"))
+        },
+    }
+
+
 def collect_roles(root: ET.Element) -> dict[str, list[str]]:
     roles: dict[str, list[str]] = {}
     for node in root.iter():
@@ -978,6 +1222,47 @@ def self_test_book() -> None:
     )
 
 
+def self_test_chunked_html() -> None:
+    golden = load_presentation(
+        PRESENTATION / "golden" / "chunked-html-packages.json"
+    )
+    pages = golden.get("pages")
+    require(isinstance(pages, dict), "chunked-html: pages must be an object")
+
+    for name in PROOF_PACKAGES:
+        require(name in pages, f"chunked-html: missing golden page for {name}")
+        actual = chunked_html_snapshot(name)
+        require(
+            actual == pages[name],
+            f"chunked-html: semantic snapshot drift for {name}",
+        )
+
+        rendered = ET.fromstring(render_chunked_html_package(name))
+        body = rendered.find("body")
+        require(body is not None, f"{name}: rendered body missing")
+        content_id = package_document(name)["contents_id"]
+        require(
+            body.find(f"h2[@id='{content_id}']") is not None,
+            f"{name}: contents fragment id missing",
+        )
+
+        top = body.find("nav[@data-role='top']")
+        bottom = body.find("nav[@data-role='bottom']")
+        require(
+            top is not None
+            and bottom is not None
+            and [
+                (node.attrib.get("rel"), node.attrib.get("href"))
+                for node in top.findall("a")
+            ]
+            == [
+                (node.attrib.get("rel"), node.attrib.get("href"))
+                for node in bottom.findall("a")
+            ],
+            f"{name}: top/bottom navigation drift",
+        )
+
+
 def self_test() -> None:
     for name in PROOF_PACKAGES:
         self_test_package(name)
@@ -1005,6 +1290,7 @@ def self_test() -> None:
     self_test_chapter08()
     self_test_book()
     self_test_nested_xrefs()
+    self_test_chunked_html()
 
 
 def main() -> int:
@@ -1015,6 +1301,7 @@ def main() -> int:
     parser.add_argument("--chapter")
     parser.add_argument("--book", action="store_true")
     parser.add_argument("--xref")
+    parser.add_argument("--html-package")
     parser.add_argument("--output", type=Path)
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
@@ -1031,8 +1318,9 @@ def main() -> int:
                         "chapter": "chapter08",
                         "book_graph": True,
                         "nested_xrefs": True,
+                        "chunked_html_packages": True,
                         "equivalence":
-                            "package-semantics-plus-book-hierarchy-and-xrefs",
+                            "package-semantics-plus-book-hierarchy-xrefs-and-chunked-html",
                     },
                     indent=2,
                 )
@@ -1046,6 +1334,7 @@ def main() -> int:
                 args.chapter,
                 args.book,
                 args.xref,
+                args.html_package,
             )
         )
         require(
@@ -1053,7 +1342,9 @@ def main() -> int:
             "choose only one presentation mode",
         )
 
-        if args.book:
+        if args.html_package:
+            rendered = render_chunked_html_package(args.html_package)
+        elif args.book:
             rendered = render_book_hierarchy()
         elif args.xref:
             rendered = json.dumps(

@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "source": {
+    "project": "Linux From Scratch",
+    "version": "13.1-systemd",
+    "published": "2026-09-01",
+    "surface": "chunked HTML"
+  },
+  "pages": {
+    "zlib": {
+      "filename": "zlib.html",
+      "page_id": "ch-system-zlib",
+      "title": "8.6. Zlib-1.3.2",
+      "h1": "8.6 Zlib-1.3.2",
+      "h2": [
+        "8.6.1 Installation of Zlib",
+        "8.6.2 Contents of Zlib"
+      ],
+      "navigation": {
+        "previous": "glibc.html",
+        "next": "bzip2.html",
+        "up": "chapter08.html",
+        "home": "../index.html"
+      },
+      "commands": [
+        "./configure --prefix=/usr",
+        "make",
+        "make check",
+        "make install",
+        "rm -fv /usr/lib/libz.a"
+      ],
+      "metrics": {
+        "Approximate build time": "less than 0.1 SBU",
+        "Required disk space": "5.4 MB"
+      },
+      "installed_summary": {
+        "Installed library": "libz.so"
+      }
+    },
+    "binutils": {
+      "filename": "binutils.html",
+      "page_id": "ch-system-binutils",
+      "title": "8.22. Binutils-2.47",
+      "h1": "8.22 Binutils-2.47",
+      "h2": [
+        "8.22.1 Installation of Binutils",
+        "8.22.2 Contents of Binutils"
+      ],
+      "navigation": {
+        "previous": "pkgconf.html",
+        "next": "gmp.html",
+        "up": "chapter08.html",
+        "home": "../index.html"
+      },
+      "commands": [
+        "mkdir -v build\ncd       build",
+        "../configure --prefix=/usr       \\\n             --sysconfdir=/etc   \\\n             --enable-ld=default \\\n             --enable-plugins    \\\n             --enable-shared     \\\n             --disable-werror    \\\n             --enable-64-bit-bfd \\\n             --enable-new-dtags  \\\n             --with-system-zlib  \\\n             --with-lib-path=/usr/lib \\\n             --enable-default-hash-style=gnu",
+        "make tooldir=/usr",
+        "make -k check",
+        "grep '^FAIL:' $(find -name '*.log')",
+        "make tooldir=/usr install",
+        "rm -rfv /usr/lib/lib{bfd,ctf,ctf-nobfd,gprofng,opcodes,sframe}.a \\\n        /usr/share/doc/gprofng/"
+      ],
+      "metrics": {
+        "Approximate build time": "1.7 SBU",
+        "Required disk space": "817 MB"
+      },
+      "installed_summary": {
+        "Installed programs": "addr2line, ar, as, c++filt, dwp, elfedit, gprof, gprofng, ld, ld.bfd, nm, objcopy, objdump, ranlib, readelf, size, strings, and strip",
+        "Installed libraries": "libbfd.so, libctf.so, libctf-nobfd.so, libgprofng.so, libopcodes.so, and libsframe.so",
+        "Installed directory": "/usr/lib/ldscripts"
+      }
+    }
+  }
+}
