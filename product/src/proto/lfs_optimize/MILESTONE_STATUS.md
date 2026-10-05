@@ -17,7 +17,7 @@ Roadmap:
 | M4 — Bootstrap proof | COMPLETE | Fresh Chapter 5–7 bootstrap hands directly to the normal executor; all 80 final-system packages build successfully without publication XML/book parsing. |
 | M5 — Development proof | COMPLETE | Accepted state, candidate identity, validation, definition binding/drift rejection, review evidence, and guarded transactional promotion are implemented. |
 | M6 — Release proof | SATISFIED BY COMPOSITION | M4 proves clean full-system realization from normalized state and M5 proves validated state identity and controlled promotion. Freezing accepted state under a release identity adds production plumbing but no unresolved prototype architecture question. |
-| M7 — Presentation proof | IN PROGRESS — PACKAGE-PAGE MODEL PROVEN | Zlib and Binutils prove package-page composition from presentation structure + editorial blocks + authoritative normalized package/version state, including metrics, stable command references, admonitions, definition lists, rich inline semantics, and installed-content typing. Whole-book hierarchy and golden-render equivalence remain open. |
+| M7 — Presentation proof | IN PROGRESS — PACKAGE-PAGE MODEL PROVEN; CHAPTER 8 HIERARCHY SLICE ADDED | Zlib and Binutils prove package-page semantics. Chapter 8 structure now composes five presentation-only pages around the authoritative 80-package package-set order and derives numbering/local navigation, with a source-derived 13.1-systemd golden hierarchy fixture used only for drift detection. Whole-book composition and golden rendering remain open. |
 | M8+ | NOT STARTED | BLFS, hard-BLFS, and user-system proofs remain later roadmap milestones. |
 
 ## M5 closure
@@ -93,15 +93,45 @@ phases, stable command references, multiline commands, ordered editorial blocks,
 admonitions, definition lists, inline filename/literal semantics, multiple
 installed-content categories, and typed short descriptions.
 
-The remaining M7 work is above the individual package-page model: chapter/book
-hierarchy, package ordering and numbering, navigation, cross references,
-aggregate/derived pages, indexes, and continuous golden comparisons across
-chunked HTML, no-chunks HTML, and PDF.
+## M7 Chapter 8 hierarchy slice
+
+Chapter 8 provides a clean composition proof:
+
+```text
+presentation-owned chapter identity
++ 2 leading editorial pages
++ authoritative package-set order (80 packages)
++ presentation-owned package document identities
++ 3 trailing editorial pages
+        ↓
+85-page Chapter 8 hierarchy
+        ↓
+derived 8.1 ... 8.85 numbering
++ chapter-local previous/next navigation
+```
+
+The package order is not copied into presentation state. `package-set.json`
+remains the sole order authority for the 80 normal final-system packages.
+Presentation structure maps those package identities to document identities but
+stores them as a mapping, not an ordered package list.
+
+`presentation/golden/chapter08-hierarchy.json` is a migration/validation fixture
+captured from LFS 13.1-systemd. It is not an input to compilation; the
+presentation self-test uses it only to detect hierarchy, ID, or filename drift.
+
+The hierarchy slice deliberately stops at Chapter 8 boundaries. Previous/next
+links across chapter boundaries, book-level numbering, cross references,
+indexes, aggregate pages, and rendered HTML/PDF equivalence remain subsequent
+M7 work.
 
 ## Resume instruction
 
-Move M7 from package-page semantics to chapter/book composition. Use Chapter 8
-as the first hierarchy proof: resolve package order from authoritative
-package-set/state, combine it with presentation-only chapter structure, derive
-section numbering/navigation, and compare generated hierarchy against the
-stable LFS Chapter 8 publication before broadening to the whole book.
+Run the prototype presentation validator directly after this slice lands:
+
+```text
+python3 product/src/proto/lfs_optimize/validate.py
+```
+
+If it passes, treat the Chapter 8 hierarchy model as proven and move next to
+book-level composition: chapter ordering, cross-chapter navigation, and
+cross-reference resolution before attempting full golden HTML/PDF comparison.
