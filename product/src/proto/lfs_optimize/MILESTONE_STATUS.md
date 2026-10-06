@@ -1,6 +1,6 @@
 # LFS optimize prototype — milestone status
 
-Last updated: 2026-10-05
+Last updated: 2026-10-06
 
 Authoritative branch: `proto/lfs-optimize`
 
@@ -17,7 +17,7 @@ Roadmap:
 | M4 — Bootstrap proof | COMPLETE | Fresh Chapter 5–7 bootstrap hands directly to the normal executor; all 80 final-system packages build successfully without publication XML/book parsing. |
 | M5 — Development proof | COMPLETE | Accepted state, candidate identity, validation, definition binding/drift rejection, review evidence, and guarded transactional promotion are implemented. |
 | M6 — Release proof | SATISFIED BY COMPOSITION | M4 proves clean full-system realization from normalized state and M5 proves validated state identity and controlled promotion. Freezing accepted state under a release identity adds production plumbing but no unresolved prototype architecture question. |
-| M7 — Presentation proof | IN PROGRESS — 160/199 CHUNKS COMPLETE; 39 AUTHORITY GAPS DEFERRED | 89/119 non-package bodies are proven complete. This slice generalizes normalized package rendering to 71/80 Chapter 8 packages whose source command sequence maps cleanly to normalized state, and fixes exact installed-summary labels including Zlib's plural `Installed libraries`. Nine package pages and 30 operational non-package pages remain explicit shells pending normalized authority reconciliation. |
+| M7 — Presentation proof | IN PROGRESS — 159/199 CHUNKS COMPLETE; 40 AUTHORITY GAPS DEFERRED | 89/119 non-package bodies are proven complete. Direct validation proves normalized package rendering for 70/80 Chapter 8 packages whose source command screens map cleanly to normalized state. Ten package pages and 30 operational non-package pages remain explicit shells pending normalized authority reconciliation. |
 | M8+ | NOT STARTED | BLFS, hard-BLFS, and user-system proofs remain later roadmap milestones. |
 
 ## M5 closure
@@ -365,16 +365,16 @@ The Chapter 8 package inventory now has an explicit authority split:
 
 ```text
 80 normal package pages
-├── 71 clean source ↔ normalized command mappings
-└── 9 authority/grouping mismatches
+├── 70 clean source ↔ normalized command mappings
+└── 10 authority/grouping/parameter mismatches
 ```
 
-The 71 clean packages render from normalized package/version state plus
+The 70 clean packages render from normalized package/version state plus
 presentation-owned editorial overlays. Executable command text always comes
 from normalized package state. The source-derived golden stores only SHA-256
 values for command equivalence; source command strings are not runtime inputs.
 
-The nine deferred package pages are:
+The ten deferred package pages are:
 
 ```text
 glibc
@@ -382,21 +382,22 @@ gmp
 libxcrypt
 ncurses
 coreutils
+groff
 grub
 make
 texinfo
 util-linux
 ```
 
-They remain structural shells because source publication command grouping or
-coverage does not map cleanly to the current normalized procedure state.
+They remain structural shells because source publication command grouping,
+coverage, or parameter semantics do not map cleanly to the current normalized procedure state. Groff is specifically deferred because the source exposes paper size as a build-time parameter while normalized state currently hardcodes `PAGE=letter`.
 
 Installed-summary labels are now exact presentation semantics rather than being
 inferred from item count. This closes the known Zlib mismatch: the LFS source
 uses `Installed libraries` even though only one library is listed.
 
 Together with the 89 complete non-package chunks, this slice brings the book to
-160/199 complete chunk bodies.
+159/199 complete chunk bodies.
 
 ## Resume instruction
 
@@ -406,6 +407,4 @@ Run:
 python3 product/src/proto/lfs_optimize/validate.py
 ```
 
-If it passes, treat 71-package normalized chunked HTML rendering as proven. The
-next architecture work is reconciling normalized authority for the nine deferred
-package pages, followed by the 30 deferred operational non-package pages.
+Direct validation passes at the current state, so treat 70-package normalized chunked HTML rendering as proven. The next architecture work is reconciling normalized authority for the ten deferred package pages, followed by the 30 deferred operational non-package pages.
