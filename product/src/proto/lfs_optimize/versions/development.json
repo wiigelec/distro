@@ -14,6 +14,10 @@
         "md5": "44915a91e4a28161dc421636a193fb3a",
         "size": "1,859 KB",
         "home": "https://www.kernel.org/doc/man-pages/"
+      },
+      "reference_metrics": {
+        "build_time": "0.1 SBU",
+        "disk_space": "54 MB"
       }
     },
     "iana-etc": {
@@ -23,6 +27,10 @@
         "md5": "f6d2619cfac3a68f91392e28fe4067c3",
         "size": "596 KB",
         "home": "https://www.iana.org/protocols"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "4.8 MB"
       }
     },
     "glibc": {
@@ -46,6 +54,10 @@
           "url": "https://www.iana.org/time-zones/repository/releases/tzdata2026c.tar.gz",
           "md5": "bff7174205cefab793e3b24271ef2f45"
         }
+      },
+      "reference_metrics": {
+        "build_time": "11 SBU",
+        "disk_space": "3.7 GB"
       }
     },
     "zlib": {
@@ -74,6 +86,10 @@
           "url": "https://www.linuxfromscratch.org/patches/lfs/13.1/bzip2-1.0.8-install_docs-1.patch",
           "md5": "6a5ac7e89b791aae556de0f745916f7f"
         }
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "7.3 MB"
       }
     },
     "xz": {
@@ -83,6 +99,10 @@
         "md5": "a02753f34e5546d20213b87f876a0933",
         "size": "1,512 KB",
         "home": "https://tukaani.org/xz"
+      },
+      "reference_metrics": {
+        "build_time": "0.1 SBU",
+        "disk_space": "25 MB"
       }
     },
     "lz4": {
@@ -92,6 +112,10 @@
         "md5": "dead9f5f1966d9ae56e1e32761e4e675",
         "size": "379 KB",
         "home": "https://lz4.org/"
+      },
+      "reference_metrics": {
+        "build_time": "0.1 SBU",
+        "disk_space": "4.2 MB"
       }
     },
     "zstd": {
@@ -101,6 +125,10 @@
         "md5": "780fc1896922b1bc52a4e90980cdda48",
         "size": "2,378 KB",
         "home": "https://facebook.github.io/zstd/"
+      },
+      "reference_metrics": {
+        "build_time": "0.4 SBU",
+        "disk_space": "88 MB"
       }
     },
     "file": {
@@ -110,6 +138,10 @@
         "md5": "423686e97f731d8c24e9cd1a22b03dec",
         "size": "2,631 KB",
         "home": "https://www.darwinsys.com/file/"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "21 MB"
       }
     },
     "readline": {
@@ -119,6 +151,10 @@
         "md5": "25a73bfb2a3ad7146c5e9d4408d9f6cd",
         "size": "3,340 KB",
         "home": "https://tiswww.case.edu/php/chet/readline/rltop.html"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "17 MB"
       }
     },
     "pcre2": {
@@ -128,6 +164,10 @@
         "md5": "aded5840ab5a7d772dd4e16fc294b665",
         "size": "2,096 KB",
         "home": "https://github.com/PCRE2Project/pcre2/"
+      },
+      "reference_metrics": {
+        "build_time": "0.2 SBU",
+        "disk_space": "28 MB"
       }
     },
     "m4": {
@@ -137,6 +177,10 @@
         "md5": "8051eef7239b2f187791f2ab0034d6b7",
         "size": "2,032 KB",
         "home": "https://www.gnu.org/software/m4/"
+      },
+      "reference_metrics": {
+        "build_time": "0.4 SBU",
+        "disk_space": "62 MB"
       }
     },
     "bc": {
@@ -146,6 +190,10 @@
         "md5": "ad4db5a0eb4fdbb3f6813be4b6b3da74",
         "size": "464 KB",
         "home": "https://github.com/gavinhoward"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "7.8 MB"
       }
     },
     "flex": {
@@ -155,6 +203,10 @@
         "md5": "2882e3179748cc9f9c23ec593d6adc8d",
         "size": "1,386 KB",
         "home": "https://github.com/westes/flex"
+      },
+      "reference_metrics": {
+        "build_time": "0.1 SBU",
+        "disk_space": "33 MB"
       }
     },
     "tcl": {
@@ -170,6 +222,10 @@
           "url": "https://downloads.sourceforge.net/tcl/tcl8.6.18-html.tar.gz",
           "md5": "54d1ff0f5eee4e81e5cdaa4baa343397"
         }
+      },
+      "reference_metrics": {
+        "build_time": "2.9 SBU",
+        "disk_space": "92 MB"
       }
     },
     "expect": {
@@ -185,6 +241,10 @@
           "url": "https://www.linuxfromscratch.org/patches/lfs/13.1/expect-5.45.4-gcc15-1.patch",
           "md5": "0ca4d6bb8d572fbcdb13cb36cd34833e"
         }
+      },
+      "reference_metrics": {
+        "build_time": "0.2 SBU",
+        "disk_space": "3.9 MB"
       }
     },
     "dejagnu": {
@@ -194,6 +254,10 @@
         "md5": "68c5208c58236eba447d7d6d1326b821",
         "size": "608 KB",
         "home": "https://www.gnu.org/software/dejagnu/"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "7.4 MB"
       }
     },
     "ninja": {
@@ -203,6 +267,10 @@
         "md5": "76c00637fde44909cd7d56f8d73f2042",
         "size": "286 KB",
         "home": "https://ninja-build.org/"
+      },
+      "reference_metrics": {
+        "build_time": "0.2 SBU",
+        "disk_space": "43 MB"
       }
     },
     "pkgconf": {
@@ -218,6 +286,10 @@
           "url": "https://github.com/mesonbuild/meson/releases/download/1.12.0/meson-1.12.0.tar.gz",
           "md5": "9f943c267d63016012efcb0f31ecdd7d"
         }
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "47 MB"
       }
     },
     "binutils": {
@@ -240,6 +312,10 @@
         "md5": "956dc04e864001a9c22429f761f2c283",
         "size": "2,046 KB",
         "home": "https://www.gnu.org/software/gmp/"
+      },
+      "reference_metrics": {
+        "build_time": "0.3 SBU",
+        "disk_space": "54 MB"
       }
     },
     "mpfr": {
@@ -249,6 +325,10 @@
         "md5": "7c32c39b8b6e3ae85f25156228156061",
         "size": "1,471 KB",
         "home": "https://www.mpfr.org/"
+      },
+      "reference_metrics": {
+        "build_time": "0.2 SBU",
+        "disk_space": "44 MB"
       }
     },
     "mpc": {
@@ -258,6 +338,10 @@
         "md5": "40c5fba305125279ea46041160e81daf",
         "size": "520 KB",
         "home": "https://www.multiprecision.org/"
+      },
+      "reference_metrics": {
+        "build_time": "0.1 SBU",
+        "disk_space": "23 MB"
       }
     },
     "attr": {
@@ -267,6 +351,10 @@
         "md5": "910a09c3ae0a211569d180586371cf7e",
         "size": "495 KB",
         "home": "https://savannah.nongnu.org/projects/attr"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "4.5 MB"
       }
     },
     "acl": {
@@ -276,6 +364,10 @@
         "md5": "e289f370161698a96f50b2a3fdadf411",
         "size": "376 KB",
         "home": "https://savannah.nongnu.org/projects/acl"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "7.1 MB"
       }
     },
     "libcap": {
@@ -285,6 +377,10 @@
         "md5": "0ff11419aa4813c0a0f84fe67bf3b39e",
         "size": "197 KB",
         "home": "https://sites.google.com/site/fullycapable/"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "3.1 MB"
       }
     },
     "libxcrypt": {
@@ -294,6 +390,10 @@
         "md5": "25e888919ddcd153a07daa95224fa436",
         "size": "655 KB",
         "home": "https://github.com/besser82/libxcrypt/"
+      },
+      "reference_metrics": {
+        "build_time": "0.1 SBU",
+        "disk_space": "14 MB"
       }
     },
     "shadow": {
@@ -303,6 +403,10 @@
         "md5": "f52e717bd330818c67bd57c897ec5a8e",
         "size": "2,238 KB",
         "home": "https://github.com/shadow-maint/shadow/"
+      },
+      "reference_metrics": {
+        "build_time": "0.1 SBU",
+        "disk_space": "112 MB"
       }
     },
     "gawk": {
@@ -312,6 +416,10 @@
         "md5": "d379c2110e7a3e15347dd5559a41ad64",
         "size": "3,749 KB",
         "home": "https://www.gnu.org/software/gawk/"
+      },
+      "reference_metrics": {
+        "build_time": "0.2 SBU",
+        "disk_space": "47 MB"
       }
     },
     "gcc": {
@@ -321,6 +429,10 @@
         "md5": "19b777fb19ea4982731392481306f0d3",
         "size": "104,689 KB",
         "home": "https://gcc.gnu.org/"
+      },
+      "reference_metrics": {
+        "build_time": "53 SBU (with tests)",
+        "disk_space": "7.3 GB"
       }
     },
     "ncurses": {
@@ -330,6 +442,10 @@
         "md5": "dd45bf6854430af403452a7a6a40652c",
         "size": "3,703 KB",
         "home": "https://www.gnu.org/software/ncurses/"
+      },
+      "reference_metrics": {
+        "build_time": "0.2 SBU",
+        "disk_space": "47 MB"
       }
     },
     "sed": {
@@ -339,6 +455,10 @@
         "md5": "c70dc5372db95c816442ffedf77a0d0f",
         "size": "1,693 KB",
         "home": "https://www.gnu.org/software/sed/"
+      },
+      "reference_metrics": {
+        "build_time": "0.4 SBU",
+        "disk_space": "42 MB"
       }
     },
     "psmisc": {
@@ -348,6 +468,10 @@
         "md5": "53eae841735189a896d614cba440eb10",
         "size": "423 KB",
         "home": "https://gitlab.com/psmisc/psmisc"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "6.8 MB"
       }
     },
     "gettext": {
@@ -357,6 +481,10 @@
         "md5": "dc8b2911535929cec1e263706b0a13a1",
         "size": "10,471 KB",
         "home": "https://www.gnu.org/software/gettext/"
+      },
+      "reference_metrics": {
+        "build_time": "2.1 SBU",
+        "disk_space": "448 MB"
       }
     },
     "bison": {
@@ -366,6 +494,10 @@
         "md5": "c28f119f405a2304ff0a7ccdcc629713",
         "size": "2,752 KB",
         "home": "https://www.gnu.org/software/bison/"
+      },
+      "reference_metrics": {
+        "build_time": "2.1 SBU",
+        "disk_space": "63 MB"
       }
     },
     "grep": {
@@ -375,6 +507,10 @@
         "md5": "5d9301ed9d209c4a88c8d3a6fd08b9ac",
         "size": "1,874 KB",
         "home": "https://www.gnu.org/software/grep/"
+      },
+      "reference_metrics": {
+        "build_time": "0.5 SBU",
+        "disk_space": "48 MB"
       }
     },
     "bash": {
@@ -384,6 +520,10 @@
         "md5": "977c8c0c5ae6309191e7768e28ebc951",
         "size": "11,089 KB",
         "home": "https://www.gnu.org/software/bash/"
+      },
+      "reference_metrics": {
+        "build_time": "1.4 SBU",
+        "disk_space": "56 MB"
       }
     },
     "libtool": {
@@ -393,6 +533,10 @@
         "md5": "87743862e6cabfb9e76651bc64e31e5c",
         "size": "1,068 KB",
         "home": "https://www.gnu.org/software/libtool/"
+      },
+      "reference_metrics": {
+        "build_time": "0.6 SBU",
+        "disk_space": "50 MB"
       }
     },
     "gdbm": {
@@ -402,6 +546,10 @@
         "md5": "aaa600665bc89e2febb3c7bd90679115",
         "size": "1,198 KB",
         "home": "https://www.gnu.org/software/gdbm/"
+      },
+      "reference_metrics": {
+        "build_time": "0.2 SBU",
+        "disk_space": "13 MB"
       }
     },
     "gperf": {
@@ -411,6 +559,10 @@
         "md5": "31753b021ea78a21f154bf9eecb8b079",
         "size": "1,789 KB",
         "home": "https://www.gnu.org/software/gperf/"
+      },
+      "reference_metrics": {
+        "build_time": "0.2 SBU",
+        "disk_space": "12 MB"
       }
     },
     "expat": {
@@ -420,6 +572,10 @@
         "md5": "1747f5a57b191f0373baeb5adc8078ca",
         "size": "506 KB",
         "home": "https://libexpat.github.io/"
+      },
+      "reference_metrics": {
+        "build_time": "0.1 SBU",
+        "disk_space": "12 MB"
       }
     },
     "inetutils": {
@@ -429,6 +585,10 @@
         "md5": "f0f9ad13045a67da9c882148f9efae6b",
         "size": "2,916 KB",
         "home": "https://www.gnu.org/software/inetutils/"
+      },
+      "reference_metrics": {
+        "build_time": "0.3 SBU",
+        "disk_space": "38 MB"
       }
     },
     "less": {
@@ -438,6 +598,10 @@
         "md5": "c4c9eea5b1862783b078c67ca67c9185",
         "size": "974 KB",
         "home": "https://www.greenwoodsoftware.com/less/"
+      },
+      "reference_metrics": {
+        "build_time": "0.1 SBU",
+        "disk_space": "17 MB"
       }
     },
     "perl": {
@@ -447,6 +611,10 @@
         "md5": "55761cf1543af326492fd194647796d1",
         "size": "14,571 KB",
         "home": "https://www.perl.org/"
+      },
+      "reference_metrics": {
+        "build_time": "1.3 SBU",
+        "disk_space": "261 MB"
       }
     },
     "autoconf": {
@@ -456,6 +624,10 @@
         "md5": "9cbad9a116ef845bafeed8e7bc771bf4",
         "size": "1,385 KB",
         "home": "https://www.gnu.org/software/autoconf/"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU (about 0.4 SBU with tests)",
+        "disk_space": "25 MB"
       }
     },
     "automake": {
@@ -465,6 +637,10 @@
         "md5": "cea31dbf1120f890cbf2a3032cfb9a68",
         "size": "1,614 KB",
         "home": "https://www.gnu.org/software/automake/"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU (about 1.1 SBU with tests)",
+        "disk_space": "124 MB"
       }
     },
     "openssl": {
@@ -474,6 +650,10 @@
         "md5": "07e316afe26b61e72206b81706b497bb",
         "size": "53,789 KB",
         "home": "https://www.openssl-library.org/"
+      },
+      "reference_metrics": {
+        "build_time": "1.9 SBU",
+        "disk_space": "1.0 GB"
       }
     },
     "libelf": {
@@ -483,6 +663,10 @@
         "md5": "3e8ef51c43beceddbbb74879549cf72c",
         "size": "11,751 KB",
         "home": "https://sourceware.org/elfutils/"
+      },
+      "reference_metrics": {
+        "build_time": "0.3 SBU",
+        "disk_space": "159 MB"
       }
     },
     "libffi": {
@@ -492,6 +676,10 @@
         "md5": "96fe46f2a7bb82559b35a268a2c000ba",
         "size": "1,545 KB",
         "home": "https://sourceware.org/libffi/"
+      },
+      "reference_metrics": {
+        "build_time": "1.7 SBU",
+        "disk_space": "12 MB"
       }
     },
     "sqlite": {
@@ -507,6 +695,10 @@
           "url": "https://sqlite.org/2026/sqlite-doc-3530400.zip",
           "md5": "2cd5b168d0e5c5ae2b99beb3a4269a73"
         }
+      },
+      "reference_metrics": {
+        "build_time": "0.4 SBU",
+        "disk_space": "128 MB"
       }
     },
     "mpdecimal": {
@@ -516,6 +708,10 @@
         "md5": "3d4412579b1edc1047efab151889cca9",
         "size": "309 KB",
         "home": "https://www.bytereef.org/mpdecimal/"
+      },
+      "reference_metrics": {
+        "build_time": "0.1 SBU",
+        "disk_space": "4.4 MB"
       }
     },
     "Python": {
@@ -535,6 +731,10 @@
           "url": "https://www.python.org/ftp/python/doc/3.14.7/python-3.14.7-docs-html.tar.bz2",
           "md5": "bdf55dddc02a76961d61730f06d18849"
         }
+      },
+      "reference_metrics": {
+        "build_time": "2.7 SBU",
+        "disk_space": "509 MB"
       }
     },
     "flit-core": {
@@ -544,6 +744,10 @@
         "md5": "89ebb783230fc8db6c1d2a39644b7085",
         "size": "52 KB",
         "home": "https://pypi.org/project/flit-core/"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "1.3 MB"
       }
     },
     "packaging": {
@@ -553,6 +757,10 @@
         "md5": "c6809ec56986682ceffe573b8778a1ce",
         "size": "307 KB",
         "home": "https://pypi.org/project/packaging/"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "3.0 MB"
       }
     },
     "wheel": {
@@ -562,6 +770,10 @@
         "md5": "f668e4885de814378b332eceea04a8a0",
         "size": "65 KB",
         "home": "https://pypi.org/project/wheel/"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "768 KB"
       }
     },
     "setuptools": {
@@ -571,6 +783,10 @@
         "md5": "c6919a4b0862ca30604559e163a6cce9",
         "size": "1,142 KB",
         "home": "https://pypi.org/project/setuptools/"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "19 MB"
       }
     },
     "meson": {
@@ -580,6 +796,10 @@
         "md5": "9f943c267d63016012efcb0f31ecdd7d",
         "size": "2,460 KB",
         "home": "https://mesonbuild.com"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "50 MB"
       }
     },
     "kmod": {
@@ -589,6 +809,10 @@
         "md5": "36f2cc483745e81ede3406fa55e1065a",
         "size": "434 KB",
         "home": "https://github.com/kmod-project/kmod"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "6.8 MB"
       }
     },
     "coreutils": {
@@ -604,6 +828,10 @@
           "url": "https://www.linuxfromscratch.org/patches/lfs/13.1/coreutils-9.11-i18n-1.patch",
           "md5": "900d64d9936516b68613271c9ebc0059"
         }
+      },
+      "reference_metrics": {
+        "build_time": "1.2 SBU",
+        "disk_space": "194 MB"
       }
     },
     "diffutils": {
@@ -613,6 +841,10 @@
         "md5": "d1b18b20868fb561f77861cd90b05de4",
         "size": "1,894 KB",
         "home": "https://www.gnu.org/software/diffutils/"
+      },
+      "reference_metrics": {
+        "build_time": "0.4 SBU",
+        "disk_space": "51 MB"
       }
     },
     "findutils": {
@@ -622,6 +854,10 @@
         "md5": "512c6875ed84034dca240c4bc9380b96",
         "size": "2,394 KB",
         "home": "https://www.gnu.org/software/findutils/"
+      },
+      "reference_metrics": {
+        "build_time": "0.9 SBU",
+        "disk_space": "71 MB"
       }
     },
     "groff": {
@@ -631,6 +867,10 @@
         "md5": "d9d996af3d05ebab934380be708ea584",
         "size": "8,795 KB",
         "home": "https://www.gnu.org/software/groff/"
+      },
+      "reference_metrics": {
+        "build_time": "0.6 SBU",
+        "disk_space": "128 MB"
       }
     },
     "grub": {
@@ -640,6 +880,10 @@
         "md5": "383f9effad01c235d2535357ff717543",
         "size": "7,545 KB",
         "home": "https://www.gnu.org/software/grub/"
+      },
+      "reference_metrics": {
+        "build_time": "1.0 SBU",
+        "disk_space": "245 MB"
       }
     },
     "gzip": {
@@ -649,6 +893,10 @@
         "md5": "4bf5a10f287501ee8e8ebe00ef62b2c2",
         "size": "865 KB",
         "home": "https://www.gnu.org/software/gzip/"
+      },
+      "reference_metrics": {
+        "build_time": "0.1 SBU",
+        "disk_space": "21 MB"
       }
     },
     "iproute2": {
@@ -658,6 +906,10 @@
         "md5": "4f322144fb9a0877c5f9ef71b2f11180",
         "size": "943 KB",
         "home": "https://www.kernel.org/pub/linux/utils/net/iproute2/"
+      },
+      "reference_metrics": {
+        "build_time": "0.1 SBU",
+        "disk_space": "18 MB"
       }
     },
     "kbd": {
@@ -673,6 +925,10 @@
           "url": "https://www.linuxfromscratch.org/patches/lfs/13.1/kbd-2.10.0-backspace-1.patch",
           "md5": "f75cca16a38da6caa7d52151f7136895"
         }
+      },
+      "reference_metrics": {
+        "build_time": "0.1 SBU",
+        "disk_space": "45 MB"
       }
     },
     "libpipeline": {
@@ -682,6 +938,10 @@
         "md5": "17ac6969b2015386bcb5d278a08a40b5",
         "size": "1,046 KB",
         "home": "https://libpipeline.nongnu.org/"
+      },
+      "reference_metrics": {
+        "build_time": "0.1 SBU",
+        "disk_space": "10 MB"
       }
     },
     "make": {
@@ -691,6 +951,10 @@
         "md5": "c8469a3713cbbe04d955d4ae4be23eeb",
         "size": "2,300 KB",
         "home": "https://www.gnu.org/software/make/"
+      },
+      "reference_metrics": {
+        "build_time": "0.6 SBU",
+        "disk_space": "13 MB"
       }
     },
     "patch": {
@@ -700,6 +964,10 @@
         "md5": "149327a021d41c8f88d034eab41c039f",
         "size": "886 KB",
         "home": "https://savannah.gnu.org/projects/patch/"
+      },
+      "reference_metrics": {
+        "build_time": "0.2 SBU",
+        "disk_space": "14 MB"
       }
     },
     "tar": {
@@ -715,6 +983,10 @@
           "url": "https://www.linuxfromscratch.org/patches/lfs/13.1/tar-1.35-acl_fix-1.patch",
           "md5": "dbab49e317105539611866dac5dd54f6"
         }
+      },
+      "reference_metrics": {
+        "build_time": "0.5 SBU",
+        "disk_space": "43 MB"
       }
     },
     "texinfo": {
@@ -724,6 +996,10 @@
         "md5": "915a09fcdfc2bf0f5ecf9e556d5698ff",
         "size": "6,778 KB",
         "home": "https://www.gnu.org/software/texinfo/"
+      },
+      "reference_metrics": {
+        "build_time": "0.4 SBU",
+        "disk_space": "151 MB"
       }
     },
     "vim": {
@@ -733,6 +1009,10 @@
         "md5": "060c9c0d7e2bdb5e5d80daad596cae02",
         "size": "19,662 KB",
         "home": "https://www.vim.org"
+      },
+      "reference_metrics": {
+        "build_time": "3.3 SBU",
+        "disk_space": "234 MB"
       }
     },
     "markupsafe": {
@@ -742,6 +1022,10 @@
         "md5": "13a73126d25afa72a1ff0daed072f5fe",
         "size": "79 KB",
         "home": "https://palletsprojects.com/p/markupsafe/"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "696 KB"
       }
     },
     "jinja2": {
@@ -751,6 +1035,10 @@
         "md5": "66d4c25ff43d1deaf9637ccda523dec8",
         "size": "240 KB",
         "home": "https://jinja.palletsprojects.com/en/3.1.x/"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "2.7 MB"
       }
     },
     "systemd": {
@@ -766,6 +1054,10 @@
           "url": "https://anduin.linuxfromscratch.org/LFS/systemd-man-pages-261.2.tar.xz",
           "md5": "4c5533c1a2d0921dd4c5b5e6b8902570"
         }
+      },
+      "reference_metrics": {
+        "build_time": "1.2 SBU",
+        "disk_space": "396 MB"
       }
     },
     "dbus": {
@@ -775,6 +1067,10 @@
         "md5": "97832e6f0a260936d28536e5349c22e5",
         "size": "1,090 KB",
         "home": "https://www.freedesktop.org/wiki/Software/dbus"
+      },
+      "reference_metrics": {
+        "build_time": "0.1 SBU",
+        "disk_space": "17 MB"
       }
     },
     "man-db": {
@@ -784,6 +1080,10 @@
         "md5": "b6335533cbeac3b24cd7be31fdee8c83",
         "size": "2,061 KB",
         "home": "https://www.nongnu.org/man-db/"
+      },
+      "reference_metrics": {
+        "build_time": "0.3 SBU",
+        "disk_space": "44 MB"
       }
     },
     "procps": {
@@ -793,6 +1093,10 @@
         "md5": "d47bdda51c4bd595a1ab21b8e538bcb3",
         "size": "1,552 KB",
         "home": "https://gitlab.com/procps-ng/procps/"
+      },
+      "reference_metrics": {
+        "build_time": "0.1 SBU",
+        "disk_space": "28 MB"
       }
     },
     "util-linux": {
@@ -802,6 +1106,10 @@
         "md5": "1d70131b70abda3dec3b37e282a20c96",
         "size": "10,409 KB",
         "home": "https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git/"
+      },
+      "reference_metrics": {
+        "build_time": "0.5 SBU",
+        "disk_space": "362 MB"
       }
     },
     "e2fsprogs": {
@@ -811,6 +1119,10 @@
         "md5": "733a93bc688314834ff2d10530ff4dc4",
         "size": "9,870 KB",
         "home": "https://e2fsprogs.sourceforge.net/"
+      },
+      "reference_metrics": {
+        "build_time": "2.4 SBU on a spinning disk, 0.4 SBU on an SSD",
+        "disk_space": "101 MB"
       }
     }
   }
