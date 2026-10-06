@@ -2420,6 +2420,7 @@ def self_test_package_bulk() -> None:
     require(set(complete).union(deferred) == set(package_set) and not set(complete).intersection(deferred), "package-bulk: complete/deferred package split drift")
 
     for name in complete:
+        package = resolve([name])["packages"][0]
         editorial = load_presentation(PRESENTATION / "editorial" / f"{name}.json")
         require(editorial.get("installed_labels") == observations[name]["installed_labels"], f"{name}: installed source-label drift")
         require(
