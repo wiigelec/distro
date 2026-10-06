@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "source": {
+    "project": "Linux From Scratch",
+    "version": "13.1-systemd",
+    "published": "2026-09-01",
+    "slice": "generic editorial bodies"
+  },
+  "documents": {
+    "pre-foreword": {
+      "block_sha256": "ae92e7b5a9f5aa32e6c071e2225169bfd47acf585e318305ddc6c2fdfb3f0027",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "ch-partitioning-hostreqs": {
+      "block_sha256": "50c5882428897cfe81e186d75ff48ffc089b8e34b21c2d60da5dbc5d22bf2955",
+      "xref_targets": [
+        "chapter-cross-tools",
+        "chapter-building-system",
+        "chapter-bootable",
+        "ch-partitioning-creatingfilesystem"
+      ],
+      "bootstrap_command_count": 0
+    },
+    "ch-tools-binutils-pass1": {
+      "block_sha256": "41d7566d2775a7342d174d791c452166d4013eeaa46f7ecce288a50a90f1c11a",
+      "xref_targets": [
+        "ch-tools-generalinstructions",
+        "contents-binutils"
+      ],
+      "bootstrap_command_count": 4
+    },
+    "ch-system-introduction": {
+      "block_sha256": "0be2b05e6ee7232c7eefb0d14eb06cc88549fb34256ef49f2285dc2712850bfe",
+      "xref_targets": [
+        "chapter-building-system"
+      ],
+      "bootstrap_command_count": 0
+    }
+  }
+}

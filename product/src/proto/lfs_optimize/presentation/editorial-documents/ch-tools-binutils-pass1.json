@@ -1,0 +1,377 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-tools-binutils-pass1",
+  "title": "Binutils-2.47 - Pass 1",
+  "blocks": [
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The Binutils package contains a linker, an assembler, and other tools for handling object files."
+            }
+          ]
+        },
+        {
+          "type": "segmented_list",
+          "titles": [
+            "Approximate build time",
+            "Required disk space"
+          ],
+          "values": [
+            "1 SBU",
+            "691 MB"
+          ]
+        }
+      ],
+      "role": "package"
+    },
+    {
+      "type": "section",
+      "title": "Installation of Cross Binutils",
+      "blocks": [
+        {
+          "type": "admonition",
+          "kind": "note",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Go back and re-read the notes in the section titled"
+                },
+                {
+                  "type": "xref",
+                  "target": "ch-tools-generalinstructions",
+                  "label": "General Compilation Instructions"
+                },
+                {
+                  "type": "text",
+                  "text": ". Understanding the notes labeled important can save you a lot of problems later."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "It is important that Binutils be the first package compiled because both Glibc and GCC perform various tests on the available linker and assembler to determine which of their own features to enable."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The Binutils documentation recommends building Binutils in a dedicated build directory:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 0
+        },
+        {
+          "type": "admonition",
+          "kind": "note",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "In order for the SBU values listed in the rest of the book to be of any use, measure the time it takes to build this package from the configuration, up to and including the first install. To achieve this easily, wrap the commands in a"
+                },
+                {
+                  "type": "code",
+                  "text": "time"
+                },
+                {
+                  "type": "text",
+                  "text": "command like this: time { ../configure ... && make && make install; } ."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Now prepare Binutils for compilation:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 1
+        },
+        {
+          "type": "definition_list",
+          "title": "The meaning of the configure options:",
+          "entries": [
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--prefix=$LFS/tools"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This tells the configure script to prepare to install the Binutils programs in the"
+                    },
+                    {
+                      "type": "code",
+                      "text": "$LFS/tools"
+                    },
+                    {
+                      "type": "text",
+                      "text": "directory."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--with-sysroot=$LFS"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "For cross compilation, this tells the build system to look in $LFS for the target system libraries as needed."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--target=$LFS_TGT"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Because the machine description in the"
+                    },
+                    {
+                      "type": "code",
+                      "text": "LFS_TGT"
+                    },
+                    {
+                      "type": "text",
+                      "text": "variable is slightly different than the value returned by the"
+                    },
+                    {
+                      "type": "code",
+                      "text": "config.guess"
+                    },
+                    {
+                      "type": "text",
+                      "text": "script, this switch will tell the"
+                    },
+                    {
+                      "type": "code",
+                      "text": "configure"
+                    },
+                    {
+                      "type": "text",
+                      "text": "script to adjust binutil's build system for building a cross linker."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--disable-nls"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This disables internationalization as i18n is not needed for the temporary tools."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--enable-gprofng=no"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This disables building gprofng which is not needed for the temporary tools."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--disable-werror"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This prevents the build from stopping in the event that there are warnings from the host's compiler."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--enable-new-dtags"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This makes the linker use the"
+                    },
+                    {
+                      "type": "quote",
+                      "text": "runpath"
+                    },
+                    {
+                      "type": "text",
+                      "text": "tag for embedding library search paths into executables and shared libraries, instead of the traditional"
+                    },
+                    {
+                      "type": "quote",
+                      "text": "rpath"
+                    },
+                    {
+                      "type": "text",
+                      "text": "tag. It makes debugging dynamically linked executables easier and works around potential issues in the test suite of some packages."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--enable-default-hash-style=gnu"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "By default, the linker would generate both the GNU-style hash table and the classic ELF hash table for shared libraries and dynamically linked executables. The hash tables are only intended for a dynamic linker to perform symbol lookup. On LFS the dynamic linker (provided by the Glibc package) will always use the GNU-style hash table which is faster to query. So the classic ELF hash table is completely useless. This makes the linker only generate the GNU-style hash table by default, so we can avoid wasting time to generate the classic ELF hash table when we build the packages, or wasting disk space to store it."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Continue with compiling the package:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 2
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Install the package:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 3
+        }
+      ],
+      "role": "installation"
+    },
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Details on this package are located in"
+            },
+            {
+              "type": "xref",
+              "target": "contents-binutils",
+              "label": "Contents of Binutils",
+              "suffix": "."
+            }
+          ]
+        }
+      ],
+      "role": "content"
+    }
+  ]
+}

@@ -980,6 +980,265 @@ def render_chunked_html_package(name: str) -> str:
     return ET.tostring(html, encoding="unicode", method="html")
 
 
+def editorial_document_path(section_id: str) -> Path:
+    return PRESENTATION / "editorial-documents" / f"{section_id}.json"
+
+
+def load_editorial_document(section_id: str) -> dict[str, Any] | None:
+    path = editorial_document_path(section_id)
+    if not path.is_file():
+        return None
+    document = load_presentation(path)
+    require(
+        document.get("document_id") == section_id,
+        f"{section_id}: editorial document identity mismatch",
+    )
+    require(
+        isinstance(document.get("blocks"), list),
+        f"{section_id}: editorial blocks must be a list",
+    )
+    return document
+
+
+def bootstrap_stage(section_id: str) -> dict[str, Any]:
+    bootstrap = load_json(HERE / "bootstrap-13.1.json")
+    matches = [
+        stage for stage in bootstrap.get("stages", [])
+        if stage.get("id") == section_id
+    ]
+    require(
+        len(matches) == 1,
+        f"{section_id}: bootstrap stage not found",
+    )
+    return matches[0]
+
+
+def _render_editorial_inline(
+    parent: ET.Element,
+    content: list[dict[str, Any]],
+    source_document_id: str,
+) -> None:
+    def append(value: str) -> None:
+        if len(parent):
+            parent[-1].tail = (parent[-1].tail or "") + value
+        else:
+            parent.text = (parent.text or "") + value
+
+    for part in content:
+        kind = part.get("type")
+        if kind == "text":
+            append(part["text"])
+            continue
+        if kind == "xref":
+            node = ET.SubElement(
+                parent,
+                "a",
+                {
+                    "href": resolve_chunked_xref(
+                        source_document_id,
+                        part["target"],
+                    ),
+                    "data-xref-target": part["target"],
+                },
+            )
+            node.text = part["label"]
+            if part.get("suffix"):
+                node.tail = part["suffix"]
+            continue
+        if kind == "link":
+            node = ET.SubElement(parent, "a", {"href": part["href"]})
+            node.text = part["label"]
+            continue
+        if kind == "emphasis":
+            node = ET.SubElement(parent, "em")
+            node.text = part["text"]
+            continue
+        if kind == "quote":
+            node = ET.SubElement(parent, "q")
+            node.text = part["text"]
+            continue
+        if kind == "replaceable":
+            node = ET.SubElement(parent, "var")
+            node.text = part["text"]
+            continue
+        if kind == "code":
+            node = ET.SubElement(parent, "code")
+            node.text = part["text"]
+            continue
+        raise RuntimeError(
+            f"{source_document_id}: unsupported editorial inline {kind}"
+        )
+
+
+def _render_editorial_blocks(
+    parent: ET.Element,
+    blocks: list[dict[str, Any]],
+    source_document_id: str,
+    *,
+    heading_level: int = 2,
+) -> None:
+    section_index = 0
+    for block in blocks:
+        kind = block.get("type")
+        if kind == "paragraph":
+            node = ET.SubElement(parent, "p")
+            _render_editorial_inline(
+                node,
+                block["content"],
+                source_document_id,
+            )
+        elif kind == "pre":
+            node = ET.SubElement(parent, "pre")
+            node.text = block["text"]
+        elif kind == "bootstrap_command":
+            stage = bootstrap_stage(source_document_id)
+            index = block["index"]
+            commands = stage.get("commands")
+            require(
+                isinstance(commands, list)
+                and 0 <= index < len(commands),
+                f"{source_document_id}: bootstrap command index out of range",
+            )
+            pre = ET.SubElement(parent, "pre")
+            add_text(
+                pre,
+                "code",
+                commands[index],
+                **{"data-bootstrap-command": str(index)},
+            )
+        elif kind == "list":
+            list_node = ET.SubElement(
+                parent,
+                "ol" if block.get("ordered") else "ul",
+            )
+            for item in block["items"]:
+                li = ET.SubElement(list_node, "li")
+                _render_editorial_blocks(
+                    li,
+                    item,
+                    source_document_id,
+                    heading_level=heading_level,
+                )
+        elif kind == "admonition":
+            aside = ET.SubElement(
+                parent,
+                "aside",
+                {"data-kind": block["kind"]},
+            )
+            if block.get("title"):
+                add_text(aside, f"h{min(heading_level, 6)}", block["title"])
+            _render_editorial_blocks(
+                aside,
+                block["blocks"],
+                source_document_id,
+                heading_level=min(heading_level + 1, 6),
+            )
+        elif kind == "section":
+            section_index += 1
+            attrs = {}
+            if block.get("id"):
+                attrs["id"] = block["id"]
+            section = ET.SubElement(parent, "section", attrs)
+            if block.get("title"):
+                add_text(
+                    section,
+                    f"h{min(heading_level, 6)}",
+                    block["title"],
+                )
+            _render_editorial_blocks(
+                section,
+                block["blocks"],
+                source_document_id,
+                heading_level=min(heading_level + 1, 6),
+            )
+        elif kind == "heading":
+            add_text(
+                parent,
+                f"h{min(heading_level, 6)}",
+                block["text"],
+            )
+        elif kind == "definition_list":
+            if block.get("title"):
+                add_text(
+                    parent,
+                    f"h{min(heading_level, 6)}",
+                    block["title"],
+                )
+            dl = ET.SubElement(parent, "dl")
+            for entry in block["entries"]:
+                dt = ET.SubElement(dl, "dt")
+                _render_editorial_inline(
+                    dt,
+                    entry["term"],
+                    source_document_id,
+                )
+                dd = ET.SubElement(dl, "dd")
+                _render_editorial_blocks(
+                    dd,
+                    entry["blocks"],
+                    source_document_id,
+                    heading_level=heading_level,
+                )
+        elif kind == "segmented_list":
+            require(
+                len(block["titles"]) == len(block["values"]),
+                f"{source_document_id}: segmented-list arity mismatch",
+            )
+            dl = ET.SubElement(parent, "dl")
+            for title, value in zip(block["titles"], block["values"]):
+                add_text(dl, "dt", title)
+                add_text(dl, "dd", value)
+        else:
+            raise RuntimeError(
+                f"{source_document_id}: unsupported editorial block {kind}"
+            )
+
+
+def render_chunked_html_editorial(
+    document: dict[str, Any],
+    editorial: dict[str, Any],
+) -> str:
+    section_id = document["section_id"]
+    html = ET.Element("html")
+    head = ET.SubElement(html, "head")
+    add_text(head, "title", document_display_title(document))
+    body = ET.SubElement(
+        html,
+        "body",
+        {
+            "id": section_id,
+            "data-filename": document["filename"],
+            "data-output-path": document["output_path"],
+            "data-body-status": "complete",
+        },
+    )
+    nav = document_nav(document)
+
+    def add_nav(role: str) -> None:
+        nav_node = ET.SubElement(body, "nav", {"data-role": role})
+        for relation in ("previous", "next", "up", "home"):
+            if relation in nav:
+                add_text(
+                    nav_node,
+                    "a",
+                    relation.capitalize(),
+                    rel=relation,
+                    href=nav[relation],
+                )
+
+    add_nav("top")
+    add_text(body, "h1", document_h1(document))
+    main = ET.SubElement(body, "main")
+    _render_editorial_blocks(
+        main,
+        editorial["blocks"],
+        section_id,
+    )
+    add_nav("bottom")
+    ET.indent(html, space="  ")
+    return ET.tostring(html, encoding="unicode", method="html")
+
+
 def render_chunked_html_document(section_id: str) -> str:
     index = book_document_index()
     require(section_id in index, f"unknown book document: {section_id}")
@@ -988,6 +1247,10 @@ def render_chunked_html_document(section_id: str) -> str:
     package_name = document.get("package")
     if package_name in PROOF_PACKAGES:
         return render_chunked_html_package(package_name)
+
+    editorial = load_editorial_document(section_id)
+    if editorial is not None:
+        return render_chunked_html_editorial(document, editorial)
 
     html = ET.Element("html")
     head = ET.SubElement(html, "head")
@@ -1476,6 +1739,94 @@ def self_test_chunked_html() -> None:
         )
 
 
+def _editorial_block_digest(blocks: list[dict[str, Any]]) -> str:
+    import hashlib
+    payload = json.dumps(
+        blocks,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+    ).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _count_bootstrap_commands(blocks: list[dict[str, Any]]) -> int:
+    count = 0
+    for block in blocks:
+        if block.get("type") == "bootstrap_command":
+            count += 1
+        if isinstance(block.get("blocks"), list):
+            count += _count_bootstrap_commands(block["blocks"])
+        if block.get("type") == "list":
+            for item in block["items"]:
+                count += _count_bootstrap_commands(item)
+        if block.get("type") == "definition_list":
+            for entry in block["entries"]:
+                count += _count_bootstrap_commands(entry["blocks"])
+    return count
+
+
+def self_test_editorial_slice() -> None:
+    golden = load_presentation(
+        PRESENTATION / "golden" / "editorial-slice.json"
+    )
+    expected = golden.get("documents")
+    require(
+        isinstance(expected, dict) and expected,
+        "editorial-slice: missing golden documents",
+    )
+
+    for section_id, observation in expected.items():
+        editorial = load_editorial_document(section_id)
+        require(
+            editorial is not None,
+            f"{section_id}: missing migrated editorial document",
+        )
+        require(
+            _editorial_block_digest(editorial["blocks"])
+            == observation["block_sha256"],
+            f"{section_id}: editorial semantic drift",
+        )
+        require(
+            _count_bootstrap_commands(editorial["blocks"])
+            == observation["bootstrap_command_count"],
+            f"{section_id}: bootstrap command binding drift",
+        )
+
+        rendered = ET.fromstring(
+            render_chunked_html_document(section_id)
+        )
+        body = rendered.find("body")
+        require(
+            body is not None
+            and body.attrib.get("data-body-status") == "complete"
+            and rendered.find("body/main") is not None,
+            f"{section_id}: editorial page did not render complete body",
+        )
+
+        actual_targets = [
+            node.attrib["data-xref-target"]
+            for node in rendered.findall(".//a[@data-xref-target]")
+        ]
+        require(
+            actual_targets == observation["xref_targets"],
+            f"{section_id}: xref target drift",
+        )
+
+    pass1 = ET.fromstring(
+        render_chunked_html_document("ch-tools-binutils-pass1")
+    )
+    stage = bootstrap_stage("ch-tools-binutils-pass1")
+    rendered_commands = [
+        node.text or ""
+        for node in pass1.findall(".//code[@data-bootstrap-command]")
+    ]
+    require(
+        rendered_commands == stage["commands"],
+        "editorial-slice: bootstrap command text/order drift",
+    )
+
+
 def self_test() -> None:
     for name in PROOF_PACKAGES:
         self_test_package(name)
@@ -1505,6 +1856,7 @@ def self_test() -> None:
     self_test_nested_xrefs()
     self_test_chunked_html()
     self_test_chunked_html_book()
+    self_test_editorial_slice()
 
 
 def main() -> int:
@@ -1535,8 +1887,9 @@ def main() -> int:
                         "nested_xrefs": True,
                         "chunked_html_packages": True,
                         "chunked_html_book": True,
+                        "generic_editorial_slice": True,
                         "equivalence":
-                            "package-semantics-plus-book-hierarchy-xrefs-and-full-chunk-routing",
+                            "package-semantics-book-routing-and-generic-editorial-slice",
                     },
                     indent=2,
                 )

@@ -17,7 +17,7 @@ Roadmap:
 | M4 — Bootstrap proof | COMPLETE | Fresh Chapter 5–7 bootstrap hands directly to the normal executor; all 80 final-system packages build successfully without publication XML/book parsing. |
 | M5 — Development proof | COMPLETE | Accepted state, candidate identity, validation, definition binding/drift rejection, review evidence, and guarded transactional promotion are implemented. |
 | M6 — Release proof | SATISFIED BY COMPOSITION | M4 proves clean full-system realization from normalized state and M5 proves validated state identity and controlled promotion. Freezing accepted state under a release identity adds production plumbing but no unresolved prototype architecture question. |
-| M7 — Presentation proof | IN PROGRESS — PACKAGE/CHAPTER/BOOK/XREF + PACKAGE HTML PROVEN; FULL CHUNK ROUTING SLICE ADDED | Zlib/Binutils package HTML is proven. The current slice adds collision-free output paths for all 199 chunks, hierarchy-derived up links, relative prev/next/home navigation, and chunked xref href resolution across directories. Unmigrated page bodies render as explicit structural shells; full editorial-body migration, no-chunks HTML, and PDF remain open. |
+| M7 — Presentation proof | IN PROGRESS — PACKAGE/BOOK ROUTING PROVEN; GENERIC EDITORIAL SLICE ADDED | Full 199-chunk routing/navigation/xrefs and Zlib/Binutils package HTML are proven. The current slice migrates four representative non-normal-package bodies through a generic editorial model, including prose, lists, admonitions, nested sections, definition/segmented lists, preformatted text, links/xrefs, and bootstrap command bindings. Bulk body migration, no-chunks HTML, and PDF remain open. |
 | M8+ | NOT STARTED | BLFS, hard-BLFS, and user-system proofs remain later roadmap milestones. |
 
 ## M5 closure
@@ -271,14 +271,47 @@ The CLI can materialize the complete browser-navigable chunk tree:
 python3 product/src/proto/lfs_optimize/presentation.py   --html-book-dir /tmp/lfs-html
 ```
 
+## M7 generic editorial-body slice
+
+Four representative pages now exercise a generic document-body model:
+
+- Preface / Foreword (`pre-foreword`);
+- Host System Requirements (`ch-partitioning-hostreqs`);
+- Binutils Pass 1 (`ch-tools-binutils-pass1`); and
+- Chapter 8 Introduction (`ch-system-introduction`).
+
+The runtime authority split is:
+
+```text
+presentation/editorial-documents/<document-id>.json
+        → prose, lists, sections, admonitions, links/xrefs
+bootstrap-13.1.json
+        → bootstrap command text/order
+presentation book graph
+        → chunk routes and xref hrefs
+```
+
+Bootstrap editorial blocks bind commands by index and never duplicate command
+strings. Generic xrefs bind only target identity and display text; their hrefs are
+resolved from the composed chunk graph.
+
+The generic block vocabulary is intentionally limited to constructs demonstrated
+by this slice: paragraph/rich inline content, preformatted text, ordered/unordered
+lists, nested sections/headings, admonitions, definition lists, segmented lists,
+external links, and internal xrefs.
+
+`presentation/golden/editorial-slice.json` is source-derived validation state
+only. Runtime rendering does not consume it.
+
 ## Resume instruction
 
-Run the direct prototype validator after this slice lands:
+Run:
 
 ```text
 python3 product/src/proto/lfs_optimize/validate.py
 ```
 
-The initial route golden scanner leaked later `dbhtml dir` processing instructions into preceding elements. The fixture now scopes processing instructions to their owning XML element; runtime composition and the corrected source-derived oracle agree on all 199 output paths. Rerun the direct validator; if it passes, treat full-book chunk routing/navigation/xref addressing as proven.
-The next M7 work is editorial-body migration for the remaining chunks, after
-which chunked HTML reader equivalence can close before no-chunks HTML and PDF.
+If it passes, treat the generic editorial-body model as proven for this
+representative slice. The next step is mechanical migration of the remaining
+editorial bodies, extending the vocabulary only when the source demonstrates a
+new reader-visible construct.
