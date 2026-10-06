@@ -2129,11 +2129,20 @@ def self_test_editorial_bulk() -> None:
         )
 
 
+def _canonical_source_command(value: str) -> str:
+    import re
+    return re.sub(r"[ \t]*\\\r?\n[ \t]*", " ", value.strip())
+
+
 def _resolved_command_hashes(name: str) -> list[str]:
     import hashlib
     package = resolve([name])["packages"][0]
     return [
-        hashlib.sha256(command["command"].strip().encode()).hexdigest()
+        hashlib.sha256(
+            _canonical_source_command(
+                command.get("source_command", command["command"])
+            ).encode()
+        ).hexdigest()
         for _step, command in command_sequence(package)
     ]
 
