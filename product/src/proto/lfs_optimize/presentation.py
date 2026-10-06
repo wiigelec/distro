@@ -343,7 +343,55 @@ def render_installation(
             if isinstance(command.get("id"), str):
                 attrs["command_id"] = command["id"]
             screen = ET.SubElement(install, "screen", {"format": "linespecific"})
-            add_text(screen, "userinput", command["command"], **attrs)
+            add_text(
+                screen,
+                "userinput",
+                command.get("source_command", command["command"]),
+                **attrs,
+            )
+        elif kind == "command-group":
+            positions = block.get("command_indices")
+            require(
+                isinstance(positions, list)
+                and positions
+                and all(isinstance(position, int) for position in positions),
+                f"{package['name']}: invalid command group",
+            )
+            require(
+                positions == list(range(positions[0], positions[-1] + 1))
+                and 0 <= positions[0]
+                and positions[-1] < len(sequence),
+                f"{package['name']}: command group must be contiguous and in range",
+            )
+            require(
+                all(position not in rendered_positions for position in positions),
+                f"{package['name']}: duplicate command group position",
+            )
+            group = [sequence[position] for position in positions]
+            require(
+                len({step["phase"] for step, _command in group}) == 1,
+                f"{package['name']}: command group must share one phase",
+            )
+            rendered_positions.extend(positions)
+            step = group[0][0]
+            screen = ET.SubElement(install, "screen", {"format": "linespecific"})
+            add_text(
+                screen,
+                "userinput",
+                "\n".join(
+                    command.get("source_command", command["command"])
+                    for _step, command in group
+                ),
+                role="build-command",
+                command_indices=",".join(str(position) for position in positions),
+                remap=command_remap(step["phase"]),
+                condition=step["condition"],
+                user=(
+                    "mixed"
+                    if len({command["user"] for _step, command in group}) > 1
+                    else group[0][1]["user"]
+                ),
+            )
         elif kind == "pre":
             screen = ET.SubElement(install, "screen", {"format": "linespecific", "role": "editorial-output"})
             add_text(screen, "computeroutput", block["text"])
@@ -1118,9 +1166,17 @@ def render_chunked_html_package(name: str) -> str:
             require((command is None) != (output is None), f"{name}: invalid screen payload")
             if command is not None:
                 attrs = {
-                    "data-command-index": command.attrib["command_index"],
                     "data-phase": command.attrib["remap"],
                 }
+                if "command_index" in command.attrib:
+                    attrs["data-command-index"] = command.attrib["command_index"]
+                if "command_indices" in command.attrib:
+                    attrs["data-command-indices"] = command.attrib["command_indices"]
+                require(
+                    ("data-command-index" in attrs)
+                    != ("data-command-indices" in attrs),
+                    f"{name}: command screen identity drift",
+                )
                 if "command_id" in command.attrib:
                     attrs["data-command-id"] = command.attrib["command_id"]
                 add_text(pre, "code", command.text or "", **attrs)
@@ -2332,6 +2388,58 @@ def _resolved_command_hashes(name: str) -> list[str]:
     ]
 
 
+def _editorial_command_screen_hashes(
+    package: dict[str, Any],
+    editorial: dict[str, Any],
+) -> list[str]:
+    import hashlib
+    sequence = command_sequence(package)
+    hashes: list[str] = []
+    covered: list[int] = []
+    for block in editorial.get("installation_blocks", []):
+        kind = block.get("type")
+        if kind == "command":
+            position = block.get("command_index")
+            require(
+                isinstance(position, int) and 0 <= position < len(sequence),
+                f"{package['name']}: invalid command oracle reference",
+            )
+            positions = [position]
+        elif kind == "command-group":
+            positions = block.get("command_indices")
+            require(
+                isinstance(positions, list)
+                and positions
+                and all(isinstance(position, int) for position in positions)
+                and positions == list(range(positions[0], positions[-1] + 1))
+                and 0 <= positions[0]
+                and positions[-1] < len(sequence),
+                f"{package['name']}: invalid command-group oracle reference",
+            )
+        else:
+            continue
+        require(
+            all(position not in covered for position in positions),
+            f"{package['name']}: duplicate command oracle reference",
+        )
+        covered.extend(positions)
+        value = "\n".join(
+            sequence[position][1].get(
+                "source_command",
+                sequence[position][1]["command"],
+            )
+            for position in positions
+        )
+        hashes.append(
+            hashlib.sha256(_canonical_source_command(value).encode()).hexdigest()
+        )
+    require(
+        covered == list(range(len(sequence))),
+        f"{package['name']}: command oracle coverage drift",
+    )
+    return hashes
+
+
 def _editorial_illustrative_command_hashes(editorial: dict[str, Any]) -> list[str]:
     import hashlib
     hashes: list[str] = []
@@ -2415,7 +2523,7 @@ def self_test_package_bulk() -> None:
         golden.get("command_scope") == "installation-screen-userinput",
         "package-bulk: command oracle must be scoped to Installation screen/userinput commands",
     )
-    require(len(complete) == golden.get("complete_package_count") == 73 and len(deferred) == golden.get("deferred_package_count") == 7, "package-bulk: package coverage drift")
+    require(len(complete) == golden.get("complete_package_count") == 74 and len(deferred) == golden.get("deferred_package_count") == 6, "package-bulk: package coverage drift")
     package_set = load_json(HERE / "package-set.json")["packages"]
     require(set(complete).union(deferred) == set(package_set) and not set(complete).intersection(deferred), "package-bulk: complete/deferred package split drift")
 
@@ -2428,7 +2536,7 @@ def self_test_package_bulk() -> None:
             == observations[name]["installed_term_kinds"],
             f"{name}: installed term-kind drift",
         )
-        require(_resolved_command_hashes(name) == observations[name]["command_sha256"], f"{name}: source/normalized command drift")
+        require(_editorial_command_screen_hashes(package, editorial) == observations[name]["command_sha256"], f"{name}: source/normalized command drift")
         require(
             _editorial_illustrative_command_hashes(editorial)
             == observations[name].get("illustrative_command_sha256", []),
@@ -2520,8 +2628,8 @@ def main() -> int:
                         "editorial_vocabulary_complete": True,
                         "editorial_bulk_complete": 89,
                         "editorial_operational_deferred": 30,
-                        "package_bulk_complete": 73,
-                        "package_authority_deferred": 7,
+                        "package_bulk_complete": 74,
+                        "package_authority_deferred": 6,
                         "equivalence":
                             "package-semantics-book-routing-editorial-and-package-bulk",
                     },

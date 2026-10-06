@@ -1,0 +1,213 @@
+{
+  "schema_version": 1,
+  "package": "coreutils",
+  "installation_title": "Installation of Coreutils",
+  "contents_title": "Contents of Coreutils",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "libraries": "Installed library",
+    "directories": "Installed directory"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "text": "POSIX requires that programs from Coreutils recognize character boundaries correctly even in multibyte locales. Apply the internationalization patch:"
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "admonition",
+      "kind": "note",
+      "paragraphs": [
+        "Many bugs have been found in this patch. When reporting new bugs to the Coreutils maintainers, first check whether they are reproducible without this patch."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Now prepare Coreutils for compilation:"
+    },
+    {
+      "type": "command-group",
+      "command_indices": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Compile the package:"
+    },
+    {
+      "type": "command",
+      "command_index": 4
+    },
+    {
+      "type": "paragraph",
+      "text": "If running the test suite, first run the tests intended for the root user:"
+    },
+    {
+      "type": "command",
+      "command_index": 5
+    },
+    {
+      "type": "paragraph",
+      "text": "Add a temporary group and make tester a member so tests requiring multiple groups are not skipped:"
+    },
+    {
+      "type": "command",
+      "command_index": 6
+    },
+    {
+      "type": "paragraph",
+      "text": "Fix permissions so the non-root user can compile and run the tests:"
+    },
+    {
+      "type": "command",
+      "command_index": 7
+    },
+    {
+      "type": "paragraph",
+      "text": "Run the remainder of the tests as tester:"
+    },
+    {
+      "type": "command",
+      "command_index": 8
+    },
+    {
+      "type": "paragraph",
+      "text": "Remove the temporary group:"
+    },
+    {
+      "type": "command",
+      "command_index": 9
+    },
+    {
+      "type": "paragraph",
+      "text": "Install the package:"
+    },
+    {
+      "type": "command",
+      "command_index": 10
+    },
+    {
+      "type": "paragraph",
+      "text": "Move programs to the locations specified by the FHS:"
+    },
+    {
+      "type": "command-group",
+      "command_indices": [
+        11,
+        12,
+        13
+      ]
+    }
+  ],
+  "installed_term_kinds": {
+    "lbracket": "program",
+    "base32": "program",
+    "base64": "program",
+    "b2sum": "program",
+    "basename": "program",
+    "basenc": "program",
+    "cat": "program",
+    "chgrp": "program",
+    "chmod": "program",
+    "chown": "program",
+    "chroot": "program",
+    "cksum": "program",
+    "comm": "program",
+    "cp": "program",
+    "csplit": "program",
+    "cut": "program",
+    "date": "program",
+    "dd": "program",
+    "df": "program",
+    "dir": "program",
+    "dircolors": "program",
+    "dirname": "program",
+    "du": "program",
+    "echo": "program",
+    "env": "program",
+    "expand": "program",
+    "expr": "program",
+    "factor": "program",
+    "false": "program",
+    "fmt": "program",
+    "fold": "program",
+    "groups": "program",
+    "head": "program",
+    "hostid": "program",
+    "id": "program",
+    "install": "program",
+    "join": "program",
+    "link": "program",
+    "ln": "program",
+    "logname": "program",
+    "ls": "program",
+    "md5sum": "program",
+    "mkdir": "program",
+    "mkfifo": "program",
+    "mknod": "program",
+    "mktemp": "program",
+    "mv": "program",
+    "nice": "program",
+    "nl": "program",
+    "nohup": "program",
+    "nproc": "program",
+    "numfmt": "program",
+    "od": "program",
+    "paste": "program",
+    "pathchk": "program",
+    "pinky": "program",
+    "pr": "program",
+    "printenv": "program",
+    "printf": "program",
+    "ptx": "program",
+    "pwd": "program",
+    "readlink": "program",
+    "realpath": "program",
+    "rm": "program",
+    "rmdir": "program",
+    "seq": "program",
+    "sha1sum": "program",
+    "sha224sum": "program",
+    "sha256sum": "program",
+    "sha384sum": "program",
+    "sha512sum": "program",
+    "shred": "program",
+    "shuf": "program",
+    "sleep": "program",
+    "sort": "program",
+    "split": "program",
+    "stat": "program",
+    "stdbuf": "program",
+    "stty": "program",
+    "sum": "program",
+    "sync": "program",
+    "tac": "program",
+    "tail": "program",
+    "tee": "program",
+    "test": "program",
+    "timeout": "program",
+    "touch": "program",
+    "tr": "program",
+    "true": "program",
+    "truncate": "program",
+    "tsort": "program",
+    "tty": "program",
+    "uname": "program",
+    "unexpand": "program",
+    "uniq": "program",
+    "unlink": "program",
+    "users": "program",
+    "vdir": "program",
+    "wc": "program",
+    "who": "program",
+    "whoami": "program",
+    "yes": "program",
+    "libstdbuf": "library"
+  }
+}
