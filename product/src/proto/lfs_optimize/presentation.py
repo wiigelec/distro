@@ -186,6 +186,59 @@ def command_sequence(
     ]
 
 
+def supplemental_command_sequence(
+    package: dict[str, Any],
+    procedure_name: str,
+) -> list[tuple[dict[str, Any], dict[str, Any]]]:
+    procedures = package.get("supplemental_procedures", {})
+    require(
+        isinstance(procedures, dict),
+        f"{package['name']}: supplemental_procedures must be an object",
+    )
+    selected = procedures.get(procedure_name)
+    require(
+        isinstance(selected, dict),
+        f"{package['name']}: unknown supplemental procedure {procedure_name}",
+    )
+    procedure = selected.get("procedure")
+    require(
+        isinstance(procedure, list) and procedure,
+        f"{package['name']}: empty supplemental procedure {procedure_name}",
+    )
+    sequence: list[tuple[dict[str, Any], dict[str, Any]]] = []
+    for step_index, step in enumerate(procedure):
+        require(
+            isinstance(step, dict)
+            and isinstance(step.get("phase"), str)
+            and step["phase"],
+            f"{package['name']}: invalid supplemental step {procedure_name}/{step_index}",
+        )
+        require(
+            isinstance(step.get("working_directory"), str)
+            and step["working_directory"],
+            f"{package['name']}: invalid supplemental working directory {procedure_name}/{step_index}",
+        )
+        require(
+            step.get("condition") in ("always", "tests-enabled"),
+            f"{package['name']}: invalid supplemental condition {procedure_name}/{step_index}",
+        )
+        commands = step.get("commands")
+        require(
+            isinstance(commands, list) and commands,
+            f"{package['name']}: empty supplemental commands {procedure_name}/{step_index}",
+        )
+        for command_index, command in enumerate(commands):
+            require(
+                isinstance(command, dict)
+                and isinstance(command.get("command"), str)
+                and command["command"]
+                and command.get("user") in ("root", "tester"),
+                f"{package['name']}: invalid supplemental command {procedure_name}/{step_index}/{command_index}",
+            )
+            sequence.append((step, command))
+    return sequence
+
+
 def command_index(package: dict[str, Any]) -> tuple[dict[str, tuple[dict[str, Any], dict[str, Any]]], list[str]]:
     by_id: dict[str, tuple[dict[str, Any], dict[str, Any]]] = {}
     order: list[str] = []
@@ -329,6 +382,42 @@ def render_installation(
                             "userinput",
                             text,
                             role="illustrative-command",
+                        )
+                    elif child_kind == "supplemental-command":
+                        procedure_name = child.get("procedure")
+                        position = child.get("command_index")
+                        require(
+                            isinstance(procedure_name, str) and procedure_name,
+                            f"{package['name']}: supplemental command missing procedure",
+                        )
+                        sequence = supplemental_command_sequence(
+                            package,
+                            procedure_name,
+                        )
+                        require(
+                            isinstance(position, int)
+                            and 0 <= position < len(sequence),
+                            f"{package['name']}: invalid supplemental command index",
+                        )
+                        step, command = sequence[position]
+                        screen = ET.SubElement(
+                            node,
+                            "screen",
+                            {
+                                "format": "linespecific",
+                                "role": "supplemental-build-command",
+                                "supplemental_procedure": procedure_name,
+                                "command_index": str(position),
+                                "remap": command_remap(step["phase"]),
+                                "condition": step["condition"],
+                                "user": command["user"],
+                            },
+                        )
+                        add_text(
+                            screen,
+                            "userinput",
+                            command["command"],
+                            role="supplemental-command",
                         )
                     else:
                         raise RuntimeError(
@@ -1089,6 +1178,34 @@ def render_chunked_html_package(name: str) -> str:
                         "code",
                         userinput.text or "",
                         **{"data-role": "illustrative-command"},
+                    )
+                elif (
+                    admonition_child.tag == "screen"
+                    and admonition_child.attrib.get("role")
+                    == "supplemental-build-command"
+                ):
+                    userinput = admonition_child.find("userinput")
+                    require(
+                        userinput is not None
+                        and userinput.attrib.get("role") == "supplemental-command",
+                        f"{name}: invalid supplemental command screen",
+                    )
+                    pre = ET.SubElement(
+                        aside,
+                        "pre",
+                        {
+                            "data-role": "supplemental-build-command",
+                            "data-supplemental-procedure":
+                                admonition_child.attrib["supplemental_procedure"],
+                            "data-command-index":
+                                admonition_child.attrib["command_index"],
+                        },
+                    )
+                    add_text(
+                        pre,
+                        "code",
+                        userinput.text or "",
+                        **{"data-role": "supplemental-command"},
                     )
                 else:
                     raise RuntimeError(
@@ -2247,6 +2364,47 @@ def _editorial_illustrative_command_hashes(editorial: dict[str, Any]) -> list[st
     return hashes
 
 
+def _editorial_supplemental_command_hashes(
+    package: dict[str, Any],
+    editorial: dict[str, Any],
+) -> dict[str, list[str]]:
+    import hashlib
+    hashes: dict[str, list[str]] = {}
+
+    def visit(blocks: list[dict[str, Any]]) -> None:
+        for block in blocks:
+            kind = block.get("type")
+            if kind == "supplemental-command":
+                procedure_name = block.get("procedure")
+                position = block.get("command_index")
+                require(
+                    isinstance(procedure_name, str) and procedure_name,
+                    f"{package['name']}: invalid supplemental procedure reference",
+                )
+                sequence = supplemental_command_sequence(package, procedure_name)
+                require(
+                    isinstance(position, int) and 0 <= position < len(sequence),
+                    f"{package['name']}: invalid supplemental command reference",
+                )
+                _step, command = sequence[position]
+                hashes.setdefault(procedure_name, []).append(
+                    hashlib.sha256(
+                        _canonical_source_command(
+                            command.get("source_command", command["command"])
+                        ).encode()
+                    ).hexdigest()
+                )
+            elif kind == "admonition" and "blocks" in block:
+                nested = block["blocks"]
+                require(isinstance(nested, list), "admonition blocks must be a list")
+                visit(nested)
+
+    blocks = editorial.get("installation_blocks")
+    require(isinstance(blocks, list), "editorial installation blocks must be a list")
+    visit(blocks)
+    return hashes
+
+
 def self_test_package_bulk() -> None:
     golden = load_presentation(PRESENTATION / "golden" / "chunked-html-packages-all.json")
     complete = golden.get("complete_packages")
@@ -2257,7 +2415,7 @@ def self_test_package_bulk() -> None:
         golden.get("command_scope") == "installation-screen-userinput",
         "package-bulk: command oracle must be scoped to Installation screen/userinput commands",
     )
-    require(len(complete) == golden.get("complete_package_count") == 71 and len(deferred) == golden.get("deferred_package_count") == 9, "package-bulk: package coverage drift")
+    require(len(complete) == golden.get("complete_package_count") == 72 and len(deferred) == golden.get("deferred_package_count") == 8, "package-bulk: package coverage drift")
     package_set = load_json(HERE / "package-set.json")["packages"]
     require(set(complete).union(deferred) == set(package_set) and not set(complete).intersection(deferred), "package-bulk: complete/deferred package split drift")
 
@@ -2274,6 +2432,11 @@ def self_test_package_bulk() -> None:
             _editorial_illustrative_command_hashes(editorial)
             == observations[name].get("illustrative_command_sha256", []),
             f"{name}: illustrative command drift",
+        )
+        require(
+            _editorial_supplemental_command_hashes(package, editorial)
+            == observations[name].get("supplemental_command_sha256", {}),
+            f"{name}: supplemental command drift",
         )
         rendered = ET.fromstring(render_chunked_html_package(name))
         require(rendered.find("body/dl[@data-role='installed-summary']") is not None, f"{name}: installed summary missing")
@@ -2356,8 +2519,8 @@ def main() -> int:
                         "editorial_vocabulary_complete": True,
                         "editorial_bulk_complete": 89,
                         "editorial_operational_deferred": 30,
-                        "package_bulk_complete": 71,
-                        "package_authority_deferred": 9,
+                        "package_bulk_complete": 72,
+                        "package_authority_deferred": 8,
                         "equivalence":
                             "package-semantics-book-routing-editorial-and-package-bulk",
                     },

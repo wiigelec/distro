@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "package": "libxcrypt",
+  "installation_title": "Installation of Libxcrypt",
+  "contents_title": "Contents of Libxcrypt",
+  "installed_labels": {
+    "libraries": "Installed library"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "text": "First, make a fix required by glibc-2.43 and later:"
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "text": "Prepare Libxcrypt for compilation:"
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "definition-list",
+      "title": "The meaning of the new configure options:",
+      "items": [
+        {
+          "term": "--enable-hashes=strong,glibc",
+          "text": "Build strong hash algorithms recommended for security use cases, and the hash algorithms provided by traditional Glibc libcrypt for compatibility."
+        },
+        {
+          "term": "--enable-obsolete-api=no",
+          "text": "Disable obsolete API functions. They are not needed for a modern Linux system built from source."
+        },
+        {
+          "term": "--disable-failure-tokens",
+          "text": "Disable failure token feature. It's needed for compatibility with the traditional hash libraries of some platforms, but a Linux system based on Glibc does not need it."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Compile the package:"
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "text": "To test the results, issue:"
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    },
+    {
+      "type": "paragraph",
+      "text": "Install the package:"
+    },
+    {
+      "type": "command",
+      "command_index": 4
+    },
+    {
+      "type": "admonition",
+      "kind": "note",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "The instructions above disabled obsolete API functions since no package installed by compiling from sources would link against them at runtime. However, the only known binary-only applications that link against these functions require ABI version 1. If you must have such functions because of some binary-only application or to be compliant with LSB, build the package again with the following commands:"
+        },
+        {
+          "type": "supplemental-command",
+          "procedure": "obsolete-api-abi1",
+          "command_index": 0
+        }
+      ]
+    }
+  ],
+  "installed_term_kinds": {
+    "libcrypt": "library"
+  }
+}

@@ -6,8 +6,8 @@
     "published": "2026-09-01",
     "slice": "normalized Chapter 8 package rendering"
   },
-  "complete_package_count": 71,
-  "deferred_package_count": 9,
+  "complete_package_count": 72,
+  "deferred_package_count": 8,
   "complete_packages": [
     "man-pages",
     "iana-etc",
@@ -34,6 +34,7 @@
     "attr",
     "acl",
     "libcap",
+    "libxcrypt",
     "shadow",
     "gawk",
     "gcc",
@@ -86,7 +87,6 @@
     "glibc",
     "groff",
     "grub",
-    "libxcrypt",
     "make",
     "ncurses",
     "texinfo",
@@ -1654,6 +1654,26 @@
       "installed_term_kinds": {
         "libgmp": "library",
         "libgmpxx": "library"
+      }
+    },
+    "libxcrypt": {
+      "command_sha256": [
+        "e669edcfb52821fae780e6cc18a0f293b475bac82f5a056ca7e395b3fc268f24",
+        "94eba9ecd02735cbc397ecc4ded563cde145338fd5cef3e8e8ab1a7b58ba5dc2",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "supplemental_command_sha256": {
+        "obsolete-api-abi1": [
+          "4eff2198a19cc4cf59d651eb2eadfad4fcca41c7c6d98c529231ccd6e84ab5d9"
+        ]
+      },
+      "installed_labels": {
+        "libraries": "Installed library"
+      },
+      "installed_term_kinds": {
+        "libcrypt": "library"
       }
     }
   },

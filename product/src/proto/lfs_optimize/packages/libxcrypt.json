@@ -104,5 +104,23 @@
       "name": "libcrypt",
       "description": "Contains functions to hash passwords"
     }
-  ]
+  ],
+  "supplemental_procedures": {
+    "obsolete-api-abi1": {
+      "description": "Rebuild and install the obsolete ABI version 1 compatibility library for binary-only applications or LSB compatibility.",
+      "procedure": [
+        {
+          "phase": "compatibility",
+          "commands": [
+            {
+              "command": "make distclean\n./configure --prefix=/usr                \\\n            --enable-hashes=strong,glibc \\\n            --enable-obsolete-api=glibc  \\\n            --disable-static             \\\n            --disable-failure-tokens\nmake\ncp -av --remove-destination .libs/libcrypt.so.1* /usr/lib",
+              "user": "root"
+            }
+          ],
+          "working_directory": "source",
+          "condition": "always"
+        }
+      ]
+    }
+  }
 }
