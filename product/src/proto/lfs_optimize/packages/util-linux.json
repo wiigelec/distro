@@ -50,6 +50,24 @@
       "condition": "always"
     }
   ],
+  "supplemental_procedures": {
+    "full-coverage-tests": {
+      "description": "Run the broader Util-linux test suite after booting the completed LFS system when the required kernel and BLFS dependencies are available.",
+      "procedure": [
+        {
+          "phase": "test",
+          "commands": [
+            {
+              "command": "bash tests/run.sh --srcdir=$PWD --builddir=$PWD",
+              "user": "root"
+            }
+          ],
+          "working_directory": "source",
+          "condition": "always"
+        }
+      ]
+    }
+  },
   "installed": {
     "programs": [
       "addpart",

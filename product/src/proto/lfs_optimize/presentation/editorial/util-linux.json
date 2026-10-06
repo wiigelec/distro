@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "package": "util-linux",
+  "installation_title": "Installation of Util-linux",
+  "contents_title": "Contents of Util-linux",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "libraries": "Installed libraries",
+    "directories": "Installed directories"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "text": "Prepare Util-linux for compilation:"
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "text": "The --disable and --without options prevent warnings about building components that either require packages not in LFS, or are inconsistent with programs installed by other packages."
+    },
+    {
+      "type": "paragraph",
+      "text": "Compile the package:"
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "If desired, create a dummy "
+        },
+        {
+          "type": "filename",
+          "text": "/etc/fstab"
+        },
+        {
+          "type": "text",
+          "text": " file to satisfy two tests and run the test suite as a non-root user:"
+        }
+      ]
+    },
+    {
+      "type": "admonition",
+      "kind": "warning",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "Running the test suite as the root user can be harmful to your system. To run it, the CONFIG_SCSI_DEBUG option for the kernel must be available in the currently running system and must be built as a module. Building it into the kernel will prevent booting. For complete coverage, other BLFS packages must be installed. If desired, this test can be run by booting into the completed LFS system and running:"
+        },
+        {
+          "type": "supplemental-command",
+          "procedure": "full-coverage-tests",
+          "command_index": 0
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "text": "The lsfd: inotify test will fail if the kernel option CONFIG_NETLINK_DIAG is not enabled."
+    },
+    {
+      "type": "paragraph",
+      "text": "Install the package:"
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    }
+  ],
+  "installed_term_kinds": {
+    "addpart": "program",
+    "agetty": "program",
+    "blkdiscard": "program",
+    "blkid": "program",
+    "blkzone": "program",
+    "blockdev": "program",
+    "cal": "program",
+    "cfdisk": "program",
+    "chcpu": "program",
+    "chmem": "program",
+    "choom": "program",
+    "chrt": "program",
+    "col": "program",
+    "colcrt": "program",
+    "colrm": "program",
+    "column": "program",
+    "ctrlaltdel": "program",
+    "delpart": "program",
+    "dmesg": "program",
+    "eject": "program",
+    "fallocate": "program",
+    "fdisk": "program",
+    "fincore": "program",
+    "findfs": "program",
+    "findmnt": "program",
+    "flock": "program",
+    "fsck": "program",
+    "fsck.cramfs": "program",
+    "fsck.minix": "program",
+    "fsfreeze": "program",
+    "fstrim": "program",
+    "getopt": "program",
+    "hardlink": "program",
+    "hexdump": "program",
+    "hwclock": "program",
+    "i386": "program",
+    "ionice": "program",
+    "ipcmk": "program",
+    "ipcrm": "program",
+    "ipcs": "program",
+    "irqtop": "program",
+    "isosize": "program",
+    "kill": "program",
+    "last": "program",
+    "lastb": "program",
+    "ldattach": "program",
+    "linux32": "program",
+    "linux64": "program",
+    "logger": "program",
+    "look": "program",
+    "losetup": "program",
+    "lsblk": "program",
+    "lscpu": "program",
+    "lsfd": "program",
+    "lsipc": "program",
+    "lsirq": "program",
+    "lslocks": "program",
+    "lslogins": "program",
+    "lsmem": "program",
+    "lsns": "program",
+    "mcookie": "program",
+    "mesg": "program",
+    "mkfs": "program",
+    "mkfs.bfs": "program",
+    "mkfs.cramfs": "program",
+    "mkfs.minix": "program",
+    "mkswap": "program",
+    "more": "program",
+    "mount": "program",
+    "mountpoint": "program",
+    "namei": "program",
+    "nsenter": "program",
+    "partx": "program",
+    "pivot_root": "program",
+    "prlimit": "program",
+    "readprofile": "program",
+    "rename": "program",
+    "renice": "program",
+    "resizepart": "program",
+    "rev": "program",
+    "rfkill": "program",
+    "rtcwake": "program",
+    "script": "program",
+    "scriptlive": "program",
+    "scriptreplay": "program",
+    "setarch": "program",
+    "setsid": "program",
+    "setterm": "program",
+    "sfdisk": "program",
+    "sulogin": "program",
+    "swaplabel": "program",
+    "swapoff": "program",
+    "swapon": "program",
+    "switch_root": "program",
+    "taskset": "program",
+    "uclampset": "program",
+    "ul": "program",
+    "umount": "program",
+    "uname26": "program",
+    "unshare": "program",
+    "utmpdump": "program",
+    "uuidd": "program",
+    "uuidgen": "program",
+    "uuidparse": "program",
+    "wall": "program",
+    "wdctl": "program",
+    "whereis": "program",
+    "wipefs": "program",
+    "x86_64": "program",
+    "zramctl": "program",
+    "libblkid": "library",
+    "libfdisk": "library",
+    "libmount": "library",
+    "libsmartcols": "library",
+    "libuuid": "library"
+  }
+}
