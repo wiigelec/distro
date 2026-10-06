@@ -27,6 +27,7 @@
         },
         {
           "command": "mkdir -v build",
+          "source_command": "mkdir -v build\ncd       build",
           "user": "root"
         }
       ],
@@ -38,6 +39,7 @@
       "commands": [
         {
           "command": "../configure --prefix=/usr --disable-werror --disable-nscd libc_cv_slibdir=/usr/lib --enable-stack-protector=strong --enable-kernel=5.10",
+          "source_command": "../configure --prefix=/usr                   \\\n             --disable-werror                \\\n             --disable-nscd                  \\\n             libc_cv_slibdir=/usr/lib        \\\n             --enable-stack-protector=strong \\\n             --enable-kernel=5.10",
           "user": "root"
         }
       ],
@@ -86,7 +88,7 @@
           "user": "root"
         },
         {
-          "command": "make localedata/install-locales",
+          "command": "localedef -i C -f UTF-8 C.UTF-8\nlocaledef -i cs_CZ -f UTF-8 cs_CZ.UTF-8\nlocaledef -i de_DE -f ISO-8859-1 de_DE\nlocaledef -i de_DE@euro -f ISO-8859-15 de_DE@euro\nlocaledef -i de_DE -f UTF-8 de_DE.UTF-8\nlocaledef -i el_GR -f ISO-8859-7 el_GR\nlocaledef -i en_GB -f ISO-8859-1 en_GB\nlocaledef -i en_GB -f UTF-8 en_GB.UTF-8\nlocaledef -i en_HK -f ISO-8859-1 en_HK\nlocaledef -i en_PH -f ISO-8859-1 en_PH\nlocaledef -i en_US -f ISO-8859-1 en_US\nlocaledef -i en_US -f UTF-8 en_US.UTF-8\nlocaledef -i es_ES -f ISO-8859-15 es_ES@euro\nlocaledef -i es_MX -f ISO-8859-1 es_MX\nlocaledef -i fa_IR -f UTF-8 fa_IR\nlocaledef -i fr_FR -f ISO-8859-1 fr_FR\nlocaledef -i fr_FR@euro -f ISO-8859-15 fr_FR@euro\nlocaledef -i fr_FR -f UTF-8 fr_FR.UTF-8\nlocaledef -i is_IS -f ISO-8859-1 is_IS\nlocaledef -i is_IS -f UTF-8 is_IS.UTF-8\nlocaledef -i it_IT -f ISO-8859-1 it_IT\nlocaledef -i it_IT -f ISO-8859-15 it_IT@euro\nlocaledef -i it_IT -f UTF-8 it_IT.UTF-8\nlocaledef -i ja_JP -f EUC-JP ja_JP\nlocaledef -i ja_JP -f UTF-8 ja_JP.UTF-8\nlocaledef -i nl_NL@euro -f ISO-8859-15 nl_NL@euro\nlocaledef -i ru_RU -f KOI8-R ru_RU.KOI8-R\nlocaledef -i ru_RU -f UTF-8 ru_RU.UTF-8\nlocaledef -i se_NO -f UTF-8 se_NO.UTF-8\nlocaledef -i ta_IN -f UTF-8 ta_IN.UTF-8\nlocaledef -i tr_TR -f UTF-8 tr_TR.UTF-8\nlocaledef -i zh_CN -f GB18030 zh_CN.GB18030\nlocaledef -i zh_HK -f BIG5-HKSCS zh_HK.BIG5-HKSCS\nlocaledef -i zh_TW -f UTF-8 zh_TW.UTF-8",
           "user": "root"
         }
       ],
@@ -94,6 +96,92 @@
       "condition": "always"
     }
   ],
+  "supplemental_procedures": {
+    "diagnose-test-timeouts": {
+      "description": "Identify Glibc tests that timed out after the default test suite.",
+      "procedure": [
+        {
+          "phase": "test",
+          "commands": [
+            {
+              "command": "grep \"Timed out\" $(find -name \\*.out)",
+              "user": "root"
+            }
+          ],
+          "working_directory": "build",
+          "condition": "tests-enabled"
+        }
+      ]
+    },
+    "upgrade-remove-nscd": {
+      "description": "Remove and stop the obsolete nscd service when upgrading an older running LFS system.",
+      "procedure": [
+        {
+          "phase": "install",
+          "commands": [
+            {
+              "command": "rm -f /usr/sbin/nscd",
+              "user": "root"
+            },
+            {
+              "command": "systemctl disable --now nscd",
+              "user": "root"
+            }
+          ],
+          "working_directory": "build",
+          "condition": "always"
+        }
+      ]
+    },
+    "upgrade-shared-libraries": {
+      "description": "Perform the guarded DESTDIR shared-library replacement required for an in-place Glibc upgrade.",
+      "procedure": [
+        {
+          "phase": "install",
+          "commands": [
+            {
+              "command": "make DESTDIR=$PWD/dest install\ninstall -vm755 dest/usr/lib/*.so.* /usr/lib",
+              "user": "root"
+            }
+          ],
+          "working_directory": "build",
+          "condition": "always"
+        }
+      ]
+    },
+    "upgrade-gcc-fixed-headers": {
+      "description": "Relocate GCC headers and remove stale fixed Glibc headers after upgrading an older LFS system.",
+      "procedure": [
+        {
+          "phase": "install",
+          "commands": [
+            {
+              "command": "DIR=$(dirname $(gcc -print-libgcc-file-name))\n[ -e $DIR/include/limits.h ]    || mv $DIR/include{-fixed,}/limits.h\n[ -e $DIR/include/syslimits.h ] || mv $DIR/include{-fixed,}/syslimits.h\nrm -rfv $DIR/include-fixed/*\nunset DIR",
+              "user": "root"
+            }
+          ],
+          "working_directory": "build",
+          "condition": "always"
+        }
+      ]
+    },
+    "all-locales": {
+      "description": "Install every locale listed in glibc localedata/SUPPORTED instead of only the minimum test-coverage locale set.",
+      "procedure": [
+        {
+          "phase": "install",
+          "commands": [
+            {
+              "command": "make localedata/install-locales",
+              "user": "root"
+            }
+          ],
+          "working_directory": "build",
+          "condition": "always"
+        }
+      ]
+    }
+  },
   "test_expectations": [
     "The Glibc test suite is critical and must not be skipped.",
     "io/tst-lchmod is known to fail in the LFS chroot environment.",
@@ -110,7 +198,7 @@
       "ldconfig",
       "ldd",
       "lddlibc4",
-      "ld.so",
+      "ld.so (symlink to ld-linux-x86-64.so.2 or ld-linux.so.2)",
       "locale",
       "localedef",
       "makedb",
@@ -128,27 +216,55 @@
     "libraries": [
       "ld-linux-x86-64.so.2",
       "ld-linux.so.2",
-      "libBrokenLocale",
-      "libanl",
-      "libc",
+      "libBrokenLocale.{a,so}",
+      "libanl.{a,so}",
+      "libc.{a,so}",
       "libc_nonshared.a",
       "libc_malloc_debug.so",
-      "libdl",
+      "libdl.{a,so.2}",
       "libg.a",
-      "libm",
+      "libm.{a,so}",
       "libmcheck.a",
       "libmemusage.so",
-      "libmvec",
+      "libmvec.{a,so}",
       "libnsl.so.1",
       "libnss_compat.so",
       "libnss_dns.so",
       "libnss_files.so",
       "libnss_hesiod.so",
-      "libpthread.a",
-      "libresolv",
-      "librt.a",
-      "libthread_db",
-      "libutil.a"
+      "libpcprofile.so",
+      "libpthread.{a,so.0}",
+      "libresolv.{a,so}",
+      "librt.{a,so.1}",
+      "libthread_db.so",
+      "libutil.{a,so.1}"
+    ],
+    "directories": [
+      "/usr/include/arpa",
+      "/usr/include/bits",
+      "/usr/include/gnu",
+      "/usr/include/net",
+      "/usr/include/netash",
+      "/usr/include/netatalk",
+      "/usr/include/netax25",
+      "/usr/include/neteconet",
+      "/usr/include/netinet",
+      "/usr/include/netipx",
+      "/usr/include/netiucv",
+      "/usr/include/netpacket",
+      "/usr/include/netrom",
+      "/usr/include/netrose",
+      "/usr/include/nfs",
+      "/usr/include/protocols",
+      "/usr/include/rpc",
+      "/usr/include/sys",
+      "/usr/lib/audit",
+      "/usr/lib/gconv",
+      "/usr/lib/locale",
+      "/usr/libexec/getconf",
+      "/usr/share/i18n",
+      "/usr/share/zoneinfo",
+      "/var/lib/nss_db"
     ]
   },
   "description": "The Glibc package contains the main C library. This library provides the basic routines for allocating memory, searching directories, opening and closing files, reading and writing files, string handling, pattern matching, arithmetic, and so on.",
@@ -187,14 +303,44 @@
   },
   "installed_descriptions": [
     {
+      "id": "gencat",
+      "name": "gencat",
+      "description": "Generates message catalogues"
+    },
+    {
+      "id": "getconf",
+      "name": "getconf",
+      "description": "Displays the system configuration values for file system specific variables"
+    },
+    {
+      "id": "getent",
+      "name": "getent",
+      "description": "Gets entries from an administrative database"
+    },
+    {
+      "id": "iconv",
+      "name": "iconv",
+      "description": "Performs character set conversion"
+    },
+    {
+      "id": "iconvconfig",
+      "name": "iconvconfig",
+      "description": "Creates fastloading iconv module configuration files"
+    },
+    {
+      "id": "ldconfig",
+      "name": "ldconfig",
+      "description": "Configures the dynamic linker runtime bindings"
+    },
+    {
       "id": "ldd",
       "name": "ldd",
       "description": "Reports which shared libraries are required by each given program or shared library"
     },
     {
-      "id": "ldconfig",
-      "name": "ldconfig",
-      "description": "Configures the dynamic linker run-time bindings"
+      "id": "lddlibc4",
+      "name": "lddlibc4",
+      "description": "Assists ldd with object files. It does not exist on newer architectures like x86_64"
     },
     {
       "id": "locale",
@@ -207,14 +353,154 @@
       "description": "Compiles locale specifications"
     },
     {
+      "id": "makedb",
+      "name": "makedb",
+      "description": "Creates a simple database from textual input"
+    },
+    {
+      "id": "mtrace",
+      "name": "mtrace",
+      "description": "Reads and interprets a memory trace file and displays a summary in human-readable format"
+    },
+    {
+      "id": "pcprofiledump",
+      "name": "pcprofiledump",
+      "description": "Dump information generated by PC profiling"
+    },
+    {
+      "id": "pldd",
+      "name": "pldd",
+      "description": "Lists dynamic shared objects used by running processes"
+    },
+    {
+      "id": "sln",
+      "name": "sln",
+      "description": "A statically linked ln program"
+    },
+    {
+      "id": "sotruss",
+      "name": "sotruss",
+      "description": "Traces shared library procedure calls of a specified command"
+    },
+    {
+      "id": "sprof",
+      "name": "sprof",
+      "description": "Reads and displays shared object profiling data"
+    },
+    {
+      "id": "tzselect",
+      "name": "tzselect",
+      "description": "Asks the user about the location of the system and reports the corresponding time zone description"
+    },
+    {
+      "id": "xtrace",
+      "name": "xtrace",
+      "description": "Traces the execution of a program by printing the currently executed function"
+    },
+    {
+      "id": "zdump",
+      "name": "zdump",
+      "description": "The time zone dumper"
+    },
+    {
+      "id": "zic",
+      "name": "zic",
+      "description": "The time zone compiler"
+    },
+    {
+      "id": "ld.so",
+      "name": "ld-*.so",
+      "description": "The helper program for shared library executables"
+    },
+    {
+      "id": "libBrokenLocale",
+      "name": "libBrokenLocale",
+      "description": "Used internally by Glibc as a gross hack to get broken programs (e.g., some Motif applications) running. See comments in glibc-2.44/locale/broken_cur_max.c for more information"
+    },
+    {
+      "id": "libanl",
+      "name": "libanl",
+      "description": "Dummy library containing no functions. Previously was the asynchronous name lookup library, whose functions are now in libc"
+    },
+    {
       "id": "libc",
       "name": "libc",
       "description": "The main C library"
     },
     {
+      "id": "libc_malloc_debug",
+      "name": "libc_malloc_debug",
+      "description": "Turns on memory allocation checking when preloaded"
+    },
+    {
+      "id": "libdl",
+      "name": "libdl",
+      "description": "Dummy library containing no functions. Previously was the dynamic linking interface library, whose functions are now in libc"
+    },
+    {
+      "id": "libg",
+      "name": "libg",
+      "description": "Dummy library containing no functions. Previously was a runtime library for g++"
+    },
+    {
       "id": "libm",
       "name": "libm",
       "description": "The mathematical library"
+    },
+    {
+      "id": "libmvec",
+      "name": "libmvec",
+      "description": "The vector math library, linked in as needed when libm is used"
+    },
+    {
+      "id": "libmcheck",
+      "name": "libmcheck",
+      "description": "Turns on memory allocation checking when linked to"
+    },
+    {
+      "id": "libmemusage",
+      "name": "libmemusage",
+      "description": "Used by memusage to help collect information about the memory usage of a program"
+    },
+    {
+      "id": "libnsl",
+      "name": "libnsl",
+      "description": "The network services library, now deprecated"
+    },
+    {
+      "id": "libnss",
+      "name": "libnss_*",
+      "description": "The Name Service Switch modules, containing functions for resolving host names, user names, group names, aliases, services, protocols, etc. Loaded by libc according to the configuration in /etc/nsswitch.conf"
+    },
+    {
+      "id": "libpcprofile",
+      "name": "libpcprofile",
+      "description": "Can be preloaded to PC profile an executable"
+    },
+    {
+      "id": "libpthread",
+      "name": "libpthread",
+      "description": "Dummy library containing no functions. Previously contained functions providing most of the interfaces specified by the POSIX.1c Threads Extensions and the semaphore interfaces specified by the POSIX.1b Real-time Extensions, now the functions are in libc"
+    },
+    {
+      "id": "libresolv",
+      "name": "libresolv",
+      "description": "Contains functions for creating, sending, and interpreting packets to the Internet domain name servers"
+    },
+    {
+      "id": "librt",
+      "name": "librt",
+      "description": "Contains functions providing most of the interfaces specified by the POSIX.1b Real-time Extensions"
+    },
+    {
+      "id": "libthread_db",
+      "name": "libthread_db",
+      "description": "Contains functions useful for building debuggers for multi-threaded programs"
+    },
+    {
+      "id": "libutil",
+      "name": "libutil",
+      "description": "Dummy library containing no functions. Previously contained code for standard functions used in many different Unix utilities. These functions are now in libc"
     }
   ]
 }

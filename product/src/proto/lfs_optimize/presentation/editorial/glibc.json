@@ -1,0 +1,255 @@
+{
+  "schema_version": 1,
+  "package": "glibc",
+  "installation_title": "Installation of Glibc",
+  "contents_title": "Contents of Glibc",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "libraries": "Installed libraries",
+    "directories": "Installed directories"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "text": "Some Glibc programs use the non-FHS-compliant /var/db directory for runtime data. Apply the FHS patch:"
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "text": "Apply the upstream fixes patch for old x86_64 tanh failures and parallel installation:"
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "text": "Build Glibc in a dedicated build directory:"
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "text": "Prepare Glibc for compilation:"
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    },
+    {
+      "type": "definition-list",
+      "title": "The meaning of the configure options:",
+      "items": [
+        {
+          "term": "--disable-werror",
+          "text": "Disables -Werror passed to GCC, which is necessary for running the test suite."
+        },
+        {
+          "term": "--enable-kernel=5.10",
+          "text": "Allows this Glibc to support kernels as old as 5.10 and generates workarounds for newer system calls."
+        },
+        {
+          "term": "--enable-stack-protector=strong",
+          "text": "Adds stronger stack-protector checks for buffer overflows."
+        },
+        {
+          "term": "--disable-nscd",
+          "text": "Does not build the name service cache daemon, which is no longer used."
+        },
+        {
+          "term": "libc_cv_slibdir=/usr/lib",
+          "text": "Selects /usr/lib as the system library directory instead of lib64."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Compile the package:"
+    },
+    {
+      "type": "command",
+      "command_index": 4
+    },
+    {
+      "type": "admonition",
+      "kind": "important",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "The Glibc test suite is considered critical in this section. Do not skip it."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Run the test suite:"
+    },
+    {
+      "type": "command",
+      "command_index": 5
+    },
+    {
+      "type": "admonition",
+      "kind": "note",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "A few failures can generally be ignored. io/tst-lchmod is known to fail in the LFS chroot environment. Some tests can time out on slower systems or with parallel make jobs; identify timeout failures with:"
+        },
+        {
+          "type": "supplemental-command",
+          "procedure": "diagnose-test-timeouts",
+          "command_index": 0
+        },
+        {
+          "type": "paragraph",
+          "text": "Some failures can also depend on the CPU model or host kernel version."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Prevent the install stage from warning about a missing /etc/ld.so.conf:"
+    },
+    {
+      "type": "command",
+      "command_index": 6
+    },
+    {
+      "type": "paragraph",
+      "text": "Skip an outdated installation sanity check that fails with a modern Glibc configuration:"
+    },
+    {
+      "type": "command",
+      "command_index": 7
+    },
+    {
+      "type": "admonition",
+      "kind": "important",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "When upgrading Glibc in place on an older running LFS system, additional precautions are required. For pre-12.1 systems, remove nscd and, on systemd systems, disable its service:"
+        },
+        {
+          "type": "supplemental-command",
+          "procedure": "upgrade-remove-nscd",
+          "command_index": 0
+        },
+        {
+          "type": "supplemental-command",
+          "procedure": "upgrade-remove-nscd",
+          "command_index": 1
+        },
+        {
+          "type": "paragraph",
+          "text": "Perform the guarded DESTDIR installation and replace the shared libraries in a single operation:"
+        },
+        {
+          "type": "supplemental-command",
+          "procedure": "upgrade-shared-libraries",
+          "command_index": 0
+        },
+        {
+          "type": "paragraph",
+          "text": "After rebooting an older pre-12.0 system whose GCC used fixincludes, relocate the GCC headers and remove stale fixed copies:"
+        },
+        {
+          "type": "supplemental-command",
+          "procedure": "upgrade-gcc-fixed-headers",
+          "command_index": 0
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Install the package:"
+    },
+    {
+      "type": "command",
+      "command_index": 8
+    },
+    {
+      "type": "paragraph",
+      "text": "Fix the hardcoded loader path in the ldd script:"
+    },
+    {
+      "type": "command",
+      "command_index": 9
+    },
+    {
+      "type": "paragraph",
+      "text": "Install the minimum locale set used to provide broad test-suite coverage:"
+    },
+    {
+      "type": "command",
+      "command_index": 10
+    },
+    {
+      "type": "paragraph",
+      "text": "Alternatively, install every locale listed in localedata/SUPPORTED:"
+    },
+    {
+      "type": "supplemental-command",
+      "procedure": "all-locales",
+      "command_index": 0
+    },
+    {
+      "type": "admonition",
+      "kind": "note",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "Glibc uses Libidn2 at run time when resolving internationalized domain names. Install Libidn2 from BLFS if that capability is needed."
+        }
+      ]
+    }
+  ],
+  "installed_term_kinds": {
+    "gencat": "program",
+    "getconf": "program",
+    "getent": "program",
+    "iconv": "program",
+    "iconvconfig": "program",
+    "ldconfig": "program",
+    "ldd": "program",
+    "lddlibc4": "program",
+    "locale": "program",
+    "localedef": "program",
+    "makedb": "program",
+    "mtrace": "program",
+    "pcprofiledump": "program",
+    "pldd": "program",
+    "sln": "program",
+    "sotruss": "program",
+    "sprof": "program",
+    "tzselect": "program",
+    "xtrace": "program",
+    "zdump": "program",
+    "zic": "program",
+    "ld.so": "library",
+    "libBrokenLocale": "library",
+    "libanl": "library",
+    "libc": "library",
+    "libc_malloc_debug": "library",
+    "libdl": "library",
+    "libg": "library",
+    "libm": "library",
+    "libmvec": "library",
+    "libmcheck": "library",
+    "libmemusage": "library",
+    "libnsl": "library",
+    "libnss": "library",
+    "libpcprofile": "library",
+    "libpthread": "library",
+    "libresolv": "library",
+    "librt": "library",
+    "libthread_db": "library",
+    "libutil": "library"
+  }
+}

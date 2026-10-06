@@ -6,11 +6,12 @@
     "published": "2026-09-01",
     "slice": "normalized Chapter 8 package rendering"
   },
-  "complete_package_count": 79,
-  "deferred_package_count": 1,
+  "complete_package_count": 80,
+  "deferred_package_count": 0,
   "complete_packages": [
     "man-pages",
     "iana-etc",
+    "glibc",
     "zlib",
     "bzip2",
     "xz",
@@ -89,9 +90,7 @@
     "util-linux",
     "e2fsprogs"
   ],
-  "deferred_authority_mismatches": [
-    "glibc"
-  ],
+  "deferred_authority_mismatches": [],
   "packages": {
     "man-pages": {
       "command_sha256": [
@@ -2114,6 +2113,86 @@
         "grub-set-default": "program",
         "grub-sparc64-setup": "program",
         "grub-syslinux2cfg": "program"
+      }
+    },
+    "glibc": {
+      "command_sha256": [
+        "6fc1445c41b8d2f672e140bab20b0b0e4239dd7a0d90694bb38db6203c372dcf",
+        "17a3de75feb43eac6dad8ddb5725c8b4a1b8cf5d4b1f8e47e72c2bf2da7eb9d6",
+        "2e2e13a6fedd45d15e32fdc1bd5aa2edcad1231e281827d1d3fb8131c5818617",
+        "69b8481444b2799bddabeb386594a43d3d277d3bb3989ac249725e548128ad8f",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "b1c8db92911f4da9d802b66d290d5b220839db5410a6dafbf6fd075f2e158606",
+        "04bde4c9130c0565d082936ad1c7ebe77bf38869727efbe0b16d39f83f02cd08",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f",
+        "8de73c9c5c04e089ad5a2fcbd7a5bb78202e04bacb82d6af1d425c3cdce49cec",
+        "d44aea0371ecbcb634500b68bf54b27dc5544aca77f0182f7ab8f7ee7765b275"
+      ],
+      "supplemental_command_sha256": {
+        "diagnose-test-timeouts": [
+          "0c3cff7a9f5d30ae363514807a4ce30ba0fcb86e64bfcffdffd846a715e4d783"
+        ],
+        "upgrade-remove-nscd": [
+          "d33574eef29d775a2a692c3a4721f9d5aaf8e4cfd8364556ea50d87e55b493b7",
+          "94f7f67c919fae5b02980036f1bdd2bdad9e4585a460bef4a1203b9e901af864"
+        ],
+        "upgrade-shared-libraries": [
+          "352600ccf8a706bd84ce4dd3b39eca7895c22c4f3369a639ac05fbcaa01baa1f"
+        ],
+        "upgrade-gcc-fixed-headers": [
+          "74065293c0f5c7bbb8b10bc285ffe07e5960220373858904cf32f8883d253f55"
+        ],
+        "all-locales": [
+          "38cccb963c680b7711c1a34a92e0c410b83d604824a36156bd12f34d77e0f334"
+        ]
+      },
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed libraries",
+        "directories": "Installed directories"
+      },
+      "installed_term_kinds": {
+        "gencat": "program",
+        "getconf": "program",
+        "getent": "program",
+        "iconv": "program",
+        "iconvconfig": "program",
+        "ldconfig": "program",
+        "ldd": "program",
+        "lddlibc4": "program",
+        "locale": "program",
+        "localedef": "program",
+        "makedb": "program",
+        "mtrace": "program",
+        "pcprofiledump": "program",
+        "pldd": "program",
+        "sln": "program",
+        "sotruss": "program",
+        "sprof": "program",
+        "tzselect": "program",
+        "xtrace": "program",
+        "zdump": "program",
+        "zic": "program",
+        "ld.so": "library",
+        "libBrokenLocale": "library",
+        "libanl": "library",
+        "libc": "library",
+        "libc_malloc_debug": "library",
+        "libdl": "library",
+        "libg": "library",
+        "libm": "library",
+        "libmvec": "library",
+        "libmcheck": "library",
+        "libmemusage": "library",
+        "libnsl": "library",
+        "libnss": "library",
+        "libpcprofile": "library",
+        "libpthread": "library",
+        "libresolv": "library",
+        "librt": "library",
+        "libthread_db": "library",
+        "libutil": "library"
       }
     }
   },
