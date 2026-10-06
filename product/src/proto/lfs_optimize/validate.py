@@ -236,6 +236,20 @@ def main() -> int:
         "resolver: escaped literal braces were not restored",
     )
 
+    pkgconf_resolved = resolve(["pkgconf"])["packages"][0]
+    pkgconf_commands = [
+        command["command"]
+        for step in pkgconf_resolved["procedure"]
+        for command in step["commands"]
+    ]
+    require(
+        any(
+            f"pkgconf{{,-{pkgconf_resolved['version']}}}" in command
+            for command in pkgconf_commands
+        ),
+        "resolver: nested parameter inside escaped shell braces drifted",
+    )
+
     artifact_self_test()
     presentation_self_test()
     for package in result["packages"]:

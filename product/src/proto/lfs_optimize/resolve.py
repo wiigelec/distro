@@ -4,7 +4,6 @@ from __future__ import annotations
 import argparse
 import copy
 import json
-import re
 from pathlib import Path
 from typing import Any
 
@@ -18,17 +17,14 @@ def load_json(path: Path) -> dict[str, Any]:
     return value
 
 
+class SubstitutionVariables(dict[str, str]):
+    def __missing__(self, key: str) -> str:
+        return "{" + key + "}"
+
+
 def substitute(value: Any, variables: dict[str, str]) -> Any:
     if isinstance(value, str):
-        left_escape = "\x00LITERAL_LEFT_BRACE\x00"
-        right_escape = "\x00LITERAL_RIGHT_BRACE\x00"
-        protected = value.replace("{{", left_escape).replace("}}", right_escape)
-        substituted = re.sub(
-            r"\{([A-Za-z_][A-Za-z0-9_]*)\}",
-            lambda match: variables.get(match.group(1), match.group(0)),
-            protected,
-        )
-        return substituted.replace(left_escape, "{").replace(right_escape, "}")
+        return value.format_map(SubstitutionVariables(variables))
     if isinstance(value, list):
         return [substitute(item, variables) for item in value]
     if isinstance(value, dict):
