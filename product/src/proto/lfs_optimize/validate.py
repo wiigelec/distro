@@ -12,7 +12,7 @@ from development import (
 )
 from execute import command_failure_disposition, plan
 from presentation import self_test as presentation_self_test
-from resolve import HERE, load_json, resolve
+from resolve import HERE, load_json, resolve, substitute_string
 from system import plan_system
 
 DEPENDENCY_CLASSES = ("build", "runtime", "test", "before", "optional")
@@ -176,6 +176,36 @@ def main() -> int:
             checksum = resource.get("md5")
             require(isinstance(checksum, str) and len(checksum) == 32,
                     f"{name}/{resource_name}: invalid MD5")
+
+    require(
+        substitute_string("PAGE={paper_size}", {"paper_size": "A4"})
+        == "PAGE=A4",
+        "resolver: normalized parameter substitution drift",
+    )
+    require(
+        substitute_string("lib{{a,b}}.a", {}) == "lib{a,b}.a",
+        "resolver: doubled literal-brace escape drift",
+    )
+    require(
+        substitute_string("include{-fixed,}/limits.h", {})
+        == "include{-fixed,}/limits.h",
+        "resolver: shell brace expansion drift",
+    )
+    require(
+        substitute_string("name{,.2}", {}) == "name{,.2}",
+        "resolver: dot-bearing shell brace expansion drift",
+    )
+    require(
+        substitute_string("${LFS_TGT}", {}) == "${LFS_TGT}",
+        "resolver: shell variable brace syntax drift",
+    )
+    require(
+        substitute_string(
+            "pkgconf{{,-{version}}}",
+            {"version": "2.4.3"},
+        ) == "pkgconf{,-2.4.3}",
+        "resolver: nested parameter inside escaped braces drift",
+    )
 
     result = resolve()
     require(len(result["packages"]) == len(names),

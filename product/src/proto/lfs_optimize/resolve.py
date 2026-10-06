@@ -17,14 +17,42 @@ def load_json(path: Path) -> dict[str, Any]:
     return value
 
 
-class SubstitutionVariables(dict[str, str]):
-    def __missing__(self, key: str) -> str:
-        return "{" + key + "}"
+def substitute_string(value: str, variables: dict[str, str]) -> str:
+    result: list[str] = []
+    index = 0
+    length = len(value)
+
+    while index < length:
+        if value.startswith("{{", index):
+            result.append("{")
+            index += 2
+            continue
+        if value.startswith("}}", index):
+            result.append("}")
+            index += 2
+            continue
+        if value[index] == "{":
+            end = value.find("}", index + 1)
+            if end != -1:
+                key = value[index + 1:end]
+                if (
+                    key
+                    and (key[0].isalpha() or key[0] == "_")
+                    and all(char.isalnum() or char == "_" for char in key[1:])
+                    and key in variables
+                ):
+                    result.append(variables[key])
+                    index = end + 1
+                    continue
+        result.append(value[index])
+        index += 1
+
+    return "".join(result)
 
 
 def substitute(value: Any, variables: dict[str, str]) -> Any:
     if isinstance(value, str):
-        return value.format_map(SubstitutionVariables(variables))
+        return substitute_string(value, variables)
     if isinstance(value, list):
         return [substitute(item, variables) for item in value]
     if isinstance(value, dict):
