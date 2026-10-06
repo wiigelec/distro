@@ -91,7 +91,7 @@ def cached_download(
     item: dict[str, Any], cache_root: Path, *, mirror_required: bool
 ) -> Path:
     expected = item["md5"]
-    suffix = mirror_md5_index(cache_root).get(expected)
+    suffix = mirror_md5_index(cache_root).get(expected) if mirror_required else None
 
     if suffix is not None:
         url = LFS_SOURCE_MIRROR + suffix
@@ -240,7 +240,11 @@ def prepare_sources(package: dict[str, Any], clone: Path, cache: Path) -> str:
         shutil.rmtree(host_build_root)
     host_build_root.mkdir(parents=True)
 
-    source_archive = cached_download(package["source"], cache, mirror_required=True)
+    source_archive = cached_download(
+        package["source"],
+        cache,
+        mirror_required=package["source"].get("mirror", "lfs") == "lfs",
+    )
     extracted = safe_extract_source(source_archive, host_build_root / "unpack")
     host_source = host_build_root / "source"
     extracted.rename(host_source)

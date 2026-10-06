@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "name": "linux-pam",
+  "reference": {
+    "blfs_section": "linux-pam",
+    "edition": "r13.1-292-systemd"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "mkdir build &&\ncd build &&\n\nmeson setup ..        \\\n  --prefix=/usr       \\\n  --buildtype=release \\\n  -D docdir=/usr/share/doc/Linux-PAM-{version}"
+        }
+      ]
+    },
+    {
+      "phase": "build",
+      "working_directory": "build",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "ninja"
+        }
+      ]
+    },
+    {
+      "phase": "test",
+      "working_directory": "build",
+      "condition": "tests-enabled",
+      "commands": [
+        {
+          "user": "root",
+          "command": "install -v -m755 -d /etc/pam.d &&\ncat > /etc/pam.d/other << \"EOF\"\nauth     required       pam_deny.so\naccount  required       pam_deny.so\npassword required       pam_deny.so\nsession  required       pam_deny.so\nEOF"
+        },
+        {
+          "user": "root",
+          "command": "ninja test"
+        },
+        {
+          "user": "root",
+          "command": "rm -fv /etc/pam.d/other"
+        }
+      ]
+    },
+    {
+      "phase": "install",
+      "working_directory": "build",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "ninja install &&\nchmod -v 4755 /usr/sbin/unix_chkpwd"
+        }
+      ]
+    },
+    {
+      "phase": "system",
+      "working_directory": "build",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "install -vdm755 /etc/pam.d &&\ncat > /etc/pam.d/system-account << \"EOF\"\n# Begin /etc/pam.d/system-account\n\naccount   required    pam_unix.so\n\n# End /etc/pam.d/system-account\nEOF\n\ncat > /etc/pam.d/system-auth << \"EOF\"\n# Begin /etc/pam.d/system-auth\n\nauth      required    pam_unix.so\n\n# End /etc/pam.d/system-auth\nEOF\n\ncat > /etc/pam.d/system-session << \"EOF\"\n# Begin /etc/pam.d/system-session\n\nsession   required    pam_unix.so\n\n# End /etc/pam.d/system-session\nEOF\n\ncat > /etc/pam.d/system-password << \"EOF\"\n# Begin /etc/pam.d/system-password\n\npassword  required    pam_unix.so       yescrypt shadow try_first_pass\n\n# End /etc/pam.d/system-password\nEOF\n\ncat > /etc/pam.d/other << \"EOF\"\n# Begin /etc/pam.d/other\n\nauth        required        pam_warn.so\nauth        required        pam_deny.so\naccount     required        pam_warn.so\naccount     required        pam_deny.so\npassword    required        pam_warn.so\npassword    required        pam_deny.so\nsession     required        pam_warn.so\nsession     required        pam_deny.so\n\n# End /etc/pam.d/other\nEOF"
+        }
+      ]
+    }
+  ],
+  "description": "Linux-PAM provides Pluggable Authentication Modules used by the system administrator to control application authentication.",
+  "dependencies": {
+    "build": [
+      "Meson",
+      "Ninja"
+    ],
+    "runtime": [
+      "Shadow",
+      "systemd",
+      "libpwquality"
+    ],
+    "test": [],
+    "before": [
+      "systemd"
+    ],
+    "recommended": [
+      "libpwquality"
+    ],
+    "optional": [
+      "libnsl",
+      "libtirpc",
+      "rpcsvc-proto",
+      "Berkeley DB",
+      "libaudit",
+      "libeconf",
+      "docbook5",
+      "docbook-xsl-ns",
+      "fop",
+      "libxslt",
+      "lynx"
+    ]
+  },
+  "kernel_requirements": [
+    {
+      "symbol": "AUDIT",
+      "state": "enabled",
+      "required_for": "pam_loginuid.so when systemd is rebuilt with PAM support"
+    }
+  ],
+  "integration": {
+    "post_install": [
+      {
+        "package": "shadow",
+        "action": "rebuild-reconfigure",
+        "status": "required"
+      },
+      {
+        "package": "systemd",
+        "action": "rebuild-reconfigure",
+        "build": "blfs-pam",
+        "status": "required"
+      }
+    ]
+  },
+  "installed": {
+    "programs": [
+      "faillock",
+      "mkhomedir_helper",
+      "pam_namespace_helper",
+      "pam_timestamp_check",
+      "pwhistory_helper",
+      "unix_chkpwd"
+    ],
+    "libraries": [
+      "libpam.so",
+      "libpamc.so",
+      "libpam_misc.so"
+    ],
+    "directories": [
+      "/etc/security",
+      "/usr/lib/security",
+      "/usr/include/security",
+      "/usr/share/doc/Linux-PAM-{version}"
+    ]
+  },
+  "installed_descriptions": [
+    {
+      "id": "faillock",
+      "name": "faillock",
+      "kind": "program",
+      "description": "Displays and modifies authentication failure record files"
+    },
+    {
+      "id": "mkhomedir_helper",
+      "name": "mkhomedir_helper",
+      "kind": "program",
+      "description": "Creates home directories for users"
+    },
+    {
+      "id": "pam_namespace_helper",
+      "name": "pam_namespace_helper",
+      "kind": "program",
+      "description": "Configures a private namespace for a user session"
+    },
+    {
+      "id": "pam_timestamp_check",
+      "name": "pam_timestamp_check",
+      "kind": "program",
+      "description": "Checks whether the default PAM timestamp is valid"
+    },
+    {
+      "id": "pwhistory_helper",
+      "name": "pwhistory_helper",
+      "kind": "program",
+      "description": "Transfers password hashes from passwd or shadow to opasswd"
+    },
+    {
+      "id": "unix_chkpwd",
+      "name": "unix_chkpwd",
+      "kind": "program",
+      "description": "Helper used by pam_unix to verify a user's password"
+    }
+  ]
+}

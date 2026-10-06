@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "package": "systemd",
+  "build": "blfs-pam",
+  "description": "BLFS rebuild of systemd with Linux-PAM support enabled after Linux-PAM is installed and configured.",
+  "dependencies": {
+    "build": [
+      "Linux-PAM"
+    ],
+    "runtime": [
+      "Linux-PAM"
+    ],
+    "test": [],
+    "before": [],
+    "recommended": [
+      "Linux-PAM"
+    ],
+    "optional": [
+      "Polkit",
+      "libpwquality",
+      "cryptsetup"
+    ]
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "rm -fv /usr/lib/systemd/system/systemd-update-utmp-runlevel.service"
+        },
+        {
+          "user": "root",
+          "command": "sed -i -e 's/GROUP=\"render\"/GROUP=\"video\"/' \\\n       -e 's/GROUP=\"sgx\", //' rules.d/50-udev-default.rules.in"
+        }
+      ]
+    },
+    {
+      "phase": "configure",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "mkdir build &&\ncd build &&\n\nmeson setup ..                       --prefix=/usr                  --buildtype=release            -D default-dnssec=no           -D firstboot=false             -D install-tests=false         -D ldconfig=false              -D man=auto                    -D sysusers=false              -D rpmmacrosdir=no             -D homed=disabled              -D mode=release                -D pam=enabled                 -D pamconfdir=/etc/pam.d       -D dev-kvm-mode=0660           -D nobody-group=nogroup        -D sysupdate=disabled          -D ukify=disabled              -D docdir=/usr/share/doc/systemd-{version}"
+        }
+      ]
+    },
+    {
+      "phase": "build",
+      "working_directory": "build",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "ninja"
+        }
+      ]
+    },
+    {
+      "phase": "test",
+      "working_directory": "build",
+      "condition": "tests-enabled",
+      "commands": [
+        {
+          "user": "root",
+          "command": "ninja test"
+        }
+      ]
+    },
+    {
+      "phase": "install",
+      "working_directory": "build",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "ninja install"
+        }
+      ]
+    },
+    {
+      "phase": "system",
+      "working_directory": "build",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "grep 'pam_systemd' /etc/pam.d/system-session ||\ncat >> /etc/pam.d/system-session << \"EOF\"\n# Begin Systemd addition\n\nsession  required    pam_loginuid.so\nsession  optional    pam_systemd.so\n\n# End Systemd addition\nEOF\n\ncat > /etc/pam.d/systemd-user << \"EOF\"\n# Begin /etc/pam.d/systemd-user\n\naccount  required    pam_access.so\naccount  include     system-account\n\nsession  required    pam_env.so\nsession  required    pam_limits.so\nsession  required    pam_loginuid.so\nsession  optional    pam_keyinit.so force revoke\nsession  optional    pam_systemd.so\n\nauth     required    pam_deny.so\npassword required    pam_deny.so\n\n# End /etc/pam.d/systemd-user\nEOF"
+        },
+        {
+          "user": "root",
+          "command": "systemctl daemon-reexec",
+          "kind": "session-transition",
+          "source_command": "systemctl daemon-reexec"
+        }
+      ]
+    }
+  ]
+}

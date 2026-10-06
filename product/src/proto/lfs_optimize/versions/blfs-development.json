@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "name": "blfs-development",
+  "basis": "BLFS r13.1-292 systemd, 2026-09-30",
+  "packages": {
+    "linux-pam": {
+      "version": "1.7.3",
+      "source": {
+        "url": "https://github.com/linux-pam/linux-pam/releases/download/v1.7.3/Linux-PAM-1.7.3.tar.xz",
+        "md5": "0880bc3b28cfd8e415ee3d5a7378ebe0",
+        "size": "504 KB",
+        "home": "https://github.com/linux-pam/linux-pam",
+        "mirror": "direct"
+      },
+      "reference_metrics": {
+        "build_time": "0.3 SBU (with tests)",
+        "disk_space": "16 MB (with tests)"
+      }
+    },
+    "systemd": {
+      "version": "261.3",
+      "source": {
+        "url": "https://github.com/systemd/systemd/archive/v261.3/systemd-261.3.tar.gz",
+        "md5": "21d1d4ea580c2f111f067ee8184e7952",
+        "size": "18 MB",
+        "home": "https://systemd.io",
+        "mirror": "direct"
+      },
+      "reference_metrics": {
+        "build_time": "1.1 SBU (with tests using 4 cores)",
+        "disk_space": "488 MB (with tests)"
+      }
+    }
+  }
+}

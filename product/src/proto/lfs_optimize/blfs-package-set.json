@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "name": "blfs-pam-systemd-proof",
+  "packages": [
+    "linux-pam",
+    {
+      "name": "systemd",
+      "build": "blfs-pam"
+    }
+  ]
+}

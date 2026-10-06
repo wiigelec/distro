@@ -252,3 +252,44 @@ python3 product/src/proto/lfs_optimize/development.py bind-definitions \
   --package-set /path/to/state/package-set.json \
   --output /path/to/state/definition-state.json
 ```
+
+## Milestone 8 — BLFS proof
+
+The first BLFS slice uses Linux-PAM followed by the BLFS systemd rebuild. It
+introduces an explicit Build object without changing Package identity:
+
+```text
+Linux-PAM 1.7.3
+    |
+    +-- CONFIG_AUDIT requirement
+    +-- PAM base configuration
+    |
+    v
+systemd 261.3 [build: blfs-pam]
+    |
+    +-- -D pam=enabled
+    +-- -D pamconfdir=/etc/pam.d
+    +-- pam_systemd/systemd-user configuration
+    +-- recorded daemon-reexec session transition
+```
+
+`blfs-package-set.json` is intentionally separate from the normal LFS package
+set. An entry may be a package name or may select a named build. `blfs.py`
+combines the version-independent package definition with the BLFS version
+manifest and, when selected, a build definition under `blfs-builds/`. The
+resulting normalized package is handed to the existing normal executor.
+
+BLFS sources use `source.mirror = "direct"` so the executor fetches the
+authoritative source URL instead of requiring membership in the LFS 13.1 source
+mirror.
+
+Linux-PAM also records the BLFS requirement to rebuild/reconfigure Shadow and
+systemd after PAM is installed. This first slice executes the systemd transition;
+the Shadow PAM rebuild is the next integration step.
+
+Plan without root access:
+
+```sh
+python3 product/src/proto/lfs_optimize/validate_m8.py
+python3 product/src/proto/lfs_optimize/blfs.py --plan
+```

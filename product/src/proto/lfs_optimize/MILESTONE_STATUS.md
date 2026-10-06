@@ -18,7 +18,8 @@ Roadmap:
 | M5 — Development proof | COMPLETE | Accepted state, candidate identity, validation, definition binding/drift rejection, review evidence, and guarded transactional promotion are implemented. |
 | M6 — Release proof | SATISFIED BY COMPOSITION | M4 proves clean full-system realization from normalized state and M5 proves validated state identity and controlled promotion. Freezing accepted state under a release identity adds production plumbing but no unresolved prototype architecture question. |
 | M7 — Presentation proof | COMPLETE — 199/199 CHUNKS COMPLETE; 0 AUTHORITY GAPS | All 80/80 Chapter 8 package pages and all 119/119 non-package bodies render from normalized authority plus presentation-owned editorial state. All 38 referenced nested targets are physically present in rendered HTML. |
-| M8+ | NOT STARTED | BLFS, hard-BLFS, and user-system proofs remain later roadmap milestones. |
+| M8 — BLFS proof | IN PROGRESS | First slice models Linux-PAM 1.7.3 followed by a named PAM-enabled systemd 261.3 rebuild through the normal executor. |
+| M9+ | NOT STARTED | Hard-BLFS collections/catalogs and user-system proofs remain later roadmap milestones. |
 
 ## M5 closure
 
@@ -444,3 +445,20 @@ python3 product/src/proto/lfs_optimize/validate.py
 
 Direct validation should pass with M7 treated as complete. The next roadmap work
 is M8 — BLFS.
+
+## M8 first slice — Linux-PAM + systemd
+
+The first BLFS proof deliberately targets a cross-package integration transition.
+`blfs-package-set.json` selects `linux-pam` followed by `systemd` with the named
+`blfs-pam` build. Package identity remains `systemd`; the selected build identity
+is stored separately under `blfs-builds/`.
+
+Linux-PAM introduces the first explicit BLFS kernel requirement (`CONFIG_AUDIT`)
+and post-install rebuild/reconfiguration requirements for Shadow and systemd.
+The systemd build enables PAM, installs PAM configuration into `/etc/pam.d`,
+adds `pam_systemd.so` session integration, and records `systemctl daemon-reexec`
+as a session transition rather than trying to re-exec PID 1 inside the
+disposable chroot executor.
+
+The Shadow PAM rebuild remains the next piece of this slice and is retained as
+required integration state rather than silently omitted.
