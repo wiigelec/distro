@@ -31,7 +31,7 @@
       "phase": "test",
       "commands": [
         {
-          "command": "make check",
+          "command": "chown -R tester .\nsu tester -c \"PATH=$PATH make check\"",
           "user": "root"
         }
       ],
