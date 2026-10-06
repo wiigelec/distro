@@ -225,5 +225,23 @@
       "name": "libpanelw",
       "description": "Contains functions to implement panels"
     }
-  ]
+  ],
+  "supplemental_procedures": {
+    "abi5-compatibility": {
+      "description": "Build and install non-wide-character ABI version 5 compatibility libraries for binary-only applications or LSB compatibility.",
+      "procedure": [
+        {
+          "phase": "compatibility",
+          "commands": [
+            {
+              "command": "make distclean\n./configure --prefix=/usr    \\\n            --with-shared    \\\n            --without-normal \\\n            --without-debug  \\\n            --without-cxx-binding \\\n            --with-abi-version=5\nmake sources libs\ncp -av lib/lib*.so.5* /usr/lib",
+              "user": "root"
+            }
+          ],
+          "working_directory": "source",
+          "condition": "always"
+        }
+      ]
+    }
+  }
 }
