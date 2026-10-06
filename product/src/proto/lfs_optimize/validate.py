@@ -212,6 +212,16 @@ def main() -> int:
     else:
         raise RuntimeError("groff: invalid paper-size parameter accepted")
 
+    glibc_resolved = resolve(["glibc"])["packages"][0]
+    glibc_upgrade = glibc_resolved["supplemental_procedures"][
+        "upgrade-gcc-fixed-headers"
+    ]["procedure"][0]["commands"][0]["command"]
+    require(
+        "include{-fixed,}/limits.h" in glibc_upgrade
+        and "include{-fixed,}/syslimits.h" in glibc_upgrade,
+        "resolver: shell brace expansion was mistaken for a package parameter",
+    )
+
     artifact_self_test()
     presentation_self_test()
     for package in result["packages"]:
