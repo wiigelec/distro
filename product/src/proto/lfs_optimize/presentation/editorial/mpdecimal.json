@@ -60,5 +60,9 @@
       "type": "command",
       "command_index": 3
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "libmpdec": "library",
+    "libmpdecpp": "library"
+  }
 }

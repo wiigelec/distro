@@ -246,5 +246,40 @@
       "type": "command",
       "command_index": 7
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "badblocks": "program",
+    "chattr": "program",
+    "compile_et": "program",
+    "debugfs": "program",
+    "dumpe2fs": "program",
+    "e2freefrag": "program",
+    "e2fsck": "program",
+    "e2image": "program",
+    "e2label": "program",
+    "e2mmpstatus": "program",
+    "e2scrub": "program",
+    "e2scrub_all": "program",
+    "e2undo": "program",
+    "e4crypt": "program",
+    "e4defrag": "program",
+    "filefrag": "program",
+    "fsck.ext2": "program",
+    "fsck.ext3": "program",
+    "fsck.ext4": "program",
+    "logsave": "program",
+    "lsattr": "program",
+    "mk_cmds": "program",
+    "mke2fs": "program",
+    "mkfs.ext2": "program",
+    "mkfs.ext3": "program",
+    "mkfs.ext4": "program",
+    "mklost-found": "program",
+    "resize2fs": "program",
+    "tune2fs": "program",
+    "libcom_err": "library",
+    "libe2p": "library",
+    "libext2fs": "library",
+    "libss": "library"
+  }
 }

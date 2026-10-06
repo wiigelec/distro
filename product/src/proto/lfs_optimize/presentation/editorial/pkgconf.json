@@ -87,5 +87,10 @@
       "type": "command",
       "command_index": 5
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "pkgconf": "program",
+    "bomtool": "program",
+    "libpkgconf": "library"
+  }
 }

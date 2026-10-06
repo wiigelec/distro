@@ -443,5 +443,39 @@
       "type": "command",
       "command_index": 4
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "chage": "program",
+    "chfn": "program",
+    "chgpasswd": "program",
+    "chpasswd": "program",
+    "chsh": "program",
+    "faillog": "program",
+    "getsubids": "program",
+    "gpasswd": "program",
+    "groupadd": "program",
+    "groupdel": "program",
+    "groupmod": "program",
+    "grpck": "program",
+    "grpconv": "program",
+    "grpunconv": "program",
+    "login": "program",
+    "newgidmap": "program",
+    "newgrp": "program",
+    "newuidmap": "program",
+    "newusers": "program",
+    "nologin": "program",
+    "passwd": "program",
+    "pwck": "program",
+    "pwconv": "program",
+    "pwunconv": "program",
+    "sg": "program",
+    "su": "program",
+    "useradd": "program",
+    "userdel": "program",
+    "usermod": "program",
+    "vigr": "program",
+    "vipw": "program",
+    "libsubid": "library"
+  }
 }

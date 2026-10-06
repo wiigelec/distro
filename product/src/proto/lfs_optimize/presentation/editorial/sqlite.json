@@ -144,5 +144,9 @@
       "type": "command",
       "command_index": 4
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "sqlite3": "program",
+    "libsqlite3.so": "library"
+  }
 }

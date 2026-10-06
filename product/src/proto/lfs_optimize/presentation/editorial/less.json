@@ -92,5 +92,10 @@
       "type": "command",
       "command_index": 3
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "less": "program",
+    "lessecho": "program",
+    "lesskey": "program"
+  }
 }

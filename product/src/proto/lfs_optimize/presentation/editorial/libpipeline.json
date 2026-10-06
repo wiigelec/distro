@@ -63,5 +63,8 @@
       "type": "command",
       "command_index": 2
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "libpipeline": "library"
+  }
 }

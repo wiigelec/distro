@@ -89,5 +89,15 @@
       "type": "command",
       "command_index": 2
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "depmod": "program",
+    "insmod": "program",
+    "kmod": "program",
+    "lsmod": "program",
+    "modinfo": "program",
+    "modprobe": "program",
+    "rmmod": "program",
+    "libkmod": "library"
+  }
 }

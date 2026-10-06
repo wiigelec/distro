@@ -61,5 +61,10 @@
       "type": "command",
       "command_index": 3
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "bison": "program",
+    "yacc": "program",
+    "liby": "library"
+  }
 }

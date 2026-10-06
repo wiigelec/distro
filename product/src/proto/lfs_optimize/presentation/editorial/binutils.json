@@ -175,5 +175,31 @@
     "programs": "Installed programs",
     "libraries": "Installed libraries",
     "directories": "Installed directory"
+  },
+  "installed_term_kinds": {
+    "addr2line": "program",
+    "ar": "program",
+    "as": "program",
+    "c-filt": "program",
+    "dwp": "program",
+    "elfedit": "program",
+    "gprof": "program",
+    "gprofng": "program",
+    "ld": "program",
+    "ld.bfd": "program",
+    "nm": "program",
+    "objcopy": "program",
+    "objdump": "program",
+    "ranlib": "program",
+    "readelf": "program",
+    "size": "program",
+    "strings": "program",
+    "strip": "program",
+    "libbfd": "library",
+    "libctf": "library",
+    "libctf-nobfd": "library",
+    "libgprofng": "library",
+    "libopcodes": "library",
+    "libsframe": "library"
   }
 }

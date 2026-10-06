@@ -47,5 +47,12 @@
       "type": "command",
       "command_index": 2
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "lz4": "program",
+    "lz4c": "program",
+    "lz4cat": "program",
+    "unlz4": "program",
+    "liblz4": "library"
+  }
 }

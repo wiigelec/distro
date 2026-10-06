@@ -947,5 +947,37 @@
       "type": "command",
       "command_index": 19
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "c": "program",
+    "cc": "program",
+    "cpp": "program",
+    "g": "program",
+    "gcc": "program",
+    "gcc-ar": "program",
+    "gcc-nm": "program",
+    "gcc-ranlib": "program",
+    "gcov": "program",
+    "gcov-dump": "program",
+    "gcov-tool": "program",
+    "lto-dump": "program",
+    "libasan": "library",
+    "libatomic": "library",
+    "libcc1": "library",
+    "libgcc": "library",
+    "libgcov": "library",
+    "libgomp": "library",
+    "libhwasan": "library",
+    "libitm": "library",
+    "liblsan": "library",
+    "liblto_plugin": "library",
+    "libquadmath": "library",
+    "libssp": "library",
+    "libstdc": "library",
+    "libstdcexp": "library",
+    "libstdcfs": "library",
+    "libsupc": "library",
+    "libtsan": "library",
+    "libubsan": "library"
+  }
 }

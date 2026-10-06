@@ -61,5 +61,31 @@
       "type": "command",
       "command_index": 3
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "lzcat": "program",
+    "lzcmp": "program",
+    "lzdiff": "program",
+    "lzegrep": "program",
+    "lzfgrep": "program",
+    "lzgrep": "program",
+    "lzless": "program",
+    "lzma": "program",
+    "lzmadec": "program",
+    "lzmainfo": "program",
+    "lzmore": "program",
+    "unlzma": "program",
+    "unxz": "program",
+    "xz": "program",
+    "xzcat": "program",
+    "xzcmp": "program",
+    "xzdec": "program",
+    "xzdiff": "program",
+    "xzegrep": "program",
+    "xzfgrep": "program",
+    "xzgrep": "program",
+    "xzless": "program",
+    "xzmore": "program",
+    "liblzma": "library"
+  }
 }

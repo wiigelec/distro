@@ -34,5 +34,8 @@
       "type": "command",
       "command_index": 1
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "wheel-wheel": "program"
+  }
 }

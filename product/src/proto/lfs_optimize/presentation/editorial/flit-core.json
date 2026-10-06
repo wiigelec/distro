@@ -193,5 +193,6 @@
         }
       ]
     }
-  ]
+  ],
+  "installed_term_kinds": {}
 }

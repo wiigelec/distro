@@ -260,5 +260,19 @@
       "type": "command",
       "command_index": 9
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "bunzip2": "program",
+    "bzcat": "program",
+    "bzcmp": "program",
+    "bzdiff": "program",
+    "bzegrep": "program",
+    "bzfgrep": "program",
+    "bzgrep": "program",
+    "bzip2": "program",
+    "bzip2recover": "program",
+    "bzless": "program",
+    "bzmore": "program",
+    "libbz2": "library"
+  }
 }

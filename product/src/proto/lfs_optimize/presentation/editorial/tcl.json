@@ -184,5 +184,11 @@
       "type": "command",
       "command_index": 8
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "tclsh8.6": "program",
+    "tclsh": "program",
+    "libtcl8.6.so": "library",
+    "libtclstub8.6.a": "library"
+  }
 }

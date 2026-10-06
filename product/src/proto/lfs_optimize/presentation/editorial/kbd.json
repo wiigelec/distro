@@ -172,5 +172,32 @@
       "type": "command",
       "command_index": 6
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "chvt": "program",
+    "deallocvt": "program",
+    "dumpkeys": "program",
+    "fgconsole": "program",
+    "getkeycodes": "program",
+    "kbdinfo": "program",
+    "kbd_mode": "program",
+    "kbdrate": "program",
+    "loadkeys": "program",
+    "loadunimap": "program",
+    "mapscrn": "program",
+    "openvt": "program",
+    "psfaddtable": "program",
+    "psfgettable": "program",
+    "psfstriptable": "program",
+    "psfxtable": "program",
+    "setfont": "program",
+    "setkeycodes": "program",
+    "setleds": "program",
+    "setmetamode": "program",
+    "setvtrgb": "program",
+    "showconsolefont": "program",
+    "showkey": "program",
+    "unicode_start": "program",
+    "unicode_stop": "program"
+  }
 }

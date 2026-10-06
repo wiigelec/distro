@@ -118,5 +118,11 @@
       "type": "command",
       "command_index": 3
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "find": "program",
+    "locate": "program",
+    "updatedb": "program",
+    "xargs": "program"
+  }
 }

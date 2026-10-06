@@ -72,5 +72,10 @@
       "type": "command",
       "command_index": 4
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "egrep": "program",
+    "fgrep": "program",
+    "grep": "program"
+  }
 }

@@ -158,5 +158,10 @@
       "type": "command",
       "command_index": 6
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "awk": "program",
+    "gawk": "program",
+    "gawk-version": "program"
+  }
 }

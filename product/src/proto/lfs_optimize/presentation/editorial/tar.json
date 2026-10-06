@@ -131,5 +131,8 @@
       "type": "command",
       "command_index": 4
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "tar": "program"
+  }
 }

@@ -153,5 +153,38 @@
       "type": "command",
       "command_index": 4
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "corelist": "program",
+    "cpan": "program",
+    "enc2xs": "program",
+    "encguess": "program",
+    "h2ph": "program",
+    "h2xs": "program",
+    "instmodsh": "program",
+    "json_pp": "program",
+    "libnetcfg": "program",
+    "perl": "program",
+    "perl-version": "program",
+    "perlbug": "program",
+    "perldoc": "program",
+    "perlivp": "program",
+    "perlthanks": "program",
+    "piconv": "program",
+    "pl2pm": "program",
+    "pod2html": "program",
+    "pod2man": "program",
+    "pod2text": "program",
+    "pod2usage": "program",
+    "podchecker": "program",
+    "podselect": "program",
+    "prove": "program",
+    "ptar": "program",
+    "ptardiff": "program",
+    "ptargrep": "program",
+    "shasum": "program",
+    "splain": "program",
+    "xsubpp": "program",
+    "zipdetails": "program"
+  }
 }

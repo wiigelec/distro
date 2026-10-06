@@ -206,5 +206,11 @@
         }
       ]
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "c_rehash": "program",
+    "openssl-prog": "program",
+    "libcrypto": "library",
+    "libssl": "library"
+  }
 }

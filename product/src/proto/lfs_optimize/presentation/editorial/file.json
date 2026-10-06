@@ -60,5 +60,9 @@
       "type": "command",
       "command_index": 3
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "file": "program",
+    "libmagic": "library"
+  }
 }

@@ -103,5 +103,8 @@
         }
       ]
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "meson": "program"
+  }
 }

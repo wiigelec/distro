@@ -199,5 +199,17 @@
       "type": "command",
       "command_index": 5
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "dnsdomainname": "program",
+    "ftp": "program",
+    "hostname": "program",
+    "ifconfig": "program",
+    "ping": "program",
+    "ping6": "program",
+    "talk": "program",
+    "telnet": "program",
+    "tftp": "program",
+    "traceroute": "program"
+  }
 }

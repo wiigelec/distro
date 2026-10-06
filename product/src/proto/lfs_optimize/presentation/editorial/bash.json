@@ -241,5 +241,10 @@
       "type": "command",
       "command_index": 5
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "bash": "program",
+    "bashbug": "program",
+    "sh": "program"
+  }
 }

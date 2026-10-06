@@ -146,5 +146,23 @@
       "type": "command",
       "command_index": 3
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "free": "program",
+    "pgrep": "program",
+    "pidof": "program",
+    "pkill": "program",
+    "pmap": "program",
+    "ps": "program",
+    "pwdx": "program",
+    "slabtop": "program",
+    "sysctl": "program",
+    "tload": "program",
+    "top": "program",
+    "uptime": "program",
+    "vmstat": "program",
+    "w": "program",
+    "watch": "program",
+    "libproc-2": "library"
+  }
 }

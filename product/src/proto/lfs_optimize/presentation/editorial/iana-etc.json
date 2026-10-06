@@ -20,5 +20,9 @@
       "type": "command",
       "command_index": 0
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "protocols": "file",
+    "services": "file"
+  }
 }

@@ -109,5 +109,8 @@
         }
       ]
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "man-pages": "file"
+  }
 }

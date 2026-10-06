@@ -125,5 +125,17 @@
       "type": "command",
       "command_index": 4
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "dbus-cleanup-sockets": "program",
+    "dbus-daemon": "program",
+    "dbus-launch": "program",
+    "dbus-monitor": "program",
+    "dbus-run-session": "program",
+    "dbus-send": "program",
+    "dbus-test-tool": "program",
+    "dbus-update-activation-environment": "program",
+    "dbus-uuidgen": "program",
+    "libdbus-1": "library"
+  }
 }

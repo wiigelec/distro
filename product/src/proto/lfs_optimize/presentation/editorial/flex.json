@@ -122,5 +122,11 @@
       "type": "command",
       "command_index": 4
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "flex": "program",
+    "flexpp": "program",
+    "lex": "program",
+    "libfl": "library"
+  }
 }

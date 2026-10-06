@@ -85,5 +85,12 @@
       "type": "command",
       "command_index": 3
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "gdbm_dump": "program",
+    "gdbm_load": "program",
+    "gdbmtool": "program",
+    "libgdbm": "library",
+    "libgdbm_compat": "library"
+  }
 }

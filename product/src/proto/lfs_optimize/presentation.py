@@ -120,28 +120,35 @@ def render_inline(parent: ET.Element, content: Any) -> None:
     for part in content:
         require(isinstance(part, dict), "inline content part must be an object")
         kind = part.get("type")
+        if kind == "link":
+            href = part.get("href")
+            label = part.get("label")
+            require(
+                isinstance(href, str) and href
+                and isinstance(label, str) and label,
+                "link requires href and label",
+            )
+            node = ET.SubElement(parent, "ulink", {"url": href})
+            node.text = label
+            continue
+        if kind == "xref":
+            target = part.get("target")
+            label = part.get("label")
+            require(
+                isinstance(target, str) and target
+                and isinstance(label, str) and label,
+                "xref requires target and label",
+            )
+            attrs = {"linkend": target, "label": label}
+            if isinstance(part.get("suffix"), str):
+                attrs["suffix"] = part["suffix"]
+            node = ET.SubElement(parent, "xref", attrs)
+            node.text = label
+            continue
         text = part.get("text")
         require(isinstance(text, str), "inline content part requires text")
         if kind == "text":
             append_inline_text(parent, text)
-            continue
-        if kind == "link":
-            href = part.get("href")
-            require(isinstance(href, str) and href, "link requires href")
-            node = ET.SubElement(parent, "ulink", {"url": href})
-            node.text = part.get("label", text)
-            continue
-        if kind == "xref":
-            target = part.get("target")
-            require(isinstance(target, str) and target, "xref requires target")
-            attrs = {"linkend": target}
-            label = part.get("label")
-            if isinstance(label, str):
-                attrs["label"] = label
-            if isinstance(part.get("suffix"), str):
-                attrs["suffix"] = part["suffix"]
-            node = ET.SubElement(parent, "xref", attrs)
-            node.text = label or text
             continue
         tag = INLINE_TAGS.get(kind)
         require(tag is not None, f"unsupported inline content type: {kind}")
@@ -336,11 +343,14 @@ def render_installed_summary(
 
 
 
-def render_installed_term(parent: ET.Element, item: dict[str, Any]) -> None:
-    kind = item.get("kind")
+def render_installed_term(
+    parent: ET.Element,
+    item: dict[str, Any],
+    kind: str,
+) -> None:
     require(
         kind in ("program", "library", "file", "directory"),
-        f"invalid installed kind for {item.get('id')}",
+        f"invalid installed term kind for {item.get('id')}",
     )
     if kind == "program":
         add_text(parent, "command", item["name"], role="installed-name")
@@ -369,10 +379,18 @@ def render_contents(
     render_installed_summary(contents, package, editorial)
     variable = ET.SubElement(contents, "variablelist")
     add_text(variable, "bridgehead", "Short Descriptions", renderas="sect3")
+    term_kinds = editorial.get("installed_term_kinds")
+    require(
+        isinstance(term_kinds, dict)
+        and set(term_kinds) == {
+            item["id"] for item in package["installed_descriptions"]
+        },
+        f"{package['name']}: installed term-kind coverage drift",
+    )
     for item in package["installed_descriptions"]:
         entry = ET.SubElement(variable, "varlistentry", {XML_ID: item["id"]})
         term = ET.SubElement(entry, "term")
-        render_installed_term(term, item)
+        render_installed_term(term, item, term_kinds[item["id"]])
         listitem = ET.SubElement(entry, "listitem")
         add_text(listitem, "para", item["description"], role="installed-description")
 
@@ -2133,6 +2151,11 @@ def self_test_package_bulk() -> None:
     for name in complete:
         editorial = load_presentation(PRESENTATION / "editorial" / f"{name}.json")
         require(editorial.get("installed_labels") == observations[name]["installed_labels"], f"{name}: installed source-label drift")
+        require(
+            editorial.get("installed_term_kinds")
+            == observations[name]["installed_term_kinds"],
+            f"{name}: installed term-kind drift",
+        )
         require(_resolved_command_hashes(name) == observations[name]["command_sha256"], f"{name}: source/normalized command drift")
         rendered = ET.fromstring(render_chunked_html_package(name))
         require(rendered.find("body/dl[@data-role='installed-summary']") is not None, f"{name}: installed summary missing")

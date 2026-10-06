@@ -260,5 +260,16 @@
         }
       ]
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "ex": "program",
+    "rview": "program",
+    "rvim": "program",
+    "vi": "program",
+    "view": "program",
+    "vim": "program",
+    "vimdiff": "program",
+    "vimtutor": "program",
+    "xxd": "program"
+  }
 }

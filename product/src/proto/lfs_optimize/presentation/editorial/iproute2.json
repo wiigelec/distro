@@ -85,5 +85,21 @@
       "type": "command",
       "command_index": 3
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "bridge": "program",
+    "ctstat": "program",
+    "genl": "program",
+    "ifstat": "program",
+    "ip": "program",
+    "lnstat": "program",
+    "nstat": "program",
+    "routel": "program",
+    "rtacct": "program",
+    "rtmon": "program",
+    "rtpr": "program",
+    "rtstat": "program",
+    "ss": "program",
+    "tc": "program"
+  }
 }

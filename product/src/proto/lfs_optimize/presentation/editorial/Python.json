@@ -425,5 +425,11 @@
         }
       ]
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "idle3": "program",
+    "pip3": "program",
+    "pydoc3": "program",
+    "python3": "program"
+  }
 }

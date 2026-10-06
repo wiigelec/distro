@@ -47,5 +47,8 @@
   ],
   "installed_labels": {
     "libraries": "Installed libraries"
+  },
+  "installed_term_kinds": {
+    "libz": "library"
   }
 }

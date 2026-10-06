@@ -198,5 +198,9 @@
       "type": "command",
       "command_index": 6
     }
-  ]
+  ],
+  "installed_term_kinds": {
+    "libhistory": "library",
+    "libreadline": "library"
+  }
 }
