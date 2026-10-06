@@ -2399,11 +2399,26 @@ def _editorial_command_screen_hashes(
     for block in editorial.get("installation_blocks", []):
         kind = block.get("type")
         if kind == "command":
-            position = block.get("command_index")
-            require(
-                isinstance(position, int) and 0 <= position < len(sequence),
-                f"{package['name']}: invalid command oracle reference",
-            )
+            if "command_index" in block:
+                position = block.get("command_index")
+                require(
+                    isinstance(position, int) and 0 <= position < len(sequence),
+                    f"{package['name']}: invalid command oracle reference",
+                )
+            else:
+                command_id = block.get("command_id")
+                matches = [
+                    index
+                    for index, (_step, command) in enumerate(sequence)
+                    if command.get("id") == command_id
+                ]
+                require(
+                    isinstance(command_id, str)
+                    and command_id
+                    and len(matches) == 1,
+                    f"{package['name']}: invalid command-id oracle reference",
+                )
+                position = matches[0]
             positions = [position]
         elif kind == "command-group":
             positions = block.get("command_indices")
