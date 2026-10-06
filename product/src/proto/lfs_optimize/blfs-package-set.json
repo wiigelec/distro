@@ -1,8 +1,12 @@
 {
   "schema_version": 1,
-  "name": "blfs-pam-systemd-proof",
+  "name": "blfs-pam-shadow-systemd-proof",
   "packages": [
     "linux-pam",
+    {
+      "name": "shadow",
+      "build": "blfs-pam"
+    },
     {
       "name": "systemd",
       "build": "blfs-pam"

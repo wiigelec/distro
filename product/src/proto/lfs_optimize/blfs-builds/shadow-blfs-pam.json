@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "package": "shadow",
+  "build": "blfs-pam",
+  "description": "BLFS rebuild and PAM configuration of Shadow after Linux-PAM is installed.",
+  "dependencies": {
+    "build": [
+      "Linux-PAM"
+    ],
+    "runtime": [
+      "Linux-PAM"
+    ],
+    "test": [
+      "No test suite available"
+    ],
+    "before": [
+      "systemd"
+    ],
+    "recommended": [],
+    "optional": [
+      "libbsd",
+      "tcb"
+    ]
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "find man -name Makefile.in -exec sed -i 's/getspnam\\.3 / /' {} \\; &&\nfind man -name Makefile.in -exec sed -i 's/passwd\\.5 / /'   {} \\;"
+        },
+        {
+          "user": "root",
+          "command": "sed -e 's@#ENCRYPT_METHOD DES@ENCRYPT_METHOD YESCRYPT@' \\\n    -e 's@/var/spool/mail@/var/mail@'                   \\\n    -e '/PATH=/{s@/sbin:@@;s@/bin:@@}'                  \\\n    -i etc/login.defs"
+        }
+      ]
+    },
+    {
+      "phase": "configure",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "./configure --sysconfdir=/etc   \\\n            --disable-static    \\\n            --without-libbsd    \\\n            --with-{b,yes}crypt"
+        }
+      ]
+    },
+    {
+      "phase": "build",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "make"
+        }
+      ]
+    },
+    {
+      "phase": "install",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "make exec_prefix=/usr pamddir= install"
+        }
+      ]
+    },
+    {
+      "phase": "system",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "install -v -m644 /etc/login.defs /etc/login.defs.orig &&\nfor FUNCTION in FAIL_DELAY               \\\n                FAILLOG_ENAB             \\\n                LASTLOG_ENAB             \\\n                MAIL_CHECK_ENAB          \\\n                OBSCURE_CHECKS_ENAB      \\\n                PORTTIME_CHECKS_ENAB     \\\n                QUOTAS_ENAB              \\\n                CONSOLE MOTD_FILE        \\\n                FTMP_FILE NOLOGINS_FILE  \\\n                ENV_HZ PASS_MIN_LEN      \\\n                SU_WHEEL_ONLY            \\\n                PASS_CHANGE_TRIES        \\\n                PASS_ALWAYS_WARN         \\\n                CHFN_AUTH ENCRYPT_METHOD \\\n                ENVIRON_FILE\ndo\n    sed -i \"s/^${FUNCTION}/# &/\" /etc/login.defs\ndone"
+        },
+        {
+          "user": "root",
+          "command": "cat > /etc/pam.d/login << \"EOF\"\n# Begin /etc/pam.d/login\n\nauth      optional    pam_faildelay.so  delay=3000000\nauth      requisite   pam_nologin.so\n#auth      required    pam_securetty.so\n#auth      optional    pam_group.so\nauth      include     system-auth\naccount   required    pam_access.so\naccount   include     system-account\nsession   required    pam_env.so\nsession   required    pam_limits.so\n#session   optional    pam_motd.so\n#session   optional    pam_mail.so      standard quiet\nsession   include     system-session\npassword  include     system-password\n\n# End /etc/pam.d/login\nEOF\n\ncat > /etc/pam.d/passwd << \"EOF\"\n# Begin /etc/pam.d/passwd\n\npassword  include     system-password\n\n# End /etc/pam.d/passwd\nEOF\n\ncat > /etc/pam.d/su << \"EOF\"\n# Begin /etc/pam.d/su\n\nauth      sufficient  pam_rootok.so\n#auth      sufficient  pam_wheel.so trust use_uid\nauth      include     system-auth\n#auth      required    pam_wheel.so use_uid\naccount   include     system-account\nsession   required    pam_env.so\nsession   include     system-session\n\n# End /etc/pam.d/su\nEOF"
+        },
+        {
+          "user": "root",
+          "command": "cat > /etc/pam.d/chpasswd << \"EOF\"\n# Begin /etc/pam.d/chpasswd\n\nauth      sufficient  pam_rootok.so\nauth      include     system-auth\naccount   include     system-account\npassword  include     system-password\n\n# End /etc/pam.d/chpasswd\nEOF\n\nsed -e s/chpasswd/newusers/ /etc/pam.d/chpasswd >/etc/pam.d/newusers\n\ncat > /etc/pam.d/chage << \"EOF\"\n# Begin /etc/pam.d/chage\n\nauth      sufficient  pam_rootok.so\nauth      include     system-auth\naccount   include     system-account\n\n# End /etc/pam.d/chage\nEOF\n\nfor PROGRAM in chfn chgpasswd chsh groupadd groupdel \\\n               groupmems groupmod useradd userdel usermod\ndo\n    install -v -m644 /etc/pam.d/chage /etc/pam.d/${PROGRAM}\n    sed -i \"s/chage/$PROGRAM/\" /etc/pam.d/${PROGRAM}\ndone"
+        },
+        {
+          "user": "root",
+          "command": "Verify Shadow/PAM login in a separate terminal as root, then run login and authenticate as another user before logging out.",
+          "kind": "manual-check",
+          "source_command": "Open another terminal and log in as root, then run login and login as another user; stop and repair PAM configuration if any errors occur."
+        },
+        {
+          "user": "root",
+          "command": "if [ -f /etc/login.access ]; then mv -v /etc/login.access{,.NOUSE}; fi\nif [ -f /etc/limits ]; then mv -v /etc/limits{,.NOUSE}; fi"
+        }
+      ]
+    }
+  ]
+}

@@ -17,6 +17,20 @@
         "disk_space": "16 MB (with tests)"
       }
     },
+    "shadow": {
+      "version": "4.20.2",
+      "source": {
+        "url": "https://github.com/shadow-maint/shadow/releases/download/4.20.2/shadow-4.20.2.tar.xz",
+        "md5": "f52e717bd330818c67bd57c897ec5a8e",
+        "size": "2.2 MB",
+        "home": "https://github.com/shadow-maint/shadow",
+        "mirror": "direct"
+      },
+      "reference_metrics": {
+        "build_time": "0.4 SBU",
+        "disk_space": "100 MB"
+      }
+    },
     "systemd": {
       "version": "261.3",
       "source": {

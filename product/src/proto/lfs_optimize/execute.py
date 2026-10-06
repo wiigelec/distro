@@ -308,6 +308,7 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
     if artifact.is_file() and evidence_path.is_file():
         evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
         test_failures = evidence.get("test_failures", [])
+        manual_checks = evidence.get("manual_checks", [])
         if realize_to is not None:
             extract_tar_xz(artifact, realize_to)
         result = {
@@ -328,7 +329,8 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
             "tests_enabled": run_tests,
             "test_status": "review" if test_failures else ("passed" if run_tests else "not-run"),
             "test_failures": test_failures,
-            "review_required": bool(test_failures),
+            "manual_checks": manual_checks,
+            "review_required": bool(test_failures or manual_checks),
         }
         result_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
         return result
@@ -344,6 +346,7 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
 
     command_results = []
     test_failures = []
+    manual_checks = []
     test_ready = False
     with log_path.open("w", encoding="utf-8") as log:
         index = 0
@@ -377,7 +380,8 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
                 execution_root = test_clone
             for command in step["commands"]:
                 index += 1
-                if command.get("kind") == "session-transition":
+                if command.get("kind") in {"session-transition", "manual-check"}:
+                    kind = command["kind"]
                     item = {
                         "index": index,
                         "user": command["user"],
@@ -385,8 +389,10 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
                         "source_command": command.get("source_command"),
                         "exit_code": 0,
                         "executed": False,
-                        "disposition": "recorded-session-transition",
+                        "disposition": f"recorded-{kind}",
                     }
+                    if kind == "manual-check":
+                        manual_checks.append(item.copy())
                 else:
                     with virtual_mounts(execution_root):
                         item = chroot_command(
@@ -413,7 +419,8 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
                         "tests_enabled": run_tests,
                         "test_status": "review" if test_failures else ("passed" if run_tests else "not-run"),
                         "test_failures": test_failures,
-                        "review_required": bool(test_failures),
+                        "manual_checks": manual_checks,
+                        "review_required": bool(test_failures or manual_checks),
                     }
                     result_path.write_text(
                         json.dumps(result, indent=2, sort_keys=True) + "\n"
@@ -478,7 +485,8 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
         "tests_enabled": run_tests,
         "test_status": "review" if test_failures else ("passed" if run_tests else "not-run"),
         "test_failures": test_failures,
-        "review_required": bool(test_failures),
+        "manual_checks": manual_checks,
+        "review_required": bool(test_failures or manual_checks),
     }
     result_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
     evidence_path.parent.mkdir(parents=True, exist_ok=True)
@@ -489,6 +497,7 @@ def build_package(package: dict[str, Any], root: Path, work: Path, cache: Path,
         "cache_key": cache_key,
         "tests_enabled": run_tests,
         "test_failures": test_failures,
+        "manual_checks": manual_checks,
     }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     cleanup_success_work(package_work)
     return result

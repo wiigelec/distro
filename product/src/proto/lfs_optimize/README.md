@@ -265,6 +265,14 @@ Linux-PAM 1.7.3
     +-- PAM base configuration
     |
     v
+Shadow 4.20.2 [build: blfs-pam]
+    |
+    +-- PAM-aware reinstall
+    +-- explicit /etc/pam.d service configuration
+    +-- login.defs + access/limits handoff
+    +-- recorded manual login-safety check
+    |
+    v
 systemd 261.3 [build: blfs-pam]
     |
     +-- -D pam=enabled
@@ -283,9 +291,13 @@ BLFS sources use `source.mirror = "direct"` so the executor fetches the
 authoritative source URL instead of requiring membership in the LFS 13.1 source
 mirror.
 
-Linux-PAM also records the BLFS requirement to rebuild/reconfigure Shadow and
-systemd after PAM is installed. This first slice executes the systemd transition;
-the Shadow PAM rebuild is the next integration step.
+Linux-PAM records the BLFS requirement to rebuild/reconfigure both Shadow and
+systemd after PAM is installed. Shadow is represented as a named `blfs-pam`
+Build and carries the BLFS PAM configuration transition. Its required live-login
+verification is a `manual-check`: the executor records it as review evidence and
+does not attempt to perform an interactive authentication test inside the
+disposable chroot. Systemd follows with its PAM-enabled rebuild and recorded
+daemon-reexec session transition.
 
 Plan without root access:
 
