@@ -17,7 +17,7 @@ Roadmap:
 | M4 — Bootstrap proof | COMPLETE | Fresh Chapter 5–7 bootstrap hands directly to the normal executor; all 80 final-system packages build successfully without publication XML/book parsing. |
 | M5 — Development proof | COMPLETE | Accepted state, candidate identity, validation, definition binding/drift rejection, review evidence, and guarded transactional promotion are implemented. |
 | M6 — Release proof | SATISFIED BY COMPOSITION | M4 proves clean full-system realization from normalized state and M5 proves validated state identity and controlled promotion. Freezing accepted state under a release identity adds production plumbing but no unresolved prototype architecture question. |
-| M7 — Presentation proof | IN PROGRESS — 159/199 CHUNKS COMPLETE; 40 AUTHORITY GAPS DEFERRED | 89/119 non-package bodies are proven complete. Direct validation proves normalized package rendering for 70/80 Chapter 8 packages whose source command screens map cleanly to normalized state. Ten package pages and 30 operational non-package pages remain explicit shells pending normalized authority reconciliation. |
+| M7 — Presentation proof | IN PROGRESS — 169/199 CHUNKS COMPLETE; 30 AUTHORITY GAPS DEFERRED | 89/119 non-package bodies are proven complete. Direct validation proves normalized package rendering for all 80/80 Chapter 8 package pages. The remaining gaps are the 30 operational non-package pages whose executable system-setup commands still lack normalized authority. |
 | M8+ | NOT STARTED | BLFS, hard-BLFS, and user-system proofs remain later roadmap milestones. |
 
 ## M5 closure
@@ -361,20 +361,19 @@ coverage split. It is validation-only.
 
 ## M7 bulk normalized package rendering
 
-The Chapter 8 package inventory now has an explicit authority split:
+The Chapter 8 package inventory is now fully normalized for presentation:
 
 ```text
 80 normal package pages
-├── 70 clean source ↔ normalized command mappings
-└── 10 authority/grouping/parameter mismatches
+└── 80 source ↔ normalized command mappings proven
 ```
 
-The 70 clean packages render from normalized package/version state plus
+All 80 package pages render from normalized package/version state plus
 presentation-owned editorial overlays. Executable command text always comes
 from normalized package state. The source-derived golden stores only SHA-256
 values for command equivalence; source command strings are not runtime inputs.
 
-The ten deferred package pages are:
+The ten formerly deferred package pages are now closed:
 
 ```text
 glibc
@@ -389,15 +388,31 @@ texinfo
 util-linux
 ```
 
-They remain structural shells because source publication command grouping,
-coverage, or parameter semantics do not map cleanly to the current normalized procedure state. Groff is specifically deferred because the source exposes paper size as a build-time parameter while normalized state currently hardcodes `PAGE=letter`.
+Their closure proves the extra semantics required beyond simple one-screen to
+one-command mapping: illustrative commands, supplemental procedures, command
+grouping, publication-only source forms, normalized build parameters, alternate
+procedures, and strict source-command equivalence.
 
-Installed-summary labels are now exact presentation semantics rather than being
-inferred from item count. This closes the known Zlib mismatch: the LFS source
-uses `Installed libraries` even though only one library is listed.
+Groff proves normalized parameter authority with validated `paper_size`
+defaults/overrides. GRUB proves that platform-specific EFI rebuild cycles can
+remain explicit supplemental procedures while the LFS BIOS path stays the
+default publication/execution path. Glibc proves a larger mixed case: the
+default minimum locale set, the all-locales alternative, upgrade-only
+supplemental procedures, complete installed summaries, and the full source
+short-description inventory.
 
-Together with the 89 complete non-package chunks, this slice brings the book to
-159/199 complete chunk bodies.
+Resolver substitution is intentionally shell-safe. Only known
+`{identifier}` placeholders are substituted; doubled braces preserve legacy
+literal-brace escapes, and other shell brace syntax passes through unchanged.
+Validation pins these behaviors with Groff, Binutils, Pkgconf, and Glibc cases.
+
+Installed-summary labels are exact presentation semantics rather than inferred
+from item count. This preserves source wording even where cardinality and labels
+do not line up mechanically.
+
+Together with the 89 complete non-package chunks, the book now has 169/199
+complete chunk bodies. Package-page authority is no longer an M7 gap; the
+remaining 30 gaps are all deferred operational non-package pages.
 
 ## Resume instruction
 
@@ -407,4 +422,4 @@ Run:
 python3 product/src/proto/lfs_optimize/validate.py
 ```
 
-Direct validation passes at the current state, so treat 70-package normalized chunked HTML rendering as proven. The next architecture work is reconciling normalized authority for the ten deferred package pages, followed by the 30 deferred operational non-package pages.
+Direct validation passes at the current state, so treat all 80 Chapter 8 package pages as proven. The next architecture work is reconciling normalized authority for the 30 deferred operational non-package pages.
