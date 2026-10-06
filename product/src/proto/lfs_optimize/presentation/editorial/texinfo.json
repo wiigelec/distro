@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "package": "texinfo",
+  "installation_title": "Installation of Texinfo",
+  "contents_title": "Contents of Texinfo",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "libraries": "Installed library",
+    "directories": "Installed directories"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "text": "Prepare Texinfo for compilation:"
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "text": "Compile the package:"
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "text": "To test the results, issue:"
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "text": "Install the package:"
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    },
+    {
+      "type": "paragraph",
+      "text": "Optionally, install the components belonging in a TeX installation:"
+    },
+    {
+      "type": "command",
+      "command_index": 4
+    },
+    {
+      "type": "definition-list",
+      "title": "The meaning of the make parameter:",
+      "items": [
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "TEXMF=/usr/share/texmf"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "The TEXMF makefile variable holds the location of the root of the TeX tree if, for example, a TeX package will be installed later."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The Info documentation system uses a plain text file to hold its list of menu entries. The file is located at "
+        },
+        {
+          "type": "filename",
+          "text": "/usr/share/info/dir"
+        },
+        {
+          "type": "text",
+          "text": ". Unfortunately, due to occasional problems in the Makefiles of various packages, it can sometimes get out of sync with the info pages installed on the system. If the "
+        },
+        {
+          "type": "filename",
+          "text": "/usr/share/info/dir"
+        },
+        {
+          "type": "text",
+          "text": " file ever needs to be recreated, the following optional commands will accomplish the task:"
+        }
+      ]
+    },
+    {
+      "type": "supplemental-command",
+      "procedure": "rebuild-info-index",
+      "command_index": 0
+    }
+  ],
+  "installed_term_kinds": {
+    "info": "program",
+    "install-info": "program",
+    "makeinfo": "program",
+    "pdftexi2dvi": "program",
+    "pod2texi": "program",
+    "texi2any": "program",
+    "texi2dvi": "program",
+    "texi2pdf": "program",
+    "texindex": "program"
+  }
+}

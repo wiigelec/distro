@@ -6,8 +6,8 @@
     "published": "2026-09-01",
     "slice": "normalized Chapter 8 package rendering"
   },
-  "complete_package_count": 75,
-  "deferred_package_count": 5,
+  "complete_package_count": 76,
+  "deferred_package_count": 4,
   "complete_packages": [
     "man-pages",
     "iana-etc",
@@ -76,6 +76,7 @@
     "make",
     "patch",
     "tar",
+    "texinfo",
     "vim",
     "markupsafe",
     "jinja2",
@@ -89,7 +90,6 @@
     "glibc",
     "groff",
     "grub",
-    "texinfo",
     "util-linux"
   ],
   "packages": {
@@ -1850,6 +1850,36 @@
       },
       "installed_term_kinds": {
         "make": "program"
+      }
+    },
+    "texinfo": {
+      "command_sha256": [
+        "ddec2098f6c935422e438fab08b99270dc41312bdc5c0a0ec138a95a8665a65a",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f",
+        "7d281a6f7daa7f3d431bcc6e1f8c6a56e204456e0acabc52bdbfe91536a17564"
+      ],
+      "supplemental_command_sha256": {
+        "rebuild-info-index": [
+          "c6a79122bbadf23a5ee259600ba7b534bc5ad6b0ffb7dc3982fe27afaec464aa"
+        ]
+      },
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed library",
+        "directories": "Installed directories"
+      },
+      "installed_term_kinds": {
+        "info": "program",
+        "install-info": "program",
+        "makeinfo": "program",
+        "pdftexi2dvi": "program",
+        "pod2texi": "program",
+        "texi2any": "program",
+        "texi2dvi": "program",
+        "texi2pdf": "program",
+        "texindex": "program"
       }
     }
   },

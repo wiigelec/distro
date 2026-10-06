@@ -159,5 +159,23 @@
       "name": "texindex",
       "description": "Used to sort Texinfo index files"
     }
-  ]
+  ],
+  "supplemental_procedures": {
+    "rebuild-info-index": {
+      "description": "Recreate /usr/share/info/dir if the Info menu index becomes inconsistent with installed info pages.",
+      "procedure": [
+        {
+          "phase": "maintenance",
+          "commands": [
+            {
+              "command": "pushd /usr/share/info\n  rm -v dir\n  for f in *\n    do install-info $f dir 2>/dev/null\n  done\npopd",
+              "user": "root"
+            }
+          ],
+          "working_directory": "source",
+          "condition": "always"
+        }
+      ]
+    }
+  }
 }

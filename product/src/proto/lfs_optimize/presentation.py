@@ -392,6 +392,42 @@ def render_installation(
                     else group[0][1]["user"]
                 ),
             )
+        elif kind == "supplemental-command":
+            procedure_name = block.get("procedure")
+            position = block.get("command_index")
+            require(
+                isinstance(procedure_name, str) and procedure_name,
+                f"{package['name']}: supplemental command missing procedure",
+            )
+            supplemental_sequence = supplemental_command_sequence(
+                package,
+                procedure_name,
+            )
+            require(
+                isinstance(position, int)
+                and 0 <= position < len(supplemental_sequence),
+                f"{package['name']}: invalid supplemental command index",
+            )
+            step, command = supplemental_sequence[position]
+            screen = ET.SubElement(
+                install,
+                "screen",
+                {
+                    "format": "linespecific",
+                    "role": "supplemental-build-command",
+                    "supplemental_procedure": procedure_name,
+                    "command_index": str(position),
+                    "remap": command_remap(step["phase"]),
+                    "condition": step["condition"],
+                    "user": command["user"],
+                },
+            )
+            add_text(
+                screen,
+                "userinput",
+                command.get("source_command", command["command"]),
+                role="supplemental-command",
+            )
         elif kind == "pre":
             screen = ET.SubElement(install, "screen", {"format": "linespecific", "role": "editorial-output"})
             add_text(screen, "computeroutput", block["text"])
@@ -1168,6 +1204,11 @@ def render_chunked_html_package(name: str) -> str:
                 attrs = {
                     "data-phase": command.attrib["remap"],
                 }
+                if child.attrib.get("role") == "supplemental-build-command":
+                    attrs["data-role"] = "supplemental-build-command"
+                    attrs["data-supplemental-procedure"] = child.attrib[
+                        "supplemental_procedure"
+                    ]
                 if "command_index" in command.attrib:
                     attrs["data-command-index"] = command.attrib["command_index"]
                 if "command_indices" in command.attrib:
@@ -2538,7 +2579,7 @@ def self_test_package_bulk() -> None:
         golden.get("command_scope") == "installation-screen-userinput",
         "package-bulk: command oracle must be scoped to Installation screen/userinput commands",
     )
-    require(len(complete) == golden.get("complete_package_count") == 75 and len(deferred) == golden.get("deferred_package_count") == 5, "package-bulk: package coverage drift")
+    require(len(complete) == golden.get("complete_package_count") == 76 and len(deferred) == golden.get("deferred_package_count") == 4, "package-bulk: package coverage drift")
     package_set = load_json(HERE / "package-set.json")["packages"]
     require(set(complete).union(deferred) == set(package_set) and not set(complete).intersection(deferred), "package-bulk: complete/deferred package split drift")
 
@@ -2643,8 +2684,8 @@ def main() -> int:
                         "editorial_vocabulary_complete": True,
                         "editorial_bulk_complete": 89,
                         "editorial_operational_deferred": 30,
-                        "package_bulk_complete": 75,
-                        "package_authority_deferred": 5,
+                        "package_bulk_complete": 76,
+                        "package_authority_deferred": 4,
                         "equivalence":
                             "package-semantics-book-routing-editorial-and-package-bulk",
                     },
