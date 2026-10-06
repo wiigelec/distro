@@ -390,16 +390,16 @@ def render_installation(
                             isinstance(procedure_name, str) and procedure_name,
                             f"{package['name']}: supplemental command missing procedure",
                         )
-                        sequence = supplemental_command_sequence(
+                        supplemental_sequence = supplemental_command_sequence(
                             package,
                             procedure_name,
                         )
                         require(
                             isinstance(position, int)
-                            and 0 <= position < len(sequence),
+                            and 0 <= position < len(supplemental_sequence),
                             f"{package['name']}: invalid supplemental command index",
                         )
-                        step, command = sequence[position]
+                        step, command = supplemental_sequence[position]
                         screen = ET.SubElement(
                             node,
                             "screen",
