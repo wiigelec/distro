@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "package": "grub",
+  "installation_title": "Installation of GRUB",
+  "contents_title": "Contents of GRUB",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "directories": "Installed directories"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "text": "First fix a bug introduced in grub-2.14:"
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "text": "Prepare GRUB for compilation:"
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "text": "Compile the package:"
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "text": "The test suite for this package is not recommended. Most tests depend on packages that are not available in the limited LFS environment. To run the tests anyway, run make check."
+    },
+    {
+      "type": "paragraph",
+      "text": "Install the package:"
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    }
+  ],
+  "installed_term_kinds": {
+    "grub-bios-setup": "program",
+    "grub-editenv": "program",
+    "grub-file": "program",
+    "grub-fstest": "program",
+    "grub-glue-efi": "program",
+    "grub-install": "program",
+    "grub-kbdcomp": "program",
+    "grub-macbless": "program",
+    "grub-menulst2cfg": "program",
+    "grub-mkconfig": "program",
+    "grub-mkimage": "program",
+    "grub-mklayout": "program",
+    "grub-mknetdir": "program",
+    "grub-mkpasswd-pbkdf2": "program",
+    "grub-mkrelpath": "program",
+    "grub-mkrescue": "program",
+    "grub-mkstandalone": "program",
+    "grub-ofpathname": "program",
+    "grub-probe": "program",
+    "grub-reboot": "program",
+    "grub-render-label": "program",
+    "grub-script-check": "program",
+    "grub-set-default": "program",
+    "grub-sparc64-setup": "program",
+    "grub-syslinux2cfg": "program"
+  }
+}

@@ -48,96 +48,108 @@
       ],
       "working_directory": "source",
       "condition": "always"
-    },
-    {
-      "phase": "prepare",
-      "commands": [
-        {
-          "command": "make clean",
-          "user": "root"
-        }
-      ],
-      "working_directory": "source",
-      "condition": "always"
-    },
-    {
-      "phase": "configure",
-      "commands": [
-        {
-          "command": "./configure --prefix=/usr       \\\n            --sysconfdir=/etc   \\\n            --target=x86_64     \\\n            --with-platform=efi \\\n            --disable-efiemu    \\\n            --disable-werror",
-          "user": "root"
-        }
-      ],
-      "working_directory": "source",
-      "condition": "always"
-    },
-    {
-      "phase": "build",
-      "commands": [
-        {
-          "command": "make",
-          "user": "root"
-        }
-      ],
-      "working_directory": "source",
-      "condition": "always"
-    },
-    {
-      "phase": "install",
-      "commands": [
-        {
-          "command": "make install",
-          "user": "root"
-        }
-      ],
-      "working_directory": "source",
-      "condition": "always"
-    },
-    {
-      "phase": "prepare",
-      "commands": [
-        {
-          "command": "make clean",
-          "user": "root"
-        }
-      ],
-      "working_directory": "source",
-      "condition": "always"
-    },
-    {
-      "phase": "configure",
-      "commands": [
-        {
-          "command": "./configure --prefix=/usr       \\\n            --sysconfdir=/etc   \\\n            --target=i386       \\\n            --with-platform=efi \\\n            --disable-efiemu    \\\n            --disable-werror",
-          "user": "root"
-        }
-      ],
-      "working_directory": "source",
-      "condition": "always"
-    },
-    {
-      "phase": "build",
-      "commands": [
-        {
-          "command": "make",
-          "user": "root"
-        }
-      ],
-      "working_directory": "source",
-      "condition": "always"
-    },
-    {
-      "phase": "install",
-      "commands": [
-        {
-          "command": "make install",
-          "user": "root"
-        }
-      ],
-      "working_directory": "source",
-      "condition": "always"
     }
   ],
+  "supplemental_procedures": {
+    "x86_64-efi": {
+      "description": "Build and install the x86_64 EFI GRUB target in addition to the default LFS BIOS build.",
+      "procedure": [
+        {
+          "phase": "prepare",
+          "commands": [
+            {
+              "command": "make clean",
+              "user": "root"
+            }
+          ],
+          "working_directory": "source",
+          "condition": "always"
+        },
+        {
+          "phase": "configure",
+          "commands": [
+            {
+              "command": "./configure --prefix=/usr       \\\n            --sysconfdir=/etc   \\\n            --target=x86_64     \\\n            --with-platform=efi \\\n            --disable-efiemu    \\\n            --disable-werror",
+              "user": "root"
+            }
+          ],
+          "working_directory": "source",
+          "condition": "always"
+        },
+        {
+          "phase": "build",
+          "commands": [
+            {
+              "command": "make",
+              "user": "root"
+            }
+          ],
+          "working_directory": "source",
+          "condition": "always"
+        },
+        {
+          "phase": "install",
+          "commands": [
+            {
+              "command": "make install",
+              "user": "root"
+            }
+          ],
+          "working_directory": "source",
+          "condition": "always"
+        }
+      ]
+    },
+    "i386-efi": {
+      "description": "Build and install the i386 EFI GRUB target in addition to the default LFS BIOS build.",
+      "procedure": [
+        {
+          "phase": "prepare",
+          "commands": [
+            {
+              "command": "make clean",
+              "user": "root"
+            }
+          ],
+          "working_directory": "source",
+          "condition": "always"
+        },
+        {
+          "phase": "configure",
+          "commands": [
+            {
+              "command": "./configure --prefix=/usr       \\\n            --sysconfdir=/etc   \\\n            --target=i386       \\\n            --with-platform=efi \\\n            --disable-efiemu    \\\n            --disable-werror",
+              "user": "root"
+            }
+          ],
+          "working_directory": "source",
+          "condition": "always"
+        },
+        {
+          "phase": "build",
+          "commands": [
+            {
+              "command": "make",
+              "user": "root"
+            }
+          ],
+          "working_directory": "source",
+          "condition": "always"
+        },
+        {
+          "phase": "install",
+          "commands": [
+            {
+              "command": "make install",
+              "user": "root"
+            }
+          ],
+          "working_directory": "source",
+          "condition": "always"
+        }
+      ]
+    }
+  },
   "installed": {
     "programs": [
       "grub-bios-setup",

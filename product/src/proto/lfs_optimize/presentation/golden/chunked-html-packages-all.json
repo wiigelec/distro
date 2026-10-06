@@ -6,8 +6,8 @@
     "published": "2026-09-01",
     "slice": "normalized Chapter 8 package rendering"
   },
-  "complete_package_count": 78,
-  "deferred_package_count": 2,
+  "complete_package_count": 79,
+  "deferred_package_count": 1,
   "complete_packages": [
     "man-pages",
     "iana-etc",
@@ -70,6 +70,7 @@
     "diffutils",
     "findutils",
     "groff",
+    "grub",
     "gzip",
     "iproute2",
     "kbd",
@@ -89,8 +90,7 @@
     "e2fsprogs"
   ],
   "deferred_authority_mismatches": [
-    "glibc",
-    "grub"
+    "glibc"
   ],
   "packages": {
     "man-pages": {
@@ -2075,6 +2075,45 @@
         "tbl": "program",
         "tfmtodit": "program",
         "troff": "program"
+      }
+    },
+    "grub": {
+      "command_sha256": [
+        "74b7b51ebb2e49cd95eaea149276496a5cb89a5853e5aff1c74872fa5b5d6614",
+        "b7c548c1f91aad6c42520689f186270e8a8896c7258ce7df95a6dfff9b906e72",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "directories": "Installed directories"
+      },
+      "installed_term_kinds": {
+        "grub-bios-setup": "program",
+        "grub-editenv": "program",
+        "grub-file": "program",
+        "grub-fstest": "program",
+        "grub-glue-efi": "program",
+        "grub-install": "program",
+        "grub-kbdcomp": "program",
+        "grub-macbless": "program",
+        "grub-menulst2cfg": "program",
+        "grub-mkconfig": "program",
+        "grub-mkimage": "program",
+        "grub-mklayout": "program",
+        "grub-mknetdir": "program",
+        "grub-mkpasswd-pbkdf2": "program",
+        "grub-mkrelpath": "program",
+        "grub-mkrescue": "program",
+        "grub-mkstandalone": "program",
+        "grub-ofpathname": "program",
+        "grub-probe": "program",
+        "grub-reboot": "program",
+        "grub-render-label": "program",
+        "grub-script-check": "program",
+        "grub-set-default": "program",
+        "grub-sparc64-setup": "program",
+        "grub-syslinux2cfg": "program"
       }
     }
   },
