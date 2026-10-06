@@ -1,0 +1,212 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-config-introduction",
+  "title": "Introduction",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "This chapter discusses configuration files and systemd services. First, the general configuration files needed to set up networking are presented."
+        }
+      ]
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "xref",
+                "target": "ch-config-network",
+                "label": "General Network Configuration",
+                "suffix": "."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "xref",
+                "target": "ch-config-hostname",
+                "label": "Configuring the system hostname",
+                "suffix": "."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "xref",
+                "target": "ch-config-hosts",
+                "label": "Customizing the /etc/hosts File",
+                "suffix": "."
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Second, issues that affect the proper setup of devices are discussed."
+        }
+      ]
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "xref",
+                "target": "ch-config-udev",
+                "label": "Overview of Device and Module Handling",
+                "suffix": "."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "xref",
+                "target": "ch-config-symlinks",
+                "label": "Managing Devices",
+                "suffix": "."
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Third, configuring the system clock and keyboard layout is shown."
+        }
+      ]
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "xref",
+                "target": "ch-config-clock",
+                "label": "Configuring the System Clock",
+                "suffix": "."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "xref",
+                "target": "ch-config-console",
+                "label": "Configuring the Linux Console",
+                "suffix": "."
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Fourth, a brief introduction to the scripts and configuration files used when the user logs into the system is presented."
+        }
+      ]
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "xref",
+                "target": "ch-config-locale",
+                "label": "Configuring the System Locale",
+                "suffix": "."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "xref",
+                "target": "ch-config-inputrc",
+                "label": "Creating the /etc/inputrc File",
+                "suffix": "."
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "And finally, configuring the behavior of systemd is discussed."
+        }
+      ]
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "xref",
+                "target": "ch-config-systemd-custom",
+                "label": "Systemd Usage and Configuration",
+                "suffix": "."
+              }
+            ]
+          }
+        ]
+      ]
+    }
+  ]
+}

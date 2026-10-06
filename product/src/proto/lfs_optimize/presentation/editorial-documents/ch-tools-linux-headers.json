@@ -1,0 +1,343 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-tools-linux-headers",
+  "title": "Linux-7.1.8 API Headers",
+  "blocks": [
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The Linux API Headers (in linux-7.1.8.tar.xz) expose the kernel's API for use by Glibc."
+            }
+          ]
+        },
+        {
+          "type": "segmented_list",
+          "titles": [
+            "Approximate build time",
+            "Required disk space"
+          ],
+          "values": [
+            "less than 0.1 SBU",
+            "1.8 GB"
+          ]
+        }
+      ],
+      "role": "package"
+    },
+    {
+      "type": "section",
+      "title": "Installation of Linux API Headers",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The Linux kernel needs to expose an Application Programming Interface (API) for the system's C library (Glibc in LFS) to use. This is done by way of sanitizing various C header files that are shipped in the Linux kernel source tarball."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Make sure there are no stale files embedded in the package:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 0
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Now extract the user-visible kernel headers from the source. The recommended make target"
+            },
+            {
+              "type": "quote",
+              "text": "headers_install"
+            },
+            {
+              "type": "text",
+              "text": "cannot be used, because it requires"
+            },
+            {
+              "type": "code",
+              "text": "rsync"
+            },
+            {
+              "type": "text",
+              "text": ", which may not be available. The headers are first placed in"
+            },
+            {
+              "type": "code",
+              "text": "./usr"
+            },
+            {
+              "type": "text",
+              "text": ", then copied to the needed location."
+            }
+          ]
+        },
+        {
+          "type": "flow",
+          "blocks": [
+            {
+              "type": "bootstrap_command",
+              "index": 1
+            },
+            {
+              "type": "bootstrap_command",
+              "index": 2
+            }
+          ]
+        }
+      ],
+      "role": "installation"
+    },
+    {
+      "type": "section",
+      "title": "Contents of Linux API Headers",
+      "blocks": [
+        {
+          "type": "segmented_list",
+          "titles": [
+            "Installed headers",
+            "Installed directories"
+          ],
+          "values": [
+            "/usr/include/asm/*.h, /usr/include/asm-generic/*.h, /usr/include/drm/*.h, /usr/include/linux/*.h, /usr/include/misc/*.h, /usr/include/mtd/*.h, /usr/include/rdma/*.h, /usr/include/scsi/*.h, /usr/include/sound/*.h, /usr/include/video/*.h, and /usr/include/xen/*.h",
+            "/usr/include/asm, /usr/include/asm-generic, /usr/include/drm, /usr/include/linux, /usr/include/misc, /usr/include/mtd, /usr/include/rdma, /usr/include/scsi, /usr/include/sound, /usr/include/video, and /usr/include/xen"
+          ]
+        },
+        {
+          "type": "definition_list",
+          "title": "",
+          "entries": [
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "/usr/include/asm/*.h"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "The Linux API ASM Headers"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "/usr/include/asm-generic/*.h"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "The Linux API ASM Generic Headers"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "/usr/include/drm/*.h"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "The Linux API DRM Headers"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "/usr/include/linux/*.h"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "The Linux API Linux Headers"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "/usr/include/misc/*.h"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "The Linux API Miscellaneous Headers"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "/usr/include/mtd/*.h"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "The Linux API MTD Headers"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "/usr/include/rdma/*.h"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "The Linux API RDMA Headers"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "/usr/include/scsi/*.h"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "The Linux API SCSI Headers"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "/usr/include/sound/*.h"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "The Linux API Sound Headers"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "/usr/include/video/*.h"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "The Linux API Video Headers"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "/usr/include/xen/*.h"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "The Linux API Xen Headers"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "id": "contents-linux-headers",
+      "role": "content"
+    }
+  ]
+}

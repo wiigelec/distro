@@ -17,7 +17,7 @@ Roadmap:
 | M4 — Bootstrap proof | COMPLETE | Fresh Chapter 5–7 bootstrap hands directly to the normal executor; all 80 final-system packages build successfully without publication XML/book parsing. |
 | M5 — Development proof | COMPLETE | Accepted state, candidate identity, validation, definition binding/drift rejection, review evidence, and guarded transactional promotion are implemented. |
 | M6 — Release proof | SATISFIED BY COMPOSITION | M4 proves clean full-system realization from normalized state and M5 proves validated state identity and controlled promotion. Freezing accepted state under a release identity adds production plumbing but no unresolved prototype architecture question. |
-| M7 — Presentation proof | IN PROGRESS — GENERIC EDITORIAL MODEL PROVEN; VOCABULARY COMPLETION SLICE ADDED | The direct validator proved the four-page generic editorial model. This slice adds mixed flow, tables, blockquotes, footnotes, keyboard combinations, superscripts, and additional inline semantic forms, while preserving bootstrap command authority. Bulk body migration, normal-package generalization, no-chunks HTML, and PDF remain open. |
+| M7 — Presentation proof | IN PROGRESS — EDITORIAL VOCABULARY PROVEN; 89/119 NON-PACKAGE BODIES COMPLETE | The generic editorial vocabulary is proven. This bulk slice completes every currently eligible non-package body, including all 30 bootstrap stages bound to bootstrap-13.1.json. Thirty operational pages remain explicit shells because their executable setup commands do not yet have normalized authority. Of the 80 normal Chapter 8 package pages, Zlib/Binutils remain the two proven rendered examples. |
 | M8+ | NOT STARTED | BLFS, hard-BLFS, and user-system proofs remain later roadmap milestones. |
 
 ## M5 closure
@@ -333,6 +333,32 @@ afterlfs
 `ch-tools-glibc` binds all 16 executable commands to `bootstrap-13.1.json`;
 publication editorial state does not duplicate those recipes.
 
+## M7 bulk eligible editorial migration
+
+The non-package chunk set now has an explicit authority split:
+
+```text
+119 non-package chunks
+├── 89 complete presentation bodies
+│   ├── narrative/editorial pages with no unowned build recipe
+│   └── all 30 bootstrap stages, commands bound to bootstrap-13.1.json
+└── 30 deferred operational pages
+    └── executable system-setup commands have no normalized owner yet
+```
+
+This migration creates 81 additional editorial-document files. Together with
+the eight representative proof pages, all 89 currently eligible non-package
+chunks render with `data-body-status="complete"`.
+
+The 30 deferred chunks remain structural shells on purpose. Copying their
+executable commands into presentation JSON would make publication state an
+independent recipe authority and violate the presentation/build authority
+boundary.
+
+`presentation/golden/editorial-bulk.json` records source-derived semantic
+digests, xref targets, bootstrap binding counts, and the complete/deferred
+coverage split. It is validation-only.
+
 ## Resume instruction
 
 Run:
@@ -341,8 +367,8 @@ Run:
 python3 product/src/proto/lfs_optimize/validate.py
 ```
 
-If it passes, the generic non-normal-package editorial vocabulary is complete
-for the currently inventoried LFS 13.1-systemd source. The next step is bulk
-mechanical migration of remaining eligible bodies. Chapter 8 normal package
-pages remain a separate authority path and will be generalized from normalized
-package state rather than copied into generic editorial documents.
+If it passes, bulk eligible non-package migration is proven. The next lowest-risk
+M7 expansion is to generalize the normalized Chapter 8 package renderer from the
+two proven examples to all 80 package pages. The 30 deferred operational pages
+should only be completed after their command semantics have a normalized
+non-presentation owner.

@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-tools-mpdecimal",
+  "title": "mpdecimal-4.0.1",
+  "blocks": [
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The mpdecimal package contains fast C/C++ libraries for correctly-rounded arbitrary precision decimal floating point arithmetic."
+            }
+          ]
+        },
+        {
+          "type": "segmented_list",
+          "titles": [
+            "Approximate build time",
+            "Required disk space"
+          ],
+          "values": [
+            "less than 0.1 SBU",
+            "3.3 MB"
+          ]
+        }
+      ],
+      "role": "package"
+    },
+    {
+      "type": "section",
+      "title": "Installation of mpdecimal",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Prepare mpdecimal for compilation:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 0
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Compile the package:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 1
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Install the package:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 2
+        }
+      ],
+      "role": "installation"
+    },
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Details on this package are located in"
+            },
+            {
+              "type": "xref",
+              "target": "contents-mpdecimal",
+              "label": "Contents of mpdecimal",
+              "suffix": "."
+            }
+          ]
+        }
+      ],
+      "role": "content"
+    }
+  ]
+}

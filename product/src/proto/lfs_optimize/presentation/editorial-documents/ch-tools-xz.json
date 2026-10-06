@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-tools-xz",
+  "title": "Xz-5.8.3",
+  "blocks": [
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The Xz package contains programs for compressing and decompressing files. It provides capabilities for the lzma and the newer xz compression formats. Compressing text files with"
+            },
+            {
+              "type": "code",
+              "text": "xz"
+            },
+            {
+              "type": "text",
+              "text": "yields a better compression percentage than with the traditional"
+            },
+            {
+              "type": "code",
+              "text": "gzip"
+            },
+            {
+              "type": "text",
+              "text": "or"
+            },
+            {
+              "type": "code",
+              "text": "bzip2"
+            },
+            {
+              "type": "text",
+              "text": "commands."
+            }
+          ]
+        },
+        {
+          "type": "segmented_list",
+          "titles": [
+            "Approximate build time",
+            "Required disk space"
+          ],
+          "values": [
+            "0.1 SBU",
+            "24 MB"
+          ]
+        }
+      ],
+      "role": "package"
+    },
+    {
+      "type": "section",
+      "title": "Installation of Xz",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Prepare Xz for compilation:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 0
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Compile the package:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 1
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Install the package:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 2
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Remove the libtool archive file because it is harmful for cross compilation:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 3
+        }
+      ],
+      "role": "installation"
+    },
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Details on this package are located in"
+            },
+            {
+              "type": "xref",
+              "target": "contents-xz",
+              "label": "Contents of Xz",
+              "suffix": "."
+            }
+          ]
+        }
+      ],
+      "role": "content"
+    }
+  ]
+}

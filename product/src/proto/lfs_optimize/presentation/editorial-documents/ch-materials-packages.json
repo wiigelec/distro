@@ -1,0 +1,5271 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-materials-packages",
+  "title": "All Packages",
+  "blocks": [
+    {
+      "type": "admonition",
+      "kind": "note",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Read the"
+            },
+            {
+              "type": "link",
+              "href": "https://www.linuxfromscratch.org/advisories/",
+              "label": "security advisories"
+            },
+            {
+              "type": "text",
+              "text": "before downloading packages to figure out if a newer version of any package should be used to avoid security vulnerabilities."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The upstream sources may remove old releases, especially when those releases contain a security vulnerability. If one URL below is not reachable, you should read the security advisories first to figure out if a newer version (with the vulnerability fixed) should be used. If not, try to download the removed package from a mirror. Although it's possible to download an old release from a mirror even if this release has been removed because of a vulnerability, it's not a good idea to use a release known to be vulnerable when building your system."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Download or otherwise obtain the following packages:"
+        }
+      ]
+    },
+    {
+      "type": "definition_list",
+      "title": "",
+      "entries": [
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Acl (2.4.0) -"
+            },
+            {
+              "type": "code",
+              "text": "376 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://savannah.nongnu.org/projects/acl",
+                  "label": "https://savannah.nongnu.org/projects/acl"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://download.savannah.gnu.org/releases/acl/acl-2.4.0.tar.xz",
+                  "label": "https://download.savannah.gnu.org/releases/acl/acl-2.4.0.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "e289f370161698a96f50b2a3fdadf411"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Attr (2.6.0) -"
+            },
+            {
+              "type": "code",
+              "text": "495 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://savannah.nongnu.org/projects/attr",
+                  "label": "https://savannah.nongnu.org/projects/attr"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://download.savannah.gnu.org/releases/attr/attr-2.6.0.tar.gz",
+                  "label": "https://download.savannah.gnu.org/releases/attr/attr-2.6.0.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "910a09c3ae0a211569d180586371cf7e"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Autoconf (2.73) -"
+            },
+            {
+              "type": "code",
+              "text": "1,385 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/autoconf/",
+                  "label": "https://www.gnu.org/software/autoconf/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/autoconf/autoconf-2.73.tar.xz",
+                  "label": "https://ftpmirror.gnu.org/autoconf/autoconf-2.73.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "9cbad9a116ef845bafeed8e7bc771bf4"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Automake (1.18.1) -"
+            },
+            {
+              "type": "code",
+              "text": "1,614 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/automake/",
+                  "label": "https://www.gnu.org/software/automake/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/automake/automake-1.18.1.tar.xz",
+                  "label": "https://ftpmirror.gnu.org/automake/automake-1.18.1.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "cea31dbf1120f890cbf2a3032cfb9a68"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Bash (5.3) -"
+            },
+            {
+              "type": "code",
+              "text": "11,089 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/bash/",
+                  "label": "https://www.gnu.org/software/bash/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/bash/bash-5.3.tar.gz",
+                  "label": "https://ftpmirror.gnu.org/bash/bash-5.3.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "977c8c0c5ae6309191e7768e28ebc951"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Bc (7.0.3) -"
+            },
+            {
+              "type": "code",
+              "text": "464 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://github.com/gavinhoward",
+                  "label": "https://github.com/gavinhoward"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://github.com/gavinhoward/bc/releases/download/7.0.3/bc-7.0.3.tar.xz",
+                  "label": "https://github.com/gavinhoward/bc/releases/download/7.0.3/bc-7.0.3.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "ad4db5a0eb4fdbb3f6813be4b6b3da74"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Binutils (2.47) -"
+            },
+            {
+              "type": "code",
+              "text": "28,355 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/binutils/",
+                  "label": "https://www.gnu.org/software/binutils/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://sourceware.org/pub/binutils/releases/binutils-2.47.tar.xz",
+                  "label": "https://sourceware.org/pub/binutils/releases/binutils-2.47.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "d772acfbd55a81644e9fe7b8189cd2a5"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Bison (3.8.2) -"
+            },
+            {
+              "type": "code",
+              "text": "2,752 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/bison/",
+                  "label": "https://www.gnu.org/software/bison/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/bison/bison-3.8.2.tar.xz",
+                  "label": "https://ftpmirror.gnu.org/bison/bison-3.8.2.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "c28f119f405a2304ff0a7ccdcc629713"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Bzip2 (1.0.8) -"
+            },
+            {
+              "type": "code",
+              "text": "792 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz",
+                  "label": "https://www.sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "67e051268d0c475ea773822f7500d0e5"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Coreutils (9.11) -"
+            },
+            {
+              "type": "code",
+              "text": "6,409 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/coreutils/",
+                  "label": "https://www.gnu.org/software/coreutils/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/coreutils/coreutils-9.11.tar.xz",
+                  "label": "https://ftpmirror.gnu.org/coreutils/coreutils-9.11.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "e52e9857e4aa9ae38ef32f8ed6a27604"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "D-Bus (1.16.2) -"
+            },
+            {
+              "type": "code",
+              "text": "1,090 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.freedesktop.org/wiki/Software/dbus",
+                  "label": "https://www.freedesktop.org/wiki/Software/dbus"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://dbus.freedesktop.org/releases/dbus/dbus-1.16.2.tar.xz",
+                  "label": "https://dbus.freedesktop.org/releases/dbus/dbus-1.16.2.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "97832e6f0a260936d28536e5349c22e5"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "DejaGNU (1.6.3) -"
+            },
+            {
+              "type": "code",
+              "text": "608 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/dejagnu/",
+                  "label": "https://www.gnu.org/software/dejagnu/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/dejagnu/dejagnu-1.6.3.tar.gz",
+                  "label": "https://ftpmirror.gnu.org/dejagnu/dejagnu-1.6.3.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "68c5208c58236eba447d7d6d1326b821"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Diffutils (3.12) -"
+            },
+            {
+              "type": "code",
+              "text": "1,894 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/diffutils/",
+                  "label": "https://www.gnu.org/software/diffutils/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/diffutils/diffutils-3.12.tar.xz",
+                  "label": "https://ftpmirror.gnu.org/diffutils/diffutils-3.12.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "d1b18b20868fb561f77861cd90b05de4"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "E2fsprogs (1.47.4) -"
+            },
+            {
+              "type": "code",
+              "text": "9,870 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://e2fsprogs.sourceforge.net/",
+                  "label": "https://e2fsprogs.sourceforge.net/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://downloads.sourceforge.net/project/e2fsprogs/e2fsprogs/v1.47.4/e2fsprogs-1.47.4.tar.gz",
+                  "label": "https://downloads.sourceforge.net/project/e2fsprogs/e2fsprogs/v1.47.4/e2fsprogs-1.47.4.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "733a93bc688314834ff2d10530ff4dc4"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Elfutils (0.195) -"
+            },
+            {
+              "type": "code",
+              "text": "11,751 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://sourceware.org/elfutils/",
+                  "label": "https://sourceware.org/elfutils/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://sourceware.org/ftp/elfutils/0.195/elfutils-0.195.tar.bz2",
+                  "label": "https://sourceware.org/ftp/elfutils/0.195/elfutils-0.195.tar.bz2"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "3e8ef51c43beceddbbb74879549cf72c"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Expat (2.8.3) -"
+            },
+            {
+              "type": "code",
+              "text": "506 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://libexpat.github.io/",
+                  "label": "https://libexpat.github.io/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://github.com/libexpat/libexpat/releases/download/R_2_8_3/expat-2.8.3.tar.xz",
+                  "label": "https://github.com/libexpat/libexpat/releases/download/R_2_8_3/expat-2.8.3.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "1747f5a57b191f0373baeb5adc8078ca"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Expect (5.45.4) -"
+            },
+            {
+              "type": "code",
+              "text": "618 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://core.tcl.tk/expect/",
+                  "label": "https://core.tcl.tk/expect/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://prdownloads.sourceforge.net/expect/expect5.45.4.tar.gz",
+                  "label": "https://prdownloads.sourceforge.net/expect/expect5.45.4.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "00fce8de158422f5ccd2666512329bd2"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "File (5.48) -"
+            },
+            {
+              "type": "code",
+              "text": "2,631 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.darwinsys.com/file/",
+                  "label": "https://www.darwinsys.com/file/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://astron.com/pub/file/file-5.48.tar.gz",
+                  "label": "https://astron.com/pub/file/file-5.48.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "423686e97f731d8c24e9cd1a22b03dec"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Findutils (4.11.0) -"
+            },
+            {
+              "type": "code",
+              "text": "2,394 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/findutils/",
+                  "label": "https://www.gnu.org/software/findutils/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/findutils/findutils-4.11.0.tar.xz",
+                  "label": "https://ftpmirror.gnu.org/findutils/findutils-4.11.0.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "512c6875ed84034dca240c4bc9380b96"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Flex (2.6.4) -"
+            },
+            {
+              "type": "code",
+              "text": "1,386 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://github.com/westes/flex",
+                  "label": "https://github.com/westes/flex"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz",
+                  "label": "https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "2882e3179748cc9f9c23ec593d6adc8d"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Flit-core (4.0.2) -"
+            },
+            {
+              "type": "code",
+              "text": "52 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://pypi.org/project/flit-core/",
+                  "label": "https://pypi.org/project/flit-core/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://pypi.org/packages/source/f/flit-core/flit_core-4.0.2.tar.gz",
+                  "label": "https://pypi.org/packages/source/f/flit-core/flit_core-4.0.2.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "89ebb783230fc8db6c1d2a39644b7085"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Gawk (5.4.1) -"
+            },
+            {
+              "type": "code",
+              "text": "3,749 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/gawk/",
+                  "label": "https://www.gnu.org/software/gawk/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/gawk/gawk-5.4.1.tar.xz",
+                  "label": "https://ftpmirror.gnu.org/gawk/gawk-5.4.1.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "d379c2110e7a3e15347dd5559a41ad64"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "GCC (16.2.0) -"
+            },
+            {
+              "type": "code",
+              "text": "104,689 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://gcc.gnu.org/",
+                  "label": "https://gcc.gnu.org/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/gcc/gcc-16.2.0/gcc-16.2.0.tar.xz",
+                  "label": "https://ftpmirror.gnu.org/gcc/gcc-16.2.0/gcc-16.2.0.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "19b777fb19ea4982731392481306f0d3"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "GDBM (1.26) -"
+            },
+            {
+              "type": "code",
+              "text": "1,198 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/gdbm/",
+                  "label": "https://www.gnu.org/software/gdbm/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/gdbm/gdbm-1.26.tar.gz",
+                  "label": "https://ftpmirror.gnu.org/gdbm/gdbm-1.26.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "aaa600665bc89e2febb3c7bd90679115"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Gettext (1.0) -"
+            },
+            {
+              "type": "code",
+              "text": "10,471 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/gettext/",
+                  "label": "https://www.gnu.org/software/gettext/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/gettext/gettext-1.0.tar.xz",
+                  "label": "https://ftpmirror.gnu.org/gettext/gettext-1.0.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "dc8b2911535929cec1e263706b0a13a1"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Glibc (2.44) -"
+            },
+            {
+              "type": "code",
+              "text": "20,138 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/libc/",
+                  "label": "https://www.gnu.org/software/libc/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/glibc/glibc-2.44.tar.xz",
+                  "label": "https://ftpmirror.gnu.org/glibc/glibc-2.44.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "7677da43ef759c68e005f5d4c37986a6"
+                }
+              ]
+            },
+            {
+              "type": "admonition",
+              "kind": "note",
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "The Glibc developers maintain a"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://sourceware.org/git/?p=glibc.git;a=shortlog;h=refs/heads/release/2.44/master",
+                      "label": "Git branch"
+                    },
+                    {
+                      "type": "text",
+                      "text": "containing patches considered worthy for Glibc-2.44 but unfortunately developed after Glibc-2.44 release. The LFS editors will issue a security advisory if any security fix is added into the branch, but no actions will be taken for other newly added patches. You may review the patches yourself and incorporate some patches if you consider them important."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "GMP (6.3.0) -"
+            },
+            {
+              "type": "code",
+              "text": "2,046 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/gmp/",
+                  "label": "https://www.gnu.org/software/gmp/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/gmp/gmp-6.3.0.tar.xz",
+                  "label": "https://ftpmirror.gnu.org/gmp/gmp-6.3.0.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "956dc04e864001a9c22429f761f2c283"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Gperf (3.3) -"
+            },
+            {
+              "type": "code",
+              "text": "1,789 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/gperf/",
+                  "label": "https://www.gnu.org/software/gperf/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/gperf/gperf-3.3.tar.gz",
+                  "label": "https://ftpmirror.gnu.org/gperf/gperf-3.3.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "31753b021ea78a21f154bf9eecb8b079"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Grep (3.12) -"
+            },
+            {
+              "type": "code",
+              "text": "1,874 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/grep/",
+                  "label": "https://www.gnu.org/software/grep/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/grep/grep-3.12.tar.xz",
+                  "label": "https://ftpmirror.gnu.org/grep/grep-3.12.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "5d9301ed9d209c4a88c8d3a6fd08b9ac"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Groff (1.24.1) -"
+            },
+            {
+              "type": "code",
+              "text": "8,795 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/groff/",
+                  "label": "https://www.gnu.org/software/groff/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/groff/groff-1.24.1.tar.gz",
+                  "label": "https://ftpmirror.gnu.org/groff/groff-1.24.1.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "d9d996af3d05ebab934380be708ea584"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "GRUB (2.14) -"
+            },
+            {
+              "type": "code",
+              "text": "7,545 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/grub/",
+                  "label": "https://www.gnu.org/software/grub/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/grub/grub-2.14.tar.xz",
+                  "label": "https://ftpmirror.gnu.org/grub/grub-2.14.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "383f9effad01c235d2535357ff717543"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Gzip (1.14) -"
+            },
+            {
+              "type": "code",
+              "text": "865 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/gzip/",
+                  "label": "https://www.gnu.org/software/gzip/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/gzip/gzip-1.14.tar.xz",
+                  "label": "https://ftpmirror.gnu.org/gzip/gzip-1.14.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "4bf5a10f287501ee8e8ebe00ef62b2c2"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Iana-Etc (20260805) -"
+            },
+            {
+              "type": "code",
+              "text": "596 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.iana.org/protocols",
+                  "label": "https://www.iana.org/protocols"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://github.com/Mic92/iana-etc/releases/download/20260805/iana-etc-20260805.tar.gz",
+                  "label": "https://github.com/Mic92/iana-etc/releases/download/20260805/iana-etc-20260805.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "f6d2619cfac3a68f91392e28fe4067c3"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Inetutils (2.8) -"
+            },
+            {
+              "type": "code",
+              "text": "2,916 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/inetutils/",
+                  "label": "https://www.gnu.org/software/inetutils/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/inetutils/inetutils-2.8.tar.gz",
+                  "label": "https://ftpmirror.gnu.org/inetutils/inetutils-2.8.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "f0f9ad13045a67da9c882148f9efae6b"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "IPRoute2 (7.1.0) -"
+            },
+            {
+              "type": "code",
+              "text": "943 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.kernel.org/pub/linux/utils/net/iproute2/",
+                  "label": "https://www.kernel.org/pub/linux/utils/net/iproute2/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-7.1.0.tar.xz",
+                  "label": "https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-7.1.0.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "4f322144fb9a0877c5f9ef71b2f11180"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Jinja2 (3.1.6) -"
+            },
+            {
+              "type": "code",
+              "text": "240 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://jinja.palletsprojects.com/en/3.1.x/",
+                  "label": "https://jinja.palletsprojects.com/en/3.1.x/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://pypi.org/packages/source/J/Jinja2/jinja2-3.1.6.tar.gz",
+                  "label": "https://pypi.org/packages/source/J/Jinja2/jinja2-3.1.6.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "66d4c25ff43d1deaf9637ccda523dec8"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Kbd (2.10.0) -"
+            },
+            {
+              "type": "code",
+              "text": "1,747 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://kbd-project.org/",
+                  "label": "https://kbd-project.org/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.kernel.org/pub/linux/utils/kbd/kbd-2.10.0.tar.xz",
+                  "label": "https://www.kernel.org/pub/linux/utils/kbd/kbd-2.10.0.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "77ff950dfa4c34fdf41125547bfa831a"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Kmod (34.2) -"
+            },
+            {
+              "type": "code",
+              "text": "434 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://github.com/kmod-project/kmod",
+                  "label": "https://github.com/kmod-project/kmod"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.kernel.org/pub/linux/utils/kernel/kmod/kmod-34.2.tar.xz",
+                  "label": "https://www.kernel.org/pub/linux/utils/kernel/kmod/kmod-34.2.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "36f2cc483745e81ede3406fa55e1065a"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Less (704) -"
+            },
+            {
+              "type": "code",
+              "text": "974 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.greenwoodsoftware.com/less/",
+                  "label": "https://www.greenwoodsoftware.com/less/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.greenwoodsoftware.com/less/less-704.tar.gz",
+                  "label": "https://www.greenwoodsoftware.com/less/less-704.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "c4c9eea5b1862783b078c67ca67c9185"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Libcap (2.78) -"
+            },
+            {
+              "type": "code",
+              "text": "197 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://sites.google.com/site/fullycapable/",
+                  "label": "https://sites.google.com/site/fullycapable/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.78.tar.xz",
+                  "label": "https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.78.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "0ff11419aa4813c0a0f84fe67bf3b39e"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Libffi (3.8.0) -"
+            },
+            {
+              "type": "code",
+              "text": "1,545 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://sourceware.org/libffi/",
+                  "label": "https://sourceware.org/libffi/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://github.com/libffi/libffi/releases/download/v3.8.0/libffi-3.8.0.tar.gz",
+                  "label": "https://github.com/libffi/libffi/releases/download/v3.8.0/libffi-3.8.0.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "96fe46f2a7bb82559b35a268a2c000ba"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Libpipeline (1.5.8) -"
+            },
+            {
+              "type": "code",
+              "text": "1,046 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://libpipeline.nongnu.org/",
+                  "label": "https://libpipeline.nongnu.org/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.8.tar.gz",
+                  "label": "https://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.8.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "17ac6969b2015386bcb5d278a08a40b5"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Libtool (2.6.2) -"
+            },
+            {
+              "type": "code",
+              "text": "1,068 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/libtool/",
+                  "label": "https://www.gnu.org/software/libtool/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/libtool/libtool-2.6.2.tar.xz",
+                  "label": "https://ftpmirror.gnu.org/libtool/libtool-2.6.2.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "87743862e6cabfb9e76651bc64e31e5c"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Libxcrypt (4.5.2) -"
+            },
+            {
+              "type": "code",
+              "text": "655 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://github.com/besser82/libxcrypt/",
+                  "label": "https://github.com/besser82/libxcrypt/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://github.com/besser82/libxcrypt/releases/download/v4.5.2/libxcrypt-4.5.2.tar.xz",
+                  "label": "https://github.com/besser82/libxcrypt/releases/download/v4.5.2/libxcrypt-4.5.2.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "25e888919ddcd153a07daa95224fa436"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Linux (7.1.8) -"
+            },
+            {
+              "type": "code",
+              "text": "154,722 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.kernel.org/",
+                  "label": "https://www.kernel.org/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.kernel.org/pub/linux/kernel/v7.x/linux-7.1.8.tar.xz",
+                  "label": "https://www.kernel.org/pub/linux/kernel/v7.x/linux-7.1.8.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "807584f564568b40162e9e4a72bf191f"
+                }
+              ]
+            },
+            {
+              "type": "admonition",
+              "kind": "note",
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "The Linux kernel is updated quite frequently, many times due to discoveries of security vulnerabilities. The latest available stable kernel version may be used, unless the errata page says otherwise."
+                    }
+                  ]
+                },
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "For users with limited speed or expensive bandwidth who wish to update the Linux kernel, a baseline version of the package and patches can be downloaded separately. This may save some time or cost for a subsequent patch level upgrade within a minor release."
+                    }
+                  ]
+                },
+                {
+                  "type": "flow",
+                  "blocks": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "As an example, for linux-7.1.8, the following could be downloaded:"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "list",
+                      "ordered": false,
+                      "items": [
+                        [
+                          {
+                            "type": "paragraph",
+                            "content": [
+                              {
+                                "type": "link",
+                                "href": "https://www.kernel.org/pub/linux/kernel/v6.x/linux-7.1.tar.xz",
+                                "label": "https://www.kernel.org/pub/linux/kernel/v6.x/linux-7.1.tar.xz"
+                              }
+                            ]
+                          }
+                        ],
+                        [
+                          {
+                            "type": "paragraph",
+                            "content": [
+                              {
+                                "type": "link",
+                                "href": "https://www.kernel.org/pub/linux/kernel/v6.x/patch-7.1.8.xz",
+                                "label": "https://www.kernel.org/pub/linux/kernel/v6.x/patch-7.1.8.xz"
+                              }
+                            ]
+                          }
+                        ]
+                      ]
+                    },
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Then in"
+                        },
+                        {
+                          "type": "xref",
+                          "target": "ch-tools-linux-headers",
+                          "label": "Linux-7.1.8 API Headers"
+                        },
+                        {
+                          "type": "text",
+                          "text": "and"
+                        },
+                        {
+                          "type": "xref",
+                          "target": "ch-bootable-kernel",
+                          "label": "Linux-7.1.8"
+                        },
+                        {
+                          "type": "text",
+                          "text": "unpack the kernel, change to the package directory and then apply the patch with"
+                        },
+                        {
+                          "type": "code",
+                          "text": "xzcat ../patch-7.1.8.xz | patch -Np1"
+                        },
+                        {
+                          "type": "text",
+                          "text": "."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "At this point, if a newer point version of the kernel is needed, then only the newer patch is needed. However, if a new minor version is desired, then both full minor version and any desired patch will both need to be downloaded."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Lz4 (1.10.0) -"
+            },
+            {
+              "type": "code",
+              "text": "379 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://lz4.org/",
+                  "label": "https://lz4.org/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://github.com/lz4/lz4/releases/download/v1.10.0/lz4-1.10.0.tar.gz",
+                  "label": "https://github.com/lz4/lz4/releases/download/v1.10.0/lz4-1.10.0.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "dead9f5f1966d9ae56e1e32761e4e675"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "M4 (1.4.21) -"
+            },
+            {
+              "type": "code",
+              "text": "2,032 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/m4/",
+                  "label": "https://www.gnu.org/software/m4/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/m4/m4-1.4.21.tar.xz",
+                  "label": "https://ftpmirror.gnu.org/m4/m4-1.4.21.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "8051eef7239b2f187791f2ab0034d6b7"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Make (4.4.1) -"
+            },
+            {
+              "type": "code",
+              "text": "2,300 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/make/",
+                  "label": "https://www.gnu.org/software/make/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/make/make-4.4.1.tar.gz",
+                  "label": "https://ftpmirror.gnu.org/make/make-4.4.1.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "c8469a3713cbbe04d955d4ae4be23eeb"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Man-DB (2.13.1) -"
+            },
+            {
+              "type": "code",
+              "text": "2,061 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.nongnu.org/man-db/",
+                  "label": "https://www.nongnu.org/man-db/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://download.savannah.gnu.org/releases/man-db/man-db-2.13.1.tar.xz",
+                  "label": "https://download.savannah.gnu.org/releases/man-db/man-db-2.13.1.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "b6335533cbeac3b24cd7be31fdee8c83"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Man-pages (6.18) -"
+            },
+            {
+              "type": "code",
+              "text": "1,859 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.kernel.org/doc/man-pages/",
+                  "label": "https://www.kernel.org/doc/man-pages/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.kernel.org/pub/linux/docs/man-pages/man-pages-6.18.tar.xz",
+                  "label": "https://www.kernel.org/pub/linux/docs/man-pages/man-pages-6.18.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "44915a91e4a28161dc421636a193fb3a"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "MarkupSafe (3.0.3) -"
+            },
+            {
+              "type": "code",
+              "text": "79 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://palletsprojects.com/p/markupsafe/",
+                  "label": "https://palletsprojects.com/p/markupsafe/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://pypi.org/packages/source/M/MarkupSafe/markupsafe-3.0.3.tar.gz",
+                  "label": "https://pypi.org/packages/source/M/MarkupSafe/markupsafe-3.0.3.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "13a73126d25afa72a1ff0daed072f5fe"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Meson (1.12.0) -"
+            },
+            {
+              "type": "code",
+              "text": "2,460 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://mesonbuild.com",
+                  "label": "https://mesonbuild.com"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://github.com/mesonbuild/meson/releases/download/1.12.0/meson-1.12.0.tar.gz",
+                  "label": "https://github.com/mesonbuild/meson/releases/download/1.12.0/meson-1.12.0.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "9f943c267d63016012efcb0f31ecdd7d"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "MPC (1.4.1) -"
+            },
+            {
+              "type": "code",
+              "text": "520 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.multiprecision.org/",
+                  "label": "https://www.multiprecision.org/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/mpc/mpc-1.4.1.tar.xz",
+                  "label": "https://ftpmirror.gnu.org/mpc/mpc-1.4.1.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "40c5fba305125279ea46041160e81daf"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "mpdecimal (4.0.1) -"
+            },
+            {
+              "type": "code",
+              "text": "309 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.bytereef.org/mpdecimal/",
+                  "label": "https://www.bytereef.org/mpdecimal/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.bytereef.org/software/mpdecimal/releases/mpdecimal-4.0.1.tar.gz",
+                  "label": "https://www.bytereef.org/software/mpdecimal/releases/mpdecimal-4.0.1.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "3d4412579b1edc1047efab151889cca9"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "MPFR (4.2.2) -"
+            },
+            {
+              "type": "code",
+              "text": "1,471 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.mpfr.org/",
+                  "label": "https://www.mpfr.org/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/mpfr/mpfr-4.2.2.tar.xz",
+                  "label": "https://ftpmirror.gnu.org/mpfr/mpfr-4.2.2.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "7c32c39b8b6e3ae85f25156228156061"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Ncurses (6.6) -"
+            },
+            {
+              "type": "code",
+              "text": "3,703 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/ncurses/",
+                  "label": "https://www.gnu.org/software/ncurses/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://invisible-mirror.net/archives/ncurses/ncurses-6.6.tar.gz",
+                  "label": "https://invisible-mirror.net/archives/ncurses/ncurses-6.6.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "dd45bf6854430af403452a7a6a40652c"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Ninja (1.13.2) -"
+            },
+            {
+              "type": "code",
+              "text": "286 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ninja-build.org/",
+                  "label": "https://ninja-build.org/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://github.com/ninja-build/ninja/archive/v1.13.2/ninja-1.13.2.tar.gz",
+                  "label": "https://github.com/ninja-build/ninja/archive/v1.13.2/ninja-1.13.2.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "76c00637fde44909cd7d56f8d73f2042"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "OpenSSL (4.0.1) -"
+            },
+            {
+              "type": "code",
+              "text": "53,789 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.openssl-library.org/",
+                  "label": "https://www.openssl-library.org/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://github.com/openssl/openssl/releases/download/openssl-4.0.1/openssl-4.0.1.tar.gz",
+                  "label": "https://github.com/openssl/openssl/releases/download/openssl-4.0.1/openssl-4.0.1.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "07e316afe26b61e72206b81706b497bb"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Packaging (26.3) -"
+            },
+            {
+              "type": "code",
+              "text": "307 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://pypi.org/project/packaging/",
+                  "label": "https://pypi.org/project/packaging/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://files.pythonhosted.org/packages/source/p/packaging/packaging-26.3.tar.gz",
+                  "label": "https://files.pythonhosted.org/packages/source/p/packaging/packaging-26.3.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "c6809ec56986682ceffe573b8778a1ce"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Patch (2.8) -"
+            },
+            {
+              "type": "code",
+              "text": "886 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://savannah.gnu.org/projects/patch/",
+                  "label": "https://savannah.gnu.org/projects/patch/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/patch/patch-2.8.tar.xz",
+                  "label": "https://ftpmirror.gnu.org/patch/patch-2.8.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "149327a021d41c8f88d034eab41c039f"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Pcre2 (10.47) -"
+            },
+            {
+              "type": "code",
+              "text": "2,096 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://github.com/PCRE2Project/pcre2/",
+                  "label": "https://github.com/PCRE2Project/pcre2/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.bz2",
+                  "label": "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.bz2"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "aded5840ab5a7d772dd4e16fc294b665"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Perl (5.44.0) -"
+            },
+            {
+              "type": "code",
+              "text": "14,571 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.perl.org/",
+                  "label": "https://www.perl.org/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.cpan.org/src/5.0/perl-5.44.0.tar.xz",
+                  "label": "https://www.cpan.org/src/5.0/perl-5.44.0.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "55761cf1543af326492fd194647796d1"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Pkgconf (3.0.5) -"
+            },
+            {
+              "type": "code",
+              "text": "417 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://github.com/pkgconf/pkgconf",
+                  "label": "https://github.com/pkgconf/pkgconf"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://distfiles.ariadne.space/pkgconf/pkgconf-3.0.5.tar.xz",
+                  "label": "https://distfiles.ariadne.space/pkgconf/pkgconf-3.0.5.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "18c528161e6b04ae36dc981af8c4d97e"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Procps (4.0.7) -"
+            },
+            {
+              "type": "code",
+              "text": "1,552 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://gitlab.com/procps-ng/procps/",
+                  "label": "https://gitlab.com/procps-ng/procps/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://sourceforge.net/projects/procps-ng/files/Production/procps-ng-4.0.7.tar.xz",
+                  "label": "https://sourceforge.net/projects/procps-ng/files/Production/procps-ng-4.0.7.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "d47bdda51c4bd595a1ab21b8e538bcb3"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Psmisc (23.7) -"
+            },
+            {
+              "type": "code",
+              "text": "423 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://gitlab.com/psmisc/psmisc",
+                  "label": "https://gitlab.com/psmisc/psmisc"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://sourceforge.net/projects/psmisc/files/psmisc/psmisc-23.7.tar.xz",
+                  "label": "https://sourceforge.net/projects/psmisc/files/psmisc/psmisc-23.7.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "53eae841735189a896d614cba440eb10"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Python (3.14.7) -"
+            },
+            {
+              "type": "code",
+              "text": "23,911 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.python.org/",
+                  "label": "https://www.python.org/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.python.org/ftp/python/3.14.7/Python-3.14.7.tar.xz",
+                  "label": "https://www.python.org/ftp/python/3.14.7/Python-3.14.7.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "a4c4c2991b4126e227073c2d9445f432"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Python Documentation (3.14.7) -"
+            },
+            {
+              "type": "code",
+              "text": "10,916 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.python.org/ftp/python/doc/3.14.7/python-3.14.7-docs-html.tar.bz2",
+                  "label": "https://www.python.org/ftp/python/doc/3.14.7/python-3.14.7-docs-html.tar.bz2"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "bdf55dddc02a76961d61730f06d18849"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Readline (8.3) -"
+            },
+            {
+              "type": "code",
+              "text": "3,340 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://tiswww.case.edu/php/chet/readline/rltop.html",
+                  "label": "https://tiswww.case.edu/php/chet/readline/rltop.html"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/readline/readline-8.3.tar.gz",
+                  "label": "https://ftpmirror.gnu.org/readline/readline-8.3.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "25a73bfb2a3ad7146c5e9d4408d9f6cd"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Sed (4.10) -"
+            },
+            {
+              "type": "code",
+              "text": "1,693 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/sed/",
+                  "label": "https://www.gnu.org/software/sed/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/sed/sed-4.10.tar.xz",
+                  "label": "https://ftpmirror.gnu.org/sed/sed-4.10.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "c70dc5372db95c816442ffedf77a0d0f"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Setuptools (84.0.0) -"
+            },
+            {
+              "type": "code",
+              "text": "1,142 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://pypi.org/project/setuptools/",
+                  "label": "https://pypi.org/project/setuptools/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://pypi.org/packages/source/s/setuptools/setuptools-84.0.0.tar.gz",
+                  "label": "https://pypi.org/packages/source/s/setuptools/setuptools-84.0.0.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "c6919a4b0862ca30604559e163a6cce9"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Shadow (4.20.2) -"
+            },
+            {
+              "type": "code",
+              "text": "2,238 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://github.com/shadow-maint/shadow/",
+                  "label": "https://github.com/shadow-maint/shadow/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://github.com/shadow-maint/shadow/releases/download/4.20.2/shadow-4.20.2.tar.xz",
+                  "label": "https://github.com/shadow-maint/shadow/releases/download/4.20.2/shadow-4.20.2.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "f52e717bd330818c67bd57c897ec5a8e"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Sqlite (3530400) -"
+            },
+            {
+              "type": "code",
+              "text": "3,207 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://sqlite.org",
+                  "label": "https://sqlite.org"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://sqlite.org/2026/sqlite-autoconf-3530400.tar.gz",
+                  "label": "https://sqlite.org/2026/sqlite-autoconf-3530400.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "ee54db5a5b04e77d4883ce0c051a1eba"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Sqlite Documentation (3530400) -"
+            },
+            {
+              "type": "code",
+              "text": "11,544 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://sqlite.org",
+                  "label": "https://sqlite.org"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://sqlite.org/2026/sqlite-doc-3530400.zip",
+                  "label": "https://sqlite.org/2026/sqlite-doc-3530400.zip"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "2cd5b168d0e5c5ae2b99beb3a4269a73"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Systemd (261.2) -"
+            },
+            {
+              "type": "code",
+              "text": "18,024 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://systemd.io",
+                  "label": "https://systemd.io"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://github.com/systemd/systemd/archive/v261.2/systemd-261.2.tar.gz",
+                  "label": "https://github.com/systemd/systemd/archive/v261.2/systemd-261.2.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "e3f04ccc83a28ec5e80c5432bb8329f5"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Systemd Man Pages (261.2) -"
+            },
+            {
+              "type": "code",
+              "text": "803 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://systemd.io",
+                  "label": "https://systemd.io"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://anduin.linuxfromscratch.org/LFS/systemd-man-pages-261.2.tar.xz",
+                  "label": "https://anduin.linuxfromscratch.org/LFS/systemd-man-pages-261.2.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "4c5533c1a2d0921dd4c5b5e6b8902570"
+                }
+              ]
+            },
+            {
+              "type": "admonition",
+              "kind": "note",
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "The Linux From Scratch team generates its own tarball of the man pages using the systemd source. This is done in order to avoid unnecessary dependencies."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Tar (1.35) -"
+            },
+            {
+              "type": "code",
+              "text": "2,263 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/tar/",
+                  "label": "https://www.gnu.org/software/tar/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/tar/tar-1.35.tar.xz",
+                  "label": "https://ftpmirror.gnu.org/tar/tar-1.35.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "a2d8042658cfd8ea939e6d911eaf4152"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Tcl (8.6.18) -"
+            },
+            {
+              "type": "code",
+              "text": "11,540 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://tcl.sourceforge.net/",
+                  "label": "https://tcl.sourceforge.net/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://downloads.sourceforge.net/tcl/tcl8.6.18-src.tar.gz",
+                  "label": "https://downloads.sourceforge.net/tcl/tcl8.6.18-src.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "acfe0c9f7d0c626ecf026e834a888da6"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Tcl Documentation (8.6.18) -"
+            },
+            {
+              "type": "code",
+              "text": "1,172 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://downloads.sourceforge.net/tcl/tcl8.6.18-html.tar.gz",
+                  "label": "https://downloads.sourceforge.net/tcl/tcl8.6.18-html.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "54d1ff0f5eee4e81e5cdaa4baa343397"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Texinfo (7.3) -"
+            },
+            {
+              "type": "code",
+              "text": "6,778 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.gnu.org/software/texinfo/",
+                  "label": "https://www.gnu.org/software/texinfo/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://ftpmirror.gnu.org/texinfo/texinfo-7.3.tar.xz",
+                  "label": "https://ftpmirror.gnu.org/texinfo/texinfo-7.3.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "915a09fcdfc2bf0f5ecf9e556d5698ff"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Time Zone Data (2026c) -"
+            },
+            {
+              "type": "code",
+              "text": "465 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.iana.org/time-zones",
+                  "label": "https://www.iana.org/time-zones"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.iana.org/time-zones/repository/releases/tzdata2026c.tar.gz",
+                  "label": "https://www.iana.org/time-zones/repository/releases/tzdata2026c.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "bff7174205cefab793e3b24271ef2f45"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Util-linux (2.42.2) -"
+            },
+            {
+              "type": "code",
+              "text": "10,409 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git/",
+                  "label": "https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.kernel.org/pub/linux/utils/util-linux/v2.42/util-linux-2.42.2.tar.xz",
+                  "label": "https://www.kernel.org/pub/linux/utils/util-linux/v2.42/util-linux-2.42.2.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "1d70131b70abda3dec3b37e282a20c96"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Vim (9.2.1025) -"
+            },
+            {
+              "type": "code",
+              "text": "19,662 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.vim.org",
+                  "label": "https://www.vim.org"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://github.com/vim/vim/archive/v9.2.1025/vim-9.2.1025.tar.gz",
+                  "label": "https://github.com/vim/vim/archive/v9.2.1025/vim-9.2.1025.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "060c9c0d7e2bdb5e5d80daad596cae02"
+                }
+              ]
+            },
+            {
+              "type": "admonition",
+              "kind": "note",
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "The version of vim changes daily. To get the latest version, go to"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://github.com/vim/vim/tags",
+                      "label": "https://github.com/vim/vim/tags"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Wheel (0.48.0) -"
+            },
+            {
+              "type": "code",
+              "text": "65 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://pypi.org/project/wheel/",
+                  "label": "https://pypi.org/project/wheel/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://pypi.org/packages/source/w/wheel/wheel-0.48.0.tar.gz",
+                  "label": "https://pypi.org/packages/source/w/wheel/wheel-0.48.0.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "f668e4885de814378b332eceea04a8a0"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Xz Utils (5.8.3) -"
+            },
+            {
+              "type": "code",
+              "text": "1,512 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://tukaani.org/xz",
+                  "label": "https://tukaani.org/xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://github.com//tukaani-project/xz/releases/download/v5.8.3/xz-5.8.3.tar.xz",
+                  "label": "https://github.com//tukaani-project/xz/releases/download/v5.8.3/xz-5.8.3.tar.xz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "a02753f34e5546d20213b87f876a0933"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Zlib (1.3.2) -"
+            },
+            {
+              "type": "code",
+              "text": "1,468 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://zlib.net/",
+                  "label": "https://zlib.net/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://zlib.net/fossils/zlib-1.3.2.tar.gz",
+                  "label": "https://zlib.net/fossils/zlib-1.3.2.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "a1e6c958597af3c67d162995a342138a"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Zstd (1.5.7) -"
+            },
+            {
+              "type": "code",
+              "text": "2,378 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Home page:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://facebook.github.io/zstd/",
+                  "label": "https://facebook.github.io/zstd/"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz",
+                  "label": "https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "780fc1896922b1bc52a4e90980cdda48"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Total size of these packages: about"
+        }
+      ]
+    }
+  ]
+}

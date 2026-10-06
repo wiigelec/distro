@@ -1,0 +1,4124 @@
+{
+  "schema_version": 1,
+  "document_id": "appendixc",
+  "title": "Dependencies",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Every package built in LFS relies on one or more other packages in order to build and install properly. Some packages even participate in circular dependencies, that is, the first package depends on the second which in turn depends on the first. Because of these dependencies, the order in which packages are built in LFS is very important. The purpose of this page is to document the dependencies of each package built in LFS."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "For each package that is built, there are three, and sometimes up to five types of dependencies listed below. The first lists what other packages need to be available in order to compile and install the package in question. The second lists the packages that must be available when any programs or libraries from the package are used at runtime. The third lists what packages, in addition to those on the first list, need to be available in order to run the test suites. The fourth list of dependencies are packages that require this package to be built and installed in its final location before they are built and installed."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The last list of dependencies are optional packages that are not addressed in LFS, but could be useful to the user. These packages may have additional mandatory or optional dependencies of their own. For these dependencies, the recommended practice is to install them after completion of the LFS book and then go back and rebuild the LFS package. In several cases, re-installation is addressed in BLFS."
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Acl"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, GCC, Gettext, Grep, M4, Make, Perl, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Automake, Diffutils, Findutils, and Libtool"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Coreutils, Sed, Tar, and Vim"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Attr"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, GCC, Gettext, Glibc, Grep, M4, Make, Perl, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Automake, Diffutils, Findutils, and Libtool"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Acl, Libcap, and Patch"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Autoconf"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Coreutils, Grep, M4, Make, Perl, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Bash, Coreutils, Grep, M4, Make, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Automake, Diffutils, Findutils, GCC, and Libtool"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Automake and Coreutils"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "Emacs"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Automake"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Autoconf, Bash, Coreutils, Gettext, Grep, M4, Make, Perl, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Bash, Coreutils, Grep, M4, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Binutils, Bison, Bzip2, DejaGNU, Diffutils, Expect, Findutils, Flex, GCC, Gettext, Gzip, Libtool, and Tar"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Coreutils"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Bash"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Bison, Coreutils, Diffutils, Gawk, GCC, Glibc, Grep, Make, Ncurses, Patch, Readline, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc, Ncurses, and Readline"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Expect and Shadow"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "Xorg"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Bc"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, GCC, Glibc, Grep, Make, and Readline"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc, Ncurses, and Readline"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Gawk"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Linux"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Binutils"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Diffutils, File, Flex, Gawk, GCC, Glibc, Grep, Make, Perl, Pkgconf, Sed, Texinfo, Zlib, and Zstd"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc, Zlib, and Zstd"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "DejaGNU and Expect"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "Elfutils and Jansson"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Bison"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Diffutils, GCC, Gettext, Glibc, Grep, M4, Make, Perl, and Sed"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Diffutils, Findutils, and Flex"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Kbd and Tar"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "Doxygen"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Bzip2"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Diffutils, GCC, Glibc, Make, and Patch"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "File and Libelf"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Coreutils"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Autoconf, Automake, Bash, Binutils, Coreutils, GCC, Gettext, Glibc, GMP, Grep, Libcap, Make, OpenSSL, Patch, Perl, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Diffutils, E2fsprogs, Findutils, Shadow, and Util-linux"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Bash, Diffutils, Findutils, Man-DB, and Systemd"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "Expect.pm and IO::Tty"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "D-Bus"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Diffutils, Gawk, GCC, Glibc, Grep, Make, Pkgconf, Sed, Systemd, and Util-linux"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc and Systemd"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Several packages in BLFS"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "Xorg Libraries"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "DejaGNU"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Coreutils, Diffutils, Expect, GCC, Grep, Make, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Expect and Bash"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Diffutils"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Gawk, GCC, Gettext, Glibc, Grep, Make, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Perl"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "E2fsprogs"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Diffutils, Gawk, GCC, Glibc, Grep, Gzip, Make, Pkgconf, Sed, Systemd, Texinfo, and Util-linux"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc and Util-linux"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Procps-ng and Psmisc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Expat"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Gawk, GCC, Glibc, Grep, Make, and Sed"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Python and XML::Parser"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Expect"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Diffutils, GCC, Glibc, Grep, Make, Patch, Sed, and Tcl"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc and Tcl"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "Tk"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "File"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Bzip2, Coreutils, Diffutils, Gawk, GCC, Glibc, Grep, Make, Sed, Xz, Zlib, and Zstd"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc, Bzip2, Xz, and Zlib"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "libseccomp"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Findutils"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, GCC, Gettext, Glibc, Grep, Make, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Bash and Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "DejaGNU, Diffutils, and Expect"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Flex"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, GCC, Gettext, Glibc, Grep, M4, Make, Patch, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Bash, Glibc, and M4"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Bison and Gawk"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Binutils, IProute2, Kbd, Kmod, and Man-DB"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Flit-Core"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Python"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Python"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "No test suite available"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Packaging and Wheel"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "pytest and testpath"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Gawk"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, GCC, Gettext, Glibc, GMP, Grep, Make, MPFR, Patch, Readline, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Bash, Glibc, and Mpfr"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Diffutils"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "libsigsegv"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "GCC"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Diffutils, Findutils, Gawk, GCC, Gettext, Glibc, GMP, Grep, M4, Make, MPC, MPFR, Patch, Perl, Sed, Tar, Texinfo, and Zstd"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Bash, Binutils, Glibc, Mpc, and Python"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "DejaGNU, Expect, and Shadow"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "GDC, GNAT, and ISL"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "GDBM"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Diffutils, GCC, Grep, Make, and Sed"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Bash, Glibc, and Readline"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Gettext"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Gawk, GCC, Glibc, Grep, Make, Ncurses, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Acl, Bash, Gcc, and Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Diffutils, Perl, and Tcl"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Automake and Bison"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "libunistring and libxml2"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Glibc"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Bison, Coreutils, Diffutils, Gawk, GCC, Gettext, Grep, Gzip, Linux API Headers, Make, Perl, Python, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "File"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "GMP"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Diffutils, Gawk, GCC, Glibc, Grep, M4, Make, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "GCC and Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "MPFR and GCC"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Gperf"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, GCC, Glibc, and Make"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "GCC and Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Diffutils and Expect"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Grep"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Diffutils, GCC, Gettext, Glibc, Grep, Make, Patch, Pcre2, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Gawk"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Man-DB"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Groff"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Bison, Coreutils, Gawk, GCC, Glibc, Grep, Make, Patch, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "GCC, Glibc, and Perl"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Man-DB"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "ghostscript and Uchardet"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "GRUB"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Bison, Coreutils, Diffutils, GCC, Gettext, Glibc, Grep, Make, Ncurses, Sed, Texinfo, and Xz"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Bash, GCC, Gettext, Glibc, Xz, and Sed"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Gzip"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, GCC, Glibc, Grep, Make, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Bash and Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Diffutils and Less"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Man-DB"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Iana-Etc"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Coreutils"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "No test suite available"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Perl"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Inetutils"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, GCC, Glibc, Grep, Make, Ncurses, Patch, Sed, Texinfo, and Zlib"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "GCC, Glibc, Ncurses, and Readline"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Tar"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Autoconf, Automake, Bash, Glibc, Grep, Perl, and Sed"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Perl"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "IProute2"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Bison, Coreutils, Flex, GCC, Glibc, Make, Libcap, Libelf, Linux API Headers, Pkgconf, and Zlib"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Bash, Coreutils, Glibc, Libcap, Libelf, and Zlib"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "No test suite available"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "Berkeley DB, iptables, libbpf, libmnl, and libtirpc"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Jinja2"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "MarkupSafe, Python, Setuptools, and Wheel"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "MarkupSafe and Python"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "No test suite available"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Systemd"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Kbd"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Bison, Coreutils, Flex, GCC, Gettext, Glibc, Gzip, Make, Patch, and Sed"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Bash, Coreutils, and Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "Linux-PAM"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Kmod"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Bison, Coreutils, Flex, GCC, Gettext, Glibc, Gzip, Make, OpenSSL, Pkgconf, Sed, Xz, Zlib, and Zstd"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc, Xz, and Zlib"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "No test suite available"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Systemd"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "scdoc (for man pages)"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Less"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Diffutils, GCC, Glibc, Grep, Make, Ncurses, Pcre2, and Sed"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc and Ncurses"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Gzip"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Libcap"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Attr, Bash, Binutils, Coreutils, GCC, Glibc, Perl, Make, and Sed"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "IProute2 and Shadow"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "Linux-PAM"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Libelf"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Bzip2, Coreutils, GCC, Glibc, Make, Xz, Zlib, and Zstd"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Bzip2, Glibc, Xz, Zlib, and Zstd"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "IProute2 and Linux"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Libffi"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, GCC, Glibc, Make, and Sed"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "DejaGnu"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Python"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Libpipeline"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Diffutils, Gawk, GCC, Glibc, Grep, Make, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Pkgconf"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Man-DB"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Libtool"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Diffutils, Gawk, GCC, Glibc, Grep, Make, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Autoconf, Automake, Bash, Binutils, Coreutils, File, GCC, Glibc, Grep, Make, and Sed"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Autoconf, Automake, and Findutils"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Libxcrypt"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Diffutils, Gawk, GCC, Glibc, Grep, Make, Perl, and Sed"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Perl, Python, Shadow, and Systemd"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Linux"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Bc, Binutils, Coreutils, Diffutils, Findutils, GCC, Glibc, Grep, Gzip, Kmod, Libelf, Make, Ncurses, OpenSSL, Perl, and Sed"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "No test suite available"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "cpio, LLVM (with Clang), and Rust-bindgen"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Linux API Headers"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Findutils, GCC, Glibc, Grep, Gzip, Make, Perl, and Sed"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "No test suite available"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Lz4"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, GCC, Glibc, and Make"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Python"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Zstd and Systemd"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "M4"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, GCC, Glibc, Grep, Make, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Bash and Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Diffutils"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Autoconf and Bison"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "libsigsegv"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Make"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, GCC, Gettext, Glibc, Grep, Make, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Perl and Procps-ng"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "Guile"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Man-DB"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Bzip2, Coreutils, Flex, GCC, GDBM, Gettext, Glibc, Grep, Groff, Gzip, Less, Libpipeline, Make, Pkgconf, Sed, Systemd, and Xz"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Bash, GDBM, Groff, Glibc, Gzip, Less, Libpipeline, and Zlib"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Util-linux"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "libseccomp and po4a"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Man-Pages"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Coreutils, Make, and Sed"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "No test suite available"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "MarkupSafe"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Python, Setuptools, and Wheel"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Python"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "No test suite available"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Jinja2"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Meson"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Ninja, Python, Setuptools, and Wheel"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Python"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "No test suite available"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Systemd"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Mpdecimal"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Diffutils, Gawk, GCC, Glibc, Grep, Make, and Sed"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "GCC and Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Python"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "MPC"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Diffutils, Gawk, GCC, Glibc, Grep, GMP, Make, MPFR, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc, GMP, and MPFR"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "GCC"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "MPFR"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Diffutils, Gawk, GCC, Glibc, Grep, GMP, Make, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc and GMP"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Gawk and GCC"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Ncurses"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Diffutils, Gawk, GCC, Glibc, Grep, Make, Patch, and Sed"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "No test suite available"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Bash, GRUB, Inetutils, Less, Procps-ng, Psmisc, Readline, Texinfo, Util-linux, and Vim"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Ninja"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Binutils, Coreutils, GCC, and Python"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "GCC and Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "cmake"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Meson"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "Asciidoc, Doxygen, Emacs, and re2c"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "OpenSSL"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Binutils, Coreutils, GCC, Make, and Perl"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc and Perl"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Coreutils, Kmod, Linux, and Systemd"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Packaging"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Flit-core and Python"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Python"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "No test suite available"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Wheel"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "pytest"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Patch"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Attr, Bash, Binutils, Coreutils, GCC, Glibc, Grep, Make, and Sed"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Attr and Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Diffutils"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "Ed"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Pcre2"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Bzip2, Coreutils, GCC, Glibc, GZip, Make, and Readline"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Grep"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Grep and Less"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "Valgrind and libedit"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Perl"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Gawk, GCC, GDBM, Glibc, Grep, Libxcrypt, Make, Sed, and Zlib"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "GDBM, Glibc, and Libxcrypt"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Iana-Etc, Less, and Procps-ng"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Autoconf"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "Berkeley DB"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Pkgconf"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Binutils, GCC, Glibc, Meson, Ninja, and Python"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Binutils, D-Bus, E2fsprogs, IProute2, Kmod, Man-DB, Procps-ng, Python, Systemd, and Util-linux"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Procps-ng"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, GCC, Glibc, Make, Ncurses, Pkgconf, and Systemd"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "DejaGNU"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Psmisc"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, GCC, Gettext, Glibc, Grep, Make, Ncurses, and Sed"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc and Ncurses"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Expect"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Python"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Expat, GCC, Gdbm, Gettext, Glibc, Grep, Libffi, Libxcrypt, Make, Mpdecimal, Ncurses, OpenSSL, Pkgconf, Sed, Util-linux, and Zlib"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Bzip2, Expat, Gdbm, Glibc, Libffi, Libxcrypt, Mpdecimal, Ncurses, OpenSSL, and Zlib"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "GDB and Valgrind"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Ninja"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "Berkeley DB, libnsl, and Tk"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Readline"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Gawk, GCC, Glibc, Grep, Make, Ncurses, Patch, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc and Ncurses"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "No test suite available"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Bash, Bc, and Gawk"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Sed"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, GCC, Gettext, Glibc, Grep, Make, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Acl, Attr, and Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Diffutils and Gawk"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "E2fsprogs, File, Libtool, and Shadow"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Setuptools"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Python and Wheel"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Python"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "No test suite available"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Jinja2, MarkupSafe, and Meson"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Shadow"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Acl, Attr, Bash, Binutils, Coreutils, Diffutils, Findutils, Gawk, GCC, Gettext, Glibc, Grep, Libcap, Libxcrypt, Make, and Sed"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc and Libxcrypt"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "No test suite available"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Coreutils"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "CrackLib and Linux-PAM"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Sqlite"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, GCC, Glibc, Gzip, Make, Ncurses, Readline, and Zlib"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Python"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "libarchive and libedit"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Systemd"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Acl, Bash, Binutils, Coreutils, Diffutils, Gawk, GCC, Glibc, Gperf, Grep, Jinja2, Libxcrypt, Lz4, Meson, OpenSSL, Pcre2, Pkgconf, Sed, Util-linux, and Zstd"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Acl, Glibc, Libxcrypt, OpenSSL, Util-linux, Xz, Zlib, and Zstd"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "D-Bus, E2fsprogs, Man-DB, Procps-ng, and Util-linux"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "AppArmor, audit-userspace, bash-completion, btrfs-progs, cURL, cryptsetup, docbook-xml, docbook-xsl-nons, Git, GnuTLS, iptables, jekyll, kexec-tools, libbpf, libdw, libfido2, libgcrypt, libidn2, libmicrohttpd, libpwquality, libseccomp, libxkbcommon, libxslt, Linux-PAM, lxml, make-ca, p11-kit, pefile, Polkit, pyelftools, qemu, qrencode, quota-tools, rpm, rsync, SELinux, Sphinx, systemtap, tpm2-tss, Valgrind, Xen, and zsh"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Tar"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Acl, Attr, Bash, Binutils, Bison, Coreutils, GCC, Gettext, Glibc, Grep, Inetutils, Make, Sed, and Texinfo"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Acl, Attr, Bzip2, Glibc, Gzip, and Xz"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Autoconf, Diffutils, Findutils, Gawk, and Gzip"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Tcl"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Diffutils, GCC, Glibc, Grep, Make, and Sed"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc and Zlib"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Texinfo"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, GCC, Gettext, Glibc, Grep, Make, Ncurses, Patch, and Sed"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc and Ncurses"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "SWIG"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Util-linux"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Diffutils, File, Findutils, Gawk, GCC, Gettext, Glibc, Grep, Make, Ncurses, Pkgconf, Sed, Systemd, and Zlib"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc, Ncurses, Readline, Systemd, and Zlib"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "Asciidoctor, Libcap-NG, libeconf, libuser, libutempter, Linux-PAM, smartmontools, po4a, and slang"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Vim"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Acl, Attr, Bash, Binutils, Coreutils, Diffutils, GCC, Glibc, Grep, Make, Ncurses, and Sed"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Acl, Attr, Glibc, Python, Ncurses, and Tcl"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "Xorg, GTK+2, LessTif, Ruby, and GPM"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Wheel"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Python, Flit-core, and packaging"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Python"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "No test suite available"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Jinja2, MarkupSafe, Meson, and Setuptools"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Expat, Glibc, and Perl"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "Perl"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Intltool"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "LWP::UserAgent"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Xz"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, Diffutils, GCC, Glibc, and Make"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "File, GRUB, Kmod, Libelf, Man-DB, and Systemd"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Zlib"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Bash, Binutils, Coreutils, GCC, Glibc, Make, and Sed"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "File, Kmod, Libelf, Perl, Python, and Util-linux"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Zstd"
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Installation depends on"
+      ],
+      "values": [
+        "Binutils, Coreutils, GCC, Glibc, Gzip, Lz4, Make, Xz, and Zlib"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Required at runtime"
+      ],
+      "values": [
+        "Glibc"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Test suite depends on"
+      ],
+      "values": [
+        "None"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Must be installed before"
+      ],
+      "values": [
+        "Binutils, File, GCC, Kmod, Libelf, Python, and Systemd"
+      ]
+    },
+    {
+      "type": "segmented_list",
+      "titles": [
+        "Optional dependencies"
+      ],
+      "values": [
+        "None"
+      ]
+    }
+  ]
+}

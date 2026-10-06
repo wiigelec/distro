@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-partitioning-introduction",
+  "title": "Introduction",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "In this chapter, the host tools needed for building LFS are checked and, if necessary, installed. Then a partition which will host the LFS system is prepared. We will create the partition itself, create a file system on it, and mount it."
+        }
+      ]
+    }
+  ]
+}

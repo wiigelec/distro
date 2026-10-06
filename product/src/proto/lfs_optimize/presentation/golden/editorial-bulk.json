@@ -1,0 +1,660 @@
+{
+  "schema_version": 1,
+  "source": {
+    "project": "Linux From Scratch",
+    "version": "13.1-systemd",
+    "published": "2026-09-01",
+    "slice": "bulk eligible non-package editorial bodies"
+  },
+  "complete_document_count": 89,
+  "deferred_document_count": 30,
+  "complete_documents": [
+    "preface",
+    "pre-foreword",
+    "pre-audience",
+    "pre-architecture",
+    "pre-prerequisites",
+    "pre-standards",
+    "pre-why",
+    "pre-organization",
+    "pre-errata",
+    "chapter-intro",
+    "ch-intro-how",
+    "ch-intro-whatsnew",
+    "ch-intro-changelog",
+    "ch-intro-resources",
+    "ch-intro-askforhelp",
+    "chapter-partitioning",
+    "ch-partitioning-introduction",
+    "ch-partitioning-hostreqs",
+    "ch-partitioning-stages",
+    "ch-partitioning-creatingpartition",
+    "chapter-getting-materials",
+    "ch-materials-packages",
+    "ch-materials-patches",
+    "chapter-final-preps",
+    "ch-preps-introduction",
+    "ch-preps-aboutsbus",
+    "ch-preps-abouttestsuites",
+    "partintro-cross-temp",
+    "ch-part3intro-intro",
+    "ch-tools-toolchaintechnotes",
+    "chapter-cross-tools",
+    "ch-tools-introduction",
+    "ch-tools-binutils-pass1",
+    "ch-tools-gcc-pass1",
+    "ch-tools-linux-headers",
+    "ch-tools-glibc",
+    "ch-tools-libstdcpp",
+    "chapter-temporary-tools",
+    "ch-tools-introduction-cross",
+    "ch-tools-m4",
+    "ch-tools-ncurses",
+    "ch-tools-bash",
+    "ch-tools-coreutils",
+    "ch-tools-diffutils",
+    "ch-tools-file",
+    "ch-tools-findutils",
+    "ch-tools-gawk",
+    "ch-tools-grep",
+    "ch-tools-gzip",
+    "ch-tools-make",
+    "ch-tools-patch",
+    "ch-tools-sed",
+    "ch-tools-tar",
+    "ch-tools-xz",
+    "ch-tools-binutils-pass2",
+    "ch-tools-gcc-pass2",
+    "chapter-chroot-temporary-tools",
+    "ch-tools-introduction-chroot",
+    "ch-tools-gettext",
+    "ch-tools-bison",
+    "ch-tools-perl",
+    "ch-tools-zlib",
+    "ch-tools-mpdecimal",
+    "ch-tools-Python",
+    "ch-tools-texinfo",
+    "ch-tools-util-linux",
+    "chapter-building-system",
+    "ch-system-introduction",
+    "ch-system-pkgmgt",
+    "ch-system-aboutdebug",
+    "chapter-config",
+    "ch-config-introduction",
+    "ch-config-udev",
+    "chapter-bootable",
+    "ch-bootable-introduction",
+    "chapter-finalizing",
+    "ch-finish-getcounted",
+    "ch-finish-whatnow",
+    "afterlfs",
+    "appendixa",
+    "appendixb",
+    "appendixc",
+    "Licenses",
+    "CC",
+    "part1",
+    "part2",
+    "part3",
+    "part4",
+    "part5"
+  ],
+  "deferred_command_documents": [
+    "pre-typography",
+    "ch-partitioning-creatingfilesystem",
+    "ch-partitioning-aboutlfs",
+    "ch-partitioning-mounting",
+    "ch-materials-introduction",
+    "ch-tools-creatingminlayout",
+    "ch-preps-addinguser",
+    "ch-preps-settingenviron",
+    "ch-tools-generalinstructions",
+    "ch-tools-changingowner",
+    "ch-tools-kernfs",
+    "ch-tools-chroot",
+    "ch-tools-creatingdirs",
+    "ch-tools-createfiles",
+    "ch-tools-cleanup",
+    "ch-system-stripping",
+    "ch-system-cleanup",
+    "ch-config-network",
+    "ch-config-symlinks",
+    "ch-config-clock",
+    "ch-config-console",
+    "ch-config-locale",
+    "ch-config-inputrc",
+    "ch-config-shells",
+    "ch-config-systemd-custom",
+    "ch-bootable-fstab",
+    "ch-bootable-kernel",
+    "ch-bootable-grub",
+    "ch-finish-theend",
+    "ch-finish-reboot"
+  ],
+  "documents": {
+    "preface": {
+      "block_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "pre-audience": {
+      "block_sha256": "20e6e1a7618e896a85ae889871f5699e0ab88755f41c646e217af842496b2b84",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "pre-architecture": {
+      "block_sha256": "9ab6ddc8324e9bdf0d8f69f85d7d5cfec480d3bbe441016d9c402c485881eb0d",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "pre-prerequisites": {
+      "block_sha256": "62f49044e489634d64ccc89aae02b4106b565ec62a44858ebd7316fc3d7bd603",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "pre-standards": {
+      "block_sha256": "0b5290ce04ebf3b5ecec38370bdf0a0600c3e29b4805eefddb9d7a1688dbb73a",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "pre-why": {
+      "block_sha256": "6be96088fc7157cacfb3e9bc055228a445d487edf5d02de9c9962ee4a81086a4",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "pre-organization": {
+      "block_sha256": "2d59565a995d3c0a6be1b36a6f08980e4f127cbe77bd8cc314c8ef6de5641048",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "pre-errata": {
+      "block_sha256": "1f2e201dc3cdc9c88bbed9569c943b0a2975d7372002163244ba17810e590c8a",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "chapter-intro": {
+      "block_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "ch-intro-how": {
+      "block_sha256": "ba4903342d4df92218ff436e5736334930fc88d53a999945142ebbcc3a5d3e86",
+      "xref_targets": [
+        "ch-partitioning-hostreqs",
+        "chapter-partitioning",
+        "chapter-getting-materials",
+        "chapter-final-preps",
+        "chapter-final-preps",
+        "chapter-cross-tools",
+        "chapter-cross-tools",
+        "chapter-temporary-tools",
+        "chapter-chroot-temporary-tools",
+        "ch-tools-toolchaintechnotes",
+        "chapter-building-system",
+        "chapter-config",
+        "chapter-bootable",
+        "chapter-finalizing"
+      ],
+      "bootstrap_command_count": 0
+    },
+    "ch-intro-whatsnew": {
+      "block_sha256": "9e86fd86218ad9c7712cf264b158e9eaaa00a7a20f4da14e6c3c12f862876587",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "ch-intro-changelog": {
+      "block_sha256": "56cc555486d25606e318f6f9a74e5bc61d2667af9e038a055123e1fe1a205322",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "ch-intro-resources": {
+      "block_sha256": "ed0c0863fca719a72a65fd6474a7e28461955f945082a53089a00e8f0664982a",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "ch-intro-askforhelp": {
+      "block_sha256": "bf9791e1e6c7f39ddd32eb360d12fd346c8c5e908a50d70c23fab5acbd517336",
+      "xref_targets": [
+        "ch-intro-resources",
+        "ch-intro-resources",
+        "version-check"
+      ],
+      "bootstrap_command_count": 0
+    },
+    "chapter-partitioning": {
+      "block_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "ch-partitioning-introduction": {
+      "block_sha256": "70c33f54be615c2a5014a301161472339ce1fe07959150f59d4a41885ff0b8d4",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "ch-partitioning-stages": {
+      "block_sha256": "0f2ee155bd130a8453ee6d458b43e2576916f35182270f29f3010cd957689d68",
+      "xref_targets": [
+        "ch-tools-generalinstructions",
+        "ch-tools-bindmount",
+        "ch-tools-kernfsmount"
+      ],
+      "bootstrap_command_count": 0
+    },
+    "ch-partitioning-creatingpartition": {
+      "block_sha256": "dbffc39065a7b6dafaf2513052322f2a85b2f138f437268cec5861fe99f5d218",
+      "xref_targets": [
+        "systemd-no-tmpfs",
+        "ch-bootable-fstab"
+      ],
+      "bootstrap_command_count": 0
+    },
+    "chapter-getting-materials": {
+      "block_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "ch-materials-packages": {
+      "block_sha256": "16895dcddf886b996e3f64ccf9a39a0cc0709dbf5b3b1fea7743ff2205530100",
+      "xref_targets": [
+        "ch-tools-linux-headers",
+        "ch-bootable-kernel"
+      ],
+      "bootstrap_command_count": 0
+    },
+    "ch-materials-patches": {
+      "block_sha256": "c9b65939815ee57e2b4b51f604453adbb969bd774c61d8e7ca78a951507f5933",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "chapter-final-preps": {
+      "block_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "ch-preps-introduction": {
+      "block_sha256": "b46c5195cad21fe0469752668415cebe98b417be9b196d886c15c4b52dad2bc9",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "ch-preps-aboutsbus": {
+      "block_sha256": "85b213eedb7b8d5c20ecf4b5ff8caf8e3cfb2dfd8f93a5aab491f670588e040e",
+      "xref_targets": [
+        "chapter-cross-tools",
+        "ch-tools-binutils-pass1",
+        "ch-tools-binutils-pass1"
+      ],
+      "bootstrap_command_count": 0
+    },
+    "ch-preps-abouttestsuites": {
+      "block_sha256": "6422376f11a1705a54b804386d3a2813986f682070688aa712b82a3d69cedc55",
+      "xref_targets": [
+        "chapter-cross-tools",
+        "chapter-temporary-tools"
+      ],
+      "bootstrap_command_count": 0
+    },
+    "partintro-cross-temp": {
+      "block_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "ch-part3intro-intro": {
+      "block_sha256": "9cdc9a77a29bab4b89be69dd88e87660caceaf59d8810521bdf5fd540ac69909",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "chapter-cross-tools": {
+      "block_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "ch-tools-introduction": {
+      "block_sha256": "531a7dee580acc737e5c6f11cae605d894f50d0d514d259475f6a36df931a831",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "ch-tools-gcc-pass1": {
+      "block_sha256": "4b15c2ab8526b673ccb65f26e5f16e0952add202df72bbf41efc188b12bdec90",
+      "xref_targets": [
+        "buildinstr",
+        "pie-ssp-info",
+        "contents-gcc"
+      ],
+      "bootstrap_command_count": 7
+    },
+    "ch-tools-linux-headers": {
+      "block_sha256": "ec92543e40869c510ccf5396ad0c3b2f79762733dd52bad278dba1294ea4f98f",
+      "xref_targets": [],
+      "bootstrap_command_count": 3
+    },
+    "ch-tools-libstdcpp": {
+      "block_sha256": "83c33480a1ffe69033f536a2c93c79bf4f7a49e037b0723c67b0f988f08a0cff",
+      "xref_targets": [
+        "ch-tools-gcc-pass1",
+        "contents-gcc"
+      ],
+      "bootstrap_command_count": 5
+    },
+    "chapter-temporary-tools": {
+      "block_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "ch-tools-introduction-cross": {
+      "block_sha256": "7f82a0b81c42ad9829cdaf9157753be1a33fcf67cad316524872d5ddaa2e34e5",
+      "xref_targets": [
+        "ch-preps-settingenviron"
+      ],
+      "bootstrap_command_count": 0
+    },
+    "ch-tools-m4": {
+      "block_sha256": "6a0111d3238a33c1d1f688f57ee84b8ced7e1999fb438f39d893976702a6353c",
+      "xref_targets": [
+        "contents-m4"
+      ],
+      "bootstrap_command_count": 4
+    },
+    "ch-tools-ncurses": {
+      "block_sha256": "bccfa8191c71525e06eec4954a815269b460b454cd7bea8614ae365b5d5926d1",
+      "xref_targets": [
+        "contents-ncurses"
+      ],
+      "bootstrap_command_count": 4
+    },
+    "ch-tools-bash": {
+      "block_sha256": "48c4b625b1c2a051d596f2043f3c0b6eafea39b391bcb07e74e551ca026c2e92",
+      "xref_targets": [
+        "contents-bash"
+      ],
+      "bootstrap_command_count": 4
+    },
+    "ch-tools-coreutils": {
+      "block_sha256": "e4da2639e20dd7a20e1b3459941dbefeaf12e8b55ac136f7468356574694c311",
+      "xref_targets": [
+        "contents-coreutils"
+      ],
+      "bootstrap_command_count": 4
+    },
+    "ch-tools-diffutils": {
+      "block_sha256": "003aa1ae1b2c7869edff07841218c0c53c57d20a7ff9d936132691ddd61826e6",
+      "xref_targets": [
+        "contents-diffutils"
+      ],
+      "bootstrap_command_count": 3
+    },
+    "ch-tools-file": {
+      "block_sha256": "b22f8abb2c275dbbf138309c4171584626c6f4a91babbaed9e1c282d21d991b1",
+      "xref_targets": [
+        "contents-file"
+      ],
+      "bootstrap_command_count": 5
+    },
+    "ch-tools-findutils": {
+      "block_sha256": "e6e817a6435d54eca3287fd33786cf485ce2d6f48a9868097a903e078d5d4b83",
+      "xref_targets": [
+        "contents-findutils"
+      ],
+      "bootstrap_command_count": 3
+    },
+    "ch-tools-gawk": {
+      "block_sha256": "c5fe35e5dbbec8bab6e99e908a6d126e467914846bb36f8e520c7f95817e9840",
+      "xref_targets": [
+        "contents-gawk"
+      ],
+      "bootstrap_command_count": 4
+    },
+    "ch-tools-grep": {
+      "block_sha256": "0bf6dd1aa60f936eeb5d1003adf30e15731ac066166441a200d6c9c5aa480684",
+      "xref_targets": [
+        "contents-grep"
+      ],
+      "bootstrap_command_count": 3
+    },
+    "ch-tools-gzip": {
+      "block_sha256": "125cafc60784479b018cc8e608e388f6e40a44bfdc0507b090b81dfcddca1e2c",
+      "xref_targets": [
+        "contents-gzip"
+      ],
+      "bootstrap_command_count": 3
+    },
+    "ch-tools-make": {
+      "block_sha256": "ba6070c4e0ee52361a7da021c985986680ed6bea324791cbc3ad85db59780060",
+      "xref_targets": [
+        "contents-make"
+      ],
+      "bootstrap_command_count": 3
+    },
+    "ch-tools-patch": {
+      "block_sha256": "16a1d29384d1495747684413231e3f301ce68ef59cbb775dd64422007e667628",
+      "xref_targets": [
+        "contents-patch"
+      ],
+      "bootstrap_command_count": 3
+    },
+    "ch-tools-sed": {
+      "block_sha256": "7a46ea7a18035078c2e340532cf0e9b5081391736f30631e9f9c779c4553f04a",
+      "xref_targets": [
+        "contents-sed"
+      ],
+      "bootstrap_command_count": 3
+    },
+    "ch-tools-tar": {
+      "block_sha256": "a2c33a579d69999f680b384665b26d69787bbb18074207d548a51cb7a0fae473",
+      "xref_targets": [
+        "contents-tar"
+      ],
+      "bootstrap_command_count": 3
+    },
+    "ch-tools-xz": {
+      "block_sha256": "1fe84ab21fbcc66d6fe74f4e022ce6e5f5d04afbf67d636dead8642ceae92245",
+      "xref_targets": [
+        "contents-xz"
+      ],
+      "bootstrap_command_count": 4
+    },
+    "ch-tools-binutils-pass2": {
+      "block_sha256": "9f3247d3118adfcb64982b7ef050b0b003905a50b482cc9332dc12ea9cccb5f2",
+      "xref_targets": [
+        "contents-binutils"
+      ],
+      "bootstrap_command_count": 6
+    },
+    "ch-tools-gcc-pass2": {
+      "block_sha256": "fb1c7909f8facbb229d19228066da664fe8a054af84acd13f61c2662cd3edadf",
+      "xref_targets": [
+        "ch-tools-gcc-pass1",
+        "ch-tools-libstdcpp",
+        "ch-tools-gcc-pass1",
+        "ch-tools-gcc-pass1",
+        "contents-gcc"
+      ],
+      "bootstrap_command_count": 7
+    },
+    "chapter-chroot-temporary-tools": {
+      "block_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "ch-tools-introduction-chroot": {
+      "block_sha256": "fae4c8b1cab9d129a4d17a9767962ef188481d7f8695ec56ae0a4a290fca0321",
+      "xref_targets": [
+        "ch-tools-chroot"
+      ],
+      "bootstrap_command_count": 0
+    },
+    "ch-tools-gettext": {
+      "block_sha256": "7a15641d73e17b02a170b435733df2014787a3b9536844eeb0d0b9691415bda3",
+      "xref_targets": [
+        "contents-gettext"
+      ],
+      "bootstrap_command_count": 3
+    },
+    "ch-tools-bison": {
+      "block_sha256": "3945da79a76bd25235217599916cb74056d8808c41a2bc7590ace67ad81abbef",
+      "xref_targets": [
+        "contents-bison"
+      ],
+      "bootstrap_command_count": 3
+    },
+    "ch-tools-perl": {
+      "block_sha256": "5cacb5b6cfdeae1e0c5c38a701d0346cad1b762b44a90bd5a6bf87480a88e947",
+      "xref_targets": [
+        "contents-perl"
+      ],
+      "bootstrap_command_count": 3
+    },
+    "ch-tools-zlib": {
+      "block_sha256": "bda8fba330fb8bc8c5d7fd82fe6343e1d3b23ce79e238e1e02cbbcecd5dd65d9",
+      "xref_targets": [
+        "contents-zlib"
+      ],
+      "bootstrap_command_count": 4
+    },
+    "ch-tools-mpdecimal": {
+      "block_sha256": "ef43605b9ed253c519138e36059a8a4fdcf2712be0aac06c988b0b474a3b6ea4",
+      "xref_targets": [
+        "contents-mpdecimal"
+      ],
+      "bootstrap_command_count": 3
+    },
+    "ch-tools-Python": {
+      "block_sha256": "1689f6429bf50c38e08157b538f07285a8cabf61a4c33bdbc55687c7980ad52f",
+      "xref_targets": [
+        "chapter-building-system",
+        "contents-python"
+      ],
+      "bootstrap_command_count": 3
+    },
+    "ch-tools-texinfo": {
+      "block_sha256": "483d00760455c304561f314a51cb5d54205fdccaa9d22e6467f49c3e3bc5d9d9",
+      "xref_targets": [
+        "contents-texinfo"
+      ],
+      "bootstrap_command_count": 3
+    },
+    "ch-tools-util-linux": {
+      "block_sha256": "eb2371b1747ab691da8be45f7e81c14d1f1b140f7cc8252021243203712fc842",
+      "xref_targets": [
+        "contents-utillinux"
+      ],
+      "bootstrap_command_count": 4
+    },
+    "chapter-building-system": {
+      "block_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "ch-system-aboutdebug": {
+      "block_sha256": "4b50d7414dd19c48c3241bbbf13f71b0710b7077308dad4e2c6eadfb8afcac9c",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "chapter-config": {
+      "block_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "ch-config-introduction": {
+      "block_sha256": "380e6d2f71fc05ece4ea28d12fec2f3a28236c3ba1ce5f18141afd819be6f86e",
+      "xref_targets": [
+        "ch-config-network",
+        "ch-config-hostname",
+        "ch-config-hosts",
+        "ch-config-udev",
+        "ch-config-symlinks",
+        "ch-config-clock",
+        "ch-config-console",
+        "ch-config-locale",
+        "ch-config-inputrc",
+        "ch-config-systemd-custom"
+      ],
+      "bootstrap_command_count": 0
+    },
+    "ch-config-udev": {
+      "block_sha256": "b4367b788499fe80eceb4d7a3df216e05cb46da9c1231b02d44076d274f6da6a",
+      "xref_targets": [
+        "chapter-building-system",
+        "ch-config-symlinks",
+        "ch-config-network"
+      ],
+      "bootstrap_command_count": 0
+    },
+    "chapter-bootable": {
+      "block_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "ch-bootable-introduction": {
+      "block_sha256": "30e46470fb82051362f4fadd6b61caba523998d0061c70af5f95db67a620fe38",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "chapter-finalizing": {
+      "block_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "ch-finish-getcounted": {
+      "block_sha256": "281359224039a0dc30667b6d92c290df1b2b4c40838b3dbbee48c13706438d95",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "ch-finish-whatnow": {
+      "block_sha256": "1d516c20b25ac798b63c88e4166d36acbd7b0414b5acca69dd0df16be5adbc18",
+      "xref_targets": [
+        "ch-intro-maillists"
+      ],
+      "bootstrap_command_count": 0
+    },
+    "appendixa": {
+      "block_sha256": "509d1459b64e02278db7ed86e6c3f941f5e75b585dceb240b7980cc61d6c1eb5",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "appendixb": {
+      "block_sha256": "e2077bd5b1f9be2c6e57e322324d498a3aabc4d5c9f0e3a332457e4d66aef36b",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "appendixc": {
+      "block_sha256": "181f1f4aa4eb405d245f50d402d5f5b6a58e9982b9d254827c9885a42e7a5f3e",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "Licenses": {
+      "block_sha256": "e8c08396348ed9450b486643fe19d667c423e81a26fb8c27f59471bf32f4792d",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "CC": {
+      "block_sha256": "86cf1aa7f63eceb9c1e9b7946934bed5f77a9fe400f1dfd4a8a17291c9695c2f",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "part1": {
+      "block_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "part2": {
+      "block_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "part3": {
+      "block_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "part4": {
+      "block_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    },
+    "part5": {
+      "block_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "xref_targets": [],
+      "bootstrap_command_count": 0
+    }
+  }
+}

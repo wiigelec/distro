@@ -1,0 +1,409 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-materials-patches",
+  "title": "Needed Patches",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "In addition to the packages, several patches are also required. These patches correct any mistakes in the packages that should be fixed by the maintainer. The patches also make small modifications to make the packages easier to work with. The following patches will be needed to build an LFS system:"
+        }
+      ]
+    },
+    {
+      "type": "definition_list",
+      "title": "",
+      "entries": [
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Bzip2 Documentation Patch -"
+            },
+            {
+              "type": "code",
+              "text": "1.6 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.linuxfromscratch.org/patches/lfs/13.1/bzip2-1.0.8-install_docs-1.patch",
+                  "label": "https://www.linuxfromscratch.org/patches/lfs/13.1/bzip2-1.0.8-install_docs-1.patch"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "6a5ac7e89b791aae556de0f745916f7f"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Coreutils Internationalization Fixes Patch -"
+            },
+            {
+              "type": "code",
+              "text": "67 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.linuxfromscratch.org/patches/lfs/13.1/coreutils-9.11-i18n-1.patch",
+                  "label": "https://www.linuxfromscratch.org/patches/lfs/13.1/coreutils-9.11-i18n-1.patch"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "900d64d9936516b68613271c9ebc0059"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Expect GCC15 Patch -"
+            },
+            {
+              "type": "code",
+              "text": "12 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.linuxfromscratch.org/patches/lfs/13.1/expect-5.45.4-gcc15-1.patch",
+                  "label": "https://www.linuxfromscratch.org/patches/lfs/13.1/expect-5.45.4-gcc15-1.patch"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "0ca4d6bb8d572fbcdb13cb36cd34833e"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Glibc Upstream Fixes Patch -"
+            },
+            {
+              "type": "code",
+              "text": "172 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.linuxfromscratch.org/patches/lfs/13.1/glibc-2.44-upstream_fixes-1.patch",
+                  "label": "https://www.linuxfromscratch.org/patches/lfs/13.1/glibc-2.44-upstream_fixes-1.patch"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "990574184b25aa3029a2444e81865098"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Glibc FHS Patch -"
+            },
+            {
+              "type": "code",
+              "text": "2.8 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.linuxfromscratch.org/patches/lfs/13.1/glibc-fhs-1.patch",
+                  "label": "https://www.linuxfromscratch.org/patches/lfs/13.1/glibc-fhs-1.patch"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "9a5997c3452909b1769918c759eff8a2"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Kbd Backspace/Delete Fix Patch -"
+            },
+            {
+              "type": "code",
+              "text": "12 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.linuxfromscratch.org/patches/lfs/13.1/kbd-2.10.0-backspace-1.patch",
+                  "label": "https://www.linuxfromscratch.org/patches/lfs/13.1/kbd-2.10.0-backspace-1.patch"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "f75cca16a38da6caa7d52151f7136895"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Python Openssl4 Patch -"
+            },
+            {
+              "type": "code",
+              "text": "38 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.linuxfromscratch.org/patches/lfs/13.1/Python-3.14.7-openssl_4-1.patch",
+                  "label": "https://www.linuxfromscratch.org/patches/lfs/13.1/Python-3.14.7-openssl_4-1.patch"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "597d7737df1b4ea4e184c193da523050"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "Tar Upstream Patch -"
+            },
+            {
+              "type": "code",
+              "text": "4.3 KB"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Download:"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.linuxfromscratch.org/patches/lfs/13.1/tar-1.35-acl_fix-1.patch",
+                  "label": "https://www.linuxfromscratch.org/patches/lfs/13.1/tar-1.35-acl_fix-1.patch"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "MD5 sum:"
+                },
+                {
+                  "type": "code",
+                  "text": "dbab49e317105539611866dac5dd54f6"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Total size of these patches: about"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "In addition to the above required patches, there exist a number of optional patches created by the LFS community. These optional patches solve minor problems or enable functionality that is not enabled by default. Feel free to peruse the patches database located at"
+        },
+        {
+          "type": "link",
+          "href": "https://www.linuxfromscratch.org/patches/downloads/",
+          "label": "https://www.linuxfromscratch.org/patches/downloads/"
+        },
+        {
+          "type": "text",
+          "text": "and acquire any additional patches to suit your system needs."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-tools-introduction",
+  "title": "Introduction",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "This chapter shows how to build a cross-compiler and its associated tools. Although here cross-compilation is faked, the principles are the same as for a real cross-toolchain."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The programs compiled in this chapter will be installed under the"
+        },
+        {
+          "type": "code",
+          "text": "$LFS/tools"
+        },
+        {
+          "type": "text",
+          "text": "directory to keep them separate from the files installed in the following chapters. The libraries, on the other hand, are installed into their final place, since they pertain to the system we want to build."
+        }
+      ]
+    }
+  ]
+}

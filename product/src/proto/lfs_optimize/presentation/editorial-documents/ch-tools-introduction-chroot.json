@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-tools-introduction-chroot",
+  "title": "Introduction",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "This chapter shows how to build the last missing bits of the temporary system: the tools needed to build the various packages. Now that all circular dependencies have been resolved, a"
+        },
+        {
+          "type": "quote",
+          "text": "chroot"
+        },
+        {
+          "type": "text",
+          "text": "environment, completely isolated from the host operating system (except for the running kernel), can be used for the build."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "For proper operation of the isolated environment, some communication with the running kernel must be established. This is done via the so-called"
+        },
+        {
+          "type": "emphasis",
+          "text": "Virtual Kernel File Systems"
+        },
+        {
+          "type": "text",
+          "text": ", which will be mounted before entering the chroot environment. You may want to verify that they are mounted by issuing the"
+        },
+        {
+          "type": "code",
+          "text": "findmnt"
+        },
+        {
+          "type": "text",
+          "text": "command."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Until"
+        },
+        {
+          "type": "xref",
+          "target": "ch-tools-chroot",
+          "label": "Entering the Chroot Environment"
+        },
+        {
+          "type": "text",
+          "text": ", the commands must be run as"
+        },
+        {
+          "type": "code",
+          "text": "root"
+        },
+        {
+          "type": "text",
+          "text": ", with the"
+        },
+        {
+          "type": "code",
+          "text": "LFS"
+        },
+        {
+          "type": "text",
+          "text": "variable set. After entering chroot, all commands are run as"
+        },
+        {
+          "type": "code",
+          "text": "root"
+        },
+        {
+          "type": "text",
+          "text": ", fortunately without access to the OS of the computer you built LFS on. Be careful anyway, as it is easy to destroy the whole LFS system with bad commands."
+        }
+      ]
+    }
+  ]
+}

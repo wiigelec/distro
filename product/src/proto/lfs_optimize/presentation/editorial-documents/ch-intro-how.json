@@ -1,0 +1,254 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-intro-how",
+  "title": "How to Build an LFS System",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The LFS system will be built by using an already installed Linux distribution (such as Debian, OpenMandriva, Fedora, or openSUSE). This existing Linux system (the host) will be used as a starting point to provide necessary programs, including a compiler, linker, and shell, to build the new system. Select the"
+        },
+        {
+          "type": "quote",
+          "text": "development"
+        },
+        {
+          "type": "text",
+          "text": "option during the distribution installation to include these tools."
+        }
+      ]
+    },
+    {
+      "type": "admonition",
+      "kind": "note",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "There are many ways to install a Linux distribution and the defaults are usually not optimal for building an LFS system. For suggestions on setting up a commercial distribution see:"
+            },
+            {
+              "type": "link",
+              "href": "https://www.linuxfromscratch.org/hints/downloads/files/partitioning-for-lfs.txt",
+              "label": "https://www.linuxfromscratch.org/hints/downloads/files/partitioning-for-lfs.txt"
+            },
+            {
+              "type": "text",
+              "text": "."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "As an alternative to installing a separate distribution on your machine, you may wish to use a LiveCD from a commercial distribution."
+        }
+      ]
+    },
+    {
+      "type": "admonition",
+      "kind": "note",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The host distro must satisfy"
+            },
+            {
+              "type": "xref",
+              "target": "ch-partitioning-hostreqs",
+              "label": "Host System Requirements"
+            },
+            {
+              "type": "text",
+              "text": "."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "xref",
+          "target": "chapter-partitioning",
+          "label": "Chapter 2"
+        },
+        {
+          "type": "text",
+          "text": "of this book describes how to create a new Linux native partition and file system, where the new LFS system will be compiled and installed."
+        },
+        {
+          "type": "xref",
+          "target": "chapter-getting-materials",
+          "label": "Chapter 3"
+        },
+        {
+          "type": "text",
+          "text": "explains which packages and patches must be downloaded to build an LFS system, and how to store them on the new file system."
+        },
+        {
+          "type": "xref",
+          "target": "chapter-final-preps",
+          "label": "Chapter 4"
+        },
+        {
+          "type": "text",
+          "text": "discusses the setup of an appropriate working environment. Please read"
+        },
+        {
+          "type": "xref",
+          "target": "chapter-final-preps",
+          "label": "Chapter 4"
+        },
+        {
+          "type": "text",
+          "text": "carefully as it explains several important issues you should be aware of before you begin to work your way through"
+        },
+        {
+          "type": "xref",
+          "target": "chapter-cross-tools",
+          "label": "Chapter 5"
+        },
+        {
+          "type": "text",
+          "text": "and beyond."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "xref",
+          "target": "chapter-cross-tools",
+          "label": "Chapter 5"
+        },
+        {
+          "type": "text",
+          "text": "explains the installation of the initial tool chain, (binutils, gcc, and glibc) using cross-compilation techniques to isolate the new tools from the host system."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "xref",
+          "target": "chapter-temporary-tools",
+          "label": "Chapter 6"
+        },
+        {
+          "type": "text",
+          "text": "shows you how to cross-compile basic utilities using the just built cross-toolchain."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "xref",
+          "target": "chapter-chroot-temporary-tools",
+          "label": "Chapter 7"
+        },
+        {
+          "type": "text",
+          "text": "then enters a \"chroot\" environment, where we use the new tools to build all the rest of the tools needed to create the LFS system."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "This effort to isolate the new system from the host distribution may seem excessive. A full technical explanation as to why this is done is provided in"
+        },
+        {
+          "type": "xref",
+          "target": "ch-tools-toolchaintechnotes",
+          "label": "Toolchain Technical Notes"
+        },
+        {
+          "type": "text",
+          "text": "."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "In"
+        },
+        {
+          "type": "xref",
+          "target": "chapter-building-system",
+          "label": "Chapter 8"
+        },
+        {
+          "type": "text",
+          "text": "the full-blown LFS system is built. Another advantage provided by the chroot environment is that it allows you to continue using the host system while LFS is being built. While waiting for package compilations to complete, you can continue using your computer as usual."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "To finish the installation, the basic system configuration is set up in"
+        },
+        {
+          "type": "xref",
+          "target": "chapter-config",
+          "label": "Chapter 9"
+        },
+        {
+          "type": "text",
+          "text": ", and the kernel and boot loader are created in"
+        },
+        {
+          "type": "xref",
+          "target": "chapter-bootable",
+          "label": "Chapter 10"
+        },
+        {
+          "type": "text",
+          "text": "."
+        },
+        {
+          "type": "xref",
+          "target": "chapter-finalizing",
+          "label": "Chapter 11"
+        },
+        {
+          "type": "text",
+          "text": "contains information on continuing the LFS experience beyond this book. After the steps in this chapter have been implemented, the computer is ready to boot into the new LFS system."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "This is the process in a nutshell. Detailed information on each step is presented in the following chapters. Items that seem complicated now will be clarified, and everything will fall into place as you commence your LFS adventure."
+        }
+      ]
+    }
+  ]
+}

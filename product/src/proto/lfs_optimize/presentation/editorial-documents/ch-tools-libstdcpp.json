@@ -1,0 +1,358 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-tools-libstdcpp",
+  "title": "Libstdc++ from GCC-16.2.0",
+  "blocks": [
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Libstdc++ is the standard C++ library. It is needed to compile C++ code (part of GCC is written in C++), but we had to defer its installation when we built"
+            },
+            {
+              "type": "xref",
+              "target": "ch-tools-gcc-pass1",
+              "label": "gcc-pass1"
+            },
+            {
+              "type": "text",
+              "text": "because Libstdc++ depends on Glibc, which was not yet available in the target directory."
+            }
+          ]
+        },
+        {
+          "type": "segmented_list",
+          "titles": [
+            "Approximate build time",
+            "Required disk space"
+          ],
+          "values": [
+            "0.3 SBU",
+            "1.5 GB"
+          ]
+        }
+      ],
+      "role": "package"
+    },
+    {
+      "type": "section",
+      "title": "Installation of Target Libstdc++",
+      "blocks": [
+        {
+          "type": "admonition",
+          "kind": "note",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "code",
+                  "text": "Libstdc++"
+                },
+                {
+                  "type": "text",
+                  "text": "is part of the GCC sources. You should first unpack the GCC tarball and change to the"
+                },
+                {
+                  "type": "code",
+                  "text": "gcc-16.2.0"
+                },
+                {
+                  "type": "text",
+                  "text": "directory."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Create a separate build directory for Libstdc++ and enter it:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 0
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Prepare Libstdc++ for compilation:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 1
+        },
+        {
+          "type": "definition_list",
+          "title": "The meaning of the configure options:",
+          "entries": [
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--host=..."
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Specifies that the cross-compiler we have just built should be used instead of the one in"
+                    },
+                    {
+                      "type": "code",
+                      "text": "/usr/bin"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "CXX=$LFS_TGT-gcc"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Specifies to use"
+                    },
+                    {
+                      "type": "code",
+                      "text": "$LFS_TGT-gcc"
+                    },
+                    {
+                      "type": "text",
+                      "text": "to compile the C++ code. The default,"
+                    },
+                    {
+                      "type": "code",
+                      "text": "$LFS_TGT-g++"
+                    },
+                    {
+                      "type": "text",
+                      "text": ", would automatically specify linking against"
+                    },
+                    {
+                      "type": "code",
+                      "text": "libstdc++"
+                    },
+                    {
+                      "type": "text",
+                      "text": "when invoking the linker, but in our case"
+                    },
+                    {
+                      "type": "code",
+                      "text": "libstdc++"
+                    },
+                    {
+                      "type": "text",
+                      "text": "is not installed yet so some checks in the"
+                    },
+                    {
+                      "type": "code",
+                      "text": "configure"
+                    },
+                    {
+                      "type": "text",
+                      "text": "script would misbehave with"
+                    },
+                    {
+                      "type": "code",
+                      "text": "$LFS_TGT-g++"
+                    },
+                    {
+                      "type": "text",
+                      "text": ". In a normal build, this override is automatically passed to the"
+                    },
+                    {
+                      "type": "code",
+                      "text": "configure"
+                    },
+                    {
+                      "type": "text",
+                      "text": "script from the top level directory. Here we explicitly pass it."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--disable-libstdcxx-pch"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This switch prevents the installation of precompiled include files, which are not needed at this stage."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--with-gxx-include-dir=/tools/$LFS_TGT/include/c++/16.2.0"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This specifies the installation directory for include files. Because Libstdc++ is the standard C++ library for LFS, this directory should match the location where the C++ compiler ("
+                    },
+                    {
+                      "type": "code",
+                      "text": "$LFS_TGT-g++"
+                    },
+                    {
+                      "type": "text",
+                      "text": ") would search for the standard C++ include files. In a normal build, this information is automatically passed to the Libstdc++"
+                    },
+                    {
+                      "type": "code",
+                      "text": "configure"
+                    },
+                    {
+                      "type": "text",
+                      "text": "options from the top level directory. In our case, this information must be explicitly given. The C++ compiler will prepend the sysroot path"
+                    },
+                    {
+                      "type": "code",
+                      "text": "$LFS"
+                    },
+                    {
+                      "type": "text",
+                      "text": "(specified when building GCC-pass1) to the include file search path, so it will actually search in"
+                    },
+                    {
+                      "type": "code",
+                      "text": "$LFS/tools/$LFS_TGT/include/c++/16.2.0"
+                    },
+                    {
+                      "type": "text",
+                      "text": ". The combination of the"
+                    },
+                    {
+                      "type": "code",
+                      "text": "DESTDIR"
+                    },
+                    {
+                      "type": "text",
+                      "text": "variable (in the"
+                    },
+                    {
+                      "type": "code",
+                      "text": "make install"
+                    },
+                    {
+                      "type": "text",
+                      "text": "command below) and this switch causes the headers to be installed there."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Compile Libstdc++ by running:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 2
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Install the library:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 3
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Remove the libtool archive files because they are harmful for cross-compilation:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 4
+        }
+      ],
+      "role": "installation"
+    },
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Details on this package are located in"
+            },
+            {
+              "type": "xref",
+              "target": "contents-gcc",
+              "label": "Contents of GCC",
+              "suffix": "."
+            }
+          ]
+        }
+      ],
+      "role": "content"
+    }
+  ]
+}

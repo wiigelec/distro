@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-tools-gzip",
+  "title": "Gzip-1.14",
+  "blocks": [
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The Gzip package contains programs for compressing and decompressing files."
+            }
+          ]
+        },
+        {
+          "type": "segmented_list",
+          "titles": [
+            "Approximate build time",
+            "Required disk space"
+          ],
+          "values": [
+            "0.1 SBU",
+            "12 MB"
+          ]
+        }
+      ],
+      "role": "package"
+    },
+    {
+      "type": "section",
+      "title": "Installation of Gzip",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Prepare Gzip for compilation:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 0
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Compile the package:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 1
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Install the package:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 2
+        }
+      ],
+      "role": "installation"
+    },
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Details on this package are located in"
+            },
+            {
+              "type": "xref",
+              "target": "contents-gzip",
+              "label": "Contents of Gzip",
+              "suffix": "."
+            }
+          ]
+        }
+      ],
+      "role": "content"
+    }
+  ]
+}

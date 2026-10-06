@@ -1,0 +1,200 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-tools-perl",
+  "title": "Perl-5.44.0",
+  "blocks": [
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The Perl package contains the Practical Extraction and Report Language."
+            }
+          ]
+        },
+        {
+          "type": "segmented_list",
+          "titles": [
+            "Approximate build time",
+            "Required disk space"
+          ],
+          "values": [
+            "0.6 SBU",
+            "301 MB"
+          ]
+        }
+      ],
+      "role": "package"
+    },
+    {
+      "type": "section",
+      "title": "Installation of Perl",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Prepare Perl for compilation:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 0
+        },
+        {
+          "type": "definition_list",
+          "title": "The meaning of the Configure options:",
+          "entries": [
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "-des"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This is a combination of three options: -d uses defaults for all items; -e ensures completion of all tasks; -s silences non-essential output."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "-D vendorprefix=/usr"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This ensures"
+                    },
+                    {
+                      "type": "code",
+                      "text": "perl"
+                    },
+                    {
+                      "type": "text",
+                      "text": "knows how to tell packages where they should install their Perl modules."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "-D useshrplib"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Build"
+                    },
+                    {
+                      "type": "code",
+                      "text": "libperl"
+                    },
+                    {
+                      "type": "text",
+                      "text": "needed by some Perl modules as a shared library, instead of a static library."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "-D privlib,-D archlib,-D sitelib,..."
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "These settings define where Perl looks for installed modules. The LFS editors chose to put them in a directory structure based on the MAJOR.MINOR version of Perl (5.44) which allows upgrading Perl to newer patch levels (the patch level is the last dot separated part in the full version string like 5.44.0) without reinstalling all of the modules."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Compile the package:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 1
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Install the package:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 2
+        }
+      ],
+      "role": "installation"
+    },
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Details on this package are located in"
+            },
+            {
+              "type": "xref",
+              "target": "contents-perl",
+              "label": "Contents of Perl",
+              "suffix": "."
+            }
+          ]
+        }
+      ],
+      "role": "content"
+    }
+  ]
+}

@@ -1,0 +1,1083 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-config-udev",
+  "title": "Overview of Device and Module Handling",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "In"
+        },
+        {
+          "type": "xref",
+          "target": "chapter-building-system",
+          "label": "Chapter 8"
+        },
+        {
+          "type": "text",
+          "text": ", we installed the udev daemon when"
+        },
+        {
+          "type": "text",
+          "text": "systemd was built. Before we go into the details regarding how udev works, a brief history of previous methods of handling devices is in order."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Linux systems in general traditionally used a static device creation method, whereby a great many device nodes were created under"
+        },
+        {
+          "type": "code",
+          "text": "/dev"
+        },
+        {
+          "type": "text",
+          "text": "(sometimes literally thousands of nodes), regardless of whether the corresponding hardware devices actually existed. This was typically done via a"
+        },
+        {
+          "type": "code",
+          "text": "MAKEDEV"
+        },
+        {
+          "type": "text",
+          "text": "script, which contained a number of calls to the"
+        },
+        {
+          "type": "code",
+          "text": "mknod"
+        },
+        {
+          "type": "text",
+          "text": "program with the relevant major and minor device numbers for every possible device that might exist in the world."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Using the udev method, device nodes are only created for those devices which are detected by the kernel. These device nodes are created each time the system boots; they are stored in a"
+        },
+        {
+          "type": "code",
+          "text": "devtmpfs"
+        },
+        {
+          "type": "text",
+          "text": "file system (a virtual file system that resides entirely in system memory). Device nodes do not require much space, so the memory that is used is negligible."
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "History",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "In February 2000, a new filesystem called"
+            },
+            {
+              "type": "code",
+              "text": "devfs"
+            },
+            {
+              "type": "text",
+              "text": "was merged into the 2.3.46 kernel and was made available during the 2.4 series of stable kernels. Although it was present in the kernel source itself, this method of creating devices dynamically never received overwhelming support from the core kernel developers."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The main problem with the approach adopted by"
+            },
+            {
+              "type": "code",
+              "text": "devfs"
+            },
+            {
+              "type": "text",
+              "text": "was the way it handled device detection, creation, and naming. The latter issue, that of device node naming, was perhaps the most critical. It is generally accepted that if device names are configurable, the device naming policy should be chosen by system administrators, and not imposed on them by the developer(s). The"
+            },
+            {
+              "type": "code",
+              "text": "devfs"
+            },
+            {
+              "type": "text",
+              "text": "file system also suffered from race conditions that were inherent in its design; these could not be fixed without a substantial revision of the kernel."
+            },
+            {
+              "type": "code",
+              "text": "devfs"
+            },
+            {
+              "type": "text",
+              "text": "was marked as deprecated for a long time, and was finally removed from the kernel in June, 2006."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "With the development of the unstable 2.5 kernel tree, later released as the 2.6 series of stable kernels, a new virtual filesystem called"
+            },
+            {
+              "type": "code",
+              "text": "sysfs"
+            },
+            {
+              "type": "text",
+              "text": "came to be. The job of"
+            },
+            {
+              "type": "code",
+              "text": "sysfs"
+            },
+            {
+              "type": "text",
+              "text": "is to provide information about the system's hardware configuration to userspace processes. With this userspace-visible representation, it became possible to develop a userspace replacement for"
+            },
+            {
+              "type": "code",
+              "text": "devfs"
+            },
+            {
+              "type": "text",
+              "text": "."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Udev Implementation",
+      "blocks": [
+        {
+          "type": "section",
+          "title": "Sysfs",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The"
+                },
+                {
+                  "type": "code",
+                  "text": "sysfs"
+                },
+                {
+                  "type": "text",
+                  "text": "filesystem was mentioned briefly above. One may wonder how"
+                },
+                {
+                  "type": "code",
+                  "text": "sysfs"
+                },
+                {
+                  "type": "text",
+                  "text": "knows about the devices present on a system and what device numbers should be used for them. Drivers that have been compiled into the kernel register their objects in"
+                },
+                {
+                  "type": "code",
+                  "text": "sysfs"
+                },
+                {
+                  "type": "text",
+                  "text": "(devtmpfs internally) as they are detected by the kernel. For drivers compiled as modules, registration happens when the module is loaded. Once the"
+                },
+                {
+                  "type": "code",
+                  "text": "sysfs"
+                },
+                {
+                  "type": "text",
+                  "text": "filesystem is mounted (on"
+                },
+                {
+                  "type": "code",
+                  "text": "/sys"
+                },
+                {
+                  "type": "text",
+                  "text": "), data which the drivers have registered with"
+                },
+                {
+                  "type": "code",
+                  "text": "sysfs"
+                },
+                {
+                  "type": "text",
+                  "text": "are available to userspace processes and to udevd for processing (including modifications to device nodes)."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "Device Node Creation",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Device files are created by the kernel in the"
+                },
+                {
+                  "type": "code",
+                  "text": "devtmpfs"
+                },
+                {
+                  "type": "text",
+                  "text": "file system. Any driver that wishes to register a device node will use the"
+                },
+                {
+                  "type": "code",
+                  "text": "devtmpfs"
+                },
+                {
+                  "type": "text",
+                  "text": "(via the driver core) to do it. When a"
+                },
+                {
+                  "type": "code",
+                  "text": "devtmpfs"
+                },
+                {
+                  "type": "text",
+                  "text": "instance is mounted on"
+                },
+                {
+                  "type": "code",
+                  "text": "/dev"
+                },
+                {
+                  "type": "text",
+                  "text": ", the device node will initially be exposed to userspace with a fixed name, permissions, and owner."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "A short time later, the kernel will send a uevent to"
+                },
+                {
+                  "type": "code",
+                  "text": "udevd"
+                },
+                {
+                  "type": "text",
+                  "text": ". Based on the rules specified in the files within the"
+                },
+                {
+                  "type": "code",
+                  "text": "/etc/udev/rules.d"
+                },
+                {
+                  "type": "text",
+                  "text": ","
+                },
+                {
+                  "type": "code",
+                  "text": "/usr/lib/udev/rules.d"
+                },
+                {
+                  "type": "text",
+                  "text": ", and"
+                },
+                {
+                  "type": "code",
+                  "text": "/run/udev/rules.d"
+                },
+                {
+                  "type": "text",
+                  "text": "directories,"
+                },
+                {
+                  "type": "code",
+                  "text": "udevd"
+                },
+                {
+                  "type": "text",
+                  "text": "will create additional symlinks to the device node, or change its permissions, owner, or group, or modify the internal"
+                },
+                {
+                  "type": "code",
+                  "text": "udevd"
+                },
+                {
+                  "type": "text",
+                  "text": "database entry (name) for that object."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The rules in these three directories are numbered and all three directories are merged together. If"
+                },
+                {
+                  "type": "code",
+                  "text": "udevd"
+                },
+                {
+                  "type": "text",
+                  "text": "can't find a rule for the device it is creating, it will leave the permissions and ownership at whatever"
+                },
+                {
+                  "type": "code",
+                  "text": "devtmpfs"
+                },
+                {
+                  "type": "text",
+                  "text": "used initially."
+                }
+              ]
+            }
+          ],
+          "id": "ch-config-udev-device-node-creation"
+        },
+        {
+          "type": "section",
+          "title": "Module Loading",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Device drivers compiled as modules may have aliases built into them. Aliases are visible in the output of the"
+                },
+                {
+                  "type": "code",
+                  "text": "modinfo"
+                },
+                {
+                  "type": "text",
+                  "text": "program and are usually related to the bus-specific identifiers of devices supported by a module. For example, the"
+                },
+                {
+                  "type": "emphasis",
+                  "text": "snd-fm801"
+                },
+                {
+                  "type": "text",
+                  "text": "driver supports PCI devices with vendor ID 0x1319 and device ID 0x0801, and has an alias of"
+                },
+                {
+                  "type": "code",
+                  "text": "pci:v00001319d00000801sv*sd*bc04sc01i*"
+                },
+                {
+                  "type": "text",
+                  "text": ". For most devices, the bus driver exports the alias of the driver that would handle the device via"
+                },
+                {
+                  "type": "code",
+                  "text": "sysfs"
+                },
+                {
+                  "type": "text",
+                  "text": ". E.g., the"
+                },
+                {
+                  "type": "code",
+                  "text": "/sys/bus/pci/devices/0000:00:0d.0/modalias"
+                },
+                {
+                  "type": "text",
+                  "text": "file might contain the string"
+                },
+                {
+                  "type": "code",
+                  "text": "pci:v00001319d00000801sv00001319sd00001319bc04sc01i00"
+                },
+                {
+                  "type": "text",
+                  "text": ". The default rules provided with udev will cause"
+                },
+                {
+                  "type": "code",
+                  "text": "udevd"
+                },
+                {
+                  "type": "text",
+                  "text": "to call out to"
+                },
+                {
+                  "type": "code",
+                  "text": "/sbin/modprobe"
+                },
+                {
+                  "type": "text",
+                  "text": "with the contents of the"
+                },
+                {
+                  "type": "code",
+                  "text": "MODALIAS"
+                },
+                {
+                  "type": "text",
+                  "text": "uevent environment variable (which should be the same as the contents of the"
+                },
+                {
+                  "type": "code",
+                  "text": "modalias"
+                },
+                {
+                  "type": "text",
+                  "text": "file in sysfs), thus loading all modules whose aliases match this string after wildcard expansion."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "In this example, this means that, in addition to"
+                },
+                {
+                  "type": "emphasis",
+                  "text": "snd-fm801"
+                },
+                {
+                  "type": "text",
+                  "text": ", the obsolete (and unwanted)"
+                },
+                {
+                  "type": "emphasis",
+                  "text": "forte"
+                },
+                {
+                  "type": "text",
+                  "text": "driver will be loaded if it is available. See below for ways in which the loading of unwanted drivers can be prevented."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The kernel itself is also able to load modules for network protocols, filesystems, and NLS support on demand."
+                }
+              ]
+            }
+          ],
+          "id": "module-loading"
+        },
+        {
+          "type": "section",
+          "title": "Handling Hotpluggable/Dynamic Devices",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "When you plug in a device, such as a Universal Serial Bus (USB) MP3 player, the kernel recognizes that the device is now connected and generates a uevent. This uevent is then handled by"
+                },
+                {
+                  "type": "code",
+                  "text": "udevd"
+                },
+                {
+                  "type": "text",
+                  "text": "as described above."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Problems with Loading Modules and Creating Devices",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "There are a few possible problems when it comes to automatically creating device nodes."
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "A Kernel Module Is Not Loaded Automatically",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Udev will only load a module if it has a bus-specific alias and the bus driver properly exports the necessary aliases to"
+                },
+                {
+                  "type": "code",
+                  "text": "sysfs"
+                },
+                {
+                  "type": "text",
+                  "text": ". In other cases, one should arrange module loading by other means. With Linux-7.1.8, udev is known to load properly-written drivers for INPUT, IDE, PCI, USB, SCSI, SERIO, and FireWire devices."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "To determine if the device driver you require has the necessary support for udev, run"
+                },
+                {
+                  "type": "code",
+                  "text": "modinfo"
+                },
+                {
+                  "type": "text",
+                  "text": "with the module name as the argument. Now try locating the device directory under"
+                },
+                {
+                  "type": "code",
+                  "text": "/sys/bus"
+                },
+                {
+                  "type": "text",
+                  "text": "and check whether there is a"
+                },
+                {
+                  "type": "code",
+                  "text": "modalias"
+                },
+                {
+                  "type": "text",
+                  "text": "file there."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "If the"
+                },
+                {
+                  "type": "code",
+                  "text": "modalias"
+                },
+                {
+                  "type": "text",
+                  "text": "file exists in"
+                },
+                {
+                  "type": "code",
+                  "text": "sysfs"
+                },
+                {
+                  "type": "text",
+                  "text": ", the driver supports the device and can talk to it directly, but doesn't have the alias, it is a bug in the driver. Load the driver without the help from udev and expect the issue to be fixed later."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "If there is no"
+                },
+                {
+                  "type": "code",
+                  "text": "modalias"
+                },
+                {
+                  "type": "text",
+                  "text": "file in the relevant directory under"
+                },
+                {
+                  "type": "code",
+                  "text": "/sys/bus"
+                },
+                {
+                  "type": "text",
+                  "text": ", this means that the kernel developers have not yet added modalias support to this bus type. With Linux-7.1.8, this is the case with ISA busses. Expect this issue to be fixed in later kernel versions."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Udev is not intended to load"
+                },
+                {
+                  "type": "quote",
+                  "text": "wrapper"
+                },
+                {
+                  "type": "text",
+                  "text": "drivers such as"
+                },
+                {
+                  "type": "emphasis",
+                  "text": "snd-pcm-oss"
+                },
+                {
+                  "type": "text",
+                  "text": "and non-hardware drivers such as"
+                },
+                {
+                  "type": "emphasis",
+                  "text": "loop"
+                },
+                {
+                  "type": "text",
+                  "text": "at all."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "A Kernel Module Is Not Loaded Automatically, and Udev Is Not Intended to Load It",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "If the"
+                },
+                {
+                  "type": "quote",
+                  "text": "wrapper"
+                },
+                {
+                  "type": "text",
+                  "text": "module only enhances the functionality provided by some other module (e.g.,"
+                },
+                {
+                  "type": "emphasis",
+                  "text": "snd-pcm-oss"
+                },
+                {
+                  "type": "text",
+                  "text": "enhances the functionality of"
+                },
+                {
+                  "type": "emphasis",
+                  "text": "snd-pcm"
+                },
+                {
+                  "type": "text",
+                  "text": "by making the sound cards available to OSS applications), configure"
+                },
+                {
+                  "type": "code",
+                  "text": "modprobe"
+                },
+                {
+                  "type": "text",
+                  "text": "to load the wrapper after udev loads the wrapped module. To do this, add a"
+                },
+                {
+                  "type": "quote",
+                  "text": "softdep"
+                },
+                {
+                  "type": "text",
+                  "text": "line to the corresponding"
+                },
+                {
+                  "type": "code",
+                  "text": "/etc/modprobe.d/<filename>.conf"
+                },
+                {
+                  "type": "text",
+                  "text": "file. For example:"
+                }
+              ]
+            },
+            {
+              "type": "pre",
+              "text": "softdep snd-pcm post: snd-pcm-oss"
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Note that the"
+                },
+                {
+                  "type": "quote",
+                  "text": "softdep"
+                },
+                {
+                  "type": "text",
+                  "text": "command also allows"
+                },
+                {
+                  "type": "code",
+                  "text": "pre:"
+                },
+                {
+                  "type": "text",
+                  "text": "dependencies, or a mixture of both"
+                },
+                {
+                  "type": "code",
+                  "text": "pre:"
+                },
+                {
+                  "type": "text",
+                  "text": "and"
+                },
+                {
+                  "type": "code",
+                  "text": "post:"
+                },
+                {
+                  "type": "text",
+                  "text": "dependencies. See the"
+                },
+                {
+                  "type": "link",
+                  "href": "https://man.archlinux.org/man/modprobe.d.5",
+                  "label": "modprobe.d(5)"
+                },
+                {
+                  "type": "text",
+                  "text": "manual page for more information on"
+                },
+                {
+                  "type": "quote",
+                  "text": "softdep"
+                },
+                {
+                  "type": "text",
+                  "text": "syntax and capabilities."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "Udev Loads Some Unwanted Module",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Either don't build the module, or blacklist it in a"
+                },
+                {
+                  "type": "code",
+                  "text": "/etc/modprobe.d/blacklist.conf"
+                },
+                {
+                  "type": "text",
+                  "text": "file as done with the"
+                },
+                {
+                  "type": "emphasis",
+                  "text": "forte"
+                },
+                {
+                  "type": "text",
+                  "text": "module in the example below:"
+                }
+              ]
+            },
+            {
+              "type": "pre",
+              "text": "blacklist forte"
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Blacklisted modules can still be loaded manually with the explicit"
+                },
+                {
+                  "type": "code",
+                  "text": "modprobe"
+                },
+                {
+                  "type": "text",
+                  "text": "command."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "Udev Creates a Device Incorrectly, or Makes the Wrong Symlink",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This usually happens if a rule unexpectedly matches a device. For example, a poorly-written rule can match both a SCSI disk (as desired) and the corresponding SCSI generic device (incorrectly) by vendor. Find the offending rule and make it more specific, with the help of the"
+                },
+                {
+                  "type": "code",
+                  "text": "udevadm info"
+                },
+                {
+                  "type": "text",
+                  "text": "command."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "Udev Rule Works Unreliably",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This may be another manifestation of the previous problem. If not, and your rule uses"
+                },
+                {
+                  "type": "code",
+                  "text": "sysfs"
+                },
+                {
+                  "type": "text",
+                  "text": "attributes, it may be a kernel timing issue, to be fixed in later kernels. For now, you can work around it by creating a rule that waits for the used"
+                },
+                {
+                  "type": "code",
+                  "text": "sysfs"
+                },
+                {
+                  "type": "text",
+                  "text": "attribute and appending it to the"
+                },
+                {
+                  "type": "code",
+                  "text": "/etc/udev/rules.d/10-wait_for_sysfs.rules"
+                },
+                {
+                  "type": "text",
+                  "text": "file (create this file if it does not exist). Please notify the LFS Development list if you do so and it helps."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "Udev Does Not Create a Device",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "First, be certain that the driver is built into the kernel or already loaded as a module, and that udev isn't creating a misnamed device."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "If a kernel driver does not export its data to"
+                },
+                {
+                  "type": "code",
+                  "text": "sysfs"
+                },
+                {
+                  "type": "text",
+                  "text": ", udev lacks the information needed to create a device node. This is most likely to happen with third party drivers from outside the kernel tree. Create a static device node in"
+                },
+                {
+                  "type": "code",
+                  "text": "/usr/lib/udev/devices"
+                },
+                {
+                  "type": "text",
+                  "text": "with the appropriate major/minor numbers (see the file"
+                },
+                {
+                  "type": "code",
+                  "text": "devices.txt"
+                },
+                {
+                  "type": "text",
+                  "text": "inside the kernel documentation or the documentation provided by the third party driver vendor). The static device node will be copied to"
+                },
+                {
+                  "type": "code",
+                  "text": "/dev"
+                },
+                {
+                  "type": "text",
+                  "text": "by"
+                },
+                {
+                  "type": "code",
+                  "text": "udev"
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "Device Naming Order Changes Randomly After Rebooting",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This is due to the fact that udev, by design, handles uevents and loads modules in parallel, and thus in an unpredictable order. This will never be"
+                },
+                {
+                  "type": "quote",
+                  "text": "fixed."
+                },
+                {
+                  "type": "text",
+                  "text": "You should not rely upon the kernel device names being stable. Instead, create your own rules that make symlinks with stable names based on some stable attributes of the device, such as a serial number or the output of various *_id utilities installed by udev. See"
+                },
+                {
+                  "type": "xref",
+                  "target": "ch-config-symlinks",
+                  "label": "Managing Devices"
+                },
+                {
+                  "type": "text",
+                  "text": "and"
+                },
+                {
+                  "type": "xref",
+                  "target": "ch-config-network",
+                  "label": "General Network Configuration"
+                },
+                {
+                  "type": "text",
+                  "text": "for examples."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Useful Reading",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Additional helpful documentation is available at the following sites:"
+            }
+          ]
+        },
+        {
+          "type": "list",
+          "ordered": false,
+          "items": [
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "A Userspace Implementation of"
+                  },
+                  {
+                    "type": "code",
+                    "text": "devfs"
+                  },
+                  {
+                    "type": "link",
+                    "href": "http://www.kroah.com/linux/talks/ols_2003_udev_paper/Reprint-Kroah-Hartman-OLS2003.pdf",
+                    "label": "http://www.kroah.com/linux/talks/ols_2003_udev_paper/Reprint-Kroah-Hartman-OLS2003.pdf"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "The"
+                  },
+                  {
+                    "type": "code",
+                    "text": "sysfs"
+                  },
+                  {
+                    "type": "text",
+                    "text": "Filesystem"
+                  },
+                  {
+                    "type": "link",
+                    "href": "https://www.kernel.org/pub/linux/kernel/people/mochel/doc/papers/ols-2005/mochel.pdf",
+                    "label": "https://www.kernel.org/pub/linux/kernel/people/mochel/doc/papers/ols-2005/mochel.pdf"
+                  }
+                ]
+              }
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

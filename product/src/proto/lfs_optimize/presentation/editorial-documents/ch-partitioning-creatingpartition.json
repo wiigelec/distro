@@ -1,0 +1,720 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-partitioning-creatingpartition",
+  "title": "Creating a New Partition",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Like most other operating systems, LFS is usually installed on a dedicated partition. The recommended approach to building an LFS system is to use an available empty partition or, if you have enough unpartitioned space, to create one."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "A minimal system requires a partition of around 10 gigabytes (GB). This is enough to store all the source tarballs and compile the packages. However, if the LFS system is intended to be the primary Linux system, additional software will probably be installed which will require additional space. A 30 GB partition is a reasonable size to provide for growth. The LFS system itself will not take up this much room. A large portion of this requirement is to provide sufficient free temporary storage as well as for adding additional capabilities after LFS is complete. Additionally, compiling packages can require a lot of disk space which will be reclaimed after the package is installed."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Because there is not always enough Random Access Memory (RAM) available for compilation processes, it is a good idea to use a small disk partition as"
+        },
+        {
+          "type": "code",
+          "text": "swap"
+        },
+        {
+          "type": "text",
+          "text": "space. This is used by the kernel to store seldom-used data and leave more memory available for active processes. The"
+        },
+        {
+          "type": "code",
+          "text": "swap"
+        },
+        {
+          "type": "text",
+          "text": "partition for an LFS system can be the same as the one used by the host system, in which case it is not necessary to create another one."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Start a disk partitioning program such as"
+        },
+        {
+          "type": "code",
+          "text": "cfdisk"
+        },
+        {
+          "type": "text",
+          "text": "or"
+        },
+        {
+          "type": "code",
+          "text": "fdisk"
+        },
+        {
+          "type": "text",
+          "text": "with a command line option naming the hard disk on which the new partition will be created—for example"
+        },
+        {
+          "type": "code",
+          "text": "/dev/sda"
+        },
+        {
+          "type": "text",
+          "text": "for the primary disk drive. Create a Linux native partition and a"
+        },
+        {
+          "type": "code",
+          "text": "swap"
+        },
+        {
+          "type": "text",
+          "text": "partition, if needed. Please refer to"
+        },
+        {
+          "type": "link",
+          "href": "https://man.archlinux.org/man/cfdisk.8",
+          "label": "cfdisk(8)"
+        },
+        {
+          "type": "text",
+          "text": "or"
+        },
+        {
+          "type": "link",
+          "href": "https://man.archlinux.org/man/fdisk.8",
+          "label": "fdisk(8)"
+        },
+        {
+          "type": "text",
+          "text": "if you do not yet know how to use the programs."
+        }
+      ]
+    },
+    {
+      "type": "admonition",
+      "kind": "note",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "For experienced users, other partitioning schemes are possible. The new LFS system can be on a software"
+            },
+            {
+              "type": "link",
+              "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/postlfs/raid.html",
+              "label": "RAID"
+            },
+            {
+              "type": "text",
+              "text": "array or an"
+            },
+            {
+              "type": "link",
+              "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/postlfs/aboutlvm.html",
+              "label": "LVM"
+            },
+            {
+              "type": "text",
+              "text": "logical volume. However, some of these options require an"
+            },
+            {
+              "type": "link",
+              "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/postlfs/initramfs.html",
+              "label": "initramfs"
+            },
+            {
+              "type": "text",
+              "text": ", which is an advanced topic. These partitioning methodologies are not recommended for first time LFS users."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Remember the designation of the new partition (e.g.,"
+        },
+        {
+          "type": "code",
+          "text": "sda5"
+        },
+        {
+          "type": "text",
+          "text": "). This book will refer to this as the LFS partition. Also remember the designation of the"
+        },
+        {
+          "type": "code",
+          "text": "swap"
+        },
+        {
+          "type": "text",
+          "text": "partition. These names will be needed later for the"
+        },
+        {
+          "type": "code",
+          "text": "/etc/fstab"
+        },
+        {
+          "type": "text",
+          "text": "file."
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Other Partition Issues",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Requests for advice on system partitioning are often posted on the LFS mailing lists. This is a highly subjective topic. The default for most distributions is to use the entire drive with the exception of one small swap partition. This is not optimal for LFS for several reasons. It reduces flexibility, makes sharing of data across multiple distributions or LFS builds more difficult, makes backups more time consuming, and can waste disk space through inefficient allocation of file system structures."
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "The Root Partition",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "A root LFS partition (not to be confused with the"
+                },
+                {
+                  "type": "code",
+                  "text": "/root"
+                },
+                {
+                  "type": "text",
+                  "text": "directory) of twenty gigabytes is a good compromise for most systems. It provides enough space to build LFS and most of BLFS, but is small enough so that multiple partitions can be easily created for experimentation."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "The Swap Partition",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Most distributions automatically create a swap partition. Generally the recommended size of the swap partition is about twice the amount of physical RAM, however this is rarely needed. If disk space is limited, hold the swap partition to two gigabytes and monitor the amount of disk swapping."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "If you want to use the hibernation feature (suspend-to-disk) of Linux, it writes out the contents of RAM to the swap partition before turning off the machine. In this case the size of the swap partition should be at least as large as the system's installed RAM."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Swapping is never good. For mechanical hard drives you can generally tell if a system is swapping by just listening to disk activity and observing how the system reacts to commands. With an SSD you will not be able to hear swapping, but you can tell how much swap space is being used by running the"
+                },
+                {
+                  "type": "code",
+                  "text": "top"
+                },
+                {
+                  "type": "text",
+                  "text": "or"
+                },
+                {
+                  "type": "code",
+                  "text": "free"
+                },
+                {
+                  "type": "text",
+                  "text": "programs. Use of an SSD for a swap partition should be avoided if possible. The first reaction to swapping should be to check for an unreasonable command such as trying to edit a five gigabyte file. If swapping becomes a normal occurrence, the best solution is to purchase more RAM for your system."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "The Grub BIOS Partition",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "If the"
+                },
+                {
+                  "type": "emphasis",
+                  "text": "boot disk"
+                },
+                {
+                  "type": "text",
+                  "text": "has been partitioned with a GUID Partition Table (GPT), then a small, typically 1 MB, partition must be created if the system is being booted with BIOS and it does not already exist. This partition is not formatted, but must be available for GRUB to use during installation of the boot loader. This partition will normally be labeled 'BIOS Boot' if using"
+                },
+                {
+                  "type": "code",
+                  "text": "fdisk"
+                },
+                {
+                  "type": "text",
+                  "text": "or have a code of"
+                },
+                {
+                  "type": "emphasis",
+                  "text": "EF02"
+                },
+                {
+                  "type": "text",
+                  "text": "if using the"
+                },
+                {
+                  "type": "code",
+                  "text": "gdisk"
+                },
+                {
+                  "type": "text",
+                  "text": "command."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "If the boot disk is partitioned with an MBR Partition Table, or DOS disklabel, then this partition is not needed as space already exists before the first partition that Grub can use."
+                }
+              ]
+            },
+            {
+              "type": "admonition",
+              "kind": "note",
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "The Grub BIOS partition must be on the drive that the BIOS uses to boot the system. This is not necessarily the drive that holds the LFS root partition. The disks on a system may use different partition table types. The necessity of the Grub BIOS partition depends only on the partition table type of the boot disk."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "The EFI System Partition",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This partition, also known as the"
+                },
+                {
+                  "type": "emphasis",
+                  "text": "ESP"
+                },
+                {
+                  "type": "text",
+                  "text": ", is needed when booting the system with UEFI. It stores the EFI application that is ran during bootup. The boot drive can be partitioned with MBR Partition Table, or DOS, but compatibility issues will tend to arise as a result. Therefore, it is always a good idea in this case to partition the boot drive with a GUID Partition Table (GPT). If you're only booting LFS from the partition, 20 MB or lower can suffice. The partition should be bigger than the EFI image size because GRUB dumps a lot of data to the partition before creating the EFI image. To be safe, 128 MB to 256 MB is recommended but can be dropped much lower with some experimentation. The partition label should be 'EFI System' if using"
+                },
+                {
+                  "type": "code",
+                  "text": "fdisk"
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "For Grub, the EFI System Partition should be located at"
+                },
+                {
+                  "type": "code",
+                  "text": "/boot/efi"
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "A lot of UEFI systems have a Compatibility Support Module (CSM) or Legacy Boot option, allowing to boot with BIOS. It could be a good idea to create a Grub BIOS partition if your system supports CSM in case UEFI booting does not work as expected."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "Convenience Partitions",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "There are several other partitions that are not required, but should be considered when designing a disk layout. The following list is not comprehensive, but is meant as a guide."
+                }
+              ]
+            },
+            {
+              "type": "list",
+              "ordered": false,
+              "items": [
+                [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "/boot – Highly recommended. Use this partition to store kernels and other booting information. To minimize potential boot problems with larger disks, make this the first physical partition on your first disk drive. A partition size of 200 megabytes is adequate."
+                      }
+                    ]
+                  }
+                ],
+                [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "/home – Highly recommended. Share your home directory and user customization across multiple distributions or LFS builds. The size is generally fairly large and depends on available disk space."
+                      }
+                    ]
+                  }
+                ],
+                [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "/usr – In LFS,"
+                      },
+                      {
+                        "type": "code",
+                        "text": "/bin"
+                      },
+                      {
+                        "type": "text",
+                        "text": ","
+                      },
+                      {
+                        "type": "code",
+                        "text": "/lib"
+                      },
+                      {
+                        "type": "text",
+                        "text": ", and"
+                      },
+                      {
+                        "type": "code",
+                        "text": "/sbin"
+                      },
+                      {
+                        "type": "text",
+                        "text": "are symlinks to their counterparts in"
+                      },
+                      {
+                        "type": "code",
+                        "text": "/usr"
+                      },
+                      {
+                        "type": "text",
+                        "text": ". So"
+                      },
+                      {
+                        "type": "code",
+                        "text": "/usr"
+                      },
+                      {
+                        "type": "text",
+                        "text": "contains all the binaries needed for the system to run. For LFS a separate partition for"
+                      },
+                      {
+                        "type": "code",
+                        "text": "/usr"
+                      },
+                      {
+                        "type": "text",
+                        "text": "is normally not needed. If you create it anyway, you should make a partition large enough to fit all the programs and libraries in the system. The root partition can be very small (maybe just one gigabyte) in this configuration, so it's suitable for a thin client or diskless workstation (where"
+                      },
+                      {
+                        "type": "code",
+                        "text": "/usr"
+                      },
+                      {
+                        "type": "text",
+                        "text": "is mounted from a remote server). However, you should be aware that an initramfs (not covered by LFS) will be needed to boot a system with a separate"
+                      },
+                      {
+                        "type": "code",
+                        "text": "/usr"
+                      },
+                      {
+                        "type": "text",
+                        "text": "partition."
+                      }
+                    ]
+                  }
+                ],
+                [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "/opt – This directory is most useful for BLFS, where multiple large packages like KDE or Texlive can be installed without embedding the files in the /usr hierarchy. If used, 5 to 10 gigabytes is generally adequate."
+                      }
+                    ]
+                  }
+                ],
+                [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "/tmp – By default, systemd mounts a"
+                      },
+                      {
+                        "type": "code",
+                        "text": "tmpfs"
+                      },
+                      {
+                        "type": "text",
+                        "text": "here. If you want to override that behavior, follow"
+                      },
+                      {
+                        "type": "xref",
+                        "target": "systemd-no-tmpfs",
+                        "label": "Disabling tmpfs for /tmp"
+                      },
+                      {
+                        "type": "text",
+                        "text": "when configuring the LFS system."
+                      }
+                    ]
+                  }
+                ],
+                [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "/usr/src – This partition is very useful for providing a location to store BLFS source files and share them across LFS builds. It can also be used as a location for building BLFS packages. A reasonably large partition of 30-50 gigabytes provides plenty of room."
+                      }
+                    ]
+                  }
+                ]
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Any separate partition that you want automatically mounted when the system starts must be specified in the"
+                },
+                {
+                  "type": "code",
+                  "text": "/etc/fstab"
+                },
+                {
+                  "type": "text",
+                  "text": "file. Details about how to specify partitions will be discussed in"
+                },
+                {
+                  "type": "xref",
+                  "target": "ch-bootable-fstab",
+                  "label": "Creating the /etc/fstab File"
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "An Example Disk Layout",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Below is an example layout for an empty disk drive."
+            }
+          ]
+        },
+        {
+          "type": "pre",
+          "text": "Number  Start (sector)    End (sector)        Size   Code  Name\n   1            2048           22527       10.0 MiB  EF00  EFI system partition\n   2           22528           24575     1024.0 KiB  EF02  BIOS boot partition\n   3           24576         1048575      500.0 MiB  8300  /boot\n   4         1048576         5242879        2.0 GiB  8200  swap\n   5         5242880        89128959       40.0 GiB  8300  lfs13.0+\n   6        89128960       173015039       40.0 GiB  8300  /home"
+        },
+        {
+          "type": "flow",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The above example makes a few assumptions:"
+                }
+              ]
+            },
+            {
+              "type": "list",
+              "ordered": false,
+              "items": [
+                [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "The partition table is a GUID Partition Table (GPT)."
+                      }
+                    ]
+                  }
+                ],
+                [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Both EFI and BIOS Boot partitions are present, although only one will be used. Which is used depends on the system firmware. If the system is old, it will not have UEFI capabilities at all. Some later systems can disable UEFI through the firmware setup by disabling \"Secure Boot\" and enabling \"Legacy Support\" or \"CSM\" (Compatibility Support Module). If you know in advance which mode you will use, the other partition can be omitted."
+                      }
+                    ]
+                  }
+                ],
+                [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "The EFI partition must be formatted as VFAT."
+                      }
+                    ]
+                  }
+                ],
+                [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "The BIOS partition is not formatted."
+                      }
+                    ]
+                  }
+                ],
+                [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "The swap partition must be initialized."
+                      }
+                    ]
+                  }
+                ],
+                [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "The /boot partition can be formatted as ext2 since it is rarely written (and then only by root) and does not need a journal."
+                      }
+                    ]
+                  }
+                ],
+                [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "The recommendation for all other partitions is to use ext4 formatting."
+                      }
+                    ]
+                  }
+                ],
+                [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Another partition can be added for installing the \"host\" system for building LFS. A minimal sized partition, 10 GiB, should be sufficient. If you are building the system using a LiveCD, a host partition may not be required."
+                      }
+                    ]
+                  }
+                ]
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

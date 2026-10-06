@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-finish-getcounted",
+  "title": "Get Counted",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Now that you have finished the book, do you want to be counted as an LFS user? Head over to"
+        },
+        {
+          "type": "link",
+          "href": "https://www.linuxfromscratch.org/cgi-bin/lfscounter.php",
+          "label": "https://www.linuxfromscratch.org/cgi-bin/lfscounter.php"
+        },
+        {
+          "type": "text",
+          "text": "and register as an LFS user by entering your name and the first LFS version you have used."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Let's reboot into LFS now."
+        }
+      ]
+    }
+  ]
+}

@@ -1935,6 +1935,110 @@ def self_test_editorial_slice() -> None:
     )
 
 
+def self_test_editorial_bulk() -> None:
+    golden = load_presentation(
+        PRESENTATION / "golden" / "editorial-bulk.json"
+    )
+    complete = golden.get("complete_documents")
+    deferred = golden.get("deferred_command_documents")
+    observations = golden.get("documents")
+    require(
+        isinstance(complete, list)
+        and isinstance(deferred, list)
+        and isinstance(observations, dict),
+        "editorial-bulk: invalid golden manifest",
+    )
+    require(
+        len(complete) == golden.get("complete_document_count") == 89
+        and len(deferred) == golden.get("deferred_document_count") == 30,
+        "editorial-bulk: migration counts drift",
+    )
+    require(
+        not set(complete).intersection(deferred),
+        "editorial-bulk: complete/deferred overlap",
+    )
+
+    non_package = {
+        document["section_id"]
+        for document in compose_book()["documents"]
+        if not document.get("package")
+    }
+    require(
+        set(complete).union(deferred) == non_package
+        and len(non_package) == 119,
+        "editorial-bulk: non-package coverage drift",
+    )
+
+    for section_id in complete:
+        editorial = load_editorial_document(section_id)
+        require(
+            editorial is not None,
+            f"{section_id}: complete editorial body missing",
+        )
+        rendered = ET.fromstring(
+            render_chunked_html_document(section_id)
+        )
+        body = rendered.find("body")
+        require(
+            body is not None
+            and body.attrib.get("data-body-status") == "complete",
+            f"{section_id}: complete editorial body rendered pending",
+        )
+
+    for section_id, observation in observations.items():
+        editorial = load_editorial_document(section_id)
+        require(editorial is not None, f"{section_id}: bulk body missing")
+        require(
+            _editorial_block_digest(editorial["blocks"])
+            == observation["block_sha256"],
+            f"{section_id}: bulk editorial semantic drift",
+        )
+        rendered = ET.fromstring(
+            render_chunked_html_document(section_id)
+        )
+        actual_targets = [
+            node.attrib["data-xref-target"]
+            for node in rendered.findall(".//a[@data-xref-target]")
+        ]
+        require(
+            actual_targets == observation["xref_targets"],
+            f"{section_id}: bulk xref target drift",
+        )
+        require(
+            _count_bootstrap_commands(editorial["blocks"])
+            == observation["bootstrap_command_count"],
+            f"{section_id}: bulk bootstrap binding count drift",
+        )
+        if observation["bootstrap_command_count"]:
+            stage = bootstrap_stage(section_id)
+            rendered_commands = [
+                node.text or ""
+                for node in rendered.findall(
+                    ".//code[@data-bootstrap-command]"
+                )
+            ]
+            require(
+                rendered_commands == stage["commands"],
+                f"{section_id}: bulk bootstrap command text/order drift",
+            )
+
+    for section_id in deferred:
+        require(
+            load_editorial_document(section_id) is None,
+            f"{section_id}: deferred operational body became presentation authority",
+        )
+        rendered = ET.fromstring(
+            render_chunked_html_document(section_id)
+        )
+        body = rendered.find("body")
+        require(
+            body is not None
+            and body.attrib.get("data-body-status")
+            == "pending-editorial-migration",
+            f"{section_id}: deferred operational body lost pending status",
+        )
+
+
 def self_test() -> None:
     for name in PROOF_PACKAGES:
         self_test_package(name)
@@ -1965,6 +2069,7 @@ def self_test() -> None:
     self_test_chunked_html()
     self_test_chunked_html_book()
     self_test_editorial_slice()
+    self_test_editorial_bulk()
 
 
 def main() -> int:
@@ -1997,8 +2102,10 @@ def main() -> int:
                         "chunked_html_book": True,
                         "generic_editorial_slice": True,
                         "editorial_vocabulary_complete": True,
+                        "editorial_bulk_complete": 89,
+                        "editorial_operational_deferred": 30,
                         "equivalence":
-                            "package-semantics-book-routing-and-editorial-vocabulary",
+                            "package-semantics-book-routing-and-bulk-editorial-migration",
                     },
                     indent=2,
                 )

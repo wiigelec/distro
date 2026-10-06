@@ -1,0 +1,1419 @@
+{
+  "schema_version": 1,
+  "document_id": "appendixa",
+  "title": "Acronyms and Terms",
+  "blocks": [
+    {
+      "type": "definition_list",
+      "title": "",
+      "entries": [
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "ABI"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Application Binary Interface"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "ALFS"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Automated Linux From Scratch"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "API"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Application Programming Interface"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "ASCII"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "American Standard Code for Information Interchange"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "BIOS"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Basic Input/Output System"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "BLFS"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Beyond Linux From Scratch"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "BSD"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Berkeley Software Distribution"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "chroot"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "change root"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "CMOS"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Complementary Metal Oxide Semiconductor"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "COS"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Class Of Service"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "CPU"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Central Processing Unit"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "CRC"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Cyclic Redundancy Check"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "CVS"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Concurrent Versions System"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "DHCP"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Dynamic Host Configuration Protocol"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "DNS"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Domain Name Service"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "EGA"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Enhanced Graphics Adapter"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "ELF"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Executable and Linkable Format"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "EOF"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "End of File"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "EQN"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "equation"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "ext2"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "second extended file system"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "ext3"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "third extended file system"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "ext4"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "fourth extended file system"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "FAQ"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Frequently Asked Questions"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "FHS"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Filesystem Hierarchy Standard"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "FIFO"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "First-In, First Out"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "FQDN"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Fully Qualified Domain Name"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "FTP"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "File Transfer Protocol"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "GB"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Gigabytes"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "GCC"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "GNU Compiler Collection"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "GID"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Group Identifier"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "GMT"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Greenwich Mean Time"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "HTML"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Hypertext Markup Language"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "IDE"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Integrated Drive Electronics"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "IEEE"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Institute of Electrical and Electronic Engineers"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "IO"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Input/Output"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "IP"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Internet Protocol"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "IPC"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Inter-Process Communication"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "IRC"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Internet Relay Chat"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "ISO"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "International Organization for Standardization"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "ISP"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Internet Service Provider"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "KB"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Kilobytes"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "LED"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Light Emitting Diode"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "LFS"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Linux From Scratch"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "LSB"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Linux Standard Base"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "MB"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Megabytes"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "MBR"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Master Boot Record"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "MD5"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Message Digest 5"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "NIC"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Network Interface Card"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "NLS"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Native Language Support"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "NNTP"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Network News Transport Protocol"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "NPTL"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Native POSIX Threading Library"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "OSS"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Open Sound System"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "PCH"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Pre-Compiled Headers"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "PCRE"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Perl Compatible Regular Expression"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "PID"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Process Identifier"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "PTY"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "pseudo terminal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "QOS"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Quality Of Service"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "RAM"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Random Access Memory"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "RPC"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Remote Procedure Call"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "RTC"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Real Time Clock"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "SBU"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Standard Build Unit"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "SCO"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The Santa Cruz Operation"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "SHA1"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Secure-Hash Algorithm 1"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "TLDP"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The Linux Documentation Project"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "TFTP"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Trivial File Transfer Protocol"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "TLS"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Thread-Local Storage"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "UID"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "User Identifier"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "umask"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "user file-creation mask"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "USB"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Universal Serial Bus"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "UTC"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Coordinated Universal Time"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "UUID"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Universally Unique Identifier"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "VC"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Virtual Console"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "VGA"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Video Graphics Array"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "emphasis",
+              "text": "VT"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Virtual Terminal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

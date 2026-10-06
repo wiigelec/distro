@@ -1,0 +1,261 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-partitioning-stages",
+  "title": "Building LFS in Stages",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "LFS is designed to be built in one session. That is, the instructions assume that the system will not be shut down during the process. This does not mean that the system has to be built in one sitting. The issue is that certain procedures must be repeated after a reboot when resuming LFS at different points."
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Chapters 1–4",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "These chapters run commands on the host system. When restarting, be certain of one thing:"
+            }
+          ]
+        },
+        {
+          "type": "list",
+          "ordered": false,
+          "items": [
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Procedures performed as the"
+                  },
+                  {
+                    "type": "code",
+                    "text": "root"
+                  },
+                  {
+                    "type": "text",
+                    "text": "user after Section 2.4 must have the LFS environment variable set"
+                  },
+                  {
+                    "type": "emphasis",
+                    "text": "FOR THE ROOT USER"
+                  },
+                  {
+                    "type": "text",
+                    "text": "."
+                  }
+                ]
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Chapters 5–6",
+      "blocks": [
+        {
+          "type": "list",
+          "ordered": false,
+          "items": [
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "The /mnt/lfs partition must be mounted."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "These two chapters"
+                  },
+                  {
+                    "type": "emphasis",
+                    "text": "must"
+                  },
+                  {
+                    "type": "text",
+                    "text": "be done as user"
+                  },
+                  {
+                    "type": "code",
+                    "text": "lfs"
+                  },
+                  {
+                    "type": "text",
+                    "text": ". A"
+                  },
+                  {
+                    "type": "code",
+                    "text": "su - lfs"
+                  },
+                  {
+                    "type": "text",
+                    "text": "command must be issued before performing any task in these chapters. If you don't do that, you are at risk of installing packages to the host, and potentially rendering it unusable."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "The procedures in"
+                  },
+                  {
+                    "type": "xref",
+                    "target": "ch-tools-generalinstructions",
+                    "label": "General Compilation Instructions"
+                  },
+                  {
+                    "type": "text",
+                    "text": "are critical. If there is any doubt a package has been installed correctly, ensure the previously expanded tarball has been removed, then re-extract the package, and complete all the instructions in that section."
+                  }
+                ]
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Chapters 7–10",
+      "blocks": [
+        {
+          "type": "list",
+          "ordered": false,
+          "items": [
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "The /mnt/lfs partition must be mounted."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "A few operations, from"
+                  },
+                  {
+                    "type": "quote",
+                    "text": "Preparing Virtual Kernel File Systems"
+                  },
+                  {
+                    "type": "text",
+                    "text": "to"
+                  },
+                  {
+                    "type": "quote",
+                    "text": "Entering the Chroot Environment,"
+                  },
+                  {
+                    "type": "text",
+                    "text": "must be done as the"
+                  },
+                  {
+                    "type": "code",
+                    "text": "root"
+                  },
+                  {
+                    "type": "text",
+                    "text": "user, with the LFS environment variable set for the"
+                  },
+                  {
+                    "type": "code",
+                    "text": "root"
+                  },
+                  {
+                    "type": "text",
+                    "text": "user."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "When entering chroot, the LFS environment variable must be set for"
+                  },
+                  {
+                    "type": "code",
+                    "text": "root"
+                  },
+                  {
+                    "type": "text",
+                    "text": ". The LFS variable is not used after the chroot environment has been entered."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "The virtual file systems must be mounted. This can be done before or after entering chroot by changing to a host virtual terminal and, as"
+                  },
+                  {
+                    "type": "code",
+                    "text": "root"
+                  },
+                  {
+                    "type": "text",
+                    "text": ", running the commands in"
+                  },
+                  {
+                    "type": "xref",
+                    "target": "ch-tools-bindmount",
+                    "label": "Mounting and Populating /dev"
+                  },
+                  {
+                    "type": "text",
+                    "text": "and"
+                  },
+                  {
+                    "type": "xref",
+                    "target": "ch-tools-kernfsmount",
+                    "label": "Mounting Virtual Kernel File Systems",
+                    "suffix": "."
+                  }
+                ]
+              }
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

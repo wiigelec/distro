@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-preps-abouttestsuites",
+  "title": "About the Test Suites",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Most packages provide a test suite. Running the test suite for a newly built package is a good idea because it can provide a"
+        },
+        {
+          "type": "quote",
+          "text": "sanity check"
+        },
+        {
+          "type": "text",
+          "text": "indicating that everything compiled correctly. A test suite that passes its set of checks usually proves that the package is functioning as the developer intended. It does not, however, guarantee that the package is totally bug free."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Some test suites are more important than others. For example, the test suites for the core toolchain packages—GCC, binutils, and glibc—are of the utmost importance due to their central role in a properly functioning system. The test suites for GCC and glibc can take a very long time to complete, especially on slower hardware, but are strongly recommended."
+        }
+      ]
+    },
+    {
+      "type": "admonition",
+      "kind": "note",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Running the test suites in"
+            },
+            {
+              "type": "xref",
+              "target": "chapter-cross-tools",
+              "label": "Chapter 5"
+            },
+            {
+              "type": "text",
+              "text": "and"
+            },
+            {
+              "type": "xref",
+              "target": "chapter-temporary-tools",
+              "label": "Chapter 6"
+            },
+            {
+              "type": "text",
+              "text": "is pointless; since the test programs are compiled with a cross-compiler, they probably can't run on the build host."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "A common issue with running the test suites for binutils and GCC is running out of pseudo terminals (PTYs). This can result in a large number of failing tests. This may happen for several reasons, but the most likely cause is that the host system does not have the"
+        },
+        {
+          "type": "code",
+          "text": "devpts"
+        },
+        {
+          "type": "text",
+          "text": "file system set up correctly. This issue is discussed in greater detail at"
+        },
+        {
+          "type": "link",
+          "href": "https://www.linuxfromscratch.org/lfs/faq.html#no-ptys",
+          "label": "https://www.linuxfromscratch.org/lfs/faq.html#no-ptys"
+        },
+        {
+          "type": "text",
+          "text": "."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Sometimes package test suites will fail for reasons which the developers are aware of and have deemed non-critical. Consult the logs located at"
+        },
+        {
+          "type": "link",
+          "href": "https://www.linuxfromscratch.org/lfs/build-logs/13.1/",
+          "label": "https://www.linuxfromscratch.org/lfs/build-logs/13.1/"
+        },
+        {
+          "type": "text",
+          "text": "to verify whether or not these failures are expected. This site is valid for all test suites throughout this book."
+        }
+      ]
+    }
+  ]
+}

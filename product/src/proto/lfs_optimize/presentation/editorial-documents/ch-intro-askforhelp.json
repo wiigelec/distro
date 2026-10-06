@@ -1,0 +1,369 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-intro-askforhelp",
+  "title": "Help",
+  "blocks": [
+    {
+      "type": "admonition",
+      "kind": "note",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "In case you've hit an issue building one package with the LFS instruction, we strongly discourage posting the issue directly onto the upstream support channel before discussing via a LFS support channel listed in"
+            },
+            {
+              "type": "xref",
+              "target": "ch-intro-resources",
+              "label": "Resources",
+              "suffix": "."
+            },
+            {
+              "type": "text",
+              "text": "Doing so is often quite inefficient because the upstream maintainers are rarely familiar with LFS building procedure. Even if you've really hit an upstream issue, the LFS community can still help to isolate the information wanted by the upstream maintainers and make a proper report."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "If you must ask a question directly via an upstream support channel, you shall at least note that many upstream projects have the support channels separated from the bug tracker. The"
+            },
+            {
+              "type": "quote",
+              "text": "bug"
+            },
+            {
+              "type": "text",
+              "text": "reports for asking questions are considered invalid and may annoy upstream developers for these projects."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "If an issue or a question is encountered while working through this book, please check the FAQ page at"
+        },
+        {
+          "type": "link",
+          "href": "https://www.linuxfromscratch.org/faq/#generalfaq",
+          "label": "https://www.linuxfromscratch.org/faq/#generalfaq"
+        },
+        {
+          "type": "text",
+          "text": ". Questions are often already answered there. If your question is not answered on that page, try to find the source of the problem. The following hint will give you some guidance for troubleshooting:"
+        },
+        {
+          "type": "link",
+          "href": "https://www.linuxfromscratch.org/hints/downloads/files/errors.txt",
+          "label": "https://www.linuxfromscratch.org/hints/downloads/files/errors.txt"
+        },
+        {
+          "type": "text",
+          "text": "."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "If you cannot find your problem listed in the FAQ, search the mailing lists at"
+        },
+        {
+          "type": "link",
+          "href": "https://www.linuxfromscratch.org/search.html",
+          "label": "https://www.linuxfromscratch.org/search.html"
+        },
+        {
+          "type": "text",
+          "text": "."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "We also have a wonderful LFS community that is willing to offer assistance through the mailing lists and IRC (see the"
+        },
+        {
+          "type": "xref",
+          "target": "ch-intro-resources",
+          "label": "Resources"
+        },
+        {
+          "type": "text",
+          "text": "section of this book). However, we get several support questions every day, and many of them could have been easily answered by going to the FAQ or by searching the mailing lists first. So, for us to offer the best assistance possible, you should first do some research on your own. That allows us to focus on the more unusual support needs. If your searches do not produce a solution, please include all the relevant information (mentioned below) in your request for help."
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Things to Mention",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Apart from a brief explanation of the problem being experienced, any request for help should include these essential things:"
+            }
+          ]
+        },
+        {
+          "type": "list",
+          "ordered": false,
+          "items": [
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "The version of the book being used (in this case 13.1-systemd)"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "The host distribution and version being used to create LFS"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "The output from the"
+                  },
+                  {
+                    "type": "xref",
+                    "target": "version-check",
+                    "label": "Host System Requirements"
+                  },
+                  {
+                    "type": "text",
+                    "text": "script"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "The package or section the problem was encountered in"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "The exact error message, or a clear description of the problem"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Note whether you have deviated from the book at all"
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "type": "admonition",
+          "kind": "note",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Deviating from this book does"
+                },
+                {
+                  "type": "emphasis",
+                  "text": "not"
+                },
+                {
+                  "type": "text",
+                  "text": "mean that we will not help you. After all, LFS is about personal preference. Being up-front about any changes to the established procedure helps us evaluate and determine possible causes of your problem."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Configure Script Problems",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "If something goes wrong while running the"
+            },
+            {
+              "type": "code",
+              "text": "configure"
+            },
+            {
+              "type": "text",
+              "text": "script, review the"
+            },
+            {
+              "type": "code",
+              "text": "config.log"
+            },
+            {
+              "type": "text",
+              "text": "file. This file may contain errors encountered during"
+            },
+            {
+              "type": "code",
+              "text": "configure"
+            },
+            {
+              "type": "text",
+              "text": "which were not printed to the screen. Include the"
+            },
+            {
+              "type": "emphasis",
+              "text": "relevant"
+            },
+            {
+              "type": "text",
+              "text": "lines if you need to ask for help."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Compilation Problems",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Both the screen output and the contents of various files are useful in determining the cause of compilation problems. The screen output from the"
+            },
+            {
+              "type": "code",
+              "text": "configure"
+            },
+            {
+              "type": "text",
+              "text": "script and the"
+            },
+            {
+              "type": "code",
+              "text": "make"
+            },
+            {
+              "type": "text",
+              "text": "run can be helpful. It is not necessary to include the entire output, but do include all of the relevant information. Here is an example of the type of information to include from the"
+            },
+            {
+              "type": "code",
+              "text": "make"
+            },
+            {
+              "type": "text",
+              "text": "screen output."
+            }
+          ]
+        },
+        {
+          "type": "pre",
+          "text": "gcc -D ALIASPATH=\\\"/mnt/lfs/usr/share/locale:.\\\"\n-D LOCALEDIR=\\\"/mnt/lfs/usr/share/locale\\\"\n-D LIBDIR=\\\"/mnt/lfs/usr/lib\\\"\n-D INCLUDEDIR=\\\"/mnt/lfs/usr/include\\\" -D HAVE_CONFIG_H -I. -I.\n-g -O2 -c getopt1.c\ngcc -g -O2 -static -o make ar.o arscan.o commands.o dir.o\nexpand.o file.o function.o getopt.o implicit.o job.o main.o\nmisc.o read.o remake.o rule.o signame.o variable.o vpath.o\ndefault.o remote-stub.o version.o opt1.o\n-lutil job.o: In function `load_too_high':\n/lfs/tmp/make-3.79.1/job.c:1565: undefined reference\nto `getloadavg'\ncollect2: ld returned 1 exit status\nmake[2]: *** [make] Error 1\nmake[2]: Leaving directory `/lfs/tmp/make-3.79.1'\nmake[1]: *** [all-recursive] Error 1\nmake[1]: Leaving directory `/lfs/tmp/make-3.79.1'\nmake: *** [all-recursive-am] Error 2"
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "In this case, many people would just include the bottom section:"
+            }
+          ]
+        },
+        {
+          "type": "pre",
+          "text": "make [2]: *** [make] Error 1"
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "This is not enough information to diagnose the problem, because it only notes that something went wrong, not"
+            },
+            {
+              "type": "emphasis",
+              "text": "what"
+            },
+            {
+              "type": "text",
+              "text": "went wrong. The entire section, as in the example above, is what should be saved because it includes the command that was executed and all the associated error messages."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "An excellent article about asking for help on the Internet is available online at"
+            },
+            {
+              "type": "link",
+              "href": "http://catb.org/~esr/faqs/smart-questions.html",
+              "label": "http://catb.org/~esr/faqs/smart-questions.html"
+            },
+            {
+              "type": "text",
+              "text": ". Read this document, and follow the hints. Doing so will increase the likelihood of getting the help you need."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

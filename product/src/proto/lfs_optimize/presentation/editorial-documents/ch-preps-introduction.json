@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-preps-introduction",
+  "title": "Introduction",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "In this chapter, we will perform a few additional tasks to prepare for building the temporary system. We will create a set of directories in"
+        },
+        {
+          "type": "code",
+          "text": "$LFS"
+        },
+        {
+          "type": "text",
+          "text": "(in which we will install the temporary tools), add an unprivileged user, and create an appropriate build environment for that user. We will also explain the units of time ("
+        },
+        {
+          "type": "quote",
+          "text": "SBUs"
+        },
+        {
+          "type": "text",
+          "text": ") we use to measure how long it takes to build LFS packages, and provide some information about package test suites."
+        }
+      ]
+    }
+  ]
+}

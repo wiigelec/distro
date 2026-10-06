@@ -1,0 +1,437 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-tools-ncurses",
+  "title": "Ncurses-6.6",
+  "blocks": [
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The Ncurses package contains libraries for terminal-independent handling of character screens."
+            }
+          ]
+        },
+        {
+          "type": "segmented_list",
+          "titles": [
+            "Approximate build time",
+            "Required disk space"
+          ],
+          "values": [
+            "0.4 SBU",
+            "54 MB"
+          ]
+        }
+      ],
+      "role": "package"
+    },
+    {
+      "type": "section",
+      "title": "Installation of Ncurses",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "First, run the following commands to build the"
+            },
+            {
+              "type": "code",
+              "text": "tic"
+            },
+            {
+              "type": "text",
+              "text": "program on the build host. We install it in"
+            },
+            {
+              "type": "code",
+              "text": "$LFS/tools"
+            },
+            {
+              "type": "text",
+              "text": ", so that it is found in the"
+            },
+            {
+              "type": "code",
+              "text": "PATH"
+            },
+            {
+              "type": "text",
+              "text": "when needed:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 0
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Prepare Ncurses for compilation:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 1
+        },
+        {
+          "type": "definition_list",
+          "title": "The meaning of the new configure options:",
+          "entries": [
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--with-manpage-format=normal"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This prevents Ncurses from installing compressed manual pages, which may happen if the host distribution itself has compressed manual pages."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--with-shared"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This makes Ncurses build and install shared C libraries."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--without-normal"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This prevents Ncurses from building and installing static C libraries."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--without-debug"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This prevents Ncurses from building and installing debug libraries."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--with-cxx-shared"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This makes Ncurses build and install shared C++ bindings. It also prevents it building and installing static C++ bindings."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--without-ada"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This ensures that Ncurses does not build support for the Ada compiler, which may be present on the host but will not be available once we enter the"
+                    },
+                    {
+                      "type": "code",
+                      "text": "chroot"
+                    },
+                    {
+                      "type": "text",
+                      "text": "environment."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--disable-stripping"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This switch prevents the building system from using the"
+                    },
+                    {
+                      "type": "code",
+                      "text": "strip"
+                    },
+                    {
+                      "type": "text",
+                      "text": "program from the host. Using host tools on cross-compiled programs can cause failure."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "AWK=gawk"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This switch prevents the building system from using the"
+                    },
+                    {
+                      "type": "code",
+                      "text": "mawk"
+                    },
+                    {
+                      "type": "text",
+                      "text": "program from the host. Some versions of"
+                    },
+                    {
+                      "type": "code",
+                      "text": "mawk"
+                    },
+                    {
+                      "type": "text",
+                      "text": "can cause this package to fail to build."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Compile the package:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 2
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Install the package:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 3
+        },
+        {
+          "type": "definition_list",
+          "title": "The meaning of the install options:",
+          "entries": [
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "ln -sv libncursesw.so $LFS/usr/lib/libncurses.so"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "The"
+                    },
+                    {
+                      "type": "code",
+                      "text": "libncurses.so"
+                    },
+                    {
+                      "type": "text",
+                      "text": "library is needed by a few packages we will build soon. We create this symlink to use"
+                    },
+                    {
+                      "type": "code",
+                      "text": "libncursesw.so"
+                    },
+                    {
+                      "type": "text",
+                      "text": "as a replacement."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "sed -e 's/^#if.*XOPEN.*$/#if 1/' ..."
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "The header file"
+                    },
+                    {
+                      "type": "code",
+                      "text": "curses.h"
+                    },
+                    {
+                      "type": "text",
+                      "text": "contains the definition of various Ncurses data structures. With different preprocessor macro definitions two different sets of the data structure definition may be used: the 8-bit definition is compatible with"
+                    },
+                    {
+                      "type": "code",
+                      "text": "libncurses.so"
+                    },
+                    {
+                      "type": "text",
+                      "text": "and the wide-character definition is compatible with"
+                    },
+                    {
+                      "type": "code",
+                      "text": "libncursesw.so"
+                    },
+                    {
+                      "type": "text",
+                      "text": ". Since we are using"
+                    },
+                    {
+                      "type": "code",
+                      "text": "libncursesw.so"
+                    },
+                    {
+                      "type": "text",
+                      "text": "as a replacement of"
+                    },
+                    {
+                      "type": "code",
+                      "text": "libncurses.so"
+                    },
+                    {
+                      "type": "text",
+                      "text": ", edit the header file so it will always use the wide-character data structure definition compatible with"
+                    },
+                    {
+                      "type": "code",
+                      "text": "libncursesw.so"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "role": "installation"
+    },
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Details on this package are located in"
+            },
+            {
+              "type": "xref",
+              "target": "contents-ncurses",
+              "label": "Contents of Ncurses",
+              "suffix": "."
+            }
+          ]
+        }
+      ],
+      "role": "content"
+    }
+  ]
+}

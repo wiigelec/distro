@@ -1,0 +1,1124 @@
+{
+  "schema_version": 1,
+  "document_id": "appendixb",
+  "title": "Acknowledgments",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "We would like to thank the following people and organizations for their contributions to the Linux From Scratch Project."
+        }
+      ]
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:gerard@linuxfromscratch.org",
+                "label": "Gerard Beekmans"
+              },
+              {
+                "type": "text",
+                "text": "<gerard@linuxfromscratch.org> – LFS Creator"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:bdubbs@linuxfromscratch.org",
+                "label": "Bruce Dubbs"
+              },
+              {
+                "type": "text",
+                "text": "<bdubbs@linuxfromscratch.org> – LFS Managing Editor"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:jim@linuxfromscratch.org",
+                "label": "Jim Gifford"
+              },
+              {
+                "type": "text",
+                "text": "<jim@linuxfromscratch.org> – CLFS Project Co-Leader"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:pierre@linuxfromscratch.org",
+                "label": "Pierre Labastie"
+              },
+              {
+                "type": "text",
+                "text": "<pierre@linuxfromscratch.org> – BLFS Editor and ALFS Lead"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:dj@linuxfromscratch.org",
+                "label": "DJ Lucas"
+              },
+              {
+                "type": "text",
+                "text": "<dj@linuxfromscratch.org> – LFS and BLFS Editor"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:ken@linuxfromscratch.org",
+                "label": "Ken Moffat"
+              },
+              {
+                "type": "text",
+                "text": "<ken@linuxfromscratch.org> – BLFS Editor"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Countless other people on the various LFS and BLFS mailing lists who helped make this book possible by giving their suggestions, testing the book, and submitting bug reports, instructions, and their experiences with installing various packages."
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Translators"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:macana@macana-es.com",
+                "label": "Manuel Canales Esparcia"
+              },
+              {
+                "type": "text",
+                "text": "<macana@macana-es.com> – Spanish LFS translation project"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:johan@linuxfromscratch.org",
+                "label": "Johan Lenglet"
+              },
+              {
+                "type": "text",
+                "text": "<johan@linuxfromscratch.org> – French LFS translation project until 2008"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:jmengual@linuxfromscratch.org",
+                "label": "Jean-Philippe Mengual"
+              },
+              {
+                "type": "text",
+                "text": "<jmengual@linuxfromscratch.org> – French LFS translation project 2008-2016"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:jlepiller@linuxfromscratch.org",
+                "label": "Julien Lepiller"
+              },
+              {
+                "type": "text",
+                "text": "<jlepiller@linuxfromscratch.org> – French LFS translation project 2017-present"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:lizardo@linuxfromscratch.org",
+                "label": "Anderson Lizardo"
+              },
+              {
+                "type": "text",
+                "text": "<lizardo@linuxfromscratch.org> – Portuguese LFS translation project historical"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:jafesp@gmail.com",
+                "label": "Jamenson Espindula"
+              },
+              {
+                "type": "text",
+                "text": "<jafesp@gmail.com> – Portuguese LFS translation project 2022-present"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:tr@erdfunkstelle.de",
+                "label": "Thomas Reitelbach"
+              },
+              {
+                "type": "text",
+                "text": "<tr@erdfunkstelle.de> – German LFS translation project"
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Mirror Maintainers"
+    },
+    {
+      "type": "heading",
+      "text": "North American Mirrors"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:scott@osuosl.org",
+                "label": "Scott Kveton"
+              },
+              {
+                "type": "text",
+                "text": "<scott@osuosl.org> – lfs.oregonstate.edu mirror"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:lost@l-w.net",
+                "label": "William Astle"
+              },
+              {
+                "type": "text",
+                "text": "<lost@l-w.net> – ca.linuxfromscratch.org mirror"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:eujon.sellers@gmail.com",
+                "label": "Eujon Sellers"
+              },
+              {
+                "type": "text",
+                "text": "<jpolen@rackspace.com> – lfs.introspeed.com mirror"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:justin@knierim.org",
+                "label": "Justin Knierim"
+              },
+              {
+                "type": "text",
+                "text": "<tim@idge.net> – lfs-matrix.net mirror"
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "South American Mirrors"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:manuel@linuxfromscratch.org",
+                "label": "Manuel Canales Esparcia"
+              },
+              {
+                "type": "text",
+                "text": "<manuel@linuxfromscratch.org> – lfsmirror.lfs-es.info mirror"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:lfalcon@thymbra.com",
+                "label": "Luis Falcon"
+              },
+              {
+                "type": "text",
+                "text": "<Luis Falcon> – torredehanoi.org mirror"
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "European Mirrors"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:guido@primerelay.net",
+                "label": "Guido Passet"
+              },
+              {
+                "type": "text",
+                "text": "<guido@primerelay.net> – nl.linuxfromscratch.org mirror"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:baafie@planet.nl",
+                "label": "Bastiaan Jacques"
+              },
+              {
+                "type": "text",
+                "text": "<baafie@planet.nl> – lfs.pagefault.net mirror"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:sven.cranshoff@lineo.be",
+                "label": "Sven Cranshoff"
+              },
+              {
+                "type": "text",
+                "text": "<sven.cranshoff@lineo.be> – lfs.lineo.be mirror"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Scarlet Belgium – lfs.scarlet.be mirror"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:info@aliensoft.org",
+                "label": "Sebastian Faulborn"
+              },
+              {
+                "type": "text",
+                "text": "<info@aliensoft.org> – lfs.aliensoft.org mirror"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:stuart@dontuse.ms",
+                "label": "Stuart Fox"
+              },
+              {
+                "type": "text",
+                "text": "<stuart@dontuse.ms> – lfs.dontuse.ms mirror"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:admin@realhost.de",
+                "label": "Ralf Uhlemann"
+              },
+              {
+                "type": "text",
+                "text": "<admin@realhost.de> – lfs.oss-mirror.org mirror"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:Antonin.Sprinzl@tuwien.ac.at",
+                "label": "Antonin Sprinzl"
+              },
+              {
+                "type": "text",
+                "text": "<Antonin.Sprinzl@tuwien.ac.at> – at.linuxfromscratch.org mirror"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:fredan-lfs@fredan.org",
+                "label": "Fredrik Danerklint"
+              },
+              {
+                "type": "text",
+                "text": "<fredan-lfs@fredan.org> – se.linuxfromscratch.org mirror"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:franck@linuxpourtous.com",
+                "label": "Franck"
+              },
+              {
+                "type": "text",
+                "text": "<franck@linuxpourtous.com> – lfs.linuxpourtous.com mirror"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:baque@cict.fr",
+                "label": "Philippe Baque"
+              },
+              {
+                "type": "text",
+                "text": "<baque@cict.fr> – lfs.cict.fr mirror"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:gyouja@pilgrims.ru",
+                "label": "Vitaly Chekasin"
+              },
+              {
+                "type": "text",
+                "text": "<gyouja@pilgrims.ru> – lfs.pilgrims.ru mirror"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:kontakt@wankoo.org",
+                "label": "Benjamin Heil"
+              },
+              {
+                "type": "text",
+                "text": "<kontakt@wankoo.org> – lfs.wankoo.org mirror"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:info@linuxfromscratch.org.ru",
+                "label": "Anton Maisak"
+              },
+              {
+                "type": "text",
+                "text": "<info@linuxfromscratch.org.ru> – linuxfromscratch.org.ru mirror"
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Asian Mirrors"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:satit@wbac.ac.th",
+                "label": "Satit Phermsawang"
+              },
+              {
+                "type": "text",
+                "text": "<satit@wbac.ac.th> – lfs.phayoune.org mirror"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:info@shizu-net.jp",
+                "label": "Shizunet Co.,Ltd."
+              },
+              {
+                "type": "text",
+                "text": "<info@shizu-net.jp> – lfs.mirror.shizu-net.jp mirror"
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Australian Mirrors"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:jason@dstc.edu.au",
+                "label": "Jason Andrade"
+              },
+              {
+                "type": "text",
+                "text": "<jason@dstc.edu.au> – au.linuxfromscratch.org mirror"
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Former Project Team Members"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:theladyskye@linuxfromscratch.org",
+                "label": "Christine Barczak"
+              },
+              {
+                "type": "text",
+                "text": "<theladyskye@linuxfromscratch.org> – LFS Book Editor"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Archaic <archaic@linuxfromscratch.org> – LFS Technical Writer/Editor, HLFS Project Leader, BLFS Editor, Hints and Patches Project Maintainer"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:matthew@linuxfromscratch.org",
+                "label": "Matthew Burgess"
+              },
+              {
+                "type": "text",
+                "text": "<matthew@linuxfromscratch.org> – LFS Project Leader, LFS Technical Writer/Editor"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:nathan@linuxfromscratch.org",
+                "label": "Nathan Coulson"
+              },
+              {
+                "type": "text",
+                "text": "<nathan@linuxfromscratch.org> – LFS-Bootscripts Maintainer"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Timothy Bauscher"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Robert Briggs"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Ian Chilton"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:jeroen@linuxfromscratch.org",
+                "label": "Jeroen Coumans"
+              },
+              {
+                "type": "text",
+                "text": "<jeroen@linuxfromscratch.org> – Website Developer, FAQ Maintainer"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:manuel@linuxfromscratch.org",
+                "label": "Manuel Canales Esparcia"
+              },
+              {
+                "type": "text",
+                "text": "<manuel@linuxfromscratch.org> – LFS/BLFS/HLFS XML and XSL Maintainer"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Alex Groenewoud – LFS Technical Writer"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Marc Heerdink"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:jhuntwork@linuxfromscratch.org",
+                "label": "Jeremy Huntwork"
+              },
+              {
+                "type": "text",
+                "text": "<jhuntwork@linuxfromscratch.org> – LFS Technical Writer, LFS LiveCD Maintainer"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:bryan@linuxfromscratch.org",
+                "label": "Bryan Kadzban"
+              },
+              {
+                "type": "text",
+                "text": "<bryan@linuxfromscratch.org> – LFS Technical Writer"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Mark Hymers"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Seth W. Klein – FAQ maintainer"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:nicholas@linuxfromscratch.org",
+                "label": "Nicholas Leippe"
+              },
+              {
+                "type": "text",
+                "text": "<nicholas@linuxfromscratch.org> – Wiki Maintainer"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:lizardo@linuxfromscratch.org",
+                "label": "Anderson Lizardo"
+              },
+              {
+                "type": "text",
+                "text": "<lizardo@linuxfromscratch.org> – Website Backend-Scripts Maintainer"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:dj@lucasit.com",
+                "label": "Anderson Lizardo"
+              },
+              {
+                "type": "text",
+                "text": "<dj@lucasit.com> – LFS Technical Writer"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:randy@linuxfromscratch.org",
+                "label": "Randy McMurchy"
+              },
+              {
+                "type": "text",
+                "text": "<randy@linuxfromscratch.org> – BLFS Project Leader, LFS Editor"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:dnicholson@linuxfromscratch.org",
+                "label": "Dan Nicholson"
+              },
+              {
+                "type": "text",
+                "text": "<dnicholson@linuxfromscratch.org> – LFS and BLFS Editor"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:alexander@linuxfromscratch.org",
+                "label": "Alexander E. Patrakov"
+              },
+              {
+                "type": "text",
+                "text": "<alexander@linuxfromscratch.org> – LFS Technical Writer, LFS Internationalization Editor, LFS Live CD Maintainer"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Simon Perreault"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:scot@linuxfromscratch.org",
+                "label": "Scot Mc Pherson"
+              },
+              {
+                "type": "text",
+                "text": "<scot@linuxfromscratch.org> – LFS NNTP Gateway Maintainer"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:renodr@linuxfromscratch.org",
+                "label": "Douglas R. Reno"
+              },
+              {
+                "type": "text",
+                "text": "<renodr@linuxfromscratch.org> – Systemd Editor"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:ryan@linuxfromscratch.org",
+                "label": "Ryan Oliver"
+              },
+              {
+                "type": "text",
+                "text": "<ryan@linuxfromscratch.org> – CLFS Project Co-Leader"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:gschafer@zip.com.au",
+                "label": "Greg Schafer"
+              },
+              {
+                "type": "text",
+                "text": "<gschafer@zip.com.au> – LFS Technical Writer and Architect of the Next Generation 64-bit-enabling Build Method"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Jesse Tie-Ten-Quee – LFS Technical Writer"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:jwrober@linuxfromscratch.org",
+                "label": "James Robertson"
+              },
+              {
+                "type": "text",
+                "text": "<jwrober@linuxfromscratch.org> – Bugzilla Maintainer"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:tushar@linuxfromscratch.org",
+                "label": "Tushar Teredesai"
+              },
+              {
+                "type": "text",
+                "text": "<tushar@linuxfromscratch.org> – BLFS Book Editor, Hints and Patches Project Leader"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:jeremy@linuxfromscratch.org",
+                "label": "Jeremy Utley"
+              },
+              {
+                "type": "text",
+                "text": "<jeremy@linuxfromscratch.org> – LFS Technical Writer, Bugzilla Maintainer, LFS-Bootscripts Maintainer"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "link",
+                "href": "mailto:zwinkles@gmail.com",
+                "label": "Zack Winkles"
+              },
+              {
+                "type": "text",
+                "text": "<zwinkles@gmail.com> – LFS Technical Writer"
+              }
+            ]
+          }
+        ]
+      ]
+    }
+  ]
+}

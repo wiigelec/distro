@@ -1,0 +1,474 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-tools-gcc-pass2",
+  "title": "GCC-16.2.0 - Pass 2",
+  "blocks": [
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The GCC package contains the GNU compiler collection, which includes the C and C++ compilers."
+            }
+          ]
+        },
+        {
+          "type": "segmented_list",
+          "titles": [
+            "Approximate build time",
+            "Required disk space"
+          ],
+          "values": [
+            "5.2 SBU",
+            "6.4 GB"
+          ]
+        }
+      ],
+      "role": "package"
+    },
+    {
+      "type": "section",
+      "title": "Installation of GCC",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "As in the first build of GCC, the GMP, MPFR, and MPC packages are required. Unpack the tarballs and move them into the required directories:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 0
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "If you are building on x86_64, change the default directory name for 64-bit libraries to"
+            },
+            {
+              "type": "quote",
+              "text": "lib"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 1
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Create a separate build directory again:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 2
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Before starting to build GCC, remember to unset any environment variables that override the default optimization flags."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Now prepare GCC for compilation:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 3
+        },
+        {
+          "type": "definition_list",
+          "title": "The meaning of the new configure options:",
+          "entries": [
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--target=$LFS_TGT"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "We are cross-compiling GCC, so it's impossible to build target libraries ("
+                    },
+                    {
+                      "type": "code",
+                      "text": "libgcc"
+                    },
+                    {
+                      "type": "text",
+                      "text": "and"
+                    },
+                    {
+                      "type": "code",
+                      "text": "libstdc++"
+                    },
+                    {
+                      "type": "text",
+                      "text": ") with the GCC binaries compiled in this pass—those binaries won't run on the host. The GCC build system will attempt to use the host's C and C++ compilers as a workaround by default. Building the GCC target libraries with a different version of GCC is not supported, so using the host's compilers may cause the build to fail. This parameter ensures the libraries are built by GCC pass 1."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--with-build-sysroot=$LFS"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Normally, using"
+                    },
+                    {
+                      "type": "code",
+                      "text": "--host"
+                    },
+                    {
+                      "type": "text",
+                      "text": "ensures that a cross-compiler is used for building GCC, and that compiler knows that it has to look for headers and libraries in"
+                    },
+                    {
+                      "type": "code",
+                      "text": "$LFS"
+                    },
+                    {
+                      "type": "text",
+                      "text": ". However, the build system for GCC uses additional tools which are not aware of this location. This switch is needed so those tools will find the needed files in"
+                    },
+                    {
+                      "type": "code",
+                      "text": "$LFS"
+                    },
+                    {
+                      "type": "text",
+                      "text": ", and not on the host."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--disable-fixincludes"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "By default, during the installation of GCC some system headers would be"
+                    },
+                    {
+                      "type": "quote",
+                      "text": "fixed"
+                    },
+                    {
+                      "type": "text",
+                      "text": "to be used with GCC. This is not necessary for a modern Linux system, and potentially harmful if a package is reinstalled after installing GCC. This switch prevents GCC from"
+                    },
+                    {
+                      "type": "quote",
+                      "text": "fixing"
+                    },
+                    {
+                      "type": "text",
+                      "text": "the headers."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--disable-libsanitizer"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Disable GCC sanitizer runtime libraries. They are not needed for the temporary installation. In"
+                    },
+                    {
+                      "type": "xref",
+                      "target": "ch-tools-gcc-pass1",
+                      "label": "gcc-pass1"
+                    },
+                    {
+                      "type": "text",
+                      "text": "it was implied by"
+                    },
+                    {
+                      "type": "code",
+                      "text": "--disable-libstdcxx"
+                    },
+                    {
+                      "type": "text",
+                      "text": ", and now we can explicitly pass it."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "CXX=\"$LFS_TGT-gcc -nostdinc++\""
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Specifies to use"
+                    },
+                    {
+                      "type": "code",
+                      "text": "$LFS_TGT-gcc"
+                    },
+                    {
+                      "type": "text",
+                      "text": "to compile the C++ code like"
+                    },
+                    {
+                      "type": "xref",
+                      "target": "ch-tools-libstdcpp",
+                      "label": "Libstdc++ from GCC-16.2.0"
+                    },
+                    {
+                      "type": "text",
+                      "text": "and prevent the compiler from using the headers from the previous libstdc++ installation. Mixing those headers and the C++ headers from the current libstdc++ build can cause the"
+                    },
+                    {
+                      "type": "code",
+                      "text": "#include_next"
+                    },
+                    {
+                      "type": "text",
+                      "text": "directives fail to find the C headers. In a normal build, this override is automatically passed to the"
+                    },
+                    {
+                      "type": "code",
+                      "text": "configure"
+                    },
+                    {
+                      "type": "text",
+                      "text": "script from the top level directory. Here we explicitly pass it."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "LDFLAGS_FOR_TARGET=..."
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Allow"
+                    },
+                    {
+                      "type": "code",
+                      "text": "libstdc++"
+                    },
+                    {
+                      "type": "text",
+                      "text": "to use the"
+                    },
+                    {
+                      "type": "code",
+                      "text": "libgcc"
+                    },
+                    {
+                      "type": "text",
+                      "text": "being built in this pass, instead of the previous version built in"
+                    },
+                    {
+                      "type": "xref",
+                      "target": "ch-tools-gcc-pass1",
+                      "label": "gcc-pass1"
+                    },
+                    {
+                      "type": "text",
+                      "text": ". The previous version cannot properly support C++ exception handling because it was built without libc support."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "target_configargs=gcc_cv_target_thread_file=posix"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Build the target libraries libgcc and libstdc++ with POSIX thread support enabled. The default is following the configuration of the compiler used for building the target library (in this case,"
+                    },
+                    {
+                      "type": "xref",
+                      "target": "ch-tools-gcc-pass1",
+                      "label": "gcc-pass1"
+                    },
+                    {
+                      "type": "text",
+                      "text": "which was configured with none thread support)."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Compile the package:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 4
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Install the package:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 5
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "As a finishing touch, create a utility symlink. Many programs and scripts run"
+            },
+            {
+              "type": "code",
+              "text": "cc"
+            },
+            {
+              "type": "text",
+              "text": "instead of"
+            },
+            {
+              "type": "code",
+              "text": "gcc"
+            },
+            {
+              "type": "text",
+              "text": ", which is used to keep programs generic and therefore usable on all kinds of UNIX systems where the GNU C compiler is not always installed. Running"
+            },
+            {
+              "type": "code",
+              "text": "cc"
+            },
+            {
+              "type": "text",
+              "text": "leaves the system administrator free to decide which C compiler to install:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 6
+        }
+      ],
+      "role": "installation"
+    },
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Details on this package are located in"
+            },
+            {
+              "type": "xref",
+              "target": "contents-gcc",
+              "label": "Contents of GCC",
+              "suffix": "."
+            }
+          ]
+        }
+      ],
+      "role": "content"
+    }
+  ]
+}

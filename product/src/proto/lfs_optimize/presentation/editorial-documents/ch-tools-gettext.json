@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-tools-gettext",
+  "title": "Gettext-1.0",
+  "blocks": [
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The Gettext package contains utilities for internationalization and localization. These allow programs to be compiled with NLS (Native Language Support), enabling them to output messages in the user's native language."
+            }
+          ]
+        },
+        {
+          "type": "segmented_list",
+          "titles": [
+            "Approximate build time",
+            "Required disk space"
+          ],
+          "values": [
+            "1.5 SBU",
+            "531 MB"
+          ]
+        }
+      ],
+      "role": "package"
+    },
+    {
+      "type": "section",
+      "title": "Installation of Gettext",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "For our temporary set of tools, we only need to install three programs from Gettext."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Prepare Gettext for compilation:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 0
+        },
+        {
+          "type": "definition_list",
+          "title": "The meaning of the configure option:",
+          "entries": [
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--disable-shared"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "We do not need to install any of the shared Gettext libraries at this time, therefore there is no need to build them."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Compile the package:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 1
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Install the"
+            },
+            {
+              "type": "code",
+              "text": "msgfmt"
+            },
+            {
+              "type": "text",
+              "text": ","
+            },
+            {
+              "type": "code",
+              "text": "msgmerge"
+            },
+            {
+              "type": "text",
+              "text": ", and"
+            },
+            {
+              "type": "code",
+              "text": "xgettext"
+            },
+            {
+              "type": "text",
+              "text": "programs:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 2
+        }
+      ],
+      "role": "installation"
+    },
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Details on this package are located in"
+            },
+            {
+              "type": "xref",
+              "target": "contents-gettext",
+              "label": "Contents of Gettext",
+              "suffix": "."
+            }
+          ]
+        }
+      ],
+      "role": "content"
+    }
+  ]
+}

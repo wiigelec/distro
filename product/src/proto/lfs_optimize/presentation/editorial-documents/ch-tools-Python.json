@@ -1,0 +1,244 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-tools-Python",
+  "title": "Python-3.14.7",
+  "blocks": [
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The Python 3 package contains the Python development environment. It is useful for object-oriented programming, writing scripts, prototyping large programs, and developing entire applications. Python is an interpreted computer language."
+            }
+          ]
+        },
+        {
+          "type": "segmented_list",
+          "titles": [
+            "Approximate build time",
+            "Required disk space"
+          ],
+          "values": [
+            "0.5 SBU",
+            "603 MB"
+          ]
+        }
+      ],
+      "role": "package"
+    },
+    {
+      "type": "section",
+      "title": "Installation of Python",
+      "blocks": [
+        {
+          "type": "admonition",
+          "kind": "note",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "There are two package files whose name starts with the"
+                },
+                {
+                  "type": "quote",
+                  "text": "python"
+                },
+                {
+                  "type": "text",
+                  "text": "prefix. The one to extract from is"
+                },
+                {
+                  "type": "code",
+                  "text": "Python-3.14.7.tar.xz"
+                },
+                {
+                  "type": "text",
+                  "text": "(notice the uppercase first letter)."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Prepare Python for compilation:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 0
+        },
+        {
+          "type": "definition_list",
+          "title": "The meaning of the configure option:",
+          "entries": [
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--enable-shared"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This switch prevents installation of static libraries."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--without-ensurepip"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This switch disables the Python package installer, which is not needed at this stage."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--without-static-libpython"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This switch prevents building a large, but unneeded, static library."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Compile the package:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 1
+        },
+        {
+          "type": "admonition",
+          "kind": "note",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Some Python 3 modules can't be built now because the dependencies are not installed yet. For the"
+                },
+                {
+                  "type": "code",
+                  "text": "ssl"
+                },
+                {
+                  "type": "text",
+                  "text": "module, a message"
+                },
+                {
+                  "type": "code",
+                  "text": "Python requires a OpenSSL 1.1.1 or newer"
+                },
+                {
+                  "type": "text",
+                  "text": "is outputted. The message should be ignored. Just make sure the toplevel"
+                },
+                {
+                  "type": "code",
+                  "text": "make"
+                },
+                {
+                  "type": "text",
+                  "text": "command has not failed. The optional modules are not needed now and they will be built in"
+                },
+                {
+                  "type": "xref",
+                  "target": "chapter-building-system",
+                  "label": "Chapter 8"
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Install the package:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 2
+        }
+      ],
+      "role": "installation"
+    },
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Details on this package are located in"
+            },
+            {
+              "type": "xref",
+              "target": "contents-python",
+              "label": "Contents of Python 3",
+              "suffix": "."
+            }
+          ]
+        }
+      ],
+      "role": "content"
+    }
+  ]
+}

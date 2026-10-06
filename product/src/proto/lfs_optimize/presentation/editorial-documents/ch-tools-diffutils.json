@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-tools-diffutils",
+  "title": "Diffutils-3.12",
+  "blocks": [
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The Diffutils package contains programs that show the differences between files or directories."
+            }
+          ]
+        },
+        {
+          "type": "segmented_list",
+          "titles": [
+            "Approximate build time",
+            "Required disk space"
+          ],
+          "values": [
+            "0.1 SBU",
+            "35 MB"
+          ]
+        }
+      ],
+      "role": "package"
+    },
+    {
+      "type": "section",
+      "title": "Installation of Diffutils",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Prepare Diffutils for compilation:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 0
+        },
+        {
+          "type": "definition_list",
+          "title": "The meaning of the configure options:",
+          "entries": [
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "gl_cv_func_strcasecmp_works=yes"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This option specify the result of a check for the"
+                    },
+                    {
+                      "type": "code",
+                      "text": "strcasecmp"
+                    },
+                    {
+                      "type": "text",
+                      "text": "function. The check requires running a compiled C program, and this is impossible during cross-compilation because in general a cross-compiled program cannot run on the host distro. Normally for such a check the"
+                    },
+                    {
+                      "type": "code",
+                      "text": "configure"
+                    },
+                    {
+                      "type": "text",
+                      "text": "script would use a fall-back value for cross-compilation, but the fall-back value for this check is absent and the"
+                    },
+                    {
+                      "type": "code",
+                      "text": "configure"
+                    },
+                    {
+                      "type": "text",
+                      "text": "script would have no value to use and error out. Upstream have already fixed the issue, but to apply the fix we'd need to run"
+                    },
+                    {
+                      "type": "code",
+                      "text": "autoconf"
+                    },
+                    {
+                      "type": "text",
+                      "text": "that the host distro may lack. So we just specify the check result ("
+                    },
+                    {
+                      "type": "code",
+                      "text": "yes"
+                    },
+                    {
+                      "type": "text",
+                      "text": "as we know the"
+                    },
+                    {
+                      "type": "code",
+                      "text": "strcasecmp"
+                    },
+                    {
+                      "type": "text",
+                      "text": "function in Glibc-2.44 works fine) instead, then"
+                    },
+                    {
+                      "type": "code",
+                      "text": "configure"
+                    },
+                    {
+                      "type": "text",
+                      "text": "will just use the specified value and skip the check."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Compile the package:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 1
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Install the package:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 2
+        }
+      ],
+      "role": "installation"
+    },
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Details on this package are located in"
+            },
+            {
+              "type": "xref",
+              "target": "contents-diffutils",
+              "label": "Contents of Diffutils",
+              "suffix": "."
+            }
+          ]
+        }
+      ],
+      "role": "content"
+    }
+  ]
+}

@@ -1,0 +1,3195 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-intro-changelog",
+  "title": "Changelog",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "This is version 13.1-systemd of the Linux From Scratch book, dated September 1st, 2026. If this book is more than six months old, a newer and better version is probably already available. To find out, please check one of the mirrors via"
+        },
+        {
+          "type": "link",
+          "href": "https://www.linuxfromscratch.org/mirrors.html",
+          "label": "https://www.linuxfromscratch.org/mirrors.html"
+        },
+        {
+          "type": "text",
+          "text": "."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Below is a list of changes made since the previous release of the book."
+        }
+      ]
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "2026-09-01"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - LFS-13.1 released."
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "2026-08-31"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to vim-9.2.1025 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/6006",
+                      "label": "#6006"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "2026-08-15"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to expat-2.8.3 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5996",
+                      "label": "#5996"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to iana-etc-20260805. Addresses"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5006",
+                      "label": "#5006"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to libffi-3.8.0. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5993",
+                      "label": "#5993"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to linux-7.1.8. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5997",
+                      "label": "#5997"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to meson-1.12.0. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5998",
+                      "label": "#5998"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to procps-ng-4.0.7. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/6000",
+                      "label": "#6000"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to setuptools-84.0.0 (Python module). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5994",
+                      "label": "#5994"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to shadow-4.20.2. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5995",
+                      "label": "#5995"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to vim-9.2.0954. Addresses"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/4500",
+                      "label": "#4500"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to wheel-0.48.0 (Python module). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5999",
+                      "label": "#5999"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "2026-08-07"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to flit_core-4.0.2 (Python module). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5989",
+                      "label": "#5989"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to gcc-16.2.0. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5992",
+                      "label": "#5992"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to linux-7.1.7. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5988",
+                      "label": "#5988"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to packaging-26.3 (Python module). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5990",
+                      "label": "#5990"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to pkgconf-3.0.5. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5987",
+                      "label": "#5987"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to Python-3.14.7 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5991",
+                      "label": "#5991"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "2026-08-01"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to shadow-4.20.0. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5986",
+                      "label": "#5986"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to vim-9.2.0858 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5982",
+                      "label": "#5982"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to systemd-261.2. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5981",
+                      "label": "#5981"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to sqlite-3.53.4. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5984",
+                      "label": "#5984"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to pkgconf-3.0.4. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5977",
+                      "label": "#5977"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to perl-5.44.0. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5980",
+                      "label": "#5980"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to linux-7.1.5. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5979",
+                      "label": "#5979"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to libtool-2.6.2. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5978",
+                      "label": "#5978"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to iana-etc-20260723. Addresses"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5006",
+                      "label": "#5006"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to glibc-2.44 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5983",
+                      "label": "#5983"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to binutils-2.47. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5985",
+                      "label": "#5985"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "2026-07-15"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Add mpdecimal-4.0.1. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5963",
+                      "label": "#5963"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to tzdata-2026c. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5971",
+                      "label": "#5971"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to setuptools-83.0.0. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5969",
+                      "label": "#5969"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to pkgconf-3.0.2. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5962",
+                      "label": "#5962"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to meson-1.11.2. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5975",
+                      "label": "#5975"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to libffi-3.7.1. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5970",
+                      "label": "#5970"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to linux-7.1.3. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5968",
+                      "label": "#5968"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to gawk-5.4.1. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5973",
+                      "label": "#5973"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to findutils-4.11.0. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5974",
+                      "label": "#5974"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "2026-07-01"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Add tar-1.35-acl_fix-1.patch. Addresses issue arising from acl-2.4.0."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Add Python3-3.14.6 consolidated fixes (Security patch). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5961",
+                      "label": "#5961"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to attr-2.6.0 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5967",
+                      "label": "#5967"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to acl-2.4.0 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5966",
+                      "label": "#5966"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to expat-2.8.2 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5964",
+                      "label": "#5964"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to iana-etc-20260617. Addresses"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5006",
+                      "label": "#5006"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to iproute2-7.1.0. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5954",
+                      "label": "#5954"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to libffi-3.6.0. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5958",
+                      "label": "#5958"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to linux-7.1.1. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5953",
+                      "label": "#5953"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to sqlite-autoconf-3.53.3. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5965",
+                      "label": "#5965"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to systemd-261. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5959",
+                      "label": "#5959"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to util-linux-2.42.2 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5955",
+                      "label": "#5955"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to vim-9.2.0752 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5956",
+                      "label": "#5956"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "2026-06-15"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to binutils-2.46.1. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5950",
+                      "label": "#5950"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to file-5.48. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5949",
+                      "label": "#5949"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to less-704. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5948",
+                      "label": "#5948"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to linux-7.0.12. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5945",
+                      "label": "#5945"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to openssl-4.0.1. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5951",
+                      "label": "#5951"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to Python3-3.14.6. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5952",
+                      "label": "#5952"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to sqlite-autoconf-3.53.2. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5946",
+                      "label": "#5946"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to vim-9.2.0640 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5947",
+                      "label": "#5947"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "2026-06-01"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to systemd-260.2. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5944",
+                      "label": "#5944"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to kbd-2.10.0. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5943",
+                      "label": "#5943"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to util-linux-2.42.1. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5939",
+                      "label": "#5939"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to less-702. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5941",
+                      "label": "#5941"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to vim-9.2.0567 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5940",
+                      "label": "#5940"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to iana-etc-20260529. Addresses"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5006",
+                      "label": "#5006"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "2026-05-24"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to linux-7.0.10 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5942",
+                      "label": "#5942"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "2026-05-20"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to linux-7.0.9 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5928",
+                      "label": "#5928"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "2026-05-18"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[xry111] - Fix CVE-2026-4046, CVE-2026-5450, and CVE-2026-5928 in glibc (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5930",
+                      "label": "#5930"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "2026-05-14"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[renodr] - Update to expat-2.8.1 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5933",
+                      "label": "#5933"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[renodr] - Update to tcl-8.6.18. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5935",
+                      "label": "#5935"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[renodr] - Update to vim-9.2.0480 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5928",
+                      "label": "#5928"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[renodr] - Update to linux-7.0.7 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5932",
+                      "label": "#5932"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[renodr] - Fix CVE-2026-7210 and CVE-2026-8328 in Python (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5934",
+                      "label": "#5934"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "2026-05-11"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to vim-9.2.0461 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5938",
+                      "label": "#5938"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to sqlite-3.53.1. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5929",
+                      "label": "#5929"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to Python-3.14.5. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5931",
+                      "label": "#5931"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to openssl-4.0.0. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5912",
+                      "label": "#5912"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to linux-7.0.5. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5917",
+                      "label": "#5917"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to iana-etc-20260504. Addresses"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5006",
+                      "label": "#5006"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Add Python-3.14.5 linux7 build patch. Addresses"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5931",
+                      "label": "#5931"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Add glibc linux7 fixes patch."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Add systemd openssl4 build patch. Addresses"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5912",
+                      "label": "#5912"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "2026-05-08"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to gcc-16.1.0. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5927",
+                      "label": "#5927"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "2026-05-01"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to wheel-0.47.0 (Python module). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5922",
+                      "label": "#5922"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to tzdata2026b. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5923",
+                      "label": "#5923"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to sed-4.10. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5921",
+                      "label": "#5921"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to packaging-26.2 (Python module). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5913",
+                      "label": "#5913"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to mpc-1.4.1. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5916",
+                      "label": "#5916"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to meson-1.11.1. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5919",
+                      "label": "#5919"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to vim-9.2.0421 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5914",
+                      "label": "#5914"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to man-pages-6.18. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5920",
+                      "label": "#5920"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to iproute2-7.0.0. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5925",
+                      "label": "#5925"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to inetutils-2.8. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5926",
+                      "label": "#5926"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to expat-2.8.0 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5924",
+                      "label": "#5924"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to elfutils-0.195 (libelf). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5915",
+                      "label": "#5915"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to coreutils-9.11. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5918",
+                      "label": "#5918"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to iana-etc-20260424. Addresses"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5006",
+                      "label": "#5006"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "2026-04-15"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[jlocash] - Update the Python-3.14.4 patch for 2 more issues (Security update). Addresses"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5910",
+                      "label": "#5910"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "2026-04-15"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to meson-1.11.0. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5911",
+                      "label": "#5911"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Move intltool and XML-Parser to BLFS. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/4964",
+                      "label": "#4964"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to vim-9.2.0340 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5904",
+                      "label": "#5904"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to util-linux-2.42 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5900",
+                      "label": "#5900"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to sqlite-3.53.0. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5909",
+                      "label": "#5909"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to Python3-3.14.4 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5907",
+                      "label": "#5907"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to openssl-3.6.2 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5906",
+                      "label": "#5906"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to linux-6.19.12. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5903",
+                      "label": "#5903"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to libcap-2.78 (Security Update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5905",
+                      "label": "#5905"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to iana-etc-20260409. Addresses"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5006",
+                      "label": "#5006"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "2026-04-04"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[zeckma] - Provide UEFI boot support. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5819",
+                      "label": "#5819"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "2026-04-01"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to xz-5.8.3 (Security update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5899",
+                      "label": "#5899"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to XML-Parser-2.54 (Security update). Fixes (again)"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5892",
+                      "label": "#5892"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to vim-9.2.0272. Addresses"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/4500",
+                      "label": "#4500"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to systemd-260.1. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5890",
+                      "label": "#5890"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to perl-5.42.2. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5898",
+                      "label": "#5898"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to mpc-1.4.0. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5894",
+                      "label": "#5894"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to meson-1.10.2. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5889",
+                      "label": "#5889"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to linux-6.19.10. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5893",
+                      "label": "#5893"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to iana-etc-20260327. Addresses"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5006",
+                      "label": "#5006"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to groff-1.24.1. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5888",
+                      "label": "#5888"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to autoconf-2.73. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5897",
+                      "label": "#5897"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "2026-03-26"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to XML-Parser-2.53 (Security update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5892",
+                      "label": "#5892"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Add a sed to glibc-2.43 (Security update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5895",
+                      "label": "#5895"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Add a patch to Python-3.14.3 (Security update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5896",
+                      "label": "#5896"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to expat-2.7.5 (Security update). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5891",
+                      "label": "#5891"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "2026-03-15"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to vim-9.2.0161. Addresses"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/4500",
+                      "label": "#4500"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to tzdata-2026a. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5882",
+                      "label": "#5882"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to texinfo-7.3. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5883",
+                      "label": "#5883"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to systemd-259.5. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5879",
+                      "label": "#5879"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to sqlite-autoconf-3510300 (3.51.3). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5885",
+                      "label": "#5885"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to shadow-4.19.4. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5881",
+                      "label": "#5881"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to setuptools-82.0.1 (Python module). Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5887",
+                      "label": "#5887"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to perl-5.42.1. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5886",
+                      "label": "#5886"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to linux-6.19.8. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5867",
+                      "label": "#5867"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to iproute2-6.19.0. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5874",
+                      "label": "#5874"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to iana-etc-20260306. Addresses"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5006",
+                      "label": "#5006"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to groff-1.24.0. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5880",
+                      "label": "#5880"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to gawk-5.4.0. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5876",
+                      "label": "#5876"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to file-5.47. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5878",
+                      "label": "#5878"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - Update to e2fsprogs-1.47.4. Fixes"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://wiki.linuxfromscratch.org/lfs/ticket/5884",
+                      "label": "#5884"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "2026-03-05"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[bdubbs] - LFS-13.0 released."
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ]
+      ]
+    }
+  ]
+}
