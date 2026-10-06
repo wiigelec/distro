@@ -1,0 +1,565 @@
+{
+  "schema_version": 1,
+  "document_id": "afterlfs",
+  "title": "Getting Started After LFS",
+  "blocks": [
+    {
+      "type": "section",
+      "title": "Deciding what to do next",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Now that LFS is complete and you have a bootable system, what do you do? The next step is to decide how to use it. Generally, there are two broad categories to consider: workstation or server. Indeed, these categories are not mutually exclusive. The applications needed for each category can be combined onto a single system, but let's look at them separately for now."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "A server is the simpler category. Generally this consists of a web server such as the"
+            },
+            {
+              "type": "link",
+              "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/server/apache.html",
+              "label": "Apache HTTP Server"
+            },
+            {
+              "type": "text",
+              "text": "and a database server such as"
+            },
+            {
+              "type": "link",
+              "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/server/mariadb.html",
+              "label": "MariaDB"
+            },
+            {
+              "type": "text",
+              "text": ". However other services are possible. The operating system embedded in a single use device falls into this category."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "On the other hand, a workstation is much more complex. It generally requires a graphical user environment such as"
+            },
+            {
+              "type": "link",
+              "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/lxde/lxde.html",
+              "label": "LXDE"
+            },
+            {
+              "type": "text",
+              "text": ","
+            },
+            {
+              "type": "link",
+              "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/xfce/xfce.html",
+              "label": "XFCE"
+            },
+            {
+              "type": "text",
+              "text": ","
+            },
+            {
+              "type": "link",
+              "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/kde/kde.html",
+              "label": "KDE"
+            },
+            {
+              "type": "text",
+              "text": ", or"
+            },
+            {
+              "type": "link",
+              "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/gnome/gnome.html",
+              "label": "Gnome"
+            },
+            {
+              "type": "text",
+              "text": "based on a basic"
+            },
+            {
+              "type": "link",
+              "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/x/installing.html",
+              "label": "graphical environment"
+            },
+            {
+              "type": "text",
+              "text": "and several graphical based applications such as the"
+            },
+            {
+              "type": "link",
+              "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/xsoft/firefox.html",
+              "label": "Firefox web browser"
+            },
+            {
+              "type": "text",
+              "text": ","
+            },
+            {
+              "type": "link",
+              "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/xsoft/thunderbird.html",
+              "label": "Thunderbird email client"
+            },
+            {
+              "type": "text",
+              "text": ", or"
+            },
+            {
+              "type": "link",
+              "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/xsoft/libreoffice.html",
+              "label": "LibreOffice office suite"
+            },
+            {
+              "type": "text",
+              "text": ". These applications require many (several hundred depending on desired capabilities) more packages of support applications and libraries."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "In addition to the above, there is a set of applications for system management for all kinds of systems. These applications are all in the BLFS book. Not all packages are needed in every environment. For example"
+            },
+            {
+              "type": "link",
+              "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/basicnet/dhcpcd.html",
+              "label": "dhcpcd"
+            },
+            {
+              "type": "text",
+              "text": ", is not normally appropriate for a server and"
+            },
+            {
+              "type": "link",
+              "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/basicnet/wireless_tools.html",
+              "label": "wireless_tools"
+            },
+            {
+              "type": "text",
+              "text": ", are normally only useful for a laptop system."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Working in a basic LFS environment",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "When you initially boot into LFS, you have all the internal tools to build additional packages. Unfortunately, the user environment is quite sparse. There are a couple of ways to improve this:"
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "Work from the LFS host in chroot",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This method provides a complete graphical environment where a full featured browser and copy/paste capabilities are available. This method allows using applications like the host's version of wget to download package sources to a location available when working in the chroot environment."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "In order to properly build packages in chroot, you will also need to remember to mount the virtual file systems if they are not already mounted. One way to do this is to create a script on the"
+                },
+                {
+                  "type": "emphasis",
+                  "text": "HOST"
+                },
+                {
+                  "type": "text",
+                  "text": "system:"
+                }
+              ]
+            },
+            {
+              "type": "pre",
+              "text": "cat > ~/mount-virt.sh << \"EOF\"\n#!/bin/bash\n\nfunction mountbind\n{\n   if ! mountpoint $LFS/$1 >/dev/null; then\n     $SUDO mount --bind /$1 $LFS/$1\n     echo $LFS/$1 mounted\n   else\n     echo $LFS/$1 already mounted\n   fi\n}\n\nfunction mounttype\n{\n   if ! mountpoint $LFS/$1 >/dev/null; then\n     $SUDO mount -t $2 $3 $4 $5 $LFS/$1\n     echo $LFS/$1 mounted\n   else\n     echo $LFS/$1 already mounted\n   fi\n}\n\nif [ $EUID -ne 0 ]; then\n  SUDO=sudo\nelse\n  SUDO=\"\"\nfi\n\nif [ x$LFS == x ]; then\n  echo \"LFS not set\"\n  exit 1\nfi\n\nmountbind dev\nmounttype dev/pts devpts devpts -o gid=5,mode=620\nmounttype proc    proc   proc\nmounttype sys     sysfs  sysfs\nmounttype run     tmpfs  run\nif [ -h $LFS/dev/shm ]; then\n  install -v -d -m 1777 $LFS$(realpath /dev/shm)\nelse\n  mounttype dev/shm tmpfs tmpfs -o nosuid,nodev\nfi \n\n#mountbind usr/src\n#mountbind boot\n#mountbind home\nEOF"
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Note that the last three commands in the script are commented out. These are useful if those directories are mounted as separate partitions on the host system and will be mounted when booting the completed LFS/BLFS system."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The script can be run with"
+                },
+                {
+                  "type": "code",
+                  "text": "bash ~/mount-virt.sh"
+                },
+                {
+                  "type": "text",
+                  "text": "as either a regular user (recommended) or as"
+                },
+                {
+                  "type": "code",
+                  "text": "root"
+                },
+                {
+                  "type": "text",
+                  "text": ". If run as a regular user, sudo is required on the host system."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Another issue pointed out by the script is where to store downloaded package files. This location is arbitrary. It can be in a regular user's home directory such as ~/sources or in a global location like /usr/src. Our recommendation is not to mix BLFS sources and LFS sources in (from the chroot environment) /sources. In any case, the packages must be accessible inside the chroot environment."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "A last convenience feature presented here is to streamline the process of entering the chroot environment. This can be done with an alias placed in a user's ~/.bashrc file on the host system:"
+                }
+              ]
+            },
+            {
+              "type": "pre",
+              "text": "alias lfs='sudo /usr/sbin/chroot /mnt/lfs /usr/bin/env -i HOME=/root TERM=\"$TERM\" PS1=\"\\u:\\w\\\\\\\\$ \"\nPATH=/usr/bin:/usr/sbin /bin/bash --login'"
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This alias is a little tricky because of the quoting and levels of backslash characters. It must be all on a single line. The above command has been split in two for presentation purposes."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "Work remotely via ssh",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This method also provides a full graphical environment, but first requires installing"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/postlfs/openssh.html",
+                  "label": "sshd"
+                },
+                {
+                  "type": "text",
+                  "text": "on the LFS system, usually in chroot. It also requires a second computer. This method has the advantage of being simple by not requiring the complexity of the chroot environment. It also uses your LFS built kernel for all additional packages and still provides a complete system for installing packages."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "You may use the"
+                },
+                {
+                  "type": "code",
+                  "text": "scp"
+                },
+                {
+                  "type": "text",
+                  "text": "command to upload the package sources to be built onto the LFS system. If you want to download the sources onto the LFS system directly instead, install"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/general/libtasn1.html",
+                  "label": "libtasn1"
+                },
+                {
+                  "type": "text",
+                  "text": ","
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/postlfs/p11-kit.html",
+                  "label": "p11-kit"
+                },
+                {
+                  "type": "text",
+                  "text": ","
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/postlfs/make-ca.html",
+                  "label": "make-ca"
+                },
+                {
+                  "type": "text",
+                  "text": ", and"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/basicnet/wget.html",
+                  "label": "wget"
+                },
+                {
+                  "type": "text",
+                  "text": "in chroot (or upload their sources using"
+                },
+                {
+                  "type": "code",
+                  "text": "scp"
+                },
+                {
+                  "type": "text",
+                  "text": "after booting the LFS system)."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "Work from the LFS command line",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This method requires installing"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/general/libtasn1.html",
+                  "label": "libtasn1"
+                },
+                {
+                  "type": "text",
+                  "text": ","
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/postlfs/p11-kit.html",
+                  "label": "p11-kit"
+                },
+                {
+                  "type": "text",
+                  "text": ","
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/postlfs/make-ca.html",
+                  "label": "make-ca"
+                },
+                {
+                  "type": "text",
+                  "text": ","
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/basicnet/wget.html",
+                  "label": "wget"
+                },
+                {
+                  "type": "text",
+                  "text": ","
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/general/gpm.html",
+                  "label": "gpm"
+                },
+                {
+                  "type": "text",
+                  "text": ", and"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/basicnet/links.html",
+                  "label": "links"
+                },
+                {
+                  "type": "text",
+                  "text": "(or"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/basicnet/lynx.html",
+                  "label": "lynx"
+                },
+                {
+                  "type": "text",
+                  "text": ") in chroot and then rebooting into the new LFS system. At this point the default system has six virtual consoles. Switching consoles is as easy as using the"
+                },
+                {
+                  "type": "keycombo",
+                  "keys": [
+                    "Alt",
+                    "Fx"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "key combinations where"
+                },
+                {
+                  "type": "key",
+                  "text": "Fx"
+                },
+                {
+                  "type": "text",
+                  "text": "is between"
+                },
+                {
+                  "type": "key",
+                  "text": "F1"
+                },
+                {
+                  "type": "text",
+                  "text": "and"
+                },
+                {
+                  "type": "key",
+                  "text": "F6"
+                },
+                {
+                  "type": "text",
+                  "text": ". The"
+                },
+                {
+                  "type": "keycombo",
+                  "keys": [
+                    "Alt",
+                    ""
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "and"
+                },
+                {
+                  "type": "keycombo",
+                  "keys": [
+                    "Alt",
+                    ""
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "combinations also will change the console."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "At this point you can log into two different virtual consoles and run the links or lynx browser in one console and bash in the other. GPM then allows copying commands from the browser with the left mouse button, switching consoles, and pasting into the other console."
+                }
+              ]
+            },
+            {
+              "type": "admonition",
+              "kind": "note",
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "As a side note, switching of virtual consoles can also be done from an X Window instance with the"
+                    },
+                    {
+                      "type": "keycombo",
+                      "keys": [
+                        "Ctrl",
+                        "Alt",
+                        "Fx"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "key combination, but the mouse copy operation does not work between the graphical interface and a virtual console. You can return to the X Window display with the"
+                    },
+                    {
+                      "type": "keycombo",
+                      "keys": [
+                        "Ctrl",
+                        "Alt",
+                        "Fx"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "combination, where"
+                    },
+                    {
+                      "type": "key",
+                      "text": "Fx"
+                    },
+                    {
+                      "type": "text",
+                      "text": "is usually"
+                    },
+                    {
+                      "type": "key",
+                      "text": "F1"
+                    },
+                    {
+                      "type": "text",
+                      "text": "but may be"
+                    },
+                    {
+                      "type": "key",
+                      "text": "F7"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

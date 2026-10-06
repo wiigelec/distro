@@ -17,7 +17,7 @@ Roadmap:
 | M4 — Bootstrap proof | COMPLETE | Fresh Chapter 5–7 bootstrap hands directly to the normal executor; all 80 final-system packages build successfully without publication XML/book parsing. |
 | M5 — Development proof | COMPLETE | Accepted state, candidate identity, validation, definition binding/drift rejection, review evidence, and guarded transactional promotion are implemented. |
 | M6 — Release proof | SATISFIED BY COMPOSITION | M4 proves clean full-system realization from normalized state and M5 proves validated state identity and controlled promotion. Freezing accepted state under a release identity adds production plumbing but no unresolved prototype architecture question. |
-| M7 — Presentation proof | IN PROGRESS — PACKAGE/BOOK ROUTING PROVEN; GENERIC EDITORIAL SLICE ADDED | Full 199-chunk routing/navigation/xrefs and Zlib/Binutils package HTML are proven. The current slice migrates four representative non-normal-package bodies through a generic editorial model, including prose, lists, admonitions, nested sections, definition/segmented lists, preformatted text, links/xrefs, and bootstrap command bindings. Bulk body migration, no-chunks HTML, and PDF remain open. |
+| M7 — Presentation proof | IN PROGRESS — GENERIC EDITORIAL MODEL PROVEN; VOCABULARY COMPLETION SLICE ADDED | The direct validator proved the four-page generic editorial model. This slice adds mixed flow, tables, blockquotes, footnotes, keyboard combinations, superscripts, and additional inline semantic forms, while preserving bootstrap command authority. Bulk body migration, normal-package generalization, no-chunks HTML, and PDF remain open. |
 | M8+ | NOT STARTED | BLFS, hard-BLFS, and user-system proofs remain later roadmap milestones. |
 
 ## M5 closure
@@ -303,6 +303,36 @@ external links, and internal xrefs.
 `presentation/golden/editorial-slice.json` is source-derived validation state
 only. Runtime rendering does not consume it.
 
+## M7 editorial vocabulary completion slice
+
+The first generic editorial slice exposed one semantic extraction bug: block
+content nested inside a DocBook paragraph could be flattened into plain inline
+text. Host System Requirements demonstrates this with a warning paragraph that
+contains an itemized list.
+
+The model now represents mixed flow explicitly and adds the remaining constructs
+demonstrated by non-normal-package source pages:
+
+- semantic tables;
+- blockquotes;
+- footnotes;
+- keyboard keys/combinations;
+- superscripts; and
+- code-like inline forms such as computer output, functions, constants, prompts,
+  and tokens.
+
+The proof pages added by this slice are:
+
+```text
+ch-tools-toolchaintechnotes
+ch-tools-glibc
+ch-system-pkgmgt
+afterlfs
+```
+
+`ch-tools-glibc` binds all 16 executable commands to `bootstrap-13.1.json`;
+publication editorial state does not duplicate those recipes.
+
 ## Resume instruction
 
 Run:
@@ -311,7 +341,8 @@ Run:
 python3 product/src/proto/lfs_optimize/validate.py
 ```
 
-If it passes, treat the generic editorial-body model as proven for this
-representative slice. The next step is mechanical migration of the remaining
-editorial bodies, extending the vocabulary only when the source demonstrates a
-new reader-visible construct.
+If it passes, the generic non-normal-package editorial vocabulary is complete
+for the currently inventoried LFS 13.1-systemd source. The next step is bulk
+mechanical migration of remaining eligible bodies. Chapter 8 normal package
+pages remain a separate authority path and will be generalized from normalized
+package state rather than copied into generic editorial documents.

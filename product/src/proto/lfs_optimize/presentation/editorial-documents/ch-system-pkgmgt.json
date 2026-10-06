@@ -1,0 +1,1094 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-system-pkgmgt",
+  "title": "Package Management",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Package Management is an often requested addition to the LFS Book. A Package Manager tracks the installation of files, making it easier to remove and upgrade packages. A good package manager will also handle the configuration files specially to keep the user configuration when the package is reinstalled or upgraded. Before you begin to wonder, NO—this section will not talk about nor recommend any particular package manager. What it does provide is a roundup of the more popular techniques and how they work. The perfect package manager for you may be among these techniques, or it may be a combination of two or more of these techniques. This section briefly mentions issues that may arise when upgrading packages."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Some reasons why no package manager is mentioned in LFS or BLFS include:"
+        }
+      ]
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Dealing with package management takes the focus away from the goals of these books—teaching how a Linux system is built."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "There are multiple solutions for package management, each having its strengths and drawbacks. Finding one solution that satisfies all audiences is difficult."
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "There are some hints written on the topic of package management. Visit the"
+        },
+        {
+          "type": "link",
+          "href": "https://www.linuxfromscratch.org/hints/downloads/files/",
+          "label": "Hints Project"
+        },
+        {
+          "type": "text",
+          "text": "and see if one of them fits your needs."
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Upgrade Issues",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "A Package Manager makes it easy to upgrade to newer versions when they are released. Generally the instructions in the LFS and BLFS books can be used to upgrade to the newer versions. Here are some points that you should be aware of when upgrading packages, especially on a running system."
+            }
+          ]
+        },
+        {
+          "type": "list",
+          "ordered": false,
+          "items": [
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "If the Linux kernel needs to be upgraded (for example, from 5.10.17 to 5.10.18 or 5.11.1), nothing else needs to be rebuilt. The system will keep working fine thanks to the well-defined interface between the kernel and userspace. Specifically, Linux API headers need not be upgraded along with the kernel. You will merely need to reboot your system to use the upgraded kernel."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "If Glibc needs to be upgraded to a newer version, (e.g., from Glibc-2.36 to Glibc-2.44), some extra steps are needed to avoid breaking the system. Read"
+                  },
+                  {
+                    "type": "xref",
+                    "target": "ch-system-glibc",
+                    "label": "Glibc-2.44"
+                  },
+                  {
+                    "type": "text",
+                    "text": "for details."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "If a package containing a shared library is updated, and if the name of the library"
+                  },
+                  {
+                    "type": "footnote",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "The name of a shared library is the string coded in the"
+                      },
+                      {
+                        "type": "code",
+                        "text": "DT_SONAME"
+                      },
+                      {
+                        "type": "text",
+                        "text": "entry of its ELF dynamic section. You can get it with the"
+                      },
+                      {
+                        "type": "code",
+                        "text": "readelf -d <library file> | grep SONAME"
+                      },
+                      {
+                        "type": "text",
+                        "text": "command. In most cases it's suffixed with"
+                      },
+                      {
+                        "type": "code",
+                        "text": ".so.<a version number>"
+                      },
+                      {
+                        "type": "text",
+                        "text": ", but there are some cases where it contains multiple numbers for versioning (like"
+                      },
+                      {
+                        "type": "code",
+                        "text": "libbz2.so.1.0"
+                      },
+                      {
+                        "type": "text",
+                        "text": "), contains the version number before the"
+                      },
+                      {
+                        "type": "code",
+                        "text": ".so"
+                      },
+                      {
+                        "type": "text",
+                        "text": "suffix (like"
+                      },
+                      {
+                        "type": "code",
+                        "text": "libbfd-2.47"
+                      },
+                      {
+                        "type": "text",
+                        "text": "), or does not contain any version number at all (for example"
+                      },
+                      {
+                        "type": "code",
+                        "text": "libmemusage.so"
+                      },
+                      {
+                        "type": "text",
+                        "text": "). Generally there is no correlation between the package version and the version number(s) in the library name."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "text": "changes, then any packages dynamically linked to the library must be recompiled, to link against the newer library. For example, consider a package foo-1.2.3 that installs a shared library with the name"
+                  },
+                  {
+                    "type": "code",
+                    "text": "libfoo.so.1"
+                  },
+                  {
+                    "type": "text",
+                    "text": ". Suppose you upgrade the package to a newer version foo-1.2.4 that installs a shared library with the name"
+                  },
+                  {
+                    "type": "code",
+                    "text": "libfoo.so.2"
+                  },
+                  {
+                    "type": "text",
+                    "text": ". In this case, any packages that are dynamically linked to"
+                  },
+                  {
+                    "type": "code",
+                    "text": "libfoo.so.1"
+                  },
+                  {
+                    "type": "text",
+                    "text": "need to be recompiled to link against"
+                  },
+                  {
+                    "type": "code",
+                    "text": "libfoo.so.2"
+                  },
+                  {
+                    "type": "text",
+                    "text": "in order to use the new library version. You should not remove the old libraries until all the dependent packages have been recompiled."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "If a package is (directly or indirectly) linked to both the old and new names of a shared library (for example, the package links to both"
+                  },
+                  {
+                    "type": "code",
+                    "text": "libfoo.so.2"
+                  },
+                  {
+                    "type": "text",
+                    "text": "and"
+                  },
+                  {
+                    "type": "code",
+                    "text": "libbar.so.1"
+                  },
+                  {
+                    "type": "text",
+                    "text": ", while the latter links to"
+                  },
+                  {
+                    "type": "code",
+                    "text": "libfoo.so.3"
+                  },
+                  {
+                    "type": "text",
+                    "text": "), the package may malfunction because the different revisions of the shared library present incompatible definitions for some symbol names. This can be caused by recompiling some, but not all, of the packages linked to the old shared library after the package providing the shared library is upgraded. To avoid the issue, users will need to rebuild every package linked to a shared library with an updated revision (e.g. libfoo.so.2 to libfoo.so.3) as soon as possible."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "If a package containing a shared library is updated, and the name of the library doesn't change, but the version number of the library"
+                  },
+                  {
+                    "type": "emphasis",
+                    "text": "file"
+                  },
+                  {
+                    "type": "text",
+                    "text": "decreases (for example, the library is still named"
+                  },
+                  {
+                    "type": "code",
+                    "text": "libfoo.so.1"
+                  },
+                  {
+                    "type": "text",
+                    "text": ", but the name of the library file is changed from"
+                  },
+                  {
+                    "type": "code",
+                    "text": "libfoo.so.1.25"
+                  },
+                  {
+                    "type": "text",
+                    "text": "to"
+                  },
+                  {
+                    "type": "code",
+                    "text": "libfoo.so.1.24"
+                  },
+                  {
+                    "type": "text",
+                    "text": "), you should remove the library file from the previously installed version ("
+                  },
+                  {
+                    "type": "code",
+                    "text": "libfoo.so.1.25"
+                  },
+                  {
+                    "type": "text",
+                    "text": "in this case). Otherwise, a"
+                  },
+                  {
+                    "type": "code",
+                    "text": "ldconfig"
+                  },
+                  {
+                    "type": "text",
+                    "text": "command (invoked by yourself from the command line, or by the installation of some package) will reset the symlink"
+                  },
+                  {
+                    "type": "code",
+                    "text": "libfoo.so.1"
+                  },
+                  {
+                    "type": "text",
+                    "text": "to point to the old library file because it seems to be a"
+                  },
+                  {
+                    "type": "quote",
+                    "text": "newer"
+                  },
+                  {
+                    "type": "text",
+                    "text": "version; its version number is larger. This situation may arise if you have to downgrade a package, or if the authors change the versioning scheme for library files."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "If a package containing a shared library is updated, and the name of the library doesn't change, but a severe issue (especially, a security vulnerability) is fixed, all running programs linked to the shared library should be restarted. The following command, run as"
+                  },
+                  {
+                    "type": "code",
+                    "text": "root"
+                  },
+                  {
+                    "type": "text",
+                    "text": "after the update is complete, will list which processes are using the old versions of those libraries (replace"
+                  },
+                  {
+                    "type": "replaceable",
+                    "text": "libfoo"
+                  },
+                  {
+                    "type": "text",
+                    "text": "with the name of the library):"
+                  }
+                ]
+              },
+              {
+                "type": "pre",
+                "text": "grep -l 'libfoo.*deleted' /proc/*/maps | tr -cd 0-9\\\\n | xargs -r ps u"
+              },
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "If"
+                  },
+                  {
+                    "type": "code",
+                    "text": "OpenSSH"
+                  },
+                  {
+                    "type": "text",
+                    "text": "is being used to access the system and it is linked to the updated library, you must restart the"
+                  },
+                  {
+                    "type": "code",
+                    "text": "sshd"
+                  },
+                  {
+                    "type": "text",
+                    "text": "service, then logout, login again, and run the preceding command again to confirm that nothing is still using the deleted libraries."
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "If the"
+                  },
+                  {
+                    "type": "code",
+                    "text": "systemd"
+                  },
+                  {
+                    "type": "text",
+                    "text": "daemon (running as PID 1) is linked to the updated library, you can restart it without rebooting by running"
+                  },
+                  {
+                    "type": "code",
+                    "text": "systemctl daemon-reexec"
+                  },
+                  {
+                    "type": "text",
+                    "text": "as the"
+                  },
+                  {
+                    "type": "code",
+                    "text": "root"
+                  },
+                  {
+                    "type": "text",
+                    "text": "user."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "If an executable program or a shared library is overwritten, the processes using the code or data in that program or library may crash. The correct way to update a program or a shared library without causing the process to crash is to remove it first, then install the new version. The"
+                  },
+                  {
+                    "type": "code",
+                    "text": "install"
+                  },
+                  {
+                    "type": "text",
+                    "text": "command provided by"
+                  },
+                  {
+                    "type": "code",
+                    "text": "coreutils"
+                  },
+                  {
+                    "type": "text",
+                    "text": "has already implemented this, and most packages use that command to install binary files and libraries. This means that you won't be troubled by this issue most of the time. However, the install process of some packages (notably SpiderMonkey in BLFS) just overwrites the file if it exists; this causes a crash. So it's safer to save your work and close unneeded running processes before updating a package."
+                  }
+                ]
+              }
+            ]
+          ]
+        }
+      ],
+      "id": "pkgmgmt-upgrade-issues"
+    },
+    {
+      "type": "section",
+      "title": "Package Management Techniques",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The following are some common package management techniques. Before making a decision on a package manager, do some research on the various techniques, particularly the drawbacks of each particular scheme."
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "It is All in My Head!",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Yes, this is a package management technique. Some folks do not need a package manager because they know the packages intimately and know which files are installed by each package. Some users also do not need any package management because they plan on rebuilding the entire system whenever a package is changed."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "Install in Separate Directories",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This is a simplistic package management technique that does not need a special program to manage the packages. Each package is installed in a separate directory. For example, package foo-1.1 is installed in"
+                },
+                {
+                  "type": "code",
+                  "text": "/opt/foo-1.1"
+                },
+                {
+                  "type": "text",
+                  "text": "and a symlink is made from"
+                },
+                {
+                  "type": "code",
+                  "text": "/opt/foo"
+                },
+                {
+                  "type": "text",
+                  "text": "to"
+                },
+                {
+                  "type": "code",
+                  "text": "/opt/foo-1.1"
+                },
+                {
+                  "type": "text",
+                  "text": ". When a new version foo-1.2 comes along, it is installed in"
+                },
+                {
+                  "type": "code",
+                  "text": "/opt/foo-1.2"
+                },
+                {
+                  "type": "text",
+                  "text": "and the previous symlink is replaced by a symlink to the new version."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Environment variables such as"
+                },
+                {
+                  "type": "code",
+                  "text": "PATH"
+                },
+                {
+                  "type": "text",
+                  "text": ","
+                },
+                {
+                  "type": "code",
+                  "text": "MANPATH"
+                },
+                {
+                  "type": "text",
+                  "text": ","
+                },
+                {
+                  "type": "code",
+                  "text": "INFOPATH"
+                },
+                {
+                  "type": "text",
+                  "text": ","
+                },
+                {
+                  "type": "code",
+                  "text": "PKG_CONFIG_PATH"
+                },
+                {
+                  "type": "text",
+                  "text": ","
+                },
+                {
+                  "type": "code",
+                  "text": "CPPFLAGS"
+                },
+                {
+                  "type": "text",
+                  "text": ","
+                },
+                {
+                  "type": "code",
+                  "text": "LDFLAGS"
+                },
+                {
+                  "type": "text",
+                  "text": ", and the configuration file"
+                },
+                {
+                  "type": "code",
+                  "text": "/etc/ld.so.conf"
+                },
+                {
+                  "type": "text",
+                  "text": "may need to be expanded to include the corresponding subdirectories in"
+                },
+                {
+                  "type": "code",
+                  "text": "/opt/foo-x.y"
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This scheme is used by the BLFS book to install some very large packages to make it easier to upgrade them. If you install more than a few packages, this scheme becomes unmanageable. And some packages (for example Linux API headers and Glibc) may not work well with this scheme."
+                },
+                {
+                  "type": "emphasis",
+                  "text": "Never use this scheme system-wide."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "Symlink Style Package Management",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This is a variation of the previous package management technique. Each package is installed as in the previous scheme. But instead of making the symlink via a generic package name, each file is symlinked into the"
+                },
+                {
+                  "type": "code",
+                  "text": "/usr"
+                },
+                {
+                  "type": "text",
+                  "text": "hierarchy. This removes the need to expand the environment variables. Though the symlinks can be created by the user, many package managers use this approach, and automate the creation of the symlinks. A few of the popular ones include Stow, Epkg, Graft, and Depot."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The installation script needs to be fooled, so the package thinks it is installed in"
+                },
+                {
+                  "type": "code",
+                  "text": "/usr"
+                },
+                {
+                  "type": "text",
+                  "text": "though in reality it is installed in the"
+                },
+                {
+                  "type": "code",
+                  "text": "/usr/pkg"
+                },
+                {
+                  "type": "text",
+                  "text": "hierarchy. Installing in this manner is not usually a trivial task. For example, suppose you are installing a package libfoo-1.1. The following instructions may not install the package properly:"
+                }
+              ]
+            },
+            {
+              "type": "pre",
+              "text": "./configure --prefix=/usr/pkg/libfoo/1.1\nmake\nmake install"
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The installation will work, but the dependent packages may not link to libfoo as you would expect. If you compile a package that links against libfoo, you may notice that it is linked to"
+                },
+                {
+                  "type": "code",
+                  "text": "/usr/pkg/libfoo/1.1/lib/libfoo.so.1"
+                },
+                {
+                  "type": "text",
+                  "text": "instead of"
+                },
+                {
+                  "type": "code",
+                  "text": "/usr/lib/libfoo.so.1"
+                },
+                {
+                  "type": "text",
+                  "text": "as you would expect. The correct approach is to use the"
+                },
+                {
+                  "type": "code",
+                  "text": "DESTDIR"
+                },
+                {
+                  "type": "text",
+                  "text": "variable to direct the installation. This approach works as follows:"
+                }
+              ]
+            },
+            {
+              "type": "pre",
+              "text": "./configure --prefix=/usr\nmake\nmake DESTDIR=/usr/pkg/libfoo/1.1 install"
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Most packages support this approach, but there are some which do not. For the non-compliant packages, you may either need to install the package manually, or you may find that it is easier to install some problematic packages into"
+                },
+                {
+                  "type": "code",
+                  "text": "/opt"
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "Timestamp Based",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "In this technique, a file is timestamped before the installation of the package. After the installation, a simple use of the"
+                },
+                {
+                  "type": "code",
+                  "text": "find"
+                },
+                {
+                  "type": "text",
+                  "text": "command with the appropriate options can generate a log of all the files installed after the timestamp file was created. A package manager that uses this approach is install-log."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Though this scheme has the advantage of being simple, it has two drawbacks. If, during installation, the files are installed with any timestamp other than the current time, those files will not be tracked by the package manager. Also, this scheme can only be used when packages are installed one at a time. The logs are not reliable if two packages are installed simultaneously from two different consoles."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "Tracing Installation Scripts",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "In this approach, the commands that the installation scripts perform are recorded. There are two techniques that one can use:"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The"
+                },
+                {
+                  "type": "code",
+                  "text": "LD_PRELOAD"
+                },
+                {
+                  "type": "text",
+                  "text": "environment variable can be set to point to a library to be preloaded before installation. During installation, this library tracks the packages that are being installed by attaching itself to various executables such as"
+                },
+                {
+                  "type": "code",
+                  "text": "cp"
+                },
+                {
+                  "type": "text",
+                  "text": ","
+                },
+                {
+                  "type": "code",
+                  "text": "install"
+                },
+                {
+                  "type": "text",
+                  "text": ","
+                },
+                {
+                  "type": "code",
+                  "text": "mv"
+                },
+                {
+                  "type": "text",
+                  "text": "and tracking the system calls that modify the filesystem. For this approach to work, all the executables need to be dynamically linked without the suid or sgid bit. Preloading the library may cause some unwanted side-effects during installation. Therefore, it's a good idea to perform some tests to ensure that the package manager does not break anything, and that it logs all the appropriate files."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Another technique is to use"
+                },
+                {
+                  "type": "code",
+                  "text": "strace"
+                },
+                {
+                  "type": "text",
+                  "text": ", which logs all the system calls made during the execution of the installation scripts."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "Creating Package Archives",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "In this scheme, the package installation is faked into a separate tree as previously described in the symlink style package management section. After the installation, a package archive is created using the installed files. This archive is then used to install the package on the local machine or even on other machines."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This approach is used by most of the package managers found in the commercial distributions. Examples of package managers that follow this approach are RPM (which, incidentally, is required by the"
+                },
+                {
+                  "type": "link",
+                  "href": "https://refspecs.linuxfoundation.org/lsb.shtml",
+                  "label": "Linux Standard Base Specification"
+                },
+                {
+                  "type": "text",
+                  "text": "), pkg-utils, Debian's apt, and Gentoo's Portage system. A hint describing how to adopt this style of package management for LFS systems is located at"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.linuxfromscratch.org/hints/downloads/files/fakeroot.txt",
+                  "label": "https://www.linuxfromscratch.org/hints/downloads/files/fakeroot.txt"
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The creation of package files that include dependency information is complex, and beyond the scope of LFS."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Slackware uses a"
+                },
+                {
+                  "type": "code",
+                  "text": "tar"
+                },
+                {
+                  "type": "text",
+                  "text": "-based system for package archives. This system purposely does not handle package dependencies as more complex package managers do. For details of Slackware package management, see"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.slackbook.org/html/package-management.html",
+                  "label": "https://www.slackbook.org/html/package-management.html"
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "User Based Management",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This scheme, unique to LFS, was devised by Matthias Benkmann, and is available from the"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.linuxfromscratch.org/hints/downloads/files/",
+                  "label": "Hints Project"
+                },
+                {
+                  "type": "text",
+                  "text": ". In this scheme, each package is installed as a separate user into the standard locations. Files belonging to a package are easily identified by checking the user ID. The features and shortcomings of this approach are too complex to describe in this section. For the details please see the hint at"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.linuxfromscratch.org/hints/downloads/files/more_control_and_pkg_man.txt",
+                  "label": "https://www.linuxfromscratch.org/hints/downloads/files/more_control_and_pkg_man.txt"
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Deploying LFS on Multiple Systems",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "One of the advantages of an LFS system is that there are no files that depend on the position of files on a disk system. Cloning an LFS build to another computer with the same architecture as the base system is as simple as using"
+            },
+            {
+              "type": "code",
+              "text": "tar"
+            },
+            {
+              "type": "text",
+              "text": "on the LFS partition that contains the root directory (about 900MB uncompressed for a basic LFS build), copying that file via network transfer or CD-ROM / USB stick to the new system, and expanding it. After that, a few configuration files will have to be changed. Configuration files that may need to be updated include:"
+            },
+            {
+              "type": "code",
+              "text": "/etc/hosts"
+            },
+            {
+              "type": "text",
+              "text": ","
+            },
+            {
+              "type": "code",
+              "text": "/etc/fstab"
+            },
+            {
+              "type": "text",
+              "text": ","
+            },
+            {
+              "type": "code",
+              "text": "/etc/passwd"
+            },
+            {
+              "type": "text",
+              "text": ","
+            },
+            {
+              "type": "code",
+              "text": "/etc/group"
+            },
+            {
+              "type": "text",
+              "text": ", /etc/shadow, and /etc/ld.so.conf."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "A custom kernel may be needed for the new system, depending on differences in system hardware and the original kernel configuration."
+            }
+          ]
+        },
+        {
+          "type": "admonition",
+          "kind": "important",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "If you want to deploy the LFS system onto a system with a different CPU, when you build"
+                },
+                {
+                  "type": "xref",
+                  "target": "ch-system-gmp",
+                  "label": "GMP-6.3.0"
+                },
+                {
+                  "type": "text",
+                  "text": "and"
+                },
+                {
+                  "type": "xref",
+                  "target": "ch-system-libffi",
+                  "label": "Libffi-3.8.0"
+                },
+                {
+                  "type": "text",
+                  "text": "you must follow the notes about overriding the architecture-specific optimization to produce libraries suitable for both the host system and the system(s) where you'll deploy the LFS system. Otherwise you'll get"
+                },
+                {
+                  "type": "code",
+                  "text": "Illegal Instruction"
+                },
+                {
+                  "type": "text",
+                  "text": "errors running LFS."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The GMP build system stores the architecture-specific optimization option used to build GMP into"
+                },
+                {
+                  "type": "code",
+                  "text": "gmp.h"
+                },
+                {
+                  "type": "text",
+                  "text": ", and the build system of some package using GMP can read it from the header and use it when building the package itself. At least the MPFR build system is known to do so. Thus simply rebuilding GMP on a complete LFS system is not enough: you'll need to recompile MPFR and maybe other packages using GMP if you want to"
+                },
+                {
+                  "type": "quote",
+                  "text": "convert"
+                },
+                {
+                  "type": "text",
+                  "text": "a complete LFS system to be used for a different CPU."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Finally, the new system has to be made bootable via"
+            },
+            {
+              "type": "xref",
+              "target": "ch-bootable-grub",
+              "label": "Using GRUB to Set Up the Boot Process"
+            },
+            {
+              "type": "text",
+              "text": "."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

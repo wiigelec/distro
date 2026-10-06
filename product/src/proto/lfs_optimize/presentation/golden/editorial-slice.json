@@ -13,7 +13,7 @@
       "bootstrap_command_count": 0
     },
     "ch-partitioning-hostreqs": {
-      "block_sha256": "50c5882428897cfe81e186d75ff48ffc089b8e34b21c2d60da5dbc5d22bf2955",
+      "block_sha256": "f511176fe8dd0a98af332a08a6ed1a25a847f5b226833d4ebef9eb256b25fa5b",
       "xref_targets": [
         "chapter-cross-tools",
         "chapter-building-system",
@@ -35,6 +35,46 @@
       "xref_targets": [
         "chapter-building-system"
       ],
+      "bootstrap_command_count": 0
+    },
+    "ch-tools-toolchaintechnotes": {
+      "block_sha256": "94277c2882dec9082c2db41fd69f16c49704120c3d0db70f1e35238eba7370d7",
+      "xref_targets": [
+        "chapter-cross-tools",
+        "chapter-temporary-tools",
+        "chapter-temporary-tools",
+        "chapter-building-system",
+        "chapter-building-system",
+        "chapter-temporary-tools",
+        "chapter-chroot-temporary-tools",
+        "chapter-temporary-tools",
+        "chapter-temporary-tools",
+        "chapter-chroot-temporary-tools",
+        "chapter-building-system"
+      ],
+      "bootstrap_command_count": 0
+    },
+    "ch-tools-glibc": {
+      "block_sha256": "bb5d514c7cb6f4cf5fcdf076a859d380902005a7ce160e349db3a867fe7bc613",
+      "xref_targets": [
+        "ch-tools-chroot",
+        "contents-glibc"
+      ],
+      "bootstrap_command_count": 16
+    },
+    "ch-system-pkgmgt": {
+      "block_sha256": "6a65eca82941faabb39af6cc666b839258585023796326af7607c53d51b9ec21",
+      "xref_targets": [
+        "ch-system-glibc",
+        "ch-system-gmp",
+        "ch-system-libffi",
+        "ch-bootable-grub"
+      ],
+      "bootstrap_command_count": 0
+    },
+    "afterlfs": {
+      "block_sha256": "ca053db8b0ad2d90a1ec5cf2e9a4818da48d02549b42901a63f4c780dbc3af57",
+      "xref_targets": [],
       "bootstrap_command_count": 0
     }
   }

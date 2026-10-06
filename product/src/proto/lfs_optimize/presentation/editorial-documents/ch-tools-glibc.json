@@ -1,0 +1,795 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-tools-glibc",
+  "title": "Glibc-2.44",
+  "blocks": [
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The Glibc package contains the main C library. This library provides the basic routines for allocating memory, searching directories, opening and closing files, reading and writing files, string handling, pattern matching, arithmetic, and so on."
+            }
+          ]
+        },
+        {
+          "type": "segmented_list",
+          "titles": [
+            "Approximate build time",
+            "Required disk space"
+          ],
+          "values": [
+            "1.3 SBU",
+            "900 MB"
+          ]
+        }
+      ],
+      "role": "package"
+    },
+    {
+      "type": "section",
+      "title": "Installation of Glibc",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "First, create a symbolic link for LSB compliance. Additionally, for x86_64, create a compatibility symbolic link required for proper operation of the dynamic library loader:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 0
+        },
+        {
+          "type": "admonition",
+          "kind": "note",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The above command is correct. The"
+                },
+                {
+                  "type": "code",
+                  "text": "ln"
+                },
+                {
+                  "type": "text",
+                  "text": "command has several syntactic versions, so be sure to check"
+                },
+                {
+                  "type": "code",
+                  "text": "info coreutils ln"
+                },
+                {
+                  "type": "text",
+                  "text": "and"
+                },
+                {
+                  "type": "link",
+                  "href": "https://man.archlinux.org/man/ln.1",
+                  "label": "ln(1)"
+                },
+                {
+                  "type": "text",
+                  "text": "before reporting what may appear to be an error."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Some of the Glibc programs use the non-FHS-compliant"
+            },
+            {
+              "type": "code",
+              "text": "/var/db"
+            },
+            {
+              "type": "text",
+              "text": "directory to store their runtime data. Apply the following patch to make such programs store their runtime data in the FHS-compliant locations:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 1
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Fix an issue causing the"
+            },
+            {
+              "type": "link",
+              "href": "https://man.archlinux.org/man/tanh.3",
+              "label": "tanh(3)"
+            },
+            {
+              "type": "text",
+              "text": "function to crash on some old x86_64 processors, and to fix installing with multiple"
+            },
+            {
+              "type": "code",
+              "text": "make"
+            },
+            {
+              "type": "text",
+              "text": "jobs:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 2
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The Glibc documentation recommends building Glibc in a dedicated build directory:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 3
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Ensure that the"
+            },
+            {
+              "type": "code",
+              "text": "ldconfig"
+            },
+            {
+              "type": "text",
+              "text": "and"
+            },
+            {
+              "type": "code",
+              "text": "sln"
+            },
+            {
+              "type": "text",
+              "text": "utilities are installed into"
+            },
+            {
+              "type": "code",
+              "text": "/usr/sbin"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 4
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Next, prepare Glibc for compilation:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 5
+        },
+        {
+          "type": "definition_list",
+          "title": "The meaning of the configure options:",
+          "entries": [
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--host=$LFS_TGT, --build=$(../scripts/config.guess)"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "The combined effect of these switches is that Glibc's build system configures itself to be cross-compiled, using the cross-linker and cross-compiler in"
+                    },
+                    {
+                      "type": "code",
+                      "text": "$LFS/tools"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--enable-kernel=5.10"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This tells Glibc to compile the library with support for 5.10 and later Linux kernels. Workarounds for older kernels are not enabled."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "libc_cv_slibdir=/usr/lib"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This ensures that the library is installed in /usr/lib instead of the default /lib64 on 64-bit machines."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "--disable-nscd"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Do not build the name service cache daemon which is no longer used."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "During this stage the following warning might appear:"
+            }
+          ]
+        },
+        {
+          "type": "blockquote",
+          "blocks": [
+            {
+              "type": "pre",
+              "text": "configure: WARNING:\n*** These auxiliary programs are missing or\n*** incompatible versions: msgfmt\n*** some features will be disabled.\n*** Check the INSTALL file for required versions."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The missing or incompatible"
+            },
+            {
+              "type": "code",
+              "text": "msgfmt"
+            },
+            {
+              "type": "text",
+              "text": "program is generally harmless. This"
+            },
+            {
+              "type": "code",
+              "text": "msgfmt"
+            },
+            {
+              "type": "text",
+              "text": "program is part of the Gettext package, which the host distribution should provide."
+            }
+          ]
+        },
+        {
+          "type": "admonition",
+          "kind": "note",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "There have been reports that this package may fail when building as a"
+                },
+                {
+                  "type": "quote",
+                  "text": "parallel make."
+                },
+                {
+                  "type": "text",
+                  "text": "If that occurs, rerun the make command with the"
+                },
+                {
+                  "type": "code",
+                  "text": "-j1"
+                },
+                {
+                  "type": "text",
+                  "text": "option."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Compile the package:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 6
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Install the package:"
+            }
+          ]
+        },
+        {
+          "type": "admonition",
+          "kind": "warning",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "If"
+                },
+                {
+                  "type": "code",
+                  "text": "LFS"
+                },
+                {
+                  "type": "text",
+                  "text": "is not properly set, and despite the recommendations, you are building as"
+                },
+                {
+                  "type": "code",
+                  "text": "root"
+                },
+                {
+                  "type": "text",
+                  "text": ", the next command will install the newly built Glibc to your host system, which will almost certainly render it unusable. So double-check that the environment is correctly set, and that you are not"
+                },
+                {
+                  "type": "code",
+                  "text": "root"
+                },
+                {
+                  "type": "text",
+                  "text": ", before running the following command."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 7
+        },
+        {
+          "type": "definition_list",
+          "title": "The meaning of the",
+          "entries": [
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "DESTDIR=$LFS"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "The"
+                    },
+                    {
+                      "type": "code",
+                      "text": "DESTDIR"
+                    },
+                    {
+                      "type": "text",
+                      "text": "make variable is used by almost all packages to define the location where the package should be installed. If it is not set, it defaults to the root ("
+                    },
+                    {
+                      "type": "code",
+                      "text": "/"
+                    },
+                    {
+                      "type": "text",
+                      "text": ") directory. Here we specify that the package is installed in"
+                    },
+                    {
+                      "type": "code",
+                      "text": "$LFS"
+                    },
+                    {
+                      "type": "text",
+                      "text": ", which will become the root directory in"
+                    },
+                    {
+                      "type": "xref",
+                      "target": "ch-tools-chroot",
+                      "label": "Entering the Chroot Environment",
+                      "suffix": "."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Fix a hard coded path to the executable loader in the"
+            },
+            {
+              "type": "code",
+              "text": "ldd"
+            },
+            {
+              "type": "text",
+              "text": "script:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 8
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Now that our cross toolchain is in place, it is important to ensure that compiling and linking will work as expected. We do this by performing some sanity checks:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 9
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "There should be no errors, and the output of the last command will be (allowing for platform-specific differences in the dynamic linker name):"
+            }
+          ]
+        },
+        {
+          "type": "pre",
+          "text": "[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]"
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Note that this path should not contain"
+            },
+            {
+              "type": "code",
+              "text": "/mnt/lfs"
+            },
+            {
+              "type": "text",
+              "text": "(or the value of the"
+            },
+            {
+              "type": "code",
+              "text": "LFS"
+            },
+            {
+              "type": "text",
+              "text": "variable if you used a different one). The path is resolved when the compiled program is executed, and that should only happen after we enter the chroot environment where the kernel would consider"
+            },
+            {
+              "type": "code",
+              "text": "$LFS"
+            },
+            {
+              "type": "text",
+              "text": "as the root directory ("
+            },
+            {
+              "type": "code",
+              "text": "/"
+            },
+            {
+              "type": "text",
+              "text": ")."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Now make sure that we're set up to use the correct start files:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 10
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The output of the last command should be:"
+            }
+          ]
+        },
+        {
+          "type": "pre",
+          "text": "/mnt/lfs/lib/../lib/Scrt1.o succeeded\n/mnt/lfs/lib/../lib/crti.o succeeded\n/mnt/lfs/lib/../lib/crtn.o succeeded"
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Verify that the compiler is searching for the correct header files:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 11
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "This command should return the following output:"
+            }
+          ]
+        },
+        {
+          "type": "pre",
+          "text": "#include <...> search starts here:\n /mnt/lfs/tools/lib/gcc/x86_64-lfs-linux-gnu/16.2.0/include\n /mnt/lfs/tools/lib/gcc/x86_64-lfs-linux-gnu/16.2.0/include-fixed\n /mnt/lfs/usr/include"
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Again, the directory named after your target triplet may be different than the above, depending on your system architecture."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Next, verify that the new linker is being used with the correct search paths:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 12
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "References to paths that have components with '-linux-gnu' should be ignored, but otherwise the output of the last command should be:"
+            }
+          ]
+        },
+        {
+          "type": "pre",
+          "text": "SEARCH_DIR(\"=/mnt/lfs/tools/x86_64-lfs-linux-gnu/lib64\")\nSEARCH_DIR(\"=/usr/local/lib64\")\nSEARCH_DIR(\"=/lib64\")\nSEARCH_DIR(\"=/usr/lib64\")\nSEARCH_DIR(\"=/mnt/lfs/tools/x86_64-lfs-linux-gnu/lib\")\nSEARCH_DIR(\"=/usr/local/lib\")\nSEARCH_DIR(\"=/lib\")\nSEARCH_DIR(\"=/usr/lib\");"
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "A 32-bit system may use a few other directories, but anyway the important facet here is all the paths should begin with an equal sign ("
+            },
+            {
+              "type": "code",
+              "text": "="
+            },
+            {
+              "type": "text",
+              "text": "), which would be replaced with the sysroot directory that we've configured for the linker."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Next make sure that we're using the correct libc:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 13
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The output of the last command should be:"
+            }
+          ]
+        },
+        {
+          "type": "pre",
+          "text": "attempt to open /mnt/lfs/usr/lib/libc.so.6 succeeded"
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Make sure GCC is using the correct dynamic linker:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 14
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The output of the last command should be (allowing for platform-specific differences in dynamic linker name):"
+            }
+          ]
+        },
+        {
+          "type": "pre",
+          "text": "found ld-linux-x86-64.so.2 at /mnt/lfs/usr/lib/ld-linux-x86-64.so.2"
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "If the output does not appear as shown above or is not received at all, then something is seriously wrong. Investigate and retrace the steps to find out where the problem is and correct it. Any issues should be resolved before continuing with the process."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Once everything is working correctly, clean up the test files:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_command",
+          "index": 15
+        },
+        {
+          "type": "admonition",
+          "kind": "note",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Building the packages in the next chapter will serve as an additional check that the toolchain has been built properly. If some package, especially Binutils-pass2 or GCC-pass2, fails to build, it is an indication that something has gone wrong with the preceding Binutils, GCC, or Glibc installations."
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "role": "installation"
+    },
+    {
+      "type": "section",
+      "title": "",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Details on this package are located in"
+            },
+            {
+              "type": "xref",
+              "target": "contents-glibc",
+              "label": "Contents of Glibc",
+              "suffix": "."
+            }
+          ]
+        }
+      ],
+      "role": "content"
+    }
+  ]
+}

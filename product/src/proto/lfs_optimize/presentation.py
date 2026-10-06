@@ -1065,6 +1065,32 @@ def _render_editorial_inline(
             node = ET.SubElement(parent, "code")
             node.text = part["text"]
             continue
+        if kind == "key":
+            node = ET.SubElement(parent, "kbd")
+            node.text = part["text"]
+            continue
+        if kind == "keycombo":
+            node = ET.SubElement(parent, "kbd")
+            node.text = "+".join(part["keys"])
+            node.set("data-keycombo", "true")
+            continue
+        if kind == "superscript":
+            node = ET.SubElement(parent, "sup")
+            node.text = part["text"]
+            continue
+        if kind == "footnote":
+            node = ET.SubElement(parent, "span", {"data-role": "footnote"})
+            node.text = "["
+            _render_editorial_inline(
+                node,
+                part["content"],
+                source_document_id,
+            )
+            if len(node):
+                node[-1].tail = (node[-1].tail or "") + "]"
+            else:
+                node.text = (node.text or "") + "]"
+            continue
         raise RuntimeError(
             f"{source_document_id}: unsupported editorial inline {kind}"
         )
@@ -1188,6 +1214,39 @@ def _render_editorial_blocks(
             for title, value in zip(block["titles"], block["values"]):
                 add_text(dl, "dt", title)
                 add_text(dl, "dd", value)
+        elif kind == "flow":
+            _render_editorial_blocks(
+                parent,
+                block["blocks"],
+                source_document_id,
+                heading_level=heading_level,
+            )
+        elif kind == "blockquote":
+            quote = ET.SubElement(parent, "blockquote")
+            _render_editorial_blocks(
+                quote,
+                block["blocks"],
+                source_document_id,
+                heading_level=heading_level,
+            )
+        elif kind == "table":
+            if block.get("title"):
+                add_text(
+                    parent,
+                    f"h{min(heading_level, 6)}",
+                    block["title"],
+                )
+            table = ET.SubElement(parent, "table")
+            if block.get("headers"):
+                thead = ET.SubElement(table, "thead")
+                row = ET.SubElement(thead, "tr")
+                for value in block["headers"]:
+                    add_text(row, "th", value)
+            tbody = ET.SubElement(table, "tbody")
+            for values in block["rows"]:
+                row = ET.SubElement(tbody, "tr")
+                for value in values:
+                    add_text(row, "td", value)
         else:
             raise RuntimeError(
                 f"{source_document_id}: unsupported editorial block {kind}"
@@ -1826,6 +1885,55 @@ def self_test_editorial_slice() -> None:
         "editorial-slice: bootstrap command text/order drift",
     )
 
+    hostreqs = ET.fromstring(
+        render_chunked_html_document("ch-partitioning-hostreqs")
+    )
+    require(
+        hostreqs.find(".//aside[@data-kind='warning']//ul") is not None,
+        "editorial-slice: mixed paragraph/list flow was flattened",
+    )
+
+    technotes = ET.fromstring(
+        render_chunked_html_document("ch-tools-toolchaintechnotes")
+    )
+    require(
+        len(technotes.findall(".//table")) == 3,
+        "editorial-slice: toolchain tables missing",
+    )
+
+    glibc = ET.fromstring(
+        render_chunked_html_document("ch-tools-glibc")
+    )
+    require(
+        glibc.find(".//blockquote") is not None,
+        "editorial-slice: blockquote missing",
+    )
+    glibc_stage = bootstrap_stage("ch-tools-glibc")
+    require(
+        [
+            node.text or ""
+            for node in glibc.findall(".//code[@data-bootstrap-command]")
+        ]
+        == glibc_stage["commands"],
+        "editorial-slice: Glibc bootstrap command text/order drift",
+    )
+
+    pkgmgt = ET.fromstring(
+        render_chunked_html_document("ch-system-pkgmgt")
+    )
+    require(
+        pkgmgt.find(".//span[@data-role='footnote']") is not None,
+        "editorial-slice: footnote missing",
+    )
+
+    afterlfs = ET.fromstring(
+        render_chunked_html_document("afterlfs")
+    )
+    require(
+        len(afterlfs.findall(".//kbd[@data-keycombo='true']")) == 5,
+        "editorial-slice: key-combination rendering drift",
+    )
+
 
 def self_test() -> None:
     for name in PROOF_PACKAGES:
@@ -1888,8 +1996,9 @@ def main() -> int:
                         "chunked_html_packages": True,
                         "chunked_html_book": True,
                         "generic_editorial_slice": True,
+                        "editorial_vocabulary_complete": True,
                         "equivalence":
-                            "package-semantics-book-routing-and-generic-editorial-slice",
+                            "package-semantics-book-routing-and-editorial-vocabulary",
                     },
                     indent=2,
                 )
