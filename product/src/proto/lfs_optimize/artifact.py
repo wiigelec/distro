@@ -328,9 +328,12 @@ def self_test() -> None:
         # Regression: changed child directories must not overwrite metadata on
         # an unchanged synthetic parent directory in the staged artifact.
         (before_root / "etc").mkdir()
-        os.chown(before_root / "etc", 1000, 1000)
         (after_root / "etc").mkdir()
-        os.chown(after_root / "etc", 1000, 1000)
+        # Exercise non-root parent ownership when privileges allow it, but do
+        # not require the self-test itself to run as root.
+        if os.geteuid() == 0:
+            os.chown(before_root / "etc", 1000, 1000)
+            os.chown(after_root / "etc", 1000, 1000)
         (after_root / "etc/depmod.d").mkdir()
         (after_root / "etc/modprobe.d").mkdir()
 
