@@ -66,6 +66,28 @@ def main() -> int:
                 f"{name}: invalid {dep_class} dependencies",
             )
 
+        parameters = definition.get("parameters", {})
+        require(isinstance(parameters, dict), f"{name}: invalid parameters")
+        for parameter, spec in parameters.items():
+            require(
+                isinstance(parameter, str)
+                and parameter
+                and isinstance(spec, dict),
+                f"{name}: invalid parameter definition",
+            )
+            default = spec.get("default")
+            values = spec.get("values")
+            require(
+                isinstance(default, str)
+                and default
+                and isinstance(values, list)
+                and values
+                and all(isinstance(value, str) and value for value in values)
+                and len(values) == len(set(values))
+                and default in values,
+                f"{name}: invalid parameter {parameter}",
+            )
+
         procedure = definition.get("procedure")
         require(isinstance(procedure, list) and procedure, f"{name}: missing procedure")
         seen_command_ids: set[str] = set()
@@ -158,6 +180,37 @@ def main() -> int:
     result = resolve()
     require(len(result["packages"]) == len(names),
             "resolver did not return full package set")
+
+    groff_default = resolve(["groff"])["packages"][0]
+    require(
+        groff_default.get("parameters") == {"paper_size": "letter"},
+        "groff: default paper-size parameter drift",
+    )
+    default_plan = plan(groff_default, run_tests=True)
+    require(
+        default_plan["commands"][0]["command"]
+        == "PAGE=letter ./configure --prefix=/usr",
+        "groff: default paper-size execution drift",
+    )
+    groff_a4 = resolve(
+        ["groff"],
+        parameter_overrides={"groff": {"paper_size": "A4"}},
+    )["packages"][0]
+    require(
+        groff_a4.get("parameters") == {"paper_size": "A4"}
+        and plan(groff_a4, run_tests=True)["commands"][0]["command"]
+        == "PAGE=A4 ./configure --prefix=/usr",
+        "groff: paper-size override execution drift",
+    )
+    try:
+        resolve(
+            ["groff"],
+            parameter_overrides={"groff": {"paper_size": "legal"}},
+        )
+    except RuntimeError:
+        pass
+    else:
+        raise RuntimeError("groff: invalid paper-size parameter accepted")
 
     artifact_self_test()
     presentation_self_test()

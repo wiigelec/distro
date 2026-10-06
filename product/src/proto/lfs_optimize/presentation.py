@@ -2579,7 +2579,7 @@ def self_test_package_bulk() -> None:
         golden.get("command_scope") == "installation-screen-userinput",
         "package-bulk: command oracle must be scoped to Installation screen/userinput commands",
     )
-    require(len(complete) == golden.get("complete_package_count") == 77 and len(deferred) == golden.get("deferred_package_count") == 3, "package-bulk: package coverage drift")
+    require(len(complete) == golden.get("complete_package_count") == 78 and len(deferred) == golden.get("deferred_package_count") == 2, "package-bulk: package coverage drift")
     package_set = load_json(HERE / "package-set.json")["packages"]
     require(set(complete).union(deferred) == set(package_set) and not set(complete).intersection(deferred), "package-bulk: complete/deferred package split drift")
 
@@ -2684,8 +2684,8 @@ def main() -> int:
                         "editorial_vocabulary_complete": True,
                         "editorial_bulk_complete": 89,
                         "editorial_operational_deferred": 30,
-                        "package_bulk_complete": 77,
-                        "package_authority_deferred": 3,
+                        "package_bulk_complete": 78,
+                        "package_authority_deferred": 2,
                         "equivalence":
                             "package-semantics-book-routing-editorial-and-package-bulk",
                     },

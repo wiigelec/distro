@@ -4,12 +4,22 @@
   "reference": {
     "lfs_section": "ch-system-groff"
   },
+  "parameters": {
+    "paper_size": {
+      "default": "letter",
+      "values": [
+        "letter",
+        "A4"
+      ]
+    }
+  },
   "procedure": [
     {
       "phase": "configure",
       "commands": [
         {
-          "command": "PAGE=letter ./configure --prefix=/usr",
+          "command": "PAGE={paper_size} ./configure --prefix=/usr",
+          "source_command": "PAGE=<paper_size> ./configure --prefix=/usr",
           "user": "root"
         }
       ],

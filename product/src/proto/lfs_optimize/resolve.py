@@ -27,7 +27,51 @@ def substitute(value: Any, variables: dict[str, str]) -> Any:
     return value
 
 
-def resolve_package(name: str, versions: dict[str, Any]) -> dict[str, Any]:
+def resolve_parameters(
+    name: str,
+    definition: dict[str, Any],
+    overrides: dict[str, str] | None = None,
+) -> dict[str, str]:
+    specs = definition.get("parameters", {})
+    if not isinstance(specs, dict):
+        raise RuntimeError(f"invalid package parameters: {name}")
+    overrides = overrides or {}
+    unknown = sorted(set(overrides) - set(specs))
+    if unknown:
+        raise RuntimeError(
+            f"unknown package parameter(s) for {name}: " + ", ".join(unknown)
+        )
+
+    values: dict[str, str] = {}
+    for parameter, spec in specs.items():
+        if not isinstance(parameter, str) or not parameter or not isinstance(spec, dict):
+            raise RuntimeError(f"invalid package parameter definition: {name}")
+        default = spec.get("default")
+        allowed = spec.get("values")
+        if (
+            not isinstance(default, str)
+            or not default
+            or not isinstance(allowed, list)
+            or not allowed
+            or not all(isinstance(item, str) and item for item in allowed)
+            or len(allowed) != len(set(allowed))
+            or default not in allowed
+        ):
+            raise RuntimeError(f"invalid package parameter {name}.{parameter}")
+        selected = overrides.get(parameter, default)
+        if selected not in allowed:
+            raise RuntimeError(
+                f"invalid package parameter {name}.{parameter}: {selected}"
+            )
+        values[parameter] = selected
+    return values
+
+
+def resolve_package(
+    name: str,
+    versions: dict[str, Any],
+    parameter_overrides: dict[str, str] | None = None,
+) -> dict[str, Any]:
     definition_path = HERE / "packages" / f"{name}.json"
     if not definition_path.is_file():
         raise RuntimeError(f"missing package definition: {name}")
@@ -47,7 +91,15 @@ def resolve_package(name: str, versions: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(source, dict) or not source.get("url") or not source.get("md5"):
         raise RuntimeError(f"invalid source selection: {name}")
 
-    resolved = substitute(copy.deepcopy(definition), {"version": version})
+    parameter_values = resolve_parameters(name, definition, parameter_overrides)
+    resolved_definition = copy.deepcopy(definition)
+    resolved_definition.pop("parameters", None)
+    resolved = substitute(
+        resolved_definition,
+        {"version": version, **parameter_values},
+    )
+    if parameter_values:
+        resolved["parameters"] = parameter_values
     resolved["version"] = version
     resolved["source"] = copy.deepcopy(source)
     resolved["resources"] = copy.deepcopy(selected.get("resources", {}))
@@ -57,7 +109,8 @@ def resolve_package(name: str, versions: dict[str, Any]) -> dict[str, Any]:
 
 def resolve(package_names: list[str] | None = None,
             versions_path: Path | None = None,
-            package_set_path: Path | None = None) -> dict[str, Any]:
+            package_set_path: Path | None = None,
+            parameter_overrides: dict[str, dict[str, str]] | None = None) -> dict[str, Any]:
     package_set = load_json(package_set_path or HERE / "package-set.json")
     versions_doc = load_json(versions_path or HERE / "versions" / "development.json")
     versions = versions_doc.get("packages")
@@ -89,12 +142,23 @@ def resolve(package_names: list[str] | None = None,
             details.append("unmanaged versions: " + ", ".join(extra_versions))
         raise RuntimeError("package set/version manifest mismatch (" + "; ".join(details) + ")")
 
+    parameter_overrides = parameter_overrides or {}
+    unknown_override_packages = sorted(set(parameter_overrides) - set(selected))
+    if unknown_override_packages:
+        raise RuntimeError(
+            "parameter overrides for unselected package(s): "
+            + ", ".join(unknown_override_packages)
+        )
+
     return {
         "schema_version": 1,
         "package_set": package_set["name"],
         "version_manifest": versions_doc["name"],
         "basis": versions_doc.get("basis"),
-        "packages": [resolve_package(name, versions) for name in selected],
+        "packages": [
+            resolve_package(name, versions, parameter_overrides.get(name))
+            for name in selected
+        ],
     }
 
 
