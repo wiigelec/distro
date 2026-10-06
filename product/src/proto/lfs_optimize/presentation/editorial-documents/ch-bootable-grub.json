@@ -1,0 +1,1162 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-bootable-grub",
+  "title": "Using GRUB to Set Up the Boot Process",
+  "blocks": [
+    {
+      "type": "section",
+      "title": "Introduction",
+      "blocks": [
+        {
+          "type": "admonition",
+          "kind": "warning",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Configuring GRUB incorrectly can render your system inoperable without an alternate boot device such as a CD-ROM or bootable USB drive. This section is not required to boot your LFS system. You may just want to modify your current boot loader, e.g. Grub-Legacy or GRUB2."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Ensure that an emergency boot disk is ready to"
+            },
+            {
+              "type": "quote",
+              "text": "rescue"
+            },
+            {
+              "type": "text",
+              "text": "the computer if the computer becomes unusable (un-bootable). If you do not already have a boot device, you can create one. In order for the procedure below to work, you need to jump ahead to BLFS and install xorriso from the"
+            },
+            {
+              "type": "link",
+              "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/multimedia/libisoburn.html",
+              "label": "libisoburn"
+            },
+            {
+              "type": "text",
+              "text": "package."
+            }
+          ]
+        },
+        {
+          "type": "system_operation_command",
+          "index": 0,
+          "source_index": 0
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Turn off Secure Boot",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "LFS does not have the essential packages to support Secure Boot. To set up the boot process following the instructions in this section, Secure Boot must be turned off from the configuration interface of the firmware. Read the documentation provided by the manufacturer of your system to find out how to turn off Secure Boot support."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "GRUB Naming Conventions",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "GRUB uses its own naming structure for drives and partitions in the form of"
+            },
+            {
+              "type": "emphasis",
+              "text": "(hdn,m)"
+            },
+            {
+              "type": "text",
+              "text": ", where"
+            },
+            {
+              "type": "emphasis",
+              "text": "n"
+            },
+            {
+              "type": "text",
+              "text": "is the hard drive number and"
+            },
+            {
+              "type": "emphasis",
+              "text": "m"
+            },
+            {
+              "type": "text",
+              "text": "is the partition number. The hard drive numbers start from zero, but the partition numbers start from one for normal partitions (from five for extended partitions). Note that this is different from earlier versions where both numbers started from zero. For example, partition"
+            },
+            {
+              "type": "code",
+              "text": "sda1"
+            },
+            {
+              "type": "text",
+              "text": "is"
+            },
+            {
+              "type": "emphasis",
+              "text": "(hd0,1)"
+            },
+            {
+              "type": "text",
+              "text": "to GRUB and"
+            },
+            {
+              "type": "code",
+              "text": "sdb3"
+            },
+            {
+              "type": "text",
+              "text": "is"
+            },
+            {
+              "type": "emphasis",
+              "text": "(hd1,3)"
+            },
+            {
+              "type": "text",
+              "text": ". In contrast to Linux, GRUB does not consider CD-ROM drives to be hard drives. For example, if using a CD on"
+            },
+            {
+              "type": "code",
+              "text": "hdb"
+            },
+            {
+              "type": "text",
+              "text": "and a second hard drive on"
+            },
+            {
+              "type": "code",
+              "text": "hdc"
+            },
+            {
+              "type": "text",
+              "text": ", that second hard drive would still be"
+            },
+            {
+              "type": "emphasis",
+              "text": "(hd1)"
+            },
+            {
+              "type": "text",
+              "text": "."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Setting Up the Configuration",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "If booting the system via BIOS, GRUB works by writing a stub to the first sector (named the Master Boot Record, or MBR) of the hard disk. This area is not part of any file system. The BIOS loads and executes the content of MBR, then the stub loads the main GRUB image from the BIOS Boot Partition. The GRUB image is stored as raw data instead of a file (there must be no file system on the BIOS Boot Partition), so the stub doesn't need to support any file system and it can be made small enough to fit in the MBR."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "If booting the system via UEFI, GRUB works by storing the main GRUB image as a PE-COFF executable file at a standard location in the EFI System Partition:"
+            },
+            {
+              "type": "code",
+              "text": "EFI/BOOT/BOOTX64.EFI"
+            },
+            {
+              "type": "text",
+              "text": "(or"
+            },
+            {
+              "type": "code",
+              "text": "EFI/BOOT/BOOTIA32.EFI"
+            },
+            {
+              "type": "text",
+              "text": "for"
+            },
+            {
+              "type": "code",
+              "text": "i386-efi"
+            },
+            {
+              "type": "text",
+              "text": "). The UEFI firmware loads it from the standard location and executes it, launching GRUB."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Many GRUB functions (including booting the Linux kernel) are not included in the main GRUB image. Instead, they are stored in a file system as GRUB modules. That file system is usually mounted in a way that the GRUB modules can be accessed in"
+            },
+            {
+              "type": "code",
+              "text": "/boot/grub"
+            },
+            {
+              "type": "text",
+              "text": "on most Linux distributions. To avoid the chicken-and-egg problem,"
+            },
+            {
+              "type": "code",
+              "text": "grub-install"
+            },
+            {
+              "type": "text",
+              "text": "embeds the modules necessary to access this file system into the main GRUB image, so it can find and load other modules."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The location of the boot partition is a choice of the user that affects the configuration. One recommendation is to have a separate small (suggested size is 200 MB) partition just for boot information. In doing so, not just LFS, but any Linux distribution, can access the same boot files, and in turn any booted system. If you choose to do this, you will need to mount the separate partition, move all files in the current"
+            },
+            {
+              "type": "code",
+              "text": "/boot"
+            },
+            {
+              "type": "text",
+              "text": "directory (e.g. the Linux kernel you just built in the previous section) to the new partition. You will then need to unmount the partition and remount it as"
+            },
+            {
+              "type": "code",
+              "text": "/boot"
+            },
+            {
+              "type": "text",
+              "text": ". If you do this, be sure to update"
+            },
+            {
+              "type": "code",
+              "text": "/etc/fstab"
+            },
+            {
+              "type": "text",
+              "text": "."
+            }
+          ]
+        },
+        {
+          "type": "admonition",
+          "kind": "note",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "If the host distro utilizes a separate partition for"
+                },
+                {
+                  "type": "code",
+                  "text": "/boot"
+                },
+                {
+                  "type": "text",
+                  "text": "and you want the LFS system to use that partition for"
+                },
+                {
+                  "type": "code",
+                  "text": "/boot"
+                },
+                {
+                  "type": "text",
+                  "text": "as well, just mount the partition at"
+                },
+                {
+                  "type": "code",
+                  "text": "$LFS/boot"
+                },
+                {
+                  "type": "text",
+                  "text": "in the host distro. The Linux kernel supports mounting one partition at multiple mount points."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Leaving"
+            },
+            {
+              "type": "code",
+              "text": "/boot"
+            },
+            {
+              "type": "text",
+              "text": "on the current LFS partition will also work, but configuration for multiple systems is more difficult."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "For examples and more information on boot partition layouts, looking at"
+            },
+            {
+              "type": "xref",
+              "target": "ch-partitioning-creatingpartition",
+              "label": "Creating a New Partition"
+            },
+            {
+              "type": "text",
+              "text": "may be informative."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Using the above information, determine the appropriate designator for the root partition (or boot partition, if a separate one is used). For the following example, it is assumed that the root (or separate boot) partition is"
+            },
+            {
+              "type": "code",
+              "text": "sda2"
+            },
+            {
+              "type": "text",
+              "text": "."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The following sections go over how to boot with BIOS and UEFI. The GRUB installations for BIOS, 64-bit UEFI, and 32-bit UEFI can coexist and share the same configuration. The images and data live at different locations, so you can create both the BIOS Boot Partition and the EFI System Partition, and install GRUB for all the supported firmware types (i.e. running three"
+            },
+            {
+              "type": "code",
+              "text": "grub-install"
+            },
+            {
+              "type": "text",
+              "text": "commands). If you are unsure about your firmware type, or you plan to move the hard drive to a different computer, this is something you can do as a blanket strategy."
+            }
+          ]
+        },
+        {
+          "type": "admonition",
+          "kind": "note",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "If you're doing UEFI boot but have created the Grub BIOS partition, it may be a good idea to run the command for BIOS in case UEFI booting does not work as expected."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "admonition",
+          "kind": "note",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "If you only need to install GRUB for one boot method, you don't have to run commands for both methods. You can just run the command for the boot method you need."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "Booting With BIOS",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "For booting with BIOS, make sure the boot partition is mounted (if using a separate one) and the BIOS Boot partition exists. After that, install the GRUB files into"
+                },
+                {
+                  "type": "code",
+                  "text": "/boot/grub"
+                },
+                {
+                  "type": "text",
+                  "text": "and set up the boot track:"
+                }
+              ]
+            },
+            {
+              "type": "admonition",
+              "kind": "warning",
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "The following command will overwrite the current boot loader. Do not run the command if this is not desired, for example, if using a third party boot manager to manage the MBR."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "system_operation_command",
+              "index": 1,
+              "source_index": 1
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "title": "Booting With UEFI",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "For booting with UEFI, make sure the boot partition is mounted (if using a separate one) and the EFI System Partition is mounted at"
+                },
+                {
+                  "type": "code",
+                  "text": "/boot/efi"
+                },
+                {
+                  "type": "text",
+                  "text": ". After that, install the GRUB files into"
+                },
+                {
+                  "type": "code",
+                  "text": "/boot/grub"
+                },
+                {
+                  "type": "text",
+                  "text": "and the main GRUB image at"
+                },
+                {
+                  "type": "code",
+                  "text": "/boot/efi/EFI/BOOT/BOOTX64.EFI"
+                },
+                {
+                  "type": "text",
+                  "text": ":"
+                }
+              ]
+            },
+            {
+              "type": "admonition",
+              "kind": "warning",
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "The following command will overwrite the"
+                    },
+                    {
+                      "type": "code",
+                      "text": "/boot/efi/EFI/BOOT/BOOTX64.EFI"
+                    },
+                    {
+                      "type": "text",
+                      "text": "file. If it already exists, it's likely that it's the entry of another boot loader (for example the GRUB installation from the host distro, or the Windows Boot Manager). Backup the file so it can be restored later or loaded as a secondary boot loader by the new GRUB installation from LFS."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "system_operation_command",
+              "index": 2,
+              "source_index": 2
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The command above assumes that you have 64-bit UEFI firmware. If you want to make the system bootable on 32-bit UEFI firmware, run the command with"
+                },
+                {
+                  "type": "code",
+                  "text": "x86_64-efi"
+                },
+                {
+                  "type": "text",
+                  "text": "replaced by"
+                },
+                {
+                  "type": "code",
+                  "text": "i386-efi"
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The"
+                },
+                {
+                  "type": "code",
+                  "text": "--removable"
+                },
+                {
+                  "type": "text",
+                  "text": "option makes"
+                },
+                {
+                  "type": "code",
+                  "text": "grub-install"
+                },
+                {
+                  "type": "text",
+                  "text": "use the standard location,"
+                },
+                {
+                  "type": "code",
+                  "text": "EFI/BOOT/BOOTX64.EFI"
+                },
+                {
+                  "type": "text",
+                  "text": "(or"
+                },
+                {
+                  "type": "code",
+                  "text": "EFI/BOOT/BOOTIA32.EFI"
+                },
+                {
+                  "type": "text",
+                  "text": "for"
+                },
+                {
+                  "type": "code",
+                  "text": "i386-efi"
+                },
+                {
+                  "type": "text",
+                  "text": "), instead of the location GRUB prefers ("
+                },
+                {
+                  "type": "code",
+                  "text": "EFI/GRUB/GRUBX64.EFI"
+                },
+                {
+                  "type": "text",
+                  "text": "or"
+                },
+                {
+                  "type": "code",
+                  "text": "EFI/GRUB/GRUBIA32.EFI"
+                },
+                {
+                  "type": "text",
+                  "text": "). Using a non-standard location would result in the location in a EFI variable be recorded, but LFS lacks the BLFS package"
+                },
+                {
+                  "type": "link",
+                  "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/postlfs/efibootmgr.html",
+                  "label": "efibootmgr"
+                },
+                {
+                  "type": "text",
+                  "text": ", which is needed by GRUB to record the location into the EFI variable."
+                }
+              ]
+            },
+            {
+              "type": "admonition",
+              "kind": "note",
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Some UEFI firmware implementations, while rare, skip the standard EFI path. Such systems most of the time are old, like Lenovo ThinkPads or HP desktops/laptops. When the boot entry is missing in the firmware setup, you will need to install the BLFS package"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/postlfs/efibootmgr.html",
+                      "label": "efibootmgr"
+                    },
+                    {
+                      "type": "text",
+                      "text": "to create a boot entry for UEFI. If it's easier, the package can be installed via the distribution's package manager, if applicable, and used on the host instead of on the LFS system. This can prevent the need for downloading more tarballs onto the LFS system for now."
+                    }
+                  ]
+                },
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "First install the package, then mount the EFI variable file system if it isn't already mounted:"
+                    }
+                  ]
+                },
+                {
+                  "type": "system_operation_command",
+                  "index": 3,
+                  "source_index": 3
+                },
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Now create a boot entry for the EFI:"
+                    }
+                  ]
+                },
+                {
+                  "type": "system_operation_command",
+                  "index": 4,
+                  "source_index": 4
+                },
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "The"
+                    },
+                    {
+                      "type": "code",
+                      "text": "/dev/sd<x>"
+                    },
+                    {
+                      "type": "text",
+                      "text": "drive should be the device node for the disk where the ESP exists. The"
+                    },
+                    {
+                      "type": "replaceable",
+                      "text": "<y>"
+                    },
+                    {
+                      "type": "text",
+                      "text": "partition number should match the number of the ESP. If the ESP is on"
+                    },
+                    {
+                      "type": "code",
+                      "text": "/dev/sda2"
+                    },
+                    {
+                      "type": "text",
+                      "text": ", then the partition number would be"
+                    },
+                    {
+                      "type": "code",
+                      "text": "2"
+                    },
+                    {
+                      "type": "text",
+                      "text": ". If you are using 32-bit UEFI, replace"
+                    },
+                    {
+                      "type": "replaceable",
+                      "text": "<X64>"
+                    },
+                    {
+                      "type": "text",
+                      "text": "with"
+                    },
+                    {
+                      "type": "code",
+                      "text": "IA32"
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                },
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Some (broken) firmware may require additional parameters for"
+                    },
+                    {
+                      "type": "code",
+                      "text": "efibootmgr"
+                    },
+                    {
+                      "type": "text",
+                      "text": ", like"
+                    },
+                    {
+                      "type": "code",
+                      "text": "--full-dev-path"
+                    },
+                    {
+                      "type": "text",
+                      "text": "or"
+                    },
+                    {
+                      "type": "code",
+                      "text": "-e 1 -E"
+                    },
+                    {
+                      "type": "text",
+                      "text": ". Read the man page"
+                    },
+                    {
+                      "type": "link",
+                      "href": "https://man.archlinux.org/man/efibootmgr.8",
+                      "label": "efibootmgr(8)"
+                    },
+                    {
+                      "type": "text",
+                      "text": "for details."
+                    }
+                  ]
+                },
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Now unmount the EFI variable file system:"
+                    }
+                  ]
+                },
+                {
+                  "type": "system_operation_command",
+                  "index": 5,
+                  "source_index": 5
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Creating the GRUB Configuration File",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Generate"
+            },
+            {
+              "type": "code",
+              "text": "/boot/grub/grub.cfg"
+            },
+            {
+              "type": "text",
+              "text": ":"
+            }
+          ]
+        },
+        {
+          "type": "system_operation_command",
+          "index": 6,
+          "source_index": 6
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The"
+            },
+            {
+              "type": "code",
+              "text": "insmod"
+            },
+            {
+              "type": "text",
+              "text": "commands load the"
+            },
+            {
+              "type": "code",
+              "text": "GRUB"
+            },
+            {
+              "type": "text",
+              "text": "modules named"
+            },
+            {
+              "type": "code",
+              "text": "part_gpt"
+            },
+            {
+              "type": "text",
+              "text": "and"
+            },
+            {
+              "type": "code",
+              "text": "ext2"
+            },
+            {
+              "type": "text",
+              "text": ". Despite the naming,"
+            },
+            {
+              "type": "code",
+              "text": "ext2"
+            },
+            {
+              "type": "text",
+              "text": "actually supports"
+            },
+            {
+              "type": "code",
+              "text": "ext2"
+            },
+            {
+              "type": "text",
+              "text": ","
+            },
+            {
+              "type": "code",
+              "text": "ext3"
+            },
+            {
+              "type": "text",
+              "text": ", and"
+            },
+            {
+              "type": "code",
+              "text": "ext4"
+            },
+            {
+              "type": "text",
+              "text": "filesystems. In a typical configuration, the"
+            },
+            {
+              "type": "code",
+              "text": "part_gpt"
+            },
+            {
+              "type": "text",
+              "text": "and"
+            },
+            {
+              "type": "code",
+              "text": "ext2"
+            },
+            {
+              "type": "text",
+              "text": "modules are already embedded in the main GRUB image by"
+            },
+            {
+              "type": "code",
+              "text": "grub-install"
+            },
+            {
+              "type": "text",
+              "text": ", and the"
+            },
+            {
+              "type": "code",
+              "text": "insmod"
+            },
+            {
+              "type": "text",
+              "text": "commands for them will do nothing. However, they do no harm anyway, and they may be needed with some rare configurations."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The"
+            },
+            {
+              "type": "code",
+              "text": "set gfxpayload=1024x768x32"
+            },
+            {
+              "type": "text",
+              "text": "command sets the resolution and color depth of the VESA framebuffer to be passed to the kernel. It's necessary for the kernel SimpleDRM driver to use the VESA framebuffer. You can use a different resolution or color depth value which better suits for your monitor. This line does nothing when the system is booted via UEFI, but it does no harm anyway."
+            }
+          ]
+        },
+        {
+          "type": "admonition",
+          "kind": "note",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "From"
+                },
+                {
+                  "type": "code",
+                  "text": "GRUB"
+                },
+                {
+                  "type": "text",
+                  "text": "'s perspective, the kernel files are relative to the partition used. If you used a separate /boot partition, remove /boot from the above"
+                },
+                {
+                  "type": "emphasis",
+                  "text": "linux"
+                },
+                {
+                  "type": "text",
+                  "text": "line. You will also need to change the"
+                },
+                {
+                  "type": "emphasis",
+                  "text": "set root"
+                },
+                {
+                  "type": "text",
+                  "text": "line to point to the boot partition."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "admonition",
+          "kind": "note",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The GRUB designator for a partition may change if you added or removed some disks (including removable disks like USB thumb devices). The change may cause boot failure because"
+                },
+                {
+                  "type": "code",
+                  "text": "grub.cfg"
+                },
+                {
+                  "type": "text",
+                  "text": "refers to some"
+                },
+                {
+                  "type": "quote",
+                  "text": "old"
+                },
+                {
+                  "type": "text",
+                  "text": "designators. If you wish to avoid such a problem, you may use the UUID of a partition and the UUID of a filesystem instead of a GRUB designator to specify a device. Run"
+                },
+                {
+                  "type": "code",
+                  "text": "lsblk -o UUID,PARTUUID,PATH,MOUNTPOINT"
+                },
+                {
+                  "type": "text",
+                  "text": "to show the UUIDs of your filesystems (in the"
+                },
+                {
+                  "type": "code",
+                  "text": "UUID"
+                },
+                {
+                  "type": "text",
+                  "text": "column) and partitions (in the"
+                },
+                {
+                  "type": "code",
+                  "text": "PARTUUID"
+                },
+                {
+                  "type": "text",
+                  "text": "column). Then replace"
+                },
+                {
+                  "type": "code",
+                  "text": "set root=(hdx,y)"
+                },
+                {
+                  "type": "text",
+                  "text": "with"
+                },
+                {
+                  "type": "code",
+                  "text": "search --set=root --fs-uuid <UUID of the filesystem where the kernel is installed>"
+                },
+                {
+                  "type": "text",
+                  "text": ", and replace"
+                },
+                {
+                  "type": "code",
+                  "text": "root=/dev/sda2"
+                },
+                {
+                  "type": "text",
+                  "text": "with"
+                },
+                {
+                  "type": "code",
+                  "text": "root=PARTUUID=<UUID of the partition where LFS is built>"
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Note that the UUID of a partition is completely different from the UUID of the filesystem in this partition. Some online resources may instruct you to use"
+                },
+                {
+                  "type": "code",
+                  "text": "root=UUID=<filesystem UUID>"
+                },
+                {
+                  "type": "text",
+                  "text": "instead of"
+                },
+                {
+                  "type": "code",
+                  "text": "root=PARTUUID=<partition UUID>"
+                },
+                {
+                  "type": "text",
+                  "text": ", but doing so will require an initramfs, which is beyond the scope of LFS."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The name of the device node for a partition in"
+                },
+                {
+                  "type": "code",
+                  "text": "/dev"
+                },
+                {
+                  "type": "text",
+                  "text": "may also change (very frequently on some systems with multiple NVME disks). You can also replace paths to device nodes like"
+                },
+                {
+                  "type": "code",
+                  "text": "/dev/sda1"
+                },
+                {
+                  "type": "text",
+                  "text": "with"
+                },
+                {
+                  "type": "code",
+                  "text": "PARTUUID=<partition UUID>"
+                },
+                {
+                  "type": "text",
+                  "text": ", in"
+                },
+                {
+                  "type": "code",
+                  "text": "/etc/fstab"
+                },
+                {
+                  "type": "text",
+                  "text": ", to avoid a potential boot failure in case the device node name has changed."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "GRUB is an extremely powerful program and it provides a tremendous number of options for booting from a wide variety of devices, operating systems, and partition types. There are also many options for customization such as graphical splash screens, playing sounds, mouse input, etc. The details of these options are beyond the scope of this introduction."
+            }
+          ]
+        },
+        {
+          "type": "admonition",
+          "kind": "caution",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "There is a command,"
+                },
+                {
+                  "type": "code",
+                  "text": "grub-mkconfig"
+                },
+                {
+                  "type": "text",
+                  "text": ", that can write a configuration file automatically. It uses a set of scripts in /etc/grub.d/ and will destroy any customizations that you make. These scripts are designed primarily for non-source distributions and are not recommended for LFS. If you install a commercial Linux distribution, there is a good chance that this program will be run. Be sure to back up your grub.cfg file."
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "id": "grub-cfg"
+    }
+  ]
+}

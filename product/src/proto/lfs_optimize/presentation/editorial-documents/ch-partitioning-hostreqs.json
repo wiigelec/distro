@@ -527,7 +527,8 @@
         },
         {
           "type": "heading",
-          "text": ""
+          "text": "",
+          "id": "version-check"
         },
         {
           "type": "paragraph",

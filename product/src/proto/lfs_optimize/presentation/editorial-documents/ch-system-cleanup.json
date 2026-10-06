@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-system-cleanup",
+  "title": "Cleaning Up",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Finally, clean up some extra files left over from running tests:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 0,
+      "source_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "There are also several files in the /usr/lib and /usr/libexec directories with a file name extension of .la. These are \"libtool archive\" files. On a modern Linux system the libtool .la files are only useful for libltdl. No libraries in LFS are expected to be loaded by libltdl, and it's known that some .la files can break BLFS package builds. Remove those files now:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 1,
+      "source_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "For more information about libtool archive files, see the"
+        },
+        {
+          "type": "link",
+          "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/introduction/la-files.html",
+          "label": "BLFS section \"About Libtool Archive (.la) files\""
+        },
+        {
+          "type": "text",
+          "text": "."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The compiler built in"
+        },
+        {
+          "type": "xref",
+          "target": "chapter-temporary-tools",
+          "label": "Chapter 6"
+        },
+        {
+          "type": "text",
+          "text": "and"
+        },
+        {
+          "type": "xref",
+          "target": "chapter-chroot-temporary-tools",
+          "label": "Chapter 7"
+        },
+        {
+          "type": "text",
+          "text": "is still partially installed and not needed anymore. Remove it with:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 2,
+      "source_index": 2
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Finally, remove the temporary 'tester' user account created at the beginning of the previous chapter."
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 3,
+      "source_index": 3
+    }
+  ]
+}

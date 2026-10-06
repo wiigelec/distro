@@ -1,0 +1,980 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-preps-settingenviron",
+  "title": "Setting Up the Environment",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Set up a good working environment by creating two new startup files for the"
+        },
+        {
+          "type": "code",
+          "text": "bash"
+        },
+        {
+          "type": "text",
+          "text": "shell. While logged in as user"
+        },
+        {
+          "type": "code",
+          "text": "lfs"
+        },
+        {
+          "type": "text",
+          "text": ", issue the following command to create a new"
+        },
+        {
+          "type": "code",
+          "text": ".bash_profile"
+        },
+        {
+          "type": "text",
+          "text": ":"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 0,
+      "source_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "When logged on as user"
+        },
+        {
+          "type": "code",
+          "text": "lfs"
+        },
+        {
+          "type": "text",
+          "text": ", or when switched to the"
+        },
+        {
+          "type": "code",
+          "text": "lfs"
+        },
+        {
+          "type": "text",
+          "text": "user using an"
+        },
+        {
+          "type": "code",
+          "text": "su"
+        },
+        {
+          "type": "text",
+          "text": "command with the"
+        },
+        {
+          "type": "quote",
+          "text": "-"
+        },
+        {
+          "type": "text",
+          "text": "option, the initial shell is a"
+        },
+        {
+          "type": "emphasis",
+          "text": "login"
+        },
+        {
+          "type": "text",
+          "text": "shell which reads the"
+        },
+        {
+          "type": "code",
+          "text": "/etc/profile"
+        },
+        {
+          "type": "text",
+          "text": "of the host (probably containing some settings and environment variables) and then"
+        },
+        {
+          "type": "code",
+          "text": ".bash_profile"
+        },
+        {
+          "type": "text",
+          "text": ". The"
+        },
+        {
+          "type": "code",
+          "text": "exec env -i.../bin/bash"
+        },
+        {
+          "type": "text",
+          "text": "command in the"
+        },
+        {
+          "type": "code",
+          "text": ".bash_profile"
+        },
+        {
+          "type": "text",
+          "text": "file replaces the running shell with a new one with a completely empty environment, except for the"
+        },
+        {
+          "type": "code",
+          "text": "HOME"
+        },
+        {
+          "type": "text",
+          "text": ","
+        },
+        {
+          "type": "code",
+          "text": "TERM"
+        },
+        {
+          "type": "text",
+          "text": ", and"
+        },
+        {
+          "type": "code",
+          "text": "PS1"
+        },
+        {
+          "type": "text",
+          "text": "variables. This ensures that no unwanted and potentially hazardous environment variables from the host system leak into the build environment."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The new instance of the shell is a"
+        },
+        {
+          "type": "emphasis",
+          "text": "non-login"
+        },
+        {
+          "type": "text",
+          "text": "shell, which does not read, and execute, the contents of the"
+        },
+        {
+          "type": "code",
+          "text": "/etc/profile"
+        },
+        {
+          "type": "text",
+          "text": "or"
+        },
+        {
+          "type": "code",
+          "text": ".bash_profile"
+        },
+        {
+          "type": "text",
+          "text": "files, but rather reads, and executes, the"
+        },
+        {
+          "type": "code",
+          "text": ".bashrc"
+        },
+        {
+          "type": "text",
+          "text": "file instead. Create the"
+        },
+        {
+          "type": "code",
+          "text": ".bashrc"
+        },
+        {
+          "type": "text",
+          "text": "file now:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 1,
+      "source_index": 1
+    },
+    {
+      "type": "definition_list",
+      "entries": [
+        {
+          "term": [
+            {
+              "type": "code",
+              "text": "set +h"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The"
+                },
+                {
+                  "type": "code",
+                  "text": "set +h"
+                },
+                {
+                  "type": "text",
+                  "text": "command turns off"
+                },
+                {
+                  "type": "code",
+                  "text": "bash"
+                },
+                {
+                  "type": "text",
+                  "text": "'s hash function. Hashing is ordinarily a useful feature—"
+                },
+                {
+                  "type": "code",
+                  "text": "bash"
+                },
+                {
+                  "type": "text",
+                  "text": "uses a hash table to remember the full path to executable files to avoid searching the"
+                },
+                {
+                  "type": "code",
+                  "text": "PATH"
+                },
+                {
+                  "type": "text",
+                  "text": "time and again to find the same executable. However, the new tools should be used as soon as they are installed. Switching off the hash function forces the shell to search the"
+                },
+                {
+                  "type": "code",
+                  "text": "PATH"
+                },
+                {
+                  "type": "text",
+                  "text": "whenever a program is to be run. As such, the shell will find the newly compiled tools in"
+                },
+                {
+                  "type": "code",
+                  "text": "$LFS/tools/bin"
+                },
+                {
+                  "type": "text",
+                  "text": "as soon as they are available without remembering a previous version of the same program provided by the host distro, in"
+                },
+                {
+                  "type": "code",
+                  "text": "/usr/bin"
+                },
+                {
+                  "type": "text",
+                  "text": "or"
+                },
+                {
+                  "type": "code",
+                  "text": "/bin"
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "code",
+              "text": "umask 022"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Setting the umask as we've already explained in"
+                },
+                {
+                  "type": "xref",
+                  "target": "ch-partitioning-aboutlfs",
+                  "label": "Setting the $LFS Variable and the Umask"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "code",
+              "text": "LFS=/mnt/lfs"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The"
+                },
+                {
+                  "type": "code",
+                  "text": "LFS"
+                },
+                {
+                  "type": "text",
+                  "text": "variable should be set to the chosen mount point."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "code",
+              "text": "LC_ALL=POSIX"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The"
+                },
+                {
+                  "type": "code",
+                  "text": "LC_ALL"
+                },
+                {
+                  "type": "text",
+                  "text": "variable controls the localization of certain programs, making their messages follow the conventions of a specified country. Setting"
+                },
+                {
+                  "type": "code",
+                  "text": "LC_ALL"
+                },
+                {
+                  "type": "text",
+                  "text": "to"
+                },
+                {
+                  "type": "quote",
+                  "text": "POSIX"
+                },
+                {
+                  "type": "text",
+                  "text": "or"
+                },
+                {
+                  "type": "quote",
+                  "text": "C"
+                },
+                {
+                  "type": "text",
+                  "text": "(the two are equivalent) ensures that everything will work as expected in the cross-compilation environment."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "code",
+              "text": "LFS_TGT=$(uname -m)-lfs-linux-gnu"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The"
+                },
+                {
+                  "type": "code",
+                  "text": "LFS_TGT"
+                },
+                {
+                  "type": "text",
+                  "text": "variable sets a non-default, but compatible machine description for use when building our cross-compiler and linker and when cross-compiling our temporary toolchain. More information is provided by"
+                },
+                {
+                  "type": "xref",
+                  "target": "ch-tools-toolchaintechnotes",
+                  "label": "Toolchain Technical Notes"
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "code",
+              "text": "PATH=/usr/bin"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Many modern Linux distributions have merged"
+                },
+                {
+                  "type": "code",
+                  "text": "/bin"
+                },
+                {
+                  "type": "text",
+                  "text": "and"
+                },
+                {
+                  "type": "code",
+                  "text": "/usr/bin"
+                },
+                {
+                  "type": "text",
+                  "text": ". When this is the case, the standard"
+                },
+                {
+                  "type": "code",
+                  "text": "PATH"
+                },
+                {
+                  "type": "text",
+                  "text": "variable should be set to"
+                },
+                {
+                  "type": "code",
+                  "text": "/usr/bin/"
+                },
+                {
+                  "type": "text",
+                  "text": "for the"
+                },
+                {
+                  "type": "xref",
+                  "target": "chapter-temporary-tools",
+                  "label": "Chapter 6"
+                },
+                {
+                  "type": "text",
+                  "text": "environment. When this is not the case, the following line adds"
+                },
+                {
+                  "type": "code",
+                  "text": "/bin"
+                },
+                {
+                  "type": "text",
+                  "text": "to the path."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "code",
+              "text": "if [ ! -L /bin ]; then PATH=/bin:$PATH; fi"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "If"
+                },
+                {
+                  "type": "code",
+                  "text": "/bin"
+                },
+                {
+                  "type": "text",
+                  "text": "is not a symbolic link, it must be added to the"
+                },
+                {
+                  "type": "code",
+                  "text": "PATH"
+                },
+                {
+                  "type": "text",
+                  "text": "variable."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "code",
+              "text": "PATH=$LFS/tools/bin:$PATH"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "By putting"
+                },
+                {
+                  "type": "code",
+                  "text": "$LFS/tools/bin"
+                },
+                {
+                  "type": "text",
+                  "text": "ahead of the standard"
+                },
+                {
+                  "type": "code",
+                  "text": "PATH"
+                },
+                {
+                  "type": "text",
+                  "text": ", the cross-compiler installed at the beginning of"
+                },
+                {
+                  "type": "xref",
+                  "target": "chapter-cross-tools",
+                  "label": "Chapter 5"
+                },
+                {
+                  "type": "text",
+                  "text": "is picked up by the shell immediately after its installation. This, combined with turning off hashing, limits the risk that the compiler from the host is used instead of the cross-compiler."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "code",
+              "text": "CONFIG_SITE=$LFS/usr/share/config.site"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "In"
+                },
+                {
+                  "type": "xref",
+                  "target": "chapter-cross-tools",
+                  "label": "Chapter 5"
+                },
+                {
+                  "type": "text",
+                  "text": "and"
+                },
+                {
+                  "type": "xref",
+                  "target": "chapter-temporary-tools",
+                  "label": "Chapter 6"
+                },
+                {
+                  "type": "text",
+                  "text": ", if this variable is not set,"
+                },
+                {
+                  "type": "code",
+                  "text": "configure"
+                },
+                {
+                  "type": "text",
+                  "text": "scripts may attempt to load configuration items specific to some distributions from"
+                },
+                {
+                  "type": "code",
+                  "text": "/usr/share/config.site"
+                },
+                {
+                  "type": "text",
+                  "text": "on the host system. Override it to prevent potential contamination from the host."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "code",
+              "text": "export ..."
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "While the preceding commands have set some variables, in order to make them visible within any sub-shells, we export them."
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "title": "The meaning of the settings in .bashrc"
+    },
+    {
+      "type": "admonition",
+      "kind": "important",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Several commercial distributions add an undocumented instantiation of"
+            },
+            {
+              "type": "code",
+              "text": "/etc/bash.bashrc"
+            },
+            {
+              "type": "text",
+              "text": "to the initialization of"
+            },
+            {
+              "type": "code",
+              "text": "bash"
+            },
+            {
+              "type": "text",
+              "text": ". This file has the potential to modify the"
+            },
+            {
+              "type": "code",
+              "text": "lfs"
+            },
+            {
+              "type": "text",
+              "text": "user's environment in ways that can affect the building of critical LFS packages. To make sure the"
+            },
+            {
+              "type": "code",
+              "text": "lfs"
+            },
+            {
+              "type": "text",
+              "text": "user's environment is clean, check for the presence of"
+            },
+            {
+              "type": "code",
+              "text": "/etc/bash.bashrc"
+            },
+            {
+              "type": "text",
+              "text": "and, if present, move it out of the way. As the"
+            },
+            {
+              "type": "code",
+              "text": "root"
+            },
+            {
+              "type": "text",
+              "text": "user, run:"
+            }
+          ]
+        },
+        {
+          "type": "system_operation_command",
+          "index": 2,
+          "source_index": 2
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "When the"
+            },
+            {
+              "type": "code",
+              "text": "lfs"
+            },
+            {
+              "type": "text",
+              "text": "user is no longer needed (at the beginning of"
+            },
+            {
+              "type": "xref",
+              "target": "chapter-chroot-temporary-tools",
+              "label": "Chapter 7"
+            },
+            {
+              "type": "text",
+              "text": "), you may safely restore"
+            },
+            {
+              "type": "code",
+              "text": "/etc/bash.bashrc"
+            },
+            {
+              "type": "text",
+              "text": "(if desired)."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Note that the LFS Bash package we will build in"
+            },
+            {
+              "type": "xref",
+              "target": "ch-system-bash",
+              "label": "Bash-5.3"
+            },
+            {
+              "type": "text",
+              "text": "is not configured to load or execute"
+            },
+            {
+              "type": "code",
+              "text": "/etc/bash.bashrc"
+            },
+            {
+              "type": "text",
+              "text": ", so this file is useless on a completed LFS system."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "For many modern systems with multiple processors (or cores) the compilation time for a package can be reduced by performing a \"parallel make\" by telling the make program how many processors are available via a command line option or an environment variable. For instance, an Intel Core i9-13900K processor has 8 P (performance) cores and 16 E (efficiency) cores, and a P core can simultaneously run two threads so each P core are modeled as two logical cores by the Linux kernel. As the result there are 32 logical cores in total. One obvious way to use all these logical cores is allowing"
+        },
+        {
+          "type": "code",
+          "text": "make"
+        },
+        {
+          "type": "text",
+          "text": "to spawn up to 32 build jobs. This can be done by passing the"
+        },
+        {
+          "type": "code",
+          "text": "-j32"
+        },
+        {
+          "type": "text",
+          "text": "option to"
+        },
+        {
+          "type": "code",
+          "text": "make"
+        },
+        {
+          "type": "text",
+          "text": ":"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 3,
+      "source_index": 3
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Or set the"
+        },
+        {
+          "type": "code",
+          "text": "MAKEFLAGS"
+        },
+        {
+          "type": "text",
+          "text": "environment variable and its content will be automatically used by"
+        },
+        {
+          "type": "code",
+          "text": "make"
+        },
+        {
+          "type": "text",
+          "text": "as command line options:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 4,
+      "source_index": 4
+    },
+    {
+      "type": "admonition",
+      "kind": "important",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Never pass a"
+            },
+            {
+              "type": "code",
+              "text": "-j"
+            },
+            {
+              "type": "text",
+              "text": "option without a number to"
+            },
+            {
+              "type": "code",
+              "text": "make"
+            },
+            {
+              "type": "text",
+              "text": "or set such an option in"
+            },
+            {
+              "type": "code",
+              "text": "MAKEFLAGS"
+            },
+            {
+              "type": "text",
+              "text": ". Doing so will allow"
+            },
+            {
+              "type": "code",
+              "text": "make"
+            },
+            {
+              "type": "text",
+              "text": "to spawn infinite build jobs and cause system stability problems."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "To use all logical cores available for building packages in"
+        },
+        {
+          "type": "xref",
+          "target": "chapter-cross-tools",
+          "label": "Chapter 5"
+        },
+        {
+          "type": "text",
+          "text": "and"
+        },
+        {
+          "type": "xref",
+          "target": "chapter-temporary-tools",
+          "label": "Chapter 6"
+        },
+        {
+          "type": "text",
+          "text": ", set"
+        },
+        {
+          "type": "code",
+          "text": "MAKEFLAGS"
+        },
+        {
+          "type": "text",
+          "text": "now in"
+        },
+        {
+          "type": "code",
+          "text": ".bashrc"
+        },
+        {
+          "type": "text",
+          "text": ":"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 5,
+      "source_index": 5
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Replace"
+        },
+        {
+          "type": "replaceable",
+          "text": "$(nproc)"
+        },
+        {
+          "type": "text",
+          "text": "with the number of logical cores you want to use if you don't want to use all the logical cores."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Finally, to ensure the environment is fully prepared for building the temporary tools, force the"
+        },
+        {
+          "type": "code",
+          "text": "bash"
+        },
+        {
+          "type": "text",
+          "text": "shell to read the new user profile:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 6,
+      "source_index": 6
+    }
+  ]
+}

@@ -1,0 +1,591 @@
+{
+  "schema_version": 1,
+  "basis": {
+    "project": "Linux From Scratch",
+    "version": "13.1-systemd",
+    "published": "2026-09-01"
+  },
+  "operations": {
+    "pre-typography": {
+      "context": "documentation",
+      "commands": [
+        {
+          "command": "./configure --prefix=/usr",
+          "kind": "illustrative"
+        },
+        {
+          "command": "CC=\"gcc -B/usr/bin/\" ../binutils-2.18/configure \\\n  --prefix=/tools --disable-nls --disable-werror",
+          "kind": "illustrative"
+        },
+        {
+          "command": "cat > $LFS/etc/group << \"EOF\"\nroot:x:0:\nbin:x:1:\n......\nEOF",
+          "kind": "illustrative"
+        }
+      ]
+    },
+    "ch-partitioning-creatingfilesystem": {
+      "context": "host-root",
+      "commands": [
+        {
+          "command": "mkfs -v -t ext4 /dev/<xxx>",
+          "kind": "template"
+        },
+        {
+          "command": "mkswap /dev/<yyy>",
+          "kind": "template"
+        },
+        {
+          "command": "mkfs.fat -F 32 /dev/<yyy>",
+          "kind": "template"
+        },
+        {
+          "command": "mkfs.vfat /dev/<zzz>",
+          "kind": "template"
+        }
+      ]
+    },
+    "ch-partitioning-aboutlfs": {
+      "context": "host-root",
+      "commands": [
+        {
+          "command": "export LFS=/mnt/lfs",
+          "kind": "procedure"
+        },
+        {
+          "command": "umask 022",
+          "kind": "procedure"
+        },
+        {
+          "command": "echo $LFS",
+          "kind": "check"
+        },
+        {
+          "command": "umask",
+          "kind": "check"
+        }
+      ]
+    },
+    "ch-partitioning-mounting": {
+      "context": "host-root",
+      "commands": [
+        {
+          "command": "mkdir -pv $LFS\nmount -v -t ext4 /dev/<xxx> $LFS",
+          "kind": "template"
+        },
+        {
+          "command": "mkdir -pv $LFS\nmount -v -t ext4 /dev/<xxx> $LFS\nmkdir -v $LFS/home\nmount -v -t ext4 /dev/<yyy> $LFS/home",
+          "kind": "template"
+        },
+        {
+          "command": "chown root:root $LFS\nchmod 755 $LFS",
+          "kind": "procedure"
+        },
+        {
+          "command": "/sbin/swapon -v /dev/<zzz>",
+          "kind": "template"
+        }
+      ]
+    },
+    "ch-materials-introduction": {
+      "context": "host-root",
+      "commands": [
+        {
+          "command": "mkdir -v $LFS/sources",
+          "kind": "procedure"
+        },
+        {
+          "command": "chmod -v a+wt $LFS/sources",
+          "kind": "procedure"
+        },
+        {
+          "command": "wget --input-file=wget-list-systemd --continue --directory-prefix=$LFS/sources",
+          "kind": "procedure"
+        },
+        {
+          "command": "pushd $LFS/sources\n  md5sum -c md5sums\npopd",
+          "kind": "procedure"
+        },
+        {
+          "command": "chown root:root $LFS/sources/*",
+          "kind": "procedure"
+        }
+      ]
+    },
+    "ch-tools-creatingminlayout": {
+      "context": "host-root",
+      "commands": [
+        {
+          "command": "mkdir -pv $LFS/{etc,var} $LFS/usr/{bin,lib,sbin}\n\nfor i in bin lib sbin; do\n  ln -sv usr/$i $LFS/$i\ndone\n\ncase $(uname -m) in\n  x86_64) mkdir -pv $LFS/lib64 ;;\nesac",
+          "kind": "procedure"
+        },
+        {
+          "command": "mkdir -pv $LFS/tools",
+          "kind": "procedure"
+        }
+      ]
+    },
+    "ch-preps-addinguser": {
+      "context": "host-root",
+      "commands": [
+        {
+          "command": "groupadd lfs\nuseradd -s /bin/bash -g lfs -m -k /dev/null lfs",
+          "kind": "procedure"
+        },
+        {
+          "command": "passwd lfs",
+          "kind": "interactive"
+        },
+        {
+          "command": "chown -v lfs $LFS/{usr{,/*},var,etc,tools}\ncase $(uname -m) in\n  x86_64) chown -v lfs $LFS/lib64 ;;\nesac",
+          "kind": "procedure"
+        },
+        {
+          "command": "su - lfs",
+          "kind": "session-transition"
+        }
+      ]
+    },
+    "ch-preps-settingenviron": {
+      "context": "host-lfs",
+      "commands": [
+        {
+          "command": "cat > ~/.bash_profile << \"EOF\"\nexec env -i HOME=$HOME TERM=$TERM PS1='\\u:\\w\\$ ' /bin/bash\nEOF",
+          "kind": "template"
+        },
+        {
+          "command": "cat > ~/.bashrc << \"EOF\"\nset +h\numask 022\nLFS=/mnt/lfs\nLC_ALL=POSIX\nLFS_TGT=$(uname -m)-lfs-linux-gnu\nPATH=/usr/bin\nif [ ! -L /bin ]; then PATH=/bin:$PATH; fi\nPATH=$LFS/tools/bin:$PATH\nCONFIG_SITE=$LFS/usr/share/config.site\nexport LFS LC_ALL LFS_TGT PATH CONFIG_SITE\nEOF",
+          "kind": "template"
+        },
+        {
+          "command": "[ ! -e /etc/bash.bashrc ] || mv -v /etc/bash.bashrc /etc/bash.bashrc.NOUSE",
+          "kind": "procedure"
+        },
+        {
+          "command": "make -j32",
+          "kind": "illustrative"
+        },
+        {
+          "command": "export MAKEFLAGS=-j32",
+          "kind": "illustrative"
+        },
+        {
+          "command": "cat >> ~/.bashrc << \"EOF\"\nexport MAKEFLAGS=-j$(nproc)\nEOF",
+          "kind": "illustrative"
+        },
+        {
+          "command": "source ~/.bash_profile",
+          "kind": "procedure"
+        }
+      ]
+    },
+    "ch-tools-generalinstructions": {
+      "context": "host-lfs",
+      "commands": [
+        {
+          "command": "echo $LFS",
+          "kind": "check"
+        }
+      ]
+    },
+    "ch-tools-changingowner": {
+      "context": "host-root",
+      "commands": [
+        {
+          "command": "chown --from lfs -R root:root $LFS/{usr,var,etc,tools}\ncase $(uname -m) in\n  x86_64) chown --from lfs -R root:root $LFS/lib64 ;;\nesac",
+          "kind": "procedure"
+        }
+      ]
+    },
+    "ch-tools-kernfs": {
+      "context": "host-root",
+      "commands": [
+        {
+          "command": "mkdir -pv $LFS/{dev,proc,sys,run}",
+          "kind": "procedure"
+        },
+        {
+          "command": "mount -v --bind /dev $LFS/dev",
+          "kind": "procedure"
+        },
+        {
+          "command": "mount -vt devpts devpts -o gid=5,mode=0620 $LFS/dev/pts\nmount -vt proc proc $LFS/proc\nmount -vt sysfs sysfs $LFS/sys\nmount -vt tmpfs tmpfs $LFS/run",
+          "kind": "procedure"
+        },
+        {
+          "command": "if [ -h $LFS/dev/shm ]; then\n  install -v -d -m 1777 $LFS$(realpath /dev/shm)\nelse\n  mount -vt tmpfs -o nosuid,nodev tmpfs $LFS/dev/shm\nfi",
+          "kind": "procedure"
+        }
+      ]
+    },
+    "ch-tools-chroot": {
+      "context": "host-root",
+      "commands": [
+        {
+          "command": "chroot \"$LFS\" /usr/bin/env -i   \\\n    HOME=/root                  \\\n    TERM=\"$TERM\"                \\\n    PS1='(lfs chroot) \\u:\\w\\$ ' \\\n    PATH=/usr/bin:/usr/sbin     \\\n    MAKEFLAGS=\"-j$(nproc)\"      \\\n    TESTSUITEFLAGS=\"-j$(nproc)\" \\\n    /bin/bash --login",
+          "kind": "session-transition"
+        }
+      ]
+    },
+    "ch-tools-createfiles": {
+      "context": "chroot-root",
+      "commands": [
+        {
+          "command": "exec /usr/bin/bash --login",
+          "kind": "session-transition"
+        }
+      ]
+    },
+    "ch-tools-cleanup": {
+      "context": "mixed-root",
+      "commands": [
+        {
+          "command": "exit",
+          "kind": "session-transition"
+        },
+        {
+          "command": "mountpoint -q $LFS/dev/shm && umount $LFS/dev/shm\numount $LFS/dev/pts\numount $LFS/{sys,proc,run,dev}",
+          "kind": "procedure"
+        },
+        {
+          "command": "cd $LFS\ntar -cJpf $HOME/lfs-temp-tools-13.1-systemd.tar.xz .",
+          "kind": "procedure"
+        }
+      ]
+    },
+    "ch-system-stripping": {
+      "context": "chroot-root",
+      "commands": [
+        {
+          "command": "save_usrlib=\"$(cd /usr/lib; ls ld-linux*[^g])\n             libc.so.6\n             libthread_db.so.1\n             libquadmath.so.0.0.0\n             libstdc++.so.6.0.36\n             libitm.so.1.0.0\n             libatomic.so.1.2.0\"\n\ncd /usr/lib\n\nfor LIB in $save_usrlib; do\n    objcopy --only-keep-debug --compress-debug-sections=zstd $LIB $LIB.dbg\n    cp $LIB /tmp/$LIB\n    strip --strip-unneeded /tmp/$LIB\n    objcopy --add-gnu-debuglink=$LIB.dbg /tmp/$LIB\n    install -vm755 /tmp/$LIB /usr/lib\n    rm /tmp/$LIB\ndone\n\nonline_usrbin=\"bash find strip\"\nonline_usrlib=\"libbfd-2.47.20260726.so\n               libsframe.so.3.0.0\n               libhistory.so.8.3\n               libncursesw.so.6.6\n               libm.so.6\n               libreadline.so.8.3\n               libz.so.1.3.2\n               libzstd.so.1.5.7\n               $(cd /usr/lib; find libnss*.so* -type f)\"\n\nfor BIN in $online_usrbin; do\n    cp /usr/bin/$BIN /tmp/$BIN\n    strip --strip-unneeded /tmp/$BIN\n    install -vm755 /tmp/$BIN /usr/bin\n    rm /tmp/$BIN\ndone\n\nfor LIB in $online_usrlib; do\n    cp /usr/lib/$LIB /tmp/$LIB\n    strip --strip-unneeded /tmp/$LIB\n    install -vm755 /tmp/$LIB /usr/lib\n    rm /tmp/$LIB\ndone\n\nfor i in $(find /usr/lib -type f -name \\*.so* ! -name \\*dbg) \\\n         $(find /usr/lib -type f -name \\*.a)                 \\\n         $(find /usr/{bin,sbin,libexec} -type f); do\n    case \"$online_usrbin $online_usrlib $save_usrlib\" in\n        *$(basename $i)* )\n            ;;\n        * ) strip --strip-unneeded $i\n            ;;\n    esac\ndone\n\nunset BIN LIB save_usrlib online_usrbin online_usrlib",
+          "kind": "procedure"
+        }
+      ]
+    },
+    "ch-system-cleanup": {
+      "context": "chroot-root",
+      "commands": [
+        {
+          "command": "rm -rf /tmp/{*,.*}",
+          "kind": "procedure"
+        },
+        {
+          "command": "find /usr/lib /usr/libexec -name \\*.la -delete",
+          "kind": "procedure"
+        },
+        {
+          "command": "find /usr -depth -name $(uname -m)-lfs-linux-gnu\\* | xargs rm -rf",
+          "kind": "procedure"
+        },
+        {
+          "command": "userdel -r tester",
+          "kind": "procedure"
+        }
+      ]
+    },
+    "ch-config-network": {
+      "context": "chroot-root",
+      "commands": [
+        {
+          "command": "systemctl disable systemd-networkd-wait-online",
+          "kind": "procedure"
+        },
+        {
+          "command": "ln -s /dev/null /etc/systemd/network/99-default.link",
+          "kind": "procedure"
+        },
+        {
+          "command": "cat > /etc/systemd/network/10-ether0.link << \"EOF\"\n[Match]\n# Change the MAC address as appropriate for your network device\nMACAddress=12:34:45:78:90:AB\n\n[Link]\nName=ether0\nEOF",
+          "kind": "template"
+        },
+        {
+          "command": "cat > /etc/systemd/network/10-eth-static.network << \"EOF\"\n[Match]\nName=<network-device-name>\n\n[Network]\nAddress=192.168.0.2/24\nGateway=192.168.0.1\nDNS=192.168.0.1\nDomains=<Your Domain Name>\nEOF",
+          "kind": "template"
+        },
+        {
+          "command": "cat > /etc/systemd/network/10-eth-dhcp.network << \"EOF\"\n[Match]\nName=<network-device-name>\n\n[Network]\nDHCP=ipv4\n\n[DHCPv4]\nUseDomains=true\nEOF",
+          "kind": "template"
+        },
+        {
+          "command": "systemctl disable systemd-resolved",
+          "kind": "procedure"
+        },
+        {
+          "command": "cat > /etc/resolv.conf << \"EOF\"\n# Begin /etc/resolv.conf\n\ndomain <Your Domain Name>\nnameserver <IP address of your primary nameserver>\nnameserver <IP address of your secondary nameserver>\n\n# End /etc/resolv.conf\nEOF",
+          "kind": "template"
+        },
+        {
+          "command": "echo \"<lfs>\" > /etc/hostname",
+          "kind": "template"
+        },
+        {
+          "command": "cat > /etc/hosts << \"EOF\"\n# Begin /etc/hosts\n\n<192.168.0.2> <FQDN> [alias1] [alias2] ...\n::1       ip6-localhost ip6-loopback\nff02::1   ip6-allnodes\nff02::2   ip6-allrouters\n\n# End /etc/hosts\nEOF",
+          "kind": "template"
+        }
+      ]
+    },
+    "ch-config-symlinks": {
+      "context": "chroot-root",
+      "commands": [
+        {
+          "command": "udevadm info -a -p /sys/class/video4linux/video0",
+          "kind": "check"
+        },
+        {
+          "command": "cat > /etc/udev/rules.d/83-duplicate_devs.rules << \"EOF\"\n\n# Persistent symlinks for webcam and tuner\nKERNEL==\"video*\", ATTRS{idProduct}==\"1910\", ATTRS{idVendor}==\"0d81\", SYMLINK+=\"webcam\"\nKERNEL==\"video*\", ATTRS{device}==\"0x036f\",  ATTRS{vendor}==\"0x109e\", SYMLINK+=\"tvtuner\"\n\nEOF",
+          "kind": "template"
+        }
+      ]
+    },
+    "ch-config-clock": {
+      "context": "chroot-root",
+      "commands": [
+        {
+          "command": "cat > /etc/adjtime << \"EOF\"\n0.0 0 0.0\n0\nLOCAL\nEOF",
+          "kind": "template"
+        },
+        {
+          "command": "timedatectl set-local-rtc 1",
+          "kind": "procedure"
+        },
+        {
+          "command": "timedatectl set-time YYYY-MM-DD HH:MM:SS",
+          "kind": "template"
+        },
+        {
+          "command": "timedatectl set-timezone TIMEZONE",
+          "kind": "template"
+        },
+        {
+          "command": "timedatectl list-timezones",
+          "kind": "check"
+        },
+        {
+          "command": "systemctl disable systemd-timesyncd",
+          "kind": "procedure"
+        }
+      ]
+    },
+    "ch-config-console": {
+      "context": "chroot-root",
+      "commands": [
+        {
+          "command": "echo FONT=Lat2-Terminus16 > /etc/vconsole.conf",
+          "kind": "procedure"
+        },
+        {
+          "command": "cat > /etc/vconsole.conf << \"EOF\"\nKEYMAP=de-latin1\nFONT=Lat2-Terminus16\nEOF",
+          "kind": "template"
+        },
+        {
+          "command": "localectl set-keymap MAP",
+          "kind": "template"
+        },
+        {
+          "command": "localectl set-x11-keymap LAYOUT [MODEL] [VARIANT] [OPTIONS]",
+          "kind": "template"
+        }
+      ]
+    },
+    "ch-config-locale": {
+      "context": "chroot-root",
+      "commands": [
+        {
+          "command": "locale -a",
+          "kind": "check"
+        },
+        {
+          "command": "LC_ALL=<locale name> locale charmap",
+          "kind": "template"
+        },
+        {
+          "command": "LC_ALL=<locale name> locale language\nLC_ALL=<locale name> locale charmap\nLC_ALL=<locale name> locale int_curr_symbol\nLC_ALL=<locale name> locale int_prefix",
+          "kind": "template"
+        },
+        {
+          "command": "cat > /etc/locale.conf << \"EOF\"\nLANG=<ll>_<CC>.<charmap><@modifiers>\nEOF",
+          "kind": "template"
+        },
+        {
+          "command": "cat > /etc/profile << \"EOF\"\n# Begin /etc/profile\n\nfor i in $(locale); do\n  unset ${i%=*}\ndone\n\nif [[ \"$TERM\" = linux ]]; then\n  export LANG=C.UTF-8\nelse\n  source /etc/locale.conf\n\n  for i in $(locale); do\n    key=${i%=*}\n    if [[ -v $key ]]; then\n      export $key\n    fi\n  done\nfi\n\n# End /etc/profile\nEOF",
+          "kind": "template"
+        },
+        {
+          "command": "localectl set-locale LANG=\"<ll>_<CC>.<charmap><@modifiers>\"",
+          "kind": "template"
+        },
+        {
+          "command": "localectl set-locale LANG=\"en_US.UTF-8\" LC_CTYPE=\"en_US\"",
+          "kind": "procedure"
+        }
+      ]
+    },
+    "ch-config-inputrc": {
+      "context": "chroot-root",
+      "commands": [
+        {
+          "command": "cat > /etc/inputrc << \"EOF\"\n# Begin /etc/inputrc\n# Modified by Chris Lynn <roryo@roryo.dynup.net>\n\n# Allow the command prompt to wrap to the next line\nset horizontal-scroll-mode Off\n\n# Enable 8-bit input\nset meta-flag On\nset input-meta On\n\n# Turns off 8th bit stripping\nset convert-meta Off\n\n# Keep the 8th bit for display\nset output-meta On\n\n# none, visible or audible\nset bell-style none\n\n# All of the following map the escape sequence of the value\n# contained in the 1st argument to the readline specific functions\n\"\\eOd\": backward-word\n\"\\eOc\": forward-word\n\n# for linux console\n\"\\e[1~\": beginning-of-line\n\"\\e[4~\": end-of-line\n\"\\e[5~\": beginning-of-history\n\"\\e[6~\": end-of-history\n\"\\e[3~\": delete-char\n\"\\e[2~\": quoted-insert\n\n# for xterm\n\"\\eOH\": beginning-of-line\n\"\\eOF\": end-of-line\n\n# for Konsole\n\"\\e[H\": beginning-of-line\n\"\\e[F\": end-of-line\n\n# uncomment for history search mode with up/down\n# \"\\e[A\": history-search-backward\n# \"\\e[B\": history-search-forward\n\n# End /etc/inputrc\nEOF",
+          "kind": "template"
+        }
+      ]
+    },
+    "ch-config-shells": {
+      "context": "chroot-root",
+      "commands": [
+        {
+          "command": "cat > /etc/shells << \"EOF\"\n# Begin /etc/shells\n\n/bin/sh\n/bin/bash\n\n# End /etc/shells\nEOF",
+          "kind": "template"
+        }
+      ]
+    },
+    "ch-config-systemd-custom": {
+      "context": "chroot-root",
+      "commands": [
+        {
+          "command": "mkdir -pv /etc/systemd/system/getty@tty1.service.d\n\ncat > /etc/systemd/system/getty@tty1.service.d/noclear.conf << EOF\n[Service]\nTTYVTDisallocate=no\nEOF",
+          "kind": "template"
+        },
+        {
+          "command": "systemctl mask tmp.mount",
+          "kind": "procedure"
+        },
+        {
+          "command": "mkdir -p /etc/tmpfiles.d\ncp /usr/lib/tmpfiles.d/tmp.conf /etc/tmpfiles.d",
+          "kind": "procedure"
+        },
+        {
+          "command": "mkdir -pv /etc/systemd/system/foobar.service.d\n\ncat > /etc/systemd/system/foobar.service.d/foobar.conf << EOF\n[Service]\nRestart=always\nRestartSec=30\nEOF",
+          "kind": "template"
+        },
+        {
+          "command": "mkdir -pv /etc/systemd/coredump.conf.d\n\ncat > /etc/systemd/coredump.conf.d/maxuse.conf << EOF\n[Coredump]\nMaxUse=5G\nEOF",
+          "kind": "template"
+        }
+      ]
+    },
+    "ch-bootable-fstab": {
+      "context": "chroot-root",
+      "commands": [
+        {
+          "command": "cat > /etc/fstab << \"EOF\"\n# Begin /etc/fstab\n\n# file system  mount-point  type     options             dump  fsck\n#                                                              order\n\n/dev/<xxx>     /            <fff>    defaults            1     1\n/dev/<yyy>     swap         swap     pri=1               0     0\n\n# End /etc/fstab\nEOF",
+          "kind": "template"
+        },
+        {
+          "command": "cat >> /etc/fstab << \"EOF\"\n/dev/<zzz>  /boot/efi  vfat  rw,relatime,codepage=437,iocharset=iso8859-1   0   2\nEOF",
+          "kind": "template"
+        }
+      ]
+    },
+    "ch-bootable-kernel": {
+      "context": "chroot-root",
+      "commands": [
+        {
+          "command": "make mrproper",
+          "kind": "procedure"
+        },
+        {
+          "command": "make menuconfig",
+          "kind": "interactive"
+        },
+        {
+          "command": "make",
+          "kind": "procedure"
+        },
+        {
+          "command": "make modules_install",
+          "kind": "procedure"
+        },
+        {
+          "command": "mount /boot",
+          "kind": "procedure"
+        },
+        {
+          "command": "cp -iv arch/x86/boot/bzImage /boot/vmlinuz-7.1.8-lfs-13.1-systemd",
+          "kind": "procedure"
+        },
+        {
+          "command": "cp -iv System.map /boot/System.map-7.1.8",
+          "kind": "procedure"
+        },
+        {
+          "command": "cp -iv .config /boot/config-7.1.8",
+          "kind": "procedure"
+        },
+        {
+          "command": "cp -r Documentation -T /usr/share/doc/linux-7.1.8",
+          "kind": "procedure"
+        }
+      ]
+    },
+    "ch-bootable-grub": {
+      "context": "chroot-root",
+      "commands": [
+        {
+          "command": "cd /tmp\ngrub-mkrescue --output=grub-img.iso\nxorriso -as cdrecord -v dev=/dev/cdrw blank=as_needed grub-img.iso",
+          "kind": "procedure"
+        },
+        {
+          "command": "grub-install /dev/sda --target=i386-pc",
+          "kind": "procedure"
+        },
+        {
+          "command": "grub-install --target=x86_64-efi --removable",
+          "kind": "procedure"
+        },
+        {
+          "command": "mountpoint /sys/firmware/efi/efivars ||\n  mount -v -t efivarfs efivarfs /sys/firmware/efi/efivars",
+          "kind": "procedure"
+        },
+        {
+          "command": "efibootmgr -c -d /dev/sd<x> \\\n  -p <y> -L \"LFS\" -l '\\EFI\\BOOT\\BOOT<X64>.EFI'",
+          "kind": "template"
+        },
+        {
+          "command": "umount -v /sys/firmware/efi/efivars",
+          "kind": "procedure"
+        },
+        {
+          "command": "cat > /boot/grub/grub.cfg << \"EOF\"\n# Begin /boot/grub/grub.cfg\nset default=0\nset timeout=5\n\ninsmod part_gpt\ninsmod ext2\n\nset root=(hd0,2)\nset gfxpayload=1024x768x32\n\nmenuentry \"GNU/Linux, Linux 7.1.8-lfs-13.1-systemd\" {\n        linux   /boot/vmlinuz-7.1.8-lfs-13.1-systemd root=/dev/sda2 ro\n}\nEOF",
+          "kind": "template"
+        }
+      ]
+    },
+    "ch-finish-theend": {
+      "context": "chroot-root",
+      "commands": [
+        {
+          "command": "echo 13.1-systemd > /etc/lfs-release",
+          "kind": "procedure"
+        },
+        {
+          "command": "cat > /etc/lsb-release << \"EOF\"\nDISTRIB_ID=\"Linux From Scratch\"\nDISTRIB_RELEASE=\"13.1-systemd\"\nDISTRIB_CODENAME=\"<your name here>\"\nDISTRIB_DESCRIPTION=\"Linux From Scratch\"\nEOF",
+          "kind": "template"
+        },
+        {
+          "command": "cat > /etc/os-release << \"EOF\"\nNAME=\"Linux From Scratch\"\nVERSION=\"13.1-systemd\"\nID=lfs\nPRETTY_NAME=\"Linux From Scratch 13.1-systemd\"\nVERSION_CODENAME=\"<your name here>\"\nHOME_URL=\"https://www.linuxfromscratch.org/lfs/\"\nRELEASE_TYPE=\"stable\"\nEOF",
+          "kind": "template"
+        }
+      ]
+    },
+    "ch-finish-reboot": {
+      "context": "mixed-root",
+      "commands": [
+        {
+          "command": "logout",
+          "kind": "session-transition"
+        },
+        {
+          "command": "umount -v $LFS/dev/pts\nmountpoint -q $LFS/dev/shm && umount -v $LFS/dev/shm\numount -v $LFS/dev\numount -v $LFS/run\numount -v $LFS/proc\numount -v $LFS/sys",
+          "kind": "procedure"
+        },
+        {
+          "command": "umount -v $LFS/home\numount -v $LFS",
+          "kind": "procedure"
+        },
+        {
+          "command": "umount -v $LFS",
+          "kind": "procedure"
+        }
+      ]
+    }
+  }
+}

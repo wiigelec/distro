@@ -1,0 +1,277 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-tools-kernfs",
+  "title": "Preparing Virtual Kernel File Systems",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Applications running in userspace utilize various file systems created by the kernel to communicate with the kernel itself. These file systems are virtual: no disk space is used for them. The content of these file systems resides in memory. These file systems must be mounted in the $LFS directory tree so the applications can find them in the chroot environment."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Begin by creating the directories on which these virtual file systems will be mounted:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 0,
+      "source_index": 0
+    },
+    {
+      "type": "section",
+      "title": "Mounting and Populating /dev",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "During a normal boot of an LFS system, the kernel automatically mounts the"
+            },
+            {
+              "type": "code",
+              "text": "devtmpfs"
+            },
+            {
+              "type": "text",
+              "text": "file system on the"
+            },
+            {
+              "type": "code",
+              "text": "/dev"
+            },
+            {
+              "type": "text",
+              "text": "directory; the kernel creates device nodes on that virtual file system during the boot process, or when a device is first detected or accessed. The udev daemon may change the ownership or permissions of the device nodes created by the kernel, and create new device nodes or symlinks, to ease the work of distro maintainers and system administrators. (See"
+            },
+            {
+              "type": "xref",
+              "target": "ch-config-udev-device-node-creation",
+              "label": "Device Node Creation"
+            },
+            {
+              "type": "text",
+              "text": "for details.) If the host kernel supports"
+            },
+            {
+              "type": "code",
+              "text": "devtmpfs"
+            },
+            {
+              "type": "text",
+              "text": ", we can simply mount a"
+            },
+            {
+              "type": "code",
+              "text": "devtmpfs"
+            },
+            {
+              "type": "text",
+              "text": "at"
+            },
+            {
+              "type": "code",
+              "text": "$LFS/dev"
+            },
+            {
+              "type": "text",
+              "text": "and rely on the kernel to populate it."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "But some host kernels lack"
+            },
+            {
+              "type": "code",
+              "text": "devtmpfs"
+            },
+            {
+              "type": "text",
+              "text": "support; these host distros use different methods to create the content of"
+            },
+            {
+              "type": "code",
+              "text": "/dev"
+            },
+            {
+              "type": "text",
+              "text": ". So the only host-agnostic way to populate the"
+            },
+            {
+              "type": "code",
+              "text": "$LFS/dev"
+            },
+            {
+              "type": "text",
+              "text": "directory is by bind mounting the host system's"
+            },
+            {
+              "type": "code",
+              "text": "/dev"
+            },
+            {
+              "type": "text",
+              "text": "directory. A bind mount is a special type of mount that makes a directory subtree or a file visible at some other location. Use the following command to do this."
+            }
+          ]
+        },
+        {
+          "type": "system_operation_command",
+          "index": 1,
+          "source_index": 1
+        }
+      ],
+      "id": "ch-tools-bindmount"
+    },
+    {
+      "type": "section",
+      "title": "Mounting Virtual Kernel File Systems",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Now mount the remaining virtual kernel file systems:"
+            }
+          ]
+        },
+        {
+          "type": "system_operation_command",
+          "index": 2,
+          "source_index": 2
+        },
+        {
+          "type": "definition_list",
+          "entries": [
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "gid=5"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This ensures that all devpts-created device nodes are owned by group ID 5. This is the ID we will use later on for the"
+                    },
+                    {
+                      "type": "code",
+                      "text": "tty"
+                    },
+                    {
+                      "type": "text",
+                      "text": "group. We use the group ID instead of a name, since the host system might use a different ID for its"
+                    },
+                    {
+                      "type": "code",
+                      "text": "tty"
+                    },
+                    {
+                      "type": "text",
+                      "text": "group."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "term": [
+                {
+                  "type": "code",
+                  "text": "mode=0620"
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "This ensures that all devpts-created device nodes have mode 0620 (user readable and writable, group writable). Together with the option above, this ensures that devpts will create device nodes that meet the requirements of grantpt(), meaning the Glibc"
+                    },
+                    {
+                      "type": "code",
+                      "text": "pt_chown"
+                    },
+                    {
+                      "type": "text",
+                      "text": "helper binary (which is not installed by default) is not necessary."
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "title": "The meaning of the mount options for devpts:"
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "In some host systems,"
+            },
+            {
+              "type": "code",
+              "text": "/dev/shm"
+            },
+            {
+              "type": "text",
+              "text": "is a symbolic link to a directory, typically"
+            },
+            {
+              "type": "code",
+              "text": "/run/shm"
+            },
+            {
+              "type": "text",
+              "text": ". The /run tmpfs was mounted above so in this case only a directory needs to be created with the correct permissions."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "In other host systems"
+            },
+            {
+              "type": "code",
+              "text": "/dev/shm"
+            },
+            {
+              "type": "text",
+              "text": "is a mount point for a tmpfs. In that case the mount of /dev above will only create /dev/shm as a directory in the chroot environment. In this situation we must explicitly mount a tmpfs:"
+            }
+          ]
+        },
+        {
+          "type": "system_operation_command",
+          "index": 3,
+          "source_index": 3
+        }
+      ],
+      "id": "ch-tools-kernfsmount"
+    }
+  ]
+}

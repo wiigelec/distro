@@ -1,0 +1,437 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-preps-addinguser",
+  "title": "Adding the LFS User",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "When logged in as user"
+        },
+        {
+          "type": "code",
+          "text": "root"
+        },
+        {
+          "type": "text",
+          "text": ", making a single mistake can damage or destroy a system. Therefore, the packages in the next two chapters are built as an unprivileged user. You could use your own user name, but to make it easier to set up a clean working environment, we will create a new user called"
+        },
+        {
+          "type": "code",
+          "text": "lfs"
+        },
+        {
+          "type": "text",
+          "text": "as a member of a new group (also named"
+        },
+        {
+          "type": "code",
+          "text": "lfs"
+        },
+        {
+          "type": "text",
+          "text": ") and run commands as"
+        },
+        {
+          "type": "code",
+          "text": "lfs"
+        },
+        {
+          "type": "text",
+          "text": "during the installation process. As"
+        },
+        {
+          "type": "code",
+          "text": "root"
+        },
+        {
+          "type": "text",
+          "text": ", issue the following commands to add the new user:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 0,
+      "source_index": 0
+    },
+    {
+      "type": "definition_list",
+      "entries": [
+        {
+          "term": [
+            {
+              "type": "code",
+              "text": "-s /bin/bash"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This makes"
+                },
+                {
+                  "type": "code",
+                  "text": "bash"
+                },
+                {
+                  "type": "text",
+                  "text": "the default shell for user"
+                },
+                {
+                  "type": "code",
+                  "text": "lfs"
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "code",
+              "text": "-g lfs"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This option adds user"
+                },
+                {
+                  "type": "code",
+                  "text": "lfs"
+                },
+                {
+                  "type": "text",
+                  "text": "to group"
+                },
+                {
+                  "type": "code",
+                  "text": "lfs"
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "code",
+              "text": "-m"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This creates a home directory for"
+                },
+                {
+                  "type": "code",
+                  "text": "lfs"
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "code",
+              "text": "-k /dev/null"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This parameter prevents possible copying of files from a skeleton directory (the default is"
+                },
+                {
+                  "type": "code",
+                  "text": "/etc/skel"
+                },
+                {
+                  "type": "text",
+                  "text": ") by changing the input location to the special null device."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "code",
+              "text": "lfs"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This is the name of the new user."
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "title": "This is what the command line options mean:"
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "If you want to log in as"
+        },
+        {
+          "type": "code",
+          "text": "lfs"
+        },
+        {
+          "type": "text",
+          "text": "or switch to"
+        },
+        {
+          "type": "code",
+          "text": "lfs"
+        },
+        {
+          "type": "text",
+          "text": "from a non-"
+        },
+        {
+          "type": "code",
+          "text": "root"
+        },
+        {
+          "type": "text",
+          "text": "user (as opposed to switching to user"
+        },
+        {
+          "type": "code",
+          "text": "lfs"
+        },
+        {
+          "type": "text",
+          "text": "when logged in as"
+        },
+        {
+          "type": "code",
+          "text": "root"
+        },
+        {
+          "type": "text",
+          "text": ", which does not require the"
+        },
+        {
+          "type": "code",
+          "text": "lfs"
+        },
+        {
+          "type": "text",
+          "text": "user to have a password), you need to set a password for"
+        },
+        {
+          "type": "code",
+          "text": "lfs"
+        },
+        {
+          "type": "text",
+          "text": ". Issue the following command as the"
+        },
+        {
+          "type": "code",
+          "text": "root"
+        },
+        {
+          "type": "text",
+          "text": "user to set the password:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 1,
+      "source_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Grant"
+        },
+        {
+          "type": "code",
+          "text": "lfs"
+        },
+        {
+          "type": "text",
+          "text": "full access to all the directories under"
+        },
+        {
+          "type": "code",
+          "text": "$LFS"
+        },
+        {
+          "type": "text",
+          "text": "by making"
+        },
+        {
+          "type": "code",
+          "text": "lfs"
+        },
+        {
+          "type": "text",
+          "text": "the owner:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 2,
+      "source_index": 2
+    },
+    {
+      "type": "admonition",
+      "kind": "note",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "In some host systems, the following"
+            },
+            {
+              "type": "code",
+              "text": "su"
+            },
+            {
+              "type": "text",
+              "text": "command does not complete properly and suspends the login for the"
+            },
+            {
+              "type": "code",
+              "text": "lfs"
+            },
+            {
+              "type": "text",
+              "text": "user to the background. If the prompt \"lfs:~$\" does not appear immediately, entering the"
+            },
+            {
+              "type": "code",
+              "text": "fg"
+            },
+            {
+              "type": "text",
+              "text": "command will fix the issue."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Next, start a shell running as user"
+        },
+        {
+          "type": "code",
+          "text": "lfs"
+        },
+        {
+          "type": "text",
+          "text": ". This can be done by logging in as"
+        },
+        {
+          "type": "code",
+          "text": "lfs"
+        },
+        {
+          "type": "text",
+          "text": "on a virtual console, or with the following substitute/switch user command:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 3,
+      "source_index": 3
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The"
+        },
+        {
+          "type": "quote",
+          "text": "-"
+        },
+        {
+          "type": "text",
+          "text": "instructs"
+        },
+        {
+          "type": "code",
+          "text": "su"
+        },
+        {
+          "type": "text",
+          "text": "to start a login shell as opposed to a non-login shell. The difference between these two types of shells is described in detail in"
+        },
+        {
+          "type": "link",
+          "href": "https://man.archlinux.org/man/bash.1",
+          "label": "bash(1)"
+        },
+        {
+          "type": "text",
+          "text": "and"
+        },
+        {
+          "type": "code",
+          "text": "info bash"
+        },
+        {
+          "type": "text",
+          "text": "."
+        }
+      ]
+    }
+  ]
+}

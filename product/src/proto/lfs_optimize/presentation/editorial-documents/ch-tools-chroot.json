@@ -1,0 +1,308 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-tools-chroot",
+  "title": "Entering the Chroot Environment",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Now that all the packages which are required to build the rest of the needed tools are on the system, it is time to enter the chroot environment and finish installing the temporary tools. This environment will also be used to install the final system. As user"
+        },
+        {
+          "type": "code",
+          "text": "root"
+        },
+        {
+          "type": "text",
+          "text": ", run the following command to enter the environment that is, at the moment, populated with nothing but temporary tools:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 0,
+      "source_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "If you don't want to use all available logical cores, replace"
+        },
+        {
+          "type": "replaceable",
+          "text": "$(nproc)"
+        },
+        {
+          "type": "text",
+          "text": "with the number of logical cores you want to use for building packages in this chapter and the following chapters. The test suites of some packages (notably Autoconf, Libtool, and Tar) in"
+        },
+        {
+          "type": "xref",
+          "target": "chapter-building-system",
+          "label": "Chapter 8"
+        },
+        {
+          "type": "text",
+          "text": "are not affected by"
+        },
+        {
+          "type": "code",
+          "text": "MAKEFLAGS"
+        },
+        {
+          "type": "text",
+          "text": ", they use a"
+        },
+        {
+          "type": "code",
+          "text": "TESTSUITEFLAGS"
+        },
+        {
+          "type": "text",
+          "text": "environment variable instead. We set that here as well for running these test suites with multiple cores."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The"
+        },
+        {
+          "type": "code",
+          "text": "-i"
+        },
+        {
+          "type": "text",
+          "text": "option given to the"
+        },
+        {
+          "type": "code",
+          "text": "env"
+        },
+        {
+          "type": "text",
+          "text": "command will clear all the variables in the chroot environment. After that, only the"
+        },
+        {
+          "type": "code",
+          "text": "HOME"
+        },
+        {
+          "type": "text",
+          "text": ","
+        },
+        {
+          "type": "code",
+          "text": "TERM"
+        },
+        {
+          "type": "text",
+          "text": ","
+        },
+        {
+          "type": "code",
+          "text": "PS1"
+        },
+        {
+          "type": "text",
+          "text": ", and"
+        },
+        {
+          "type": "code",
+          "text": "PATH"
+        },
+        {
+          "type": "text",
+          "text": "variables are set again. The"
+        },
+        {
+          "type": "code",
+          "text": "TERM=$TERM"
+        },
+        {
+          "type": "text",
+          "text": "construct sets the"
+        },
+        {
+          "type": "code",
+          "text": "TERM"
+        },
+        {
+          "type": "text",
+          "text": "variable inside chroot to the same value as outside chroot. This variable is needed so programs like"
+        },
+        {
+          "type": "code",
+          "text": "vim"
+        },
+        {
+          "type": "text",
+          "text": "and"
+        },
+        {
+          "type": "code",
+          "text": "less"
+        },
+        {
+          "type": "text",
+          "text": "can operate properly. If other variables are desired, such as"
+        },
+        {
+          "type": "code",
+          "text": "CFLAGS"
+        },
+        {
+          "type": "text",
+          "text": "or"
+        },
+        {
+          "type": "code",
+          "text": "CXXFLAGS"
+        },
+        {
+          "type": "text",
+          "text": ", this is a good place to set them."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "From this point on, there is no need to use the"
+        },
+        {
+          "type": "code",
+          "text": "LFS"
+        },
+        {
+          "type": "text",
+          "text": "variable any more because all work will be restricted to the LFS file system; the"
+        },
+        {
+          "type": "code",
+          "text": "chroot"
+        },
+        {
+          "type": "text",
+          "text": "command runs the Bash shell with the root ("
+        },
+        {
+          "type": "code",
+          "text": "/"
+        },
+        {
+          "type": "text",
+          "text": ") directory set to"
+        },
+        {
+          "type": "code",
+          "text": "$LFS"
+        },
+        {
+          "type": "text",
+          "text": "."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Notice that"
+        },
+        {
+          "type": "code",
+          "text": "/tools/bin"
+        },
+        {
+          "type": "text",
+          "text": "is not in the"
+        },
+        {
+          "type": "code",
+          "text": "PATH"
+        },
+        {
+          "type": "text",
+          "text": ". This means that the cross toolchain will no longer be used."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Also note that the"
+        },
+        {
+          "type": "code",
+          "text": "bash"
+        },
+        {
+          "type": "text",
+          "text": "prompt will say"
+        },
+        {
+          "type": "code",
+          "text": "I have no name!"
+        },
+        {
+          "type": "text",
+          "text": "This is normal because the"
+        },
+        {
+          "type": "code",
+          "text": "/etc/passwd"
+        },
+        {
+          "type": "text",
+          "text": "file has not been created yet."
+        }
+      ]
+    },
+    {
+      "type": "admonition",
+      "kind": "note",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "It is important that all the commands throughout the remainder of this chapter and the following chapters are run from within the chroot environment. If you leave this environment for any reason (rebooting for example), ensure that the virtual kernel filesystems are mounted as explained in"
+            },
+            {
+              "type": "xref",
+              "target": "ch-tools-bindmount",
+              "label": "Mounting and Populating /dev"
+            },
+            {
+              "type": "text",
+              "text": "and"
+            },
+            {
+              "type": "xref",
+              "target": "ch-tools-kernfsmount",
+              "label": "Mounting Virtual Kernel File Systems"
+            },
+            {
+              "type": "text",
+              "text": "and enter chroot again before continuing with the installation."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

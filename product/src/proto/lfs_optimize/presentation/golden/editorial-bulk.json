@@ -4,10 +4,10 @@
     "project": "Linux From Scratch",
     "version": "13.1-systemd",
     "published": "2026-09-01",
-    "slice": "bulk eligible non-package editorial bodies"
+    "slice": "all non-package editorial bodies"
   },
-  "complete_document_count": 89,
-  "deferred_document_count": 30,
+  "complete_document_count": 119,
+  "deferred_document_count": 0,
   "complete_documents": [
     "preface",
     "pre-foreword",
@@ -97,9 +97,7 @@
     "part2",
     "part3",
     "part4",
-    "part5"
-  ],
-  "deferred_command_documents": [
+    "part5",
     "pre-typography",
     "ch-partitioning-creatingfilesystem",
     "ch-partitioning-aboutlfs",
@@ -131,6 +129,7 @@
     "ch-finish-theend",
     "ch-finish-reboot"
   ],
+  "deferred_command_documents": [],
   "documents": {
     "preface": {
       "block_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
@@ -655,6 +654,421 @@
       "block_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
       "xref_targets": [],
       "bootstrap_command_count": 0
+    },
+    "pre-typography": {
+      "block_sha256": "4db2c0452b0ed27c066b5baa09e156cf99b3828c450d6021b3a17074a92b571d",
+      "xref_targets": [],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 3,
+      "operational_command_sha256": [
+        "ddec2098f6c935422e438fab08b99270dc41312bdc5c0a0ec138a95a8665a65a",
+        "a9ec2f3d96ec80f579c06007905f0cb51b4df271b650adc2948227f481ccd5d8",
+        "65615af7590a09100d7a5bc4021aee4666e7cb9e02e545479f478f54cdd07909"
+      ]
+    },
+    "ch-partitioning-creatingfilesystem": {
+      "block_sha256": "c9b36219139d38e18ec0561e03e0d096fa7fd354c864307ffbb0cc097c8c0fd3",
+      "xref_targets": [],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 4,
+      "operational_command_sha256": [
+        "be148207d2d95d876673740409325535b413169beb2381184bf08b73cc1f5d53",
+        "9c7fcf9866ab6bbf6b29b5c91ae74bf2d5b83cece1e54a16bdecd2b77f3ec1a9",
+        "f611577f4dbb9b3724a65c1cca0a2dbc24c8fb7800db95a74de7c88cbd3e5b19",
+        "d7425eee711107916dccc30f77fa23b6230504f46a481e4b084d3e44fec7bac6"
+      ]
+    },
+    "ch-partitioning-aboutlfs": {
+      "block_sha256": "657546858813a1bd00fbfc58ad4c51552a1faef4a83b049bc17132de294ba053",
+      "xref_targets": [],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 4,
+      "operational_command_sha256": [
+        "1aab94828df573e71282887ae0b37409239c04f5623974b2c7412fe2fcbff8e8",
+        "f674e43852c592bb82b278179f9c33526f91cccec9e7cc9c5f0e5b4d5eeda4c5",
+        "27537a8aa272bc9549ad095787c8351ad7b21e15dfe93849cd84d4fb49a87554",
+        "7417f3919c25b2d9c594ebc402175334b025981124eb201dca66a0e30f605eb8"
+      ]
+    },
+    "ch-partitioning-mounting": {
+      "block_sha256": "8c116c6af07117488c3ee1e0633740806765b39ba27af95e4d3a673214b6e2a4",
+      "xref_targets": [],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 4,
+      "operational_command_sha256": [
+        "ae4a4119abe5399cec12626717d67325c1c52c5ba21399f57fce1fb154a1b9e4",
+        "9d3f6b9b49a9c8bfde072267fc0dc1c9bdba7cb6a3b862edc9f0eb998171ad8a",
+        "f35a37c82ce43c48d487fb50c27048bce78ce8e9996a9ff679e2ea2c7ab93919",
+        "f25182dcb726e464a3ca64d8bcd6c2aafeaca03688b7d670af28edcf7632180e"
+      ]
+    },
+    "ch-materials-introduction": {
+      "block_sha256": "95e014ed44fcec90897b35707ba4adf85ff55f20f107586b366e32eede266f83",
+      "xref_targets": [],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 5,
+      "operational_command_sha256": [
+        "e290089eed208ca4a77dabc1aeb0a10cad9e8bf5d9763860a6fa80ac8c4ff8a5",
+        "b2c2b6569a2b64a0758048c6377e365beef6b354a9bc2b0b743e9432f0a8d2ff",
+        "e36d63d434f588a0e9e2fd1234ff4782830adce572299cbfc662fe0392606aad",
+        "bfd43e14a9debf47a7b4c66b02112bc4c82ddb8c45a773f847fc045b969e02cd",
+        "06e9d6691596b25766ed6ad8dbda005d83bd996c93edf5b5c4974d1010f8f01b"
+      ]
+    },
+    "ch-tools-creatingminlayout": {
+      "block_sha256": "acc32a265c177110216dbe103141447bfd5e6a5cc32da4a90a517a86c2dea6d4",
+      "xref_targets": [
+        "chapter-temporary-tools",
+        "chapter-cross-tools",
+        "chapter-building-system",
+        "chapter-temporary-tools",
+        "ch-tools-toolchaintechnotes"
+      ],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 2,
+      "operational_command_sha256": [
+        "4abb039a0d722c700349afc692a1489a0d42f653be8039ab0be1361f9e20c7c5",
+        "cb418dfab7fba56108225bbe46d3fafce7fb1e14830d44765343b46f96df032a"
+      ]
+    },
+    "ch-preps-addinguser": {
+      "block_sha256": "c6e197fbcf9984a7c147125966a5815260e6c093e9b4c4ca5e693526b98f1976",
+      "xref_targets": [],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 4,
+      "operational_command_sha256": [
+        "d3438c7901e9ece258ff4e8b1cfb085260c351626fe6a85e1404c462ed3c0d0b",
+        "50e70de4e675099ebc28e9833fade5f50bc45fcd1874ffb0e352846955b0ccc7",
+        "296e49e3348934531f12f1a32bdb8990721def6665ebc8f917302098099778b0",
+        "3baa54e318fbaa012665cdc57d570c587bb1a85cb589a52453b2b3b33a8f7c73"
+      ]
+    },
+    "ch-preps-settingenviron": {
+      "block_sha256": "ca44c7fb010a75e824bc4fd544d3a123dad6272206c43ca34bb095d9a9d31be2",
+      "xref_targets": [
+        "ch-partitioning-aboutlfs",
+        "ch-tools-toolchaintechnotes",
+        "chapter-temporary-tools",
+        "chapter-cross-tools",
+        "chapter-cross-tools",
+        "chapter-temporary-tools",
+        "chapter-chroot-temporary-tools",
+        "ch-system-bash",
+        "chapter-cross-tools",
+        "chapter-temporary-tools"
+      ],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 7,
+      "operational_command_sha256": [
+        "dc24f3606001f3257d9d77ddd1b635a873c614b64ab52de20760f586d2fc94aa",
+        "18d091ed8bbd45327ad9ba75e409a2962b086a156c66348112943429174f0e28",
+        "8da6cbdd315ef2bd18523ac037f22a647e1f0a1199738191f5870da18dd4fb38",
+        "2a75bcdddb6b7127347986d22c18b76e28bb625fb1c6f87b726a47468955c9c9",
+        "e61c82622260ed369ea5fa60eddf9bd6c3296989243bae5bba15f8f395c73be1",
+        "ab61154834ebaf9d757ce5673c21c6ccc0465acf712afc18d3ac49fad2930502",
+        "e0836f0575c330656ffc6b147d8a93a06a1c6a4a004a0e7bd818bdee7b5d7ad1"
+      ]
+    },
+    "ch-tools-generalinstructions": {
+      "block_sha256": "8117014946841f946b84863a276c4fc577f34c51d0ee79bd38be94708d9751da",
+      "xref_targets": [
+        "ch-partitioning-hostreqs",
+        "chapter-cross-tools",
+        "chapter-temporary-tools"
+      ],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 1,
+      "operational_command_sha256": [
+        "27537a8aa272bc9549ad095787c8351ad7b21e15dfe93849cd84d4fb49a87554"
+      ]
+    },
+    "ch-tools-changingowner": {
+      "block_sha256": "7246d65e224a97e8ca58d8306257548dce4a15c999cdf82f10882fa172d87079",
+      "xref_targets": [],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 1,
+      "operational_command_sha256": [
+        "e94c2c2785f527460e2b5201ea09e3ecffe0c25f618899103ed672fd37db2417"
+      ]
+    },
+    "ch-tools-kernfs": {
+      "block_sha256": "6243decd131ba34ede73b496ff0401ae7717d08b13ee3ce93959108ce513bb1b",
+      "xref_targets": [
+        "ch-config-udev-device-node-creation"
+      ],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 4,
+      "operational_command_sha256": [
+        "c84025aace596fa889a9fd8455fc7cbf05793d1d95f13ad97d649bc2e0551f1f",
+        "a6f3695589ed8e3a4e121a3d88228c6065b8ba72fc112ca8504d2d38a4e245f9",
+        "793c44ea10cc950d25c19986a160fd179da2f0f9076f91d420267a737ed4e365",
+        "8914972ee28a7e094c152f17d3346280618b22da59aae32276d2a2e72b43dbad"
+      ]
+    },
+    "ch-tools-chroot": {
+      "block_sha256": "7fc0f98fc3f735644a21003247e3bed7719f3f1cf8491cb8f2a310a106c78870",
+      "xref_targets": [
+        "chapter-building-system",
+        "ch-tools-bindmount",
+        "ch-tools-kernfsmount"
+      ],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 1,
+      "operational_command_sha256": [
+        "1eceec0154700c097586811223890fb3399c50f3e85282bf5a869e6d779ccffd"
+      ]
+    },
+    "ch-tools-creatingdirs": {
+      "block_sha256": "e24922b8163a407c43bcf7a1bd76d874a3d786dd956749f5d097b5a50f470f1b",
+      "xref_targets": [],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 2,
+      "operational_command_sha256": [
+        "0525289f6516196c030d37ff1c5b2a8c0db17b819668974ea688022dc1db43d1",
+        "71c5712e7bce539516c88cda1ff4d7ac1f4185efe09528f3f35cdb86443c7b58"
+      ]
+    },
+    "ch-tools-createfiles": {
+      "block_sha256": "ba2e4ddf5a1d3f0326ba1bad89f6133345b6615f3e9b7e33da6ff4cfca9b4afe",
+      "xref_targets": [
+        "chapter-building-system"
+      ],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 7,
+      "operational_command_sha256": [
+        "0f81679c1ecdf9e3c2f1b83062e5969f7af359efd2da89f4c2c74427abfeaaa5",
+        "7253aa5d555efb6a59e1480b3fac77474d1ac2173f987ea5b42b70f6f8fec3c8",
+        "39068f0f6562e609b18f1d9030914d6b8a795aa4df7f1e7c0661da81e725db7f",
+        "aa80c0968d9ef8ce318f49dbf7a32d1026cd1f51c6636973968ebd7239dea0ca",
+        "defe25ec2abad1ad64cdb8015df9a123c020946ac93a8a9332d5a25f0abfb2b9",
+        "f3ee6471e668cc0d157d514846c3d979d2aa41f8518804d565f66eec35b1f946",
+        "dff50220f8f77a17a2479f0ba4b7c4a1e66d4cb9ad176467de212cdd3af5c3f9"
+      ]
+    },
+    "ch-tools-cleanup": {
+      "block_sha256": "24119487e0470888564200eba7de8cccb79ada6e64b94d41245caa385f0ad950",
+      "xref_targets": [
+        "chapter-building-system",
+        "ch-partitioning-aboutlfs",
+        "ch-tools-kernfs",
+        "ch-tools-chroot"
+      ],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 6,
+      "operational_command_sha256": [
+        "56dae652ce06b9d3e4edd431ec07f96f9d287c9a529654389e13b32c421798a1",
+        "48531d822e30f81ef44231cb56d42116c7f815dc68af04a0d38fbc971f4480b2",
+        "0730ccd2a9f1699b6ee426abcd68eab4def95e3014feb188f097d2314d1bb3d2",
+        "e596899f114b5162402325dfb31fdaa792fabed718628336cc7a35a24f38eaa9",
+        "1095537c829c487014d9f8adbf2d1f2ae7a1438b4626c069a4b331f1004f9b77",
+        "70ddccab5fac600cc7ce73e7e00f0f278ce4a0de6bbae3ce5c9cd2f695af14fc"
+      ]
+    },
+    "ch-system-stripping": {
+      "block_sha256": "6f956db1dfc2c22b281fc2a6d6b337547a217fce0a5db96accd6245e476e81cc",
+      "xref_targets": [
+        "pkgmgmt-upgrade-issues"
+      ],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 1,
+      "operational_command_sha256": [
+        "9185e5a9c8fa645562d16d65f96d6ada7a7a3cd958aad925b80b16076dfaeac0"
+      ]
+    },
+    "ch-system-cleanup": {
+      "block_sha256": "792b50279b0a240ab7c1b8816e4b9570731944a8598898d02e03fb6ddd4bafa8",
+      "xref_targets": [
+        "chapter-temporary-tools",
+        "chapter-chroot-temporary-tools"
+      ],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 4,
+      "operational_command_sha256": [
+        "57f1c181f6550826ce684161bf1734371ab51d27998d68822052635c5440aa69",
+        "4d90936576d8275aa66103755bc8f428493a470d987f7e1d54f99e2ccc823d22",
+        "eec14d8bb150befb58dd33696c3dd3dfd205c8cb108c6f79fb66e8d7799f1a14",
+        "ff5b2a6b3549dcf4419a8f7d9561a8eed36950b9dea5c1702d5ae3f8860ff824"
+      ]
+    },
+    "ch-config-network": {
+      "block_sha256": "bdfbfe6ffe4ee55438edfcaeb5389244261d718e108587ef93aac4197fc4b4f9",
+      "xref_targets": [
+        "ch-system-systemd"
+      ],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 9,
+      "operational_command_sha256": [
+        "ae93ef5f414c53e5f44d4e46ac80cc35bce0e6e2c6f370aca5065549612e2b33",
+        "bf37479deceae2016a75e3735be1bc91b8e6f1521fbbde24479a8e041143c135",
+        "e29aae4590fbb69b9df7325d8ebcb1749b4a3fc7225fe996d149bbcf93e75b22",
+        "3efc700b5035923b8bd8159fb3c01ecd2b5f045165cdb7722f4a30e9664f2235",
+        "fce458363a4e86d48e74704d6b9a2de4922a1375524fe092757bcaa31b001737",
+        "d8d62d6158fa9123b2c3b1e0b40bcb057b4334ae52cfe766bbb34301e4effe45",
+        "324440623004680d8b5185307c521c189425fa28ee3ae1c076226aab2cad9c3c",
+        "4d45c4fa588725e77949fd7a19c2230448db63edb8512a8d2e37387c4067732f",
+        "be80a3af7c1fdb5b2337fa72f70d075e5bbd644bae654438be84e26d0484b2e3"
+      ]
+    },
+    "ch-config-symlinks": {
+      "block_sha256": "19099345f4c92f11bfc3743333a0b300c14ba485773dd23a721b5f5a6192ee21",
+      "xref_targets": [
+        "ch-config-udev",
+        "ch-config-network"
+      ],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 2,
+      "operational_command_sha256": [
+        "e7e447018a85985d5ace779f27bced0f5e1cc57880ae4cb8b5dc1fde67520494",
+        "0a984d93b2499c907671920e4ee69e83e0c1efeebdfad53c15f1891bf6143639"
+      ]
+    },
+    "ch-config-clock": {
+      "block_sha256": "740103da874aa2361f96705057569a2346278d00b503f4f30cc3e952474e2294",
+      "xref_targets": [],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 6,
+      "operational_command_sha256": [
+        "0c76f99e443aadeae8789c98e4b8fde487d2b4ecdc9074cae09809fd5b5dcc95",
+        "7178f0a725a2e06c584cba9dcf253dfedcf5f4cc0996d1ac468874d3bc45154e",
+        "d824c797959d7cb2e11018656d9e0925b4eef5aec8768c6eb4af895b83e3d057",
+        "3764a6b62f2ba8dfbef267bcb6c743b24f6f74162900f74fdbe6b7067eafeb46",
+        "9582afdc70cd1b2f8769731b77822494f974719bb4c111a78c53a5e1999b49a0",
+        "8a760a9c5a61ea8f415aa50c9d4d962c200dabe07927e37d3b5786b6c8c00ae4"
+      ]
+    },
+    "ch-config-console": {
+      "block_sha256": "25f57e5d68eb4655a22356ca1aafbb3e0da92f76eb2476a66bd95f89eede569d",
+      "xref_targets": [
+        "ch-config-locale"
+      ],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 4,
+      "operational_command_sha256": [
+        "4d0ce76487941dc121c61f31015b525e30b45c15d2428d306bb8fa9de02e9163",
+        "c93f11b7c0f26abf8d21554feac505d7f1ecc062cd1ba247273faa12b1697343",
+        "301bdb59b0e5d318813e2a9bb9e82799581dc7101a4da0054b7f574ed5655a8c",
+        "6c5826845273311f71be48c97910a88a036e34beb07efb92d52d02d7b3c8a3ec"
+      ]
+    },
+    "ch-config-locale": {
+      "block_sha256": "7bb4c50c35d900f0d0a740b3cc445817a33de6342dceca9e52e0bcda88d210f1",
+      "xref_targets": [],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 7,
+      "operational_command_sha256": [
+        "4b42b11b02ef1a457ba0bacc95a849ef7ebbeed141c7198974300f7e25fa8366",
+        "cca60a34cfc5ee5b99c527b79490e9f2b7c2516de9f77dc3f2071955c17f180b",
+        "aab71d6dc6e53c01caa3edfc0d0411d161ea246431bad3bfd1634e608ab4ffca",
+        "04b9c69e5218f77e02361d3afe0cfb5a5ba00d1cf301074ce11af2a4830ad995",
+        "5f4971128badb926fc9b980dd20e5077641b4b4ee0a3bcaa6726359f88c5c72c",
+        "abd13566ec2082349efd7522190b3779939abf35e3a2065725a4062f9fa2f6ed",
+        "94f102b35e760ab7c3a0a055a98fa9cd642755b9ef649134dd9d789e209f14f5"
+      ]
+    },
+    "ch-config-inputrc": {
+      "block_sha256": "5f864795b56b812c6abf5da9ffccc1b5181a9c399c6e79cc433bb67ffc57793d",
+      "xref_targets": [],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 1,
+      "operational_command_sha256": [
+        "698ea8da8c7f59e73dcb9e40f9b65554896fbb9da4c82fc6ba175ee2e9780c23"
+      ]
+    },
+    "ch-config-shells": {
+      "block_sha256": "11d4f7044c5e94c11a6f6a5da0aae7fa7d81edc69c53d2bab22fc4dd5dad5c8a",
+      "xref_targets": [],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 1,
+      "operational_command_sha256": [
+        "afb76e1e20cacb5af1963768ec4fea298cf74fd7be6cf1bff3a2da8c2ddb6523"
+      ]
+    },
+    "ch-config-systemd-custom": {
+      "block_sha256": "795baadd68fb029fc9a99ad51ad19a1bd16b00bb7d2e2fe14dbee68744f910ac",
+      "xref_targets": [],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 5,
+      "operational_command_sha256": [
+        "845143e79876fcb1fabd1308479243cc9085ed0a0b19edf7500314f6a8645308",
+        "ad9bce9fff44b22a2308a07cdd2391ecb9d7967a37b3542e01a3654d773a9c9b",
+        "c3ce42d9c052bdcce9099752723e592cf113e5c1d60866ea70213ee745c1e9bc",
+        "c49a27717eda344cf2349100ec8c3f101cdaed24c43a2c357da0f00ae5225b90",
+        "63067f065535c2a156b2f936f1f1d90c985383b332bcb863ad365f32f2167089"
+      ]
+    },
+    "ch-bootable-fstab": {
+      "block_sha256": "190131bd2b37e6194c1897f7fbffea354438f5904c5e2554d1791fd9893af215",
+      "xref_targets": [
+        "ch-bootable-kernel",
+        "ch-bootable-grub"
+      ],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 2,
+      "operational_command_sha256": [
+        "6d70a277b45a9da604db806281501b9c32de54d8b2549e16cac35456efe612c7",
+        "c11122b64376c5ba350d04439c94f98086aee2c2b26fa301041ef35467a079b1"
+      ]
+    },
+    "ch-bootable-kernel": {
+      "block_sha256": "1ca36d57c501c11ace0beaa3e3f24ee44369d150c9443901ac79057a2e12142d",
+      "xref_targets": [
+        "ch-finish-reboot",
+        "ch-bootable-grub",
+        "ch-config-udev"
+      ],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 9,
+      "operational_command_sha256": [
+        "5b413fc26f5565db31fe70601cf4284ac7df8b6cd05e4cd8aa9b94255f1fa134",
+        "3bc6da9f4410adb965004431c54e4f79b7cdaabd0d29c0f01b80e68799c86b63",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "c777db8ea0686188196c15c27be287c510f23f966b07d3af4cf0602359e39ef6",
+        "9dcaa77f9c749fd06d36de6fe1792c22d406e2033af8c7af94c036863efa575e",
+        "21668ceef1bc400ab8acfd59b7710327c382d79310ac38ca7202ebb5a1b86cf4",
+        "47f01e415e2b2aff7843259cc948c16abf91210ba357f4b670068d6de82cf3f6",
+        "0164d5e19cf73ea5f52ccd84697893c05bf127ef96ba07a588e0726e01f24670",
+        "c6e6de08d930e61fa4c7d79a21c7b10aa8044cc21b6a86d5df0d15c80ee09671"
+      ]
+    },
+    "ch-bootable-grub": {
+      "block_sha256": "4fbba415a1e3f9fbec55a5a9eac11688435116eae141511d60cd6ec5fa490d3e",
+      "xref_targets": [
+        "ch-partitioning-creatingpartition"
+      ],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 7,
+      "operational_command_sha256": [
+        "604e32b8d546a7d99750c954aae830dddfc502e5e22404f311b5c612f50348c0",
+        "72fdf643bd7a581f93210c63acf4875db13a8c971e1796371c87e747fcd6e11b",
+        "58156772966e1e0d3a6b4ce96681613130a0a5fd23f4aec7783e74f3aeffeb62",
+        "9ac8c1181f91c49349526fa04b6a721cc425d1c485dc648f1285387e2a497a8c",
+        "91f9e69a793d264767cd7c095a551ad2a26be1f3630ea1859d9468e9d46156b9",
+        "3e50d4be1d3d844bd2dccbaa4566f2fea66182de54684877bc8612de2832d554",
+        "9ebe03edfb88ba7e71101fc9fb76de68904a1b27333661b6e465960ef357d3f0"
+      ]
+    },
+    "ch-finish-theend": {
+      "block_sha256": "449b231ab72ebe87d9f0c05786bf61d2a387197dd9aecf50b0bba2d094f02adb",
+      "xref_targets": [],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 3,
+      "operational_command_sha256": [
+        "925ec094af5ca8da761b9ed335eca3b673f73a29d9aa36ba1fc0cef39e7bfc96",
+        "fcac5dfdf95d96b02968b6ab194199507ee2d3fa40333b4cab06986bb87cffee",
+        "f6bfedb6975c99458e1fc5cadcfb382a733ca2bc67d13d72ee27704f63d1ffdb"
+      ]
+    },
+    "ch-finish-reboot": {
+      "block_sha256": "56c26695c4e16012fdc9462468a6cbd54c907494f49c53fdc2d68d37bd320e64",
+      "xref_targets": [],
+      "bootstrap_command_count": 0,
+      "operational_command_count": 4,
+      "operational_command_sha256": [
+        "00270cf63f93c307e7e9d2cc7e639fa50aca58eeb64be3266a798c9c19535219",
+        "f5aa8f2dc88c1f242d972dfcd44f01f5293b101c5c6c7c83ae5a8aaf6ae223b2",
+        "7fe40f7b81bc1912311a9485131e49c608d9ce0b8272cb5ed092ad12661828c0",
+        "868880ce4659807402c55ba1afbb31169f5970168a4f3711cf15b67331b82f34"
+      ]
     }
   }
 }

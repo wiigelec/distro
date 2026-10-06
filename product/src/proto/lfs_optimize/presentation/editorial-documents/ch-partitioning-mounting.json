@@ -1,0 +1,360 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-partitioning-mounting",
+  "title": "Mounting the New Partition",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Now that a file system has been created, the partition must be mounted so the host system can access it. This book assumes that the file system is mounted at the directory specified by the"
+        },
+        {
+          "type": "code",
+          "text": "LFS"
+        },
+        {
+          "type": "text",
+          "text": "environment variable described in the previous section."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Strictly speaking, one cannot"
+        },
+        {
+          "type": "quote",
+          "text": "mount a partition."
+        },
+        {
+          "type": "text",
+          "text": "One mounts the"
+        },
+        {
+          "type": "emphasis",
+          "text": "file system"
+        },
+        {
+          "type": "text",
+          "text": "embedded in that partition. But since a single partition can't contain more than one file system, people often speak of the partition and the associated file system as if they were one and the same."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Create the mount point and mount the LFS file system with these commands:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 0,
+      "source_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Replace"
+        },
+        {
+          "type": "replaceable",
+          "text": "<xxx>"
+        },
+        {
+          "type": "text",
+          "text": "with the name of the LFS partition."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "If you are using multiple partitions for LFS (e.g., one for"
+        },
+        {
+          "type": "code",
+          "text": "/"
+        },
+        {
+          "type": "text",
+          "text": "and another for"
+        },
+        {
+          "type": "code",
+          "text": "/home"
+        },
+        {
+          "type": "text",
+          "text": "), mount them like this:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 1,
+      "source_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Replace"
+        },
+        {
+          "type": "replaceable",
+          "text": "<xxx>"
+        },
+        {
+          "type": "text",
+          "text": "and"
+        },
+        {
+          "type": "replaceable",
+          "text": "<yyy>"
+        },
+        {
+          "type": "text",
+          "text": "with the appropriate partition names."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Set the owner and permission mode of the"
+        },
+        {
+          "type": "code",
+          "text": "$LFS"
+        },
+        {
+          "type": "text",
+          "text": "directory (i.e. the root directory in the newly created file system for the LFS system) to"
+        },
+        {
+          "type": "code",
+          "text": "root"
+        },
+        {
+          "type": "text",
+          "text": "and"
+        },
+        {
+          "type": "code",
+          "text": "755"
+        },
+        {
+          "type": "text",
+          "text": "in case the host distro has been configured to use a different default for"
+        },
+        {
+          "type": "code",
+          "text": "mkfs"
+        },
+        {
+          "type": "text",
+          "text": ":"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 2,
+      "source_index": 2
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Ensure that this new partition is not mounted with permissions that are too restrictive (such as the"
+        },
+        {
+          "type": "code",
+          "text": "nosuid"
+        },
+        {
+          "type": "text",
+          "text": "or"
+        },
+        {
+          "type": "code",
+          "text": "nodev"
+        },
+        {
+          "type": "text",
+          "text": "options). Run the"
+        },
+        {
+          "type": "code",
+          "text": "mount"
+        },
+        {
+          "type": "text",
+          "text": "command without any parameters to see what options are set for the mounted LFS partition. If"
+        },
+        {
+          "type": "code",
+          "text": "nosuid"
+        },
+        {
+          "type": "text",
+          "text": "and/or"
+        },
+        {
+          "type": "code",
+          "text": "nodev"
+        },
+        {
+          "type": "text",
+          "text": "are set, the partition must be remounted."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "If you have created and mounted more partitions for the LFS system than the one mounted at"
+        },
+        {
+          "type": "code",
+          "text": "$LFS"
+        },
+        {
+          "type": "text",
+          "text": ", now you should fix up their ownership and permission mode and check the mount options for them as well."
+        }
+      ]
+    },
+    {
+      "type": "admonition",
+      "kind": "warning",
+      "blocks": [
+        {
+          "type": "flow",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The above instructions assume that you will not restart your computer throughout the LFS process. If you shut down your system, you will either need to remount the LFS partition each time you restart the build process, or modify the host system's"
+                },
+                {
+                  "type": "code",
+                  "text": "/etc/fstab"
+                },
+                {
+                  "type": "text",
+                  "text": "file to automatically remount it when you reboot. For example, you might add this line to your"
+                },
+                {
+                  "type": "code",
+                  "text": "/etc/fstab"
+                },
+                {
+                  "type": "text",
+                  "text": "file:"
+                }
+              ]
+            },
+            {
+              "type": "pre",
+              "text": "/dev/<xxx>  /mnt/lfs ext4   defaults      1     1"
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "If you use additional optional partitions, be sure to add them also."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "If you are using a"
+        },
+        {
+          "type": "code",
+          "text": "swap"
+        },
+        {
+          "type": "text",
+          "text": "partition, ensure that it is enabled using the"
+        },
+        {
+          "type": "code",
+          "text": "swapon"
+        },
+        {
+          "type": "text",
+          "text": "command:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 3,
+      "source_index": 3
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Replace"
+        },
+        {
+          "type": "replaceable",
+          "text": "<zzz>"
+        },
+        {
+          "type": "text",
+          "text": "with the name of the"
+        },
+        {
+          "type": "code",
+          "text": "swap"
+        },
+        {
+          "type": "text",
+          "text": "partition."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Now that the new LFS partition is open for business, it's time to download the packages."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,863 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-config-systemd-custom",
+  "title": "Systemd Usage and Configuration",
+  "blocks": [
+    {
+      "type": "section",
+      "title": "Basic Configuration",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The"
+            },
+            {
+              "type": "code",
+              "text": "/etc/systemd/system.conf"
+            },
+            {
+              "type": "text",
+              "text": "file contains a set of options to control basic systemd operations. The default file has all entries commented out with the default settings indicated. This file is where the log level may be changed as well as some basic logging settings. See the"
+            },
+            {
+              "type": "link",
+              "href": "https://man.archlinux.org/man/systemd-system.conf.5",
+              "label": "systemd-system.conf(5)"
+            },
+            {
+              "type": "text",
+              "text": "manual page for details on each configuration option."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Disabling Screen Clearing at Boot Time",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The normal behavior for systemd is to clear the screen at the end of the boot sequence. If desired, this behavior may be changed by running the following command:"
+            }
+          ]
+        },
+        {
+          "type": "system_operation_command",
+          "index": 0,
+          "source_index": 0
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The boot messages can always be reviewed by using the journalctl -b command as the"
+            },
+            {
+              "type": "code",
+              "text": "root"
+            },
+            {
+              "type": "text",
+              "text": "user."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Disabling tmpfs for /tmp",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "By default,"
+            },
+            {
+              "type": "code",
+              "text": "/tmp"
+            },
+            {
+              "type": "text",
+              "text": "is created as a tmpfs. If this is not desired, it can be overridden by executing the following command:"
+            }
+          ]
+        },
+        {
+          "type": "system_operation_command",
+          "index": 1,
+          "source_index": 1
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Alternatively, if a separate partition for"
+            },
+            {
+              "type": "code",
+              "text": "/tmp"
+            },
+            {
+              "type": "text",
+              "text": "is desired, specify that partition in a"
+            },
+            {
+              "type": "code",
+              "text": "/etc/fstab"
+            },
+            {
+              "type": "text",
+              "text": "entry."
+            }
+          ]
+        }
+      ],
+      "id": "systemd-no-tmpfs"
+    },
+    {
+      "type": "section",
+      "title": "Configuring Automatic File Creation and Deletion",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "There are several services that create or delete files or directories:"
+            }
+          ]
+        },
+        {
+          "type": "list",
+          "ordered": false,
+          "items": [
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "systemd-tmpfiles-clean.service"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "systemd-tmpfiles-setup-dev.service"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "systemd-tmpfiles-setup.service"
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The system location for the configuration files is"
+            },
+            {
+              "type": "code",
+              "text": "/usr/lib/tmpfiles.d/*.conf"
+            },
+            {
+              "type": "text",
+              "text": ". The local configuration files are in"
+            },
+            {
+              "type": "code",
+              "text": "/etc/tmpfiles.d"
+            },
+            {
+              "type": "text",
+              "text": ". Files in"
+            },
+            {
+              "type": "code",
+              "text": "/etc/tmpfiles.d"
+            },
+            {
+              "type": "text",
+              "text": "override files with the same name in"
+            },
+            {
+              "type": "code",
+              "text": "/usr/lib/tmpfiles.d"
+            },
+            {
+              "type": "text",
+              "text": ". See"
+            },
+            {
+              "type": "link",
+              "href": "https://man.archlinux.org/man/tmpfiles.d.5",
+              "label": "tmpfiles.d(5)"
+            },
+            {
+              "type": "text",
+              "text": "manual page for file format details."
+            }
+          ]
+        },
+        {
+          "type": "flow",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Note that the syntax for the"
+                },
+                {
+                  "type": "code",
+                  "text": "/usr/lib/tmpfiles.d/*.conf"
+                },
+                {
+                  "type": "text",
+                  "text": "files can be confusing. For example, the default deletion of files in the /tmp directory is located in"
+                },
+                {
+                  "type": "code",
+                  "text": "/usr/lib/tmpfiles.d/tmp.conf"
+                },
+                {
+                  "type": "text",
+                  "text": "with the line:"
+                }
+              ]
+            },
+            {
+              "type": "pre",
+              "text": "q /tmp 1777 root root 10d"
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The type field, q, indicates the creation of a subvolume with quotas which is really only applicable to btrfs filesystems. It references type v which in turn references type d (directory). This then creates the specified directory if it is not present and adjusts the permissions and ownership as specified. Contents of the directory will be subject to time based cleanup if the age argument is specified."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "flow",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "If the default parameters are not desired, then the file should be copied to"
+                },
+                {
+                  "type": "code",
+                  "text": "/etc/tmpfiles.d"
+                },
+                {
+                  "type": "text",
+                  "text": "and edited as desired. For example:"
+                }
+              ]
+            },
+            {
+              "type": "system_operation_command",
+              "index": 2,
+              "source_index": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Overriding Default Services Behavior",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The parameters of a unit can be overridden by creating a directory and a configuration file in"
+            },
+            {
+              "type": "code",
+              "text": "/etc/systemd/system"
+            },
+            {
+              "type": "text",
+              "text": ". For example:"
+            }
+          ]
+        },
+        {
+          "type": "system_operation_command",
+          "index": 3,
+          "source_index": 3
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "See"
+            },
+            {
+              "type": "link",
+              "href": "https://man.archlinux.org/man/systemd.unit.5",
+              "label": "systemd.unit(5)"
+            },
+            {
+              "type": "text",
+              "text": "manual page for more information. After creating the configuration file, run systemctl daemon-reload and systemctl restart foobar to activate the changes to a service."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Debugging the Boot Sequence",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Rather than plain shell scripts used in SysVinit or BSD style init systems, systemd uses a unified format for different types of startup files (or units). The command"
+            },
+            {
+              "type": "code",
+              "text": "systemctl"
+            },
+            {
+              "type": "text",
+              "text": "is used to enable, disable, control state, and obtain status of unit files. Here are some examples of frequently used commands:"
+            }
+          ]
+        },
+        {
+          "type": "list",
+          "ordered": false,
+          "items": [
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "code",
+                    "text": "systemctl list-units -t <service> [--all]"
+                  },
+                  {
+                    "type": "text",
+                    "text": ": lists loaded unit files of type service."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "code",
+                    "text": "systemctl list-units -t <target> [--all]"
+                  },
+                  {
+                    "type": "text",
+                    "text": ": lists loaded unit files of type target."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "code",
+                    "text": "systemctl show -p Wants <multi-user.target>"
+                  },
+                  {
+                    "type": "text",
+                    "text": ": shows all units that depend on the multi-user target. Targets are special unit files that are analogous to runlevels under SysVinit."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "code",
+                    "text": "systemctl status <servicename.service>"
+                  },
+                  {
+                    "type": "text",
+                    "text": ": shows the status of the servicename service. The .service extension can be omitted if there are no other unit files with the same name, such as .socket files (which create a listening socket that provides similar functionality to inetd/xinetd)."
+                  }
+                ]
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Working with the Systemd Journal",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Logging on a system booted with systemd is handled with systemd-journald (by default), rather than a typical unix syslog daemon. You can also add a normal syslog daemon and have both operate side by side if desired. The systemd-journald program stores journal entries in a binary format rather than a plain text log file. To assist with parsing the file, the command"
+            },
+            {
+              "type": "code",
+              "text": "journalctl"
+            },
+            {
+              "type": "text",
+              "text": "is provided. Here are some examples of frequently used commands:"
+            }
+          ]
+        },
+        {
+          "type": "list",
+          "ordered": false,
+          "items": [
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "code",
+                    "text": "journalctl -r"
+                  },
+                  {
+                    "type": "text",
+                    "text": ": shows all contents of the journal in reverse chronological order."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "code",
+                    "text": "journalctl -u UNIT"
+                  },
+                  {
+                    "type": "text",
+                    "text": ": shows the journal entries associated with the specified UNIT file."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "code",
+                    "text": "journalctl -b[=ID] -r"
+                  },
+                  {
+                    "type": "text",
+                    "text": ": shows the journal entries since last successful boot (or for boot ID) in reverse chronological order."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "code",
+                    "text": "journalctl -f"
+                  },
+                  {
+                    "type": "text",
+                    "text": ": provides functionality similar to tail -f (follow)."
+                  }
+                ]
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Working with Core Dumps",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Core dumps are useful to debug crashed programs, especially when a daemon process crashes. On systemd booted systems the core dumping is handled by"
+            },
+            {
+              "type": "code",
+              "text": "systemd-coredump"
+            },
+            {
+              "type": "text",
+              "text": ". It will log the core dump in the journal and store the core dump itself in"
+            },
+            {
+              "type": "code",
+              "text": "/var/lib/systemd/coredump"
+            },
+            {
+              "type": "text",
+              "text": ". To retrieve and process core dumps, the"
+            },
+            {
+              "type": "code",
+              "text": "coredumpctl"
+            },
+            {
+              "type": "text",
+              "text": "tool is provided. Here are some examples of frequently used commands:"
+            }
+          ]
+        },
+        {
+          "type": "list",
+          "ordered": false,
+          "items": [
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "code",
+                    "text": "coredumpctl -r"
+                  },
+                  {
+                    "type": "text",
+                    "text": ": lists all core dumps in reverse chronological order."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "code",
+                    "text": "coredumpctl -1 info"
+                  },
+                  {
+                    "type": "text",
+                    "text": ": shows the information from the last core dump."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "code",
+                    "text": "coredumpctl -1 debug"
+                  },
+                  {
+                    "type": "text",
+                    "text": ": loads the last core dump into"
+                  },
+                  {
+                    "type": "link",
+                    "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/general/gdb.html",
+                    "label": "GDB"
+                  },
+                  {
+                    "type": "text",
+                    "text": "."
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Core dumps may use a lot of disk space. The maximum disk space used by core dumps can be limited by creating a configuration file in"
+            },
+            {
+              "type": "code",
+              "text": "/etc/systemd/coredump.conf.d"
+            },
+            {
+              "type": "text",
+              "text": ". For example:"
+            }
+          ]
+        },
+        {
+          "type": "system_operation_command",
+          "index": 4,
+          "source_index": 4
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "See the"
+            },
+            {
+              "type": "link",
+              "href": "https://man.archlinux.org/man/systemd-coredump.8",
+              "label": "systemd-coredump(8)"
+            },
+            {
+              "type": "text",
+              "text": ","
+            },
+            {
+              "type": "link",
+              "href": "https://man.archlinux.org/man/coredumpctl.1",
+              "label": "coredumpctl(1)"
+            },
+            {
+              "type": "text",
+              "text": ", and"
+            },
+            {
+              "type": "link",
+              "href": "https://man.archlinux.org/man/coredump.conf.d.5",
+              "label": "coredump.conf.d(5)"
+            },
+            {
+              "type": "text",
+              "text": "manual pages for more information."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Long Running Processes",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Beginning with systemd-230, all user processes are killed when a user session is ended, even if nohup is used, or the process uses the"
+            },
+            {
+              "type": "code",
+              "text": "daemon()"
+            },
+            {
+              "type": "text",
+              "text": "or"
+            },
+            {
+              "type": "code",
+              "text": "setsid()"
+            },
+            {
+              "type": "text",
+              "text": "functions. This is a deliberate change from a historically permissive environment to a more restrictive one. The new behavior may cause issues if you depend on long running programs (e.g.,"
+            },
+            {
+              "type": "code",
+              "text": "screen"
+            },
+            {
+              "type": "text",
+              "text": "or"
+            },
+            {
+              "type": "code",
+              "text": "tmux"
+            },
+            {
+              "type": "text",
+              "text": ") to remain active after ending your user session. There are three ways to enable lingering processes to remain after a user session is ended."
+            }
+          ]
+        },
+        {
+          "type": "list",
+          "ordered": false,
+          "items": [
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "emphasis",
+                    "text": "Enable process lingering for only selected users"
+                  },
+                  {
+                    "type": "text",
+                    "text": ": Normal users have permission to enable process lingering with the command"
+                  },
+                  {
+                    "type": "code",
+                    "text": "loginctl enable-linger"
+                  },
+                  {
+                    "type": "text",
+                    "text": "for their own user. System administrators can use the same command with a"
+                  },
+                  {
+                    "type": "code",
+                    "text": "user"
+                  },
+                  {
+                    "type": "text",
+                    "text": "argument to enable for a user. That user can then use the"
+                  },
+                  {
+                    "type": "code",
+                    "text": "systemd-run"
+                  },
+                  {
+                    "type": "text",
+                    "text": "command to start long running processes. For example:"
+                  },
+                  {
+                    "type": "code",
+                    "text": "systemd-run --scope --user /usr/bin/screen"
+                  },
+                  {
+                    "type": "text",
+                    "text": ". If you enable lingering for your user, the user@.service will remain even after all login sessions are closed, and will automatically start at system boot. This has the advantage of explicitly allowing and disallowing processes to run after the user session has ended, but breaks backwards compatibility with tools like"
+                  },
+                  {
+                    "type": "code",
+                    "text": "nohup"
+                  },
+                  {
+                    "type": "text",
+                    "text": "and utilities that use"
+                  },
+                  {
+                    "type": "code",
+                    "text": "daemon()"
+                  },
+                  {
+                    "type": "text",
+                    "text": "."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "emphasis",
+                    "text": "Enable system-wide process lingering"
+                  },
+                  {
+                    "type": "text",
+                    "text": ": You can set"
+                  },
+                  {
+                    "type": "code",
+                    "text": "KillUserProcesses=no"
+                  },
+                  {
+                    "type": "text",
+                    "text": "in"
+                  },
+                  {
+                    "type": "code",
+                    "text": "/etc/systemd/logind.conf"
+                  },
+                  {
+                    "type": "text",
+                    "text": "to enable process lingering globally for all users. This has the benefit of leaving the old method available to all users at the expense of explicit control."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "emphasis",
+                    "text": "Disable at build-time"
+                  },
+                  {
+                    "type": "text",
+                    "text": ": You can disable lingering by default while building systemd by adding the switch"
+                  },
+                  {
+                    "type": "code",
+                    "text": "-D default-kill-user-processes=false"
+                  },
+                  {
+                    "type": "text",
+                    "text": "to the"
+                  },
+                  {
+                    "type": "code",
+                    "text": "meson"
+                  },
+                  {
+                    "type": "text",
+                    "text": "command for systemd. This completely disables the ability of systemd to kill user processes at session end."
+                  }
+                ]
+              }
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-tools-creatingminlayout",
+  "title": "Creating a Limited Directory Layout in the LFS Filesystem",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "In this section, we begin populating the LFS filesystem with the pieces that will constitute the final Linux system. The first step is to create a limited directory hierarchy, so that the programs compiled in"
+        },
+        {
+          "type": "xref",
+          "target": "chapter-temporary-tools",
+          "label": "Chapter 6"
+        },
+        {
+          "type": "text",
+          "text": "(as well as glibc and libstdc++ in"
+        },
+        {
+          "type": "xref",
+          "target": "chapter-cross-tools",
+          "label": "Chapter 5"
+        },
+        {
+          "type": "text",
+          "text": ") can be installed in their final location. We do this so those temporary programs will be overwritten when the final versions are built in"
+        },
+        {
+          "type": "xref",
+          "target": "chapter-building-system",
+          "label": "Chapter 8"
+        },
+        {
+          "type": "text",
+          "text": "."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Create the required directory layout by issuing the following commands as"
+        },
+        {
+          "type": "code",
+          "text": "root"
+        },
+        {
+          "type": "text",
+          "text": ":"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 0,
+      "source_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Programs in"
+        },
+        {
+          "type": "xref",
+          "target": "chapter-temporary-tools",
+          "label": "Chapter 6"
+        },
+        {
+          "type": "text",
+          "text": "will be compiled with a cross-compiler (more details can be found in section"
+        },
+        {
+          "type": "xref",
+          "target": "ch-tools-toolchaintechnotes",
+          "label": "Toolchain Technical Notes"
+        },
+        {
+          "type": "text",
+          "text": "). This cross-compiler will be installed in a special directory, to separate it from the other programs. Still acting as"
+        },
+        {
+          "type": "code",
+          "text": "root"
+        },
+        {
+          "type": "text",
+          "text": ", create that directory with this command:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 1,
+      "source_index": 1
+    },
+    {
+      "type": "admonition",
+      "kind": "note",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The LFS editors have deliberately decided not to use a"
+            },
+            {
+              "type": "code",
+              "text": "/usr/lib64"
+            },
+            {
+              "type": "text",
+              "text": "directory. Several steps are taken to be sure the toolchain will not use it. If for any reason this directory appears (either because you made an error in following the instructions, or because you installed a binary package that created it after finishing LFS), it may break your system. You should always be sure this directory does not exist."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-config-symlinks",
+  "title": "Managing Devices",
+  "blocks": [
+    {
+      "type": "section",
+      "title": "Dealing with Duplicate Devices",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "As explained in"
+            },
+            {
+              "type": "xref",
+              "target": "ch-config-udev",
+              "label": "Overview of Device and Module Handling"
+            },
+            {
+              "type": "text",
+              "text": "the order in which devices with the same function appear in"
+            },
+            {
+              "type": "code",
+              "text": "/dev"
+            },
+            {
+              "type": "text",
+              "text": "is essentially random. E.g., if you have a USB web camera and a TV tuner, sometimes"
+            },
+            {
+              "type": "code",
+              "text": "/dev/video0"
+            },
+            {
+              "type": "text",
+              "text": "refers to the camera and"
+            },
+            {
+              "type": "code",
+              "text": "/dev/video1"
+            },
+            {
+              "type": "text",
+              "text": "refers to the tuner, and sometimes after a reboot the order changes. For all classes of hardware except sound cards and network cards, this is fixable by creating udev rules to create persistent symlinks. The case of network cards is covered separately in"
+            },
+            {
+              "type": "xref",
+              "target": "ch-config-network",
+              "label": "General Network Configuration"
+            },
+            {
+              "type": "text",
+              "text": "and sound card configuration can be found in"
+            },
+            {
+              "type": "link",
+              "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/postlfs/devices.html",
+              "label": "BLFS"
+            },
+            {
+              "type": "text",
+              "text": "."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "For each of your devices that is likely to have this problem (even if the problem doesn't exist in your current Linux distribution), find the corresponding directory under"
+            },
+            {
+              "type": "code",
+              "text": "/sys/class"
+            },
+            {
+              "type": "text",
+              "text": "or"
+            },
+            {
+              "type": "code",
+              "text": "/sys/block"
+            },
+            {
+              "type": "text",
+              "text": ". For video devices, this may be"
+            },
+            {
+              "type": "code",
+              "text": "/sys/class/video4linux/videoX"
+            },
+            {
+              "type": "text",
+              "text": ". Figure out the attributes that identify the device uniquely (usually, vendor and product IDs and/or serial numbers work):"
+            }
+          ]
+        },
+        {
+          "type": "system_operation_command",
+          "index": 0,
+          "source_index": 0
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Then write rules that create the symlinks, e.g.:"
+            }
+          ]
+        },
+        {
+          "type": "system_operation_command",
+          "index": 1,
+          "source_index": 1
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The result is that"
+            },
+            {
+              "type": "code",
+              "text": "/dev/video0"
+            },
+            {
+              "type": "text",
+              "text": "and"
+            },
+            {
+              "type": "code",
+              "text": "/dev/video1"
+            },
+            {
+              "type": "text",
+              "text": "devices still refer randomly to the tuner and the web camera (and thus should never be used directly), but there are symlinks"
+            },
+            {
+              "type": "code",
+              "text": "/dev/tvtuner"
+            },
+            {
+              "type": "text",
+              "text": "and"
+            },
+            {
+              "type": "code",
+              "text": "/dev/webcam"
+            },
+            {
+              "type": "text",
+              "text": "that always point to the correct device."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

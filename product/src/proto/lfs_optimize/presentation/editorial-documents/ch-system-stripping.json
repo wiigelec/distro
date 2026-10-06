@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-system-stripping",
+  "title": "Stripping",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "This section is optional. If the intended user is not a programmer and does not plan to do any debugging of the system software, the system's size can be decreased by some 2 GB by removing the debugging symbols, and some unnecessary symbol table entries, from binaries and libraries. This causes no real inconvenience for a typical Linux user."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Most people who use the commands mentioned below do not experience any difficulties. However, it is easy to make a mistake and render the new system unusable. So before running the"
+        },
+        {
+          "type": "code",
+          "text": "strip"
+        },
+        {
+          "type": "text",
+          "text": "commands, it is a good idea to make a backup of the LFS system in its current state."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "A"
+        },
+        {
+          "type": "code",
+          "text": "strip"
+        },
+        {
+          "type": "text",
+          "text": "command with the"
+        },
+        {
+          "type": "code",
+          "text": "--strip-unneeded"
+        },
+        {
+          "type": "text",
+          "text": "option removes all debug symbols from a binary or library. It also removes all symbol table entries not needed by the linker (for static libraries) or dynamic linker (for dynamically linked binaries and shared libraries)."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The debugging symbols from selected libraries are compressed with"
+        },
+        {
+          "type": "code",
+          "text": "Zstd"
+        },
+        {
+          "type": "text",
+          "text": "and preserved in separate files. That debugging information is needed to run regression tests with"
+        },
+        {
+          "type": "link",
+          "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd//general/valgrind.html",
+          "label": "valgrind"
+        },
+        {
+          "type": "text",
+          "text": "or"
+        },
+        {
+          "type": "link",
+          "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd//general/gdb.html",
+          "label": "gdb"
+        },
+        {
+          "type": "text",
+          "text": "later, in BLFS."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Note that"
+        },
+        {
+          "type": "code",
+          "text": "strip"
+        },
+        {
+          "type": "text",
+          "text": "will overwrite the binary or library file it is processing. This can crash the processes using code or data from the file. If the process running"
+        },
+        {
+          "type": "code",
+          "text": "strip"
+        },
+        {
+          "type": "text",
+          "text": "is affected, the binary or library being stripped can be destroyed; this can make the system completely unusable. To avoid this problem we copy some libraries and binaries into"
+        },
+        {
+          "type": "code",
+          "text": "/tmp"
+        },
+        {
+          "type": "text",
+          "text": ", strip them there, then reinstall them with the"
+        },
+        {
+          "type": "code",
+          "text": "install"
+        },
+        {
+          "type": "text",
+          "text": "command. (The related entry in"
+        },
+        {
+          "type": "xref",
+          "target": "pkgmgmt-upgrade-issues",
+          "label": "Upgrade Issues"
+        },
+        {
+          "type": "text",
+          "text": "gives the rationale for using the"
+        },
+        {
+          "type": "code",
+          "text": "install"
+        },
+        {
+          "type": "text",
+          "text": "command here.)"
+        }
+      ]
+    },
+    {
+      "type": "admonition",
+      "kind": "note",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The ELF loader's name is ld-linux-x86-64.so.2 on 64-bit systems and ld-linux.so.2 on 32-bit systems. The construct below selects the correct name for the current architecture, excluding anything ending with"
+            },
+            {
+              "type": "code",
+              "text": "g"
+            },
+            {
+              "type": "text",
+              "text": ", in case the commands below have already been run."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "admonition",
+      "kind": "important",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "If there is any package whose version is different from the version specified by the book (either following a security advisory or satisfying personal preference), it may be necessary to update the library file name in"
+            },
+            {
+              "type": "code",
+              "text": "save_usrlib"
+            },
+            {
+              "type": "text",
+              "text": "or"
+            },
+            {
+              "type": "code",
+              "text": "online_usrlib"
+            },
+            {
+              "type": "text",
+              "text": "."
+            },
+            {
+              "type": "emphasis",
+              "text": "Failing to do so may render the system completely unusable."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 0,
+      "source_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "A large number of files will be flagged as errors because their file format is not recognized. These warnings can be safely ignored. They indicate that those files are scripts, not binaries."
+        }
+      ]
+    }
+  ]
+}

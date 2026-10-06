@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-config-inputrc",
+  "title": "Creating the /etc/inputrc File",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The"
+        },
+        {
+          "type": "code",
+          "text": "inputrc"
+        },
+        {
+          "type": "text",
+          "text": "file is the configuration file for the readline library, which provides editing capabilities while the user is entering a line from the terminal. It works by translating keyboard inputs into specific actions. Readline is used by bash and most other shells as well as many other applications."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Most people do not need user-specific functionality so the command below creates a global"
+        },
+        {
+          "type": "code",
+          "text": "/etc/inputrc"
+        },
+        {
+          "type": "text",
+          "text": "used by everyone who logs in. If you later decide you need to override the defaults on a per user basis, you can create a"
+        },
+        {
+          "type": "code",
+          "text": ".inputrc"
+        },
+        {
+          "type": "text",
+          "text": "file in the user's home directory with the modified mappings."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "For more information on how to edit the"
+        },
+        {
+          "type": "code",
+          "text": "inputrc"
+        },
+        {
+          "type": "text",
+          "text": "file, see"
+        },
+        {
+          "type": "code",
+          "text": "info bash"
+        },
+        {
+          "type": "text",
+          "text": "under the"
+        },
+        {
+          "type": "emphasis",
+          "text": "Readline Init File"
+        },
+        {
+          "type": "text",
+          "text": "section."
+        },
+        {
+          "type": "code",
+          "text": "info readline"
+        },
+        {
+          "type": "text",
+          "text": "is also a good source of information."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Below is a generic global"
+        },
+        {
+          "type": "code",
+          "text": "inputrc"
+        },
+        {
+          "type": "text",
+          "text": "along with comments to explain what the various options do. Note that comments cannot be on the same line as commands. Create the file using the following command:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 0,
+      "source_index": 0
+    }
+  ]
+}

@@ -1,0 +1,371 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-partitioning-aboutlfs",
+  "title": "Setting the $LFS Variable and the Umask",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Throughout this book, the environment variable"
+        },
+        {
+          "type": "code",
+          "text": "LFS"
+        },
+        {
+          "type": "text",
+          "text": "will be used several times. You should ensure that this variable is always defined throughout the LFS build process. It should be set to the name of the directory where you will be building your LFS system - we will use"
+        },
+        {
+          "type": "code",
+          "text": "/mnt/lfs"
+        },
+        {
+          "type": "text",
+          "text": "as an example, but you may choose any directory name you want. If you are building LFS on a separate partition, this directory will be the mount point for the partition. Choose a directory location and set the variable with the following command:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 0,
+      "source_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Having this variable set is beneficial in that commands such as"
+        },
+        {
+          "type": "code",
+          "text": "mkdir -v $LFS/tools"
+        },
+        {
+          "type": "text",
+          "text": "can be typed literally. The shell will automatically replace"
+        },
+        {
+          "type": "quote",
+          "text": "$LFS"
+        },
+        {
+          "type": "text",
+          "text": "with"
+        },
+        {
+          "type": "quote",
+          "text": "/mnt/lfs"
+        },
+        {
+          "type": "text",
+          "text": "(or whatever value the variable was set to) when it processes the command line."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Now set the file mode creation mask (umask) to"
+        },
+        {
+          "type": "code",
+          "text": "022"
+        },
+        {
+          "type": "text",
+          "text": "in case the host distro uses a different default:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 1,
+      "source_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Setting the umask to 022 ensures that newly created files and directories are only writable by their owner, but are readable and searchable (only for directories) by anyone (assuming default modes are used by the"
+        },
+        {
+          "type": "link",
+          "href": "https://man.archlinux.org/man/open.2",
+          "label": "open(2)"
+        },
+        {
+          "type": "text",
+          "text": "system call, new files will end up with permission mode 644 and directories with mode 755). An overly-permissive default can leave security holes in the LFS system, and an overly-restrictive default can cause strange issues building or using the LFS system."
+        }
+      ]
+    },
+    {
+      "type": "admonition",
+      "kind": "caution",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Do not forget to check that"
+            },
+            {
+              "type": "code",
+              "text": "LFS"
+            },
+            {
+              "type": "text",
+              "text": "is set and the umask is set to"
+            },
+            {
+              "type": "code",
+              "text": "022"
+            },
+            {
+              "type": "text",
+              "text": "whenever you leave and reenter the current working environment (such as when doing a"
+            },
+            {
+              "type": "code",
+              "text": "su"
+            },
+            {
+              "type": "text",
+              "text": "to"
+            },
+            {
+              "type": "code",
+              "text": "root"
+            },
+            {
+              "type": "text",
+              "text": "or another user). Check that the"
+            },
+            {
+              "type": "code",
+              "text": "LFS"
+            },
+            {
+              "type": "text",
+              "text": "variable is set up properly with:"
+            }
+          ]
+        },
+        {
+          "type": "system_operation_command",
+          "index": 2,
+          "source_index": 2
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Make sure the output shows the path to your LFS system's build location, which is"
+            },
+            {
+              "type": "code",
+              "text": "/mnt/lfs"
+            },
+            {
+              "type": "text",
+              "text": "if the provided example was followed."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Check that the umask is set up properly with:"
+            }
+          ]
+        },
+        {
+          "type": "system_operation_command",
+          "index": 3,
+          "source_index": 3
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The output may be"
+            },
+            {
+              "type": "code",
+              "text": "0022"
+            },
+            {
+              "type": "text",
+              "text": "or"
+            },
+            {
+              "type": "code",
+              "text": "022"
+            },
+            {
+              "type": "text",
+              "text": "(the number of leading zeros depends on the host distro)."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "If any output of these two commands is incorrect, use the command given earlier on this page to set"
+            },
+            {
+              "type": "code",
+              "text": "$LFS"
+            },
+            {
+              "type": "text",
+              "text": "to the correct directory name and set umask to"
+            },
+            {
+              "type": "code",
+              "text": "022"
+            },
+            {
+              "type": "text",
+              "text": "."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "admonition",
+      "kind": "note",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "One way to ensure that the"
+            },
+            {
+              "type": "code",
+              "text": "LFS"
+            },
+            {
+              "type": "text",
+              "text": "variable and the umask are always set properly is to edit the"
+            },
+            {
+              "type": "code",
+              "text": ".bash_profile"
+            },
+            {
+              "type": "text",
+              "text": "file in both your personal home directory and in"
+            },
+            {
+              "type": "code",
+              "text": "/root/.bash_profile"
+            },
+            {
+              "type": "text",
+              "text": "and enter the"
+            },
+            {
+              "type": "code",
+              "text": "export"
+            },
+            {
+              "type": "text",
+              "text": "and"
+            },
+            {
+              "type": "code",
+              "text": "umask"
+            },
+            {
+              "type": "text",
+              "text": "commands above. In addition, the shell specified in the"
+            },
+            {
+              "type": "code",
+              "text": "/etc/passwd"
+            },
+            {
+              "type": "text",
+              "text": "file for all users that need the"
+            },
+            {
+              "type": "code",
+              "text": "LFS"
+            },
+            {
+              "type": "text",
+              "text": "variable must be bash to ensure that the"
+            },
+            {
+              "type": "code",
+              "text": ".bash_profile"
+            },
+            {
+              "type": "text",
+              "text": "file is incorporated as a part of the login process."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Another consideration is the method that is used to log into the host system. If logging in through a graphical display manager, the user's"
+            },
+            {
+              "type": "code",
+              "text": ".bash_profile"
+            },
+            {
+              "type": "text",
+              "text": "is not normally used when a virtual terminal is started. In this case, add the commands to the"
+            },
+            {
+              "type": "code",
+              "text": ".bashrc"
+            },
+            {
+              "type": "text",
+              "text": "file for the user and"
+            },
+            {
+              "type": "code",
+              "text": "root"
+            },
+            {
+              "type": "text",
+              "text": ". In addition, some distributions use an \"if\" test, and do not run the remaining"
+            },
+            {
+              "type": "code",
+              "text": ".bashrc"
+            },
+            {
+              "type": "text",
+              "text": "instructions for a non-interactive bash invocation. Be sure to place the commands ahead of the test for non-interactive use."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

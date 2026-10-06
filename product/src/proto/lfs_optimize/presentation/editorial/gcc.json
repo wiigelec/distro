@@ -233,6 +233,7 @@
     {
       "type": "admonition",
       "kind": "note",
+      "id": "pie-ssp-info",
       "paragraphs": [
         {
           "type": "paragraph",

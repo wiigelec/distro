@@ -17,7 +17,7 @@ Roadmap:
 | M4 — Bootstrap proof | COMPLETE | Fresh Chapter 5–7 bootstrap hands directly to the normal executor; all 80 final-system packages build successfully without publication XML/book parsing. |
 | M5 — Development proof | COMPLETE | Accepted state, candidate identity, validation, definition binding/drift rejection, review evidence, and guarded transactional promotion are implemented. |
 | M6 — Release proof | SATISFIED BY COMPOSITION | M4 proves clean full-system realization from normalized state and M5 proves validated state identity and controlled promotion. Freezing accepted state under a release identity adds production plumbing but no unresolved prototype architecture question. |
-| M7 — Presentation proof | IN PROGRESS — 169/199 CHUNKS COMPLETE; 30 AUTHORITY GAPS DEFERRED | 89/119 non-package bodies are proven complete. Direct validation proves normalized package rendering for all 80/80 Chapter 8 package pages. The remaining gaps are the 30 operational non-package pages whose executable system-setup commands still lack normalized authority. |
+| M7 — Presentation proof | COMPLETE — 199/199 CHUNKS COMPLETE; 0 AUTHORITY GAPS | All 80/80 Chapter 8 package pages and all 119/119 non-package bodies render from normalized authority plus presentation-owned editorial state. All 38 referenced nested targets are physically present in rendered HTML. |
 | M8+ | NOT STARTED | BLFS, hard-BLFS, and user-system proofs remain later roadmap milestones. |
 
 ## M5 closure
@@ -333,31 +333,33 @@ afterlfs
 `ch-tools-glibc` binds all 16 executable commands to `bootstrap-13.1.json`;
 publication editorial state does not duplicate those recipes.
 
-## M7 bulk eligible editorial migration
+## M7 complete non-package editorial migration
 
-The non-package chunk set now has an explicit authority split:
+The non-package chunk set is now fully modeled:
 
 ```text
 119 non-package chunks
-├── 89 complete presentation bodies
-│   ├── narrative/editorial pages with no unowned build recipe
-│   └── all 30 bootstrap stages, commands bound to bootstrap-13.1.json
-└── 30 deferred operational pages
-    └── executable system-setup commands have no normalized owner yet
+└── 119 complete presentation bodies
+    ├── narrative/editorial pages
+    ├── 30 bootstrap package stages bound to bootstrap-13.1.json
+    └── operational pages bound to normalized bootstrap/system-operation authority
 ```
 
-This migration creates 81 additional editorial-document files. Together with
-the eight representative proof pages, all 89 currently eligible non-package
-chunks render with `data-body-status="complete"`.
+The final operational migration covers all 30 formerly deferred pages. Across
+those pages, the LFS source contains 120 `screen/userinput` command screens.
+Eleven already had normalized authority in the existing `chroot_setup` and
+`cleanup` sequences in `bootstrap-13.1.json`; those commands are referenced
+directly rather than duplicated. The remaining 109 commands are owned by
+`system-operations-13.1.json`.
 
-The 30 deferred chunks remain structural shells on purpose. Copying their
-executable commands into presentation JSON would make publication state an
-independent recipe authority and violate the presentation/build authority
-boundary.
+System-operation state distinguishes procedure, template, check, interactive,
+session-transition, and illustrative command semantics. Presentation JSON stores
+only authority references and editorial structure; it does not duplicate
+command strings.
 
 `presentation/golden/editorial-bulk.json` records source-derived semantic
-digests, xref targets, bootstrap binding counts, and the complete/deferred
-coverage split. It is validation-only.
+digests, xref targets, and canonical command hashes for validation only.
+Runtime rendering consumes normalized authority, never the golden.
 
 ## M7 bulk normalized package rendering
 
@@ -410,9 +412,27 @@ Installed-summary labels are exact presentation semantics rather than inferred
 from item count. This preserves source wording even where cardinality and labels
 do not line up mechanically.
 
-Together with the 89 complete non-package chunks, the book now has 169/199
-complete chunk bodies. Package-page authority is no longer an M7 gap; the
-remaining 30 gaps are all deferred operational non-package pages.
+Together with the 119 complete non-package chunks, all 199/199 chunk bodies are
+now complete.
+
+## M7 closure
+
+M7 is complete. The presentation proof now demonstrates, across the whole LFS
+13.1-systemd book:
+
+- all 80 normal package pages render from normalized package/version authority;
+- all 119 non-package pages render from presentation-owned editorial structure
+  with executable command text bound to normalized bootstrap or system-operation
+  authority;
+- all 199 chunk routes and navigation relationships are derived from the book
+  graph;
+- all 161 source xrefs resolve, including all 38 referenced nested targets; and
+- every referenced nested target is physically present as an `id` in its
+  rendered target chunk.
+
+The final nested-target closure preserves bridgehead, list-item, unchunked
+section, package-content, and explicit-anchor identities needed by the source
+reference graph.
 
 ## Resume instruction
 
@@ -422,4 +442,5 @@ Run:
 python3 product/src/proto/lfs_optimize/validate.py
 ```
 
-Direct validation passes at the current state, so treat all 80 Chapter 8 package pages as proven. The next architecture work is reconciling normalized authority for the 30 deferred operational non-package pages.
+Direct validation should pass with M7 treated as complete. The next roadmap work
+is M8 — BLFS.

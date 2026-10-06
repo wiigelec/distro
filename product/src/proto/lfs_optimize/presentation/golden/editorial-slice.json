@@ -13,7 +13,7 @@
       "bootstrap_command_count": 0
     },
     "ch-partitioning-hostreqs": {
-      "block_sha256": "f511176fe8dd0a98af332a08a6ed1a25a847f5b226833d4ebef9eb256b25fa5b",
+      "block_sha256": "56b57f8e197ffda2323adef1bf914442b1bba2466da7e0624fc7aca965e6230e",
       "xref_targets": [
         "chapter-cross-tools",
         "chapter-building-system",

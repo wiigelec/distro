@@ -1,0 +1,504 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-config-console",
+  "title": "Configuring the Linux Console",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "This section discusses how to configure the"
+        },
+        {
+          "type": "code",
+          "text": "systemd-vconsole-setup"
+        },
+        {
+          "type": "text",
+          "text": "system service, which configures the virtual console font and console keymap."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The"
+        },
+        {
+          "type": "code",
+          "text": "systemd-vconsole-setup"
+        },
+        {
+          "type": "text",
+          "text": "service reads the"
+        },
+        {
+          "type": "code",
+          "text": "/etc/vconsole.conf"
+        },
+        {
+          "type": "text",
+          "text": "file for configuration information. Decide which keymap and screen font will be used. Various language-specific HOWTOs can also help with this, see"
+        },
+        {
+          "type": "link",
+          "href": "https://tldp.org/HOWTO/HOWTO-INDEX/other-lang.html",
+          "label": "https://tldp.org/HOWTO/HOWTO-INDEX/other-lang.html"
+        },
+        {
+          "type": "text",
+          "text": ". Examine the output of"
+        },
+        {
+          "type": "code",
+          "text": "localectl list-keymaps"
+        },
+        {
+          "type": "text",
+          "text": "for a list of valid console keymaps. Look in the"
+        },
+        {
+          "type": "code",
+          "text": "/usr/share/consolefonts"
+        },
+        {
+          "type": "text",
+          "text": "directory for valid screen fonts."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The"
+        },
+        {
+          "type": "code",
+          "text": "/etc/vconsole.conf"
+        },
+        {
+          "type": "text",
+          "text": "file should contain lines of the form:"
+        },
+        {
+          "type": "code",
+          "text": "VARIABLE=value"
+        },
+        {
+          "type": "text",
+          "text": ". The following variables are recognized:"
+        }
+      ]
+    },
+    {
+      "type": "definition_list",
+      "entries": [
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "KEYMAP"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This variable specifies the key mapping table for the keyboard. If unset, it defaults to"
+                },
+                {
+                  "type": "code",
+                  "text": "us"
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "KEYMAP_TOGGLE"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This variable can be used to configure a second toggle keymap and is unset by default."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "FONT"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This variable specifies the font used by the virtual console."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "FONT_MAP"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This variable specifies the console map to be used."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "FONT_UNIMAP"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This variable specifies the Unicode font map."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "We'll use"
+        },
+        {
+          "type": "code",
+          "text": "C.UTF-8"
+        },
+        {
+          "type": "text",
+          "text": "as the locale for interactive sessions in the Linux console in"
+        },
+        {
+          "type": "xref",
+          "target": "ch-config-locale",
+          "label": "Configuring the System Locale"
+        },
+        {
+          "type": "text",
+          "text": "The console fonts shipped by the"
+        },
+        {
+          "type": "code",
+          "text": "Kbd"
+        },
+        {
+          "type": "text",
+          "text": "package containing the glyphs for all characters from the program messages in the"
+        },
+        {
+          "type": "code",
+          "text": "C.UTF-8"
+        },
+        {
+          "type": "text",
+          "text": "locale are"
+        },
+        {
+          "type": "code",
+          "text": "LatArCyrHeb*.psfu.gz"
+        },
+        {
+          "type": "text",
+          "text": ","
+        },
+        {
+          "type": "code",
+          "text": "LatGrkCyr*.psfu.gz"
+        },
+        {
+          "type": "text",
+          "text": ","
+        },
+        {
+          "type": "code",
+          "text": "Lat2-Terminus16.psfu.gz"
+        },
+        {
+          "type": "text",
+          "text": ", and"
+        },
+        {
+          "type": "code",
+          "text": "pancyrillic.f16.psfu.gz"
+        },
+        {
+          "type": "text",
+          "text": "in"
+        },
+        {
+          "type": "code",
+          "text": "/usr/share/consolefonts"
+        },
+        {
+          "type": "text",
+          "text": "(the other shipped console fonts lack glyphs of some characters like the Unicode left/right quotation marks and the Unicode English dash). So set one of them, for example"
+        },
+        {
+          "type": "code",
+          "text": "Lat2-Terminus16.psfu.gz"
+        },
+        {
+          "type": "text",
+          "text": "as the default console font:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 0,
+      "source_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "An example for a German keyboard and console is given below:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 1,
+      "source_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "You can change KEYMAP value at runtime by using the"
+        },
+        {
+          "type": "code",
+          "text": "localectl"
+        },
+        {
+          "type": "text",
+          "text": "utility:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 2,
+      "source_index": 2
+    },
+    {
+      "type": "admonition",
+      "kind": "note",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Please note that the"
+            },
+            {
+              "type": "code",
+              "text": "localectl"
+            },
+            {
+              "type": "text",
+              "text": "command doesn't work in the chroot environment. It can only be used after the LFS system is booted with systemd."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "You can also use"
+        },
+        {
+          "type": "code",
+          "text": "localectl"
+        },
+        {
+          "type": "text",
+          "text": "utility with the corresponding parameters to change X11 keyboard layout, model, variant and options:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 3,
+      "source_index": 3
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "To list possible values for"
+        },
+        {
+          "type": "code",
+          "text": "localectl set-x11-keymap"
+        },
+        {
+          "type": "text",
+          "text": "parameters, run"
+        },
+        {
+          "type": "code",
+          "text": "localectl"
+        },
+        {
+          "type": "text",
+          "text": "with parameters listed below:"
+        }
+      ]
+    },
+    {
+      "type": "definition_list",
+      "entries": [
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "list-x11-keymap-models"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Shows known X11 keyboard mapping models."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "list-x11-keymap-layouts"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Shows known X11 keyboard mapping layouts."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "list-x11-keymap-variants"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Shows known X11 keyboard mapping variants."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term": [
+            {
+              "type": "text",
+              "text": "list-x11-keymap-options"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Shows known X11 keyboard mapping options."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "admonition",
+      "kind": "note",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Using any of the parameters listed above requires the XKeyboard-Config package from BLFS."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

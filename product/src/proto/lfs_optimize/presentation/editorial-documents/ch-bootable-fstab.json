@@ -1,0 +1,351 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-bootable-fstab",
+  "title": "Creating the /etc/fstab File",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The"
+        },
+        {
+          "type": "code",
+          "text": "/etc/fstab"
+        },
+        {
+          "type": "text",
+          "text": "file is used by some programs to determine where file systems are to be mounted by default, in which order, and which must be checked (for integrity errors) prior to mounting. Create a new file systems table like this:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 0,
+      "source_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Replace"
+        },
+        {
+          "type": "replaceable",
+          "text": "<xxx>"
+        },
+        {
+          "type": "text",
+          "text": ","
+        },
+        {
+          "type": "replaceable",
+          "text": "<yyy>"
+        },
+        {
+          "type": "text",
+          "text": ", and"
+        },
+        {
+          "type": "replaceable",
+          "text": "<fff>"
+        },
+        {
+          "type": "text",
+          "text": "with the values appropriate for the system, for example,"
+        },
+        {
+          "type": "code",
+          "text": "sda2"
+        },
+        {
+          "type": "text",
+          "text": ","
+        },
+        {
+          "type": "code",
+          "text": "sda5"
+        },
+        {
+          "type": "text",
+          "text": ", and"
+        },
+        {
+          "type": "code",
+          "text": "ext4"
+        },
+        {
+          "type": "text",
+          "text": ". For details on the six fields in this file, see"
+        },
+        {
+          "type": "link",
+          "href": "https://man.archlinux.org/man/fstab.5",
+          "label": "fstab(5)"
+        },
+        {
+          "type": "text",
+          "text": "."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Filesystems with MS-DOS or Windows origin (i.e. vfat, ntfs, smbfs, cifs, iso9660, udf) need a special option, utf8, in order for non-ASCII characters in file names to be interpreted properly. For non-UTF-8 locales, the value of"
+        },
+        {
+          "type": "code",
+          "text": "iocharset"
+        },
+        {
+          "type": "text",
+          "text": "should be set to be the same as the character set of the locale, adjusted in such a way that the kernel understands it. This works if the relevant character set definition (found under File systems -> Native Language Support when configuring the kernel) has been compiled into the kernel or built as a module. However, if the character set of the locale is UTF-8, the corresponding option"
+        },
+        {
+          "type": "code",
+          "text": "iocharset=utf8"
+        },
+        {
+          "type": "text",
+          "text": "would make the file system case sensitive. To fix this, use the special option"
+        },
+        {
+          "type": "code",
+          "text": "utf8"
+        },
+        {
+          "type": "text",
+          "text": "instead of"
+        },
+        {
+          "type": "code",
+          "text": "iocharset=utf8"
+        },
+        {
+          "type": "text",
+          "text": ", for UTF-8 locales. The"
+        },
+        {
+          "type": "quote",
+          "text": "codepage"
+        },
+        {
+          "type": "text",
+          "text": "option is also needed for vfat and smbfs filesystems. It should be set to the codepage number used under MS-DOS in your country. For example, in order to mount USB flash drives, a ru_RU.KOI8-R user would need the following in the options portion of its mount line in"
+        },
+        {
+          "type": "code",
+          "text": "/etc/fstab"
+        },
+        {
+          "type": "text",
+          "text": ":"
+        }
+      ]
+    },
+    {
+      "type": "pre",
+      "text": "noauto,user,quiet,showexec,codepage=866,iocharset=koi8r"
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The corresponding options fragment for ru_RU.UTF-8 users is:"
+        }
+      ]
+    },
+    {
+      "type": "pre",
+      "text": "noauto,user,quiet,showexec,codepage=866,utf8"
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Note that using"
+        },
+        {
+          "type": "code",
+          "text": "iocharset"
+        },
+        {
+          "type": "text",
+          "text": "is the default for"
+        },
+        {
+          "type": "code",
+          "text": "iso8859-1"
+        },
+        {
+          "type": "text",
+          "text": "(which keeps the file system case insensitive), and the"
+        },
+        {
+          "type": "code",
+          "text": "utf8"
+        },
+        {
+          "type": "text",
+          "text": "option tells the kernel to convert the file names using UTF-8 so they can be interpreted in the UTF-8 locale."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "When installing GRUB with UEFI, the ESP must be formatted as a FAT file system (EXFAT should not be considered one). In the Linux kernel the VFAT driver handles all the FAT file systems, so this file will contain"
+        },
+        {
+          "type": "code",
+          "text": "vfat"
+        },
+        {
+          "type": "text",
+          "text": "regardless. An example of how you would go about an entry for the ESP would look like this:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 1,
+      "source_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The"
+        },
+        {
+          "type": "code",
+          "text": "iso8859-1"
+        },
+        {
+          "type": "text",
+          "text": "IO charset is used here as we'll enable it as a part of the kernel UEFI configuration in"
+        },
+        {
+          "type": "xref",
+          "target": "ch-bootable-kernel",
+          "label": "Linux-7.1.8"
+        },
+        {
+          "type": "text",
+          "text": "Technically the IO charset should match your locale as we've discussed above. However the name of all the files in the ESP only contains 7-bit ASCII characters, so things will be OK as long as the character set for your locale treats 7-bit ASCII characters in the same way as ISO-8859-1. For example, UTF-8 is such a character set."
+        }
+      ]
+    },
+    {
+      "type": "admonition",
+      "kind": "note",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The EFI filesystem only needs to be mounted when installing GRUB. The system uses this partition before the kernel is loaded and is not used otherwise. An alternative to adding this entry to the fstab file is to manually mount it before running"
+            },
+            {
+              "type": "code",
+              "text": "grub-install"
+            },
+            {
+              "type": "text",
+              "text": "below in"
+            },
+            {
+              "type": "xref",
+              "target": "ch-bootable-grub",
+              "label": "Using GRUB to Set Up the Boot Process"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "It is also possible to specify default codepage and iocharset values for some filesystems during kernel configuration. The relevant parameters are named"
+        },
+        {
+          "type": "quote",
+          "text": "Default NLS Option"
+        },
+        {
+          "type": "text",
+          "text": "("
+        },
+        {
+          "type": "code",
+          "text": "CONFIG_NLS_DEFAULT)"
+        },
+        {
+          "type": "text",
+          "text": ","
+        },
+        {
+          "type": "quote",
+          "text": "Default Remote NLS Option"
+        },
+        {
+          "type": "text",
+          "text": "("
+        },
+        {
+          "type": "code",
+          "text": "CONFIG_SMB_NLS_DEFAULT"
+        },
+        {
+          "type": "text",
+          "text": "),"
+        },
+        {
+          "type": "quote",
+          "text": "Default codepage for FAT"
+        },
+        {
+          "type": "text",
+          "text": "("
+        },
+        {
+          "type": "code",
+          "text": "CONFIG_FAT_DEFAULT_CODEPAGE"
+        },
+        {
+          "type": "text",
+          "text": "), and"
+        },
+        {
+          "type": "quote",
+          "text": "Default iocharset for FAT"
+        },
+        {
+          "type": "text",
+          "text": "("
+        },
+        {
+          "type": "code",
+          "text": "CONFIG_FAT_DEFAULT_IOCHARSET"
+        },
+        {
+          "type": "text",
+          "text": "). There is no way to specify these settings for the ntfs filesystem at kernel compilation time."
+        }
+      ]
+    }
+  ]
+}

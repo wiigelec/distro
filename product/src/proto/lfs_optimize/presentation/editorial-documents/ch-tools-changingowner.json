@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-tools-changingowner",
+  "title": "Changing Ownership",
+  "blocks": [
+    {
+      "type": "admonition",
+      "kind": "note",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The commands in the remainder of this book must be performed while logged in as user"
+            },
+            {
+              "type": "code",
+              "text": "root"
+            },
+            {
+              "type": "text",
+              "text": "and no longer as user"
+            },
+            {
+              "type": "code",
+              "text": "lfs"
+            },
+            {
+              "type": "text",
+              "text": ". Also, double check that"
+            },
+            {
+              "type": "code",
+              "text": "$LFS"
+            },
+            {
+              "type": "text",
+              "text": "is set in"
+            },
+            {
+              "type": "code",
+              "text": "root"
+            },
+            {
+              "type": "text",
+              "text": "'s environment."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Currently, the whole directory hierarchy in"
+        },
+        {
+          "type": "code",
+          "text": "$LFS"
+        },
+        {
+          "type": "text",
+          "text": "is owned by the user"
+        },
+        {
+          "type": "code",
+          "text": "lfs"
+        },
+        {
+          "type": "text",
+          "text": ", a user that exists only on the host system. If the directories and files under"
+        },
+        {
+          "type": "code",
+          "text": "$LFS"
+        },
+        {
+          "type": "text",
+          "text": "are kept as they are, they will be owned by a user ID without a corresponding account. This is dangerous because a user account created later could get this same user ID and would own all the files under"
+        },
+        {
+          "type": "code",
+          "text": "$LFS"
+        },
+        {
+          "type": "text",
+          "text": ", thus exposing these files to possible malicious manipulation."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "To address this issue, change the ownership of the"
+        },
+        {
+          "type": "code",
+          "text": "$LFS/*"
+        },
+        {
+          "type": "text",
+          "text": "directories to user"
+        },
+        {
+          "type": "code",
+          "text": "root"
+        },
+        {
+          "type": "text",
+          "text": "by running the following command:"
+        }
+      ]
+    },
+    {
+      "type": "system_operation_command",
+      "index": 0,
+      "source_index": 0
+    }
+  ]
+}

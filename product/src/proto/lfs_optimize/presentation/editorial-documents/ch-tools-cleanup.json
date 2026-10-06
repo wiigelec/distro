@@ -1,0 +1,486 @@
+{
+  "schema_version": 1,
+  "document_id": "ch-tools-cleanup",
+  "title": "Cleaning up and Saving the Temporary System",
+  "blocks": [
+    {
+      "type": "section",
+      "title": "Cleaning",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "First, remove the currently installed documentation files to prevent them from ending up in the final system, and to save about 35 MB:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_sequence_command",
+          "sequence": "cleanup",
+          "index": 0,
+          "source_index": 0
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Second, on a modern Linux system, the libtool .la files are only useful for libltdl. No libraries in LFS are loaded by libltdl, and it's known that some .la files can cause BLFS package failures. Remove those files now:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_sequence_command",
+          "sequence": "cleanup",
+          "index": 1,
+          "source_index": 1
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The current system size is now about 3 GB, however the /tools directory is no longer needed. It uses about 1 GB of disk space. Delete it now:"
+            }
+          ]
+        },
+        {
+          "type": "bootstrap_sequence_command",
+          "sequence": "cleanup",
+          "index": 2,
+          "source_index": 2
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Backup",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "At this point the essential programs and libraries have been created and your current LFS system is in a good state. Your system can now be backed up for later reuse. In case of fatal failures in the subsequent chapters, it often turns out that removing everything and starting over (more carefully) is the best way to recover. Unfortunately, all the temporary files will be removed, too. To avoid spending extra time to redo something which has been done successfully, creating a backup of the current LFS system may prove useful."
+            }
+          ]
+        },
+        {
+          "type": "admonition",
+          "kind": "note",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "All the remaining steps in this section are optional. Nevertheless, as soon as you begin installing packages in"
+                },
+                {
+                  "type": "xref",
+                  "target": "chapter-building-system",
+                  "label": "Chapter 8"
+                },
+                {
+                  "type": "text",
+                  "text": ", the temporary files will be overwritten. So it may be a good idea to do a backup of the current system as described below."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The following steps are performed from outside the chroot environment. That means you have to leave the chroot environment first before continuing. The reason for that is to get access to file system locations outside of the chroot environment to store/read the backup archive, which ought not be placed within the"
+            },
+            {
+              "type": "code",
+              "text": "$LFS"
+            },
+            {
+              "type": "text",
+              "text": "hierarchy."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "If you have decided to make a backup, leave the chroot environment:"
+            }
+          ]
+        },
+        {
+          "type": "system_operation_command",
+          "index": 0,
+          "source_index": 3
+        },
+        {
+          "type": "admonition",
+          "kind": "important",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "All of the following instructions are executed by"
+                },
+                {
+                  "type": "code",
+                  "text": "root"
+                },
+                {
+                  "type": "text",
+                  "text": "on your host system. Take extra care about the commands you're going to run as mistakes made here can modify your host system. Be aware that the environment variable"
+                },
+                {
+                  "type": "code",
+                  "text": "LFS"
+                },
+                {
+                  "type": "text",
+                  "text": "is set for user"
+                },
+                {
+                  "type": "code",
+                  "text": "lfs"
+                },
+                {
+                  "type": "text",
+                  "text": "by default but may"
+                },
+                {
+                  "type": "emphasis",
+                  "text": "not"
+                },
+                {
+                  "type": "text",
+                  "text": "be set for"
+                },
+                {
+                  "type": "code",
+                  "text": "root"
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Whenever commands are to be executed by"
+                },
+                {
+                  "type": "code",
+                  "text": "root"
+                },
+                {
+                  "type": "text",
+                  "text": ", make sure you have set"
+                },
+                {
+                  "type": "code",
+                  "text": "LFS"
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This has been discussed in"
+                },
+                {
+                  "type": "xref",
+                  "target": "ch-partitioning-aboutlfs",
+                  "label": "Setting the $LFS Variable and the Umask"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Before making a backup, unmount the virtual file systems:"
+            }
+          ]
+        },
+        {
+          "type": "system_operation_command",
+          "index": 1,
+          "source_index": 4
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Make sure you have at least 1 GB free disk space (the source tarballs will be included in the backup archive) on the file system containing the directory where you create the backup archive."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Note that the instructions below specify the home directory of the host system's"
+            },
+            {
+              "type": "code",
+              "text": "root"
+            },
+            {
+              "type": "text",
+              "text": "user, which is typically found on the root file system. Replace"
+            },
+            {
+              "type": "code",
+              "text": "$HOME"
+            },
+            {
+              "type": "text",
+              "text": "by a directory of your choice if you do not want to have the backup stored in"
+            },
+            {
+              "type": "code",
+              "text": "root"
+            },
+            {
+              "type": "text",
+              "text": "'s home directory."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Create the backup archive by running the following command:"
+            }
+          ]
+        },
+        {
+          "type": "admonition",
+          "kind": "note",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Because the backup archive is compressed, it takes a relatively long time (over 10 minutes) even on a reasonably fast system."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "system_operation_command",
+          "index": 2,
+          "source_index": 5
+        },
+        {
+          "type": "admonition",
+          "kind": "note",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "If continuing to chapter 8, don't forget to reenter the chroot environment as explained in the"
+                },
+                {
+                  "type": "quote",
+                  "text": "Important"
+                },
+                {
+                  "type": "text",
+                  "text": "box below."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Restore",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "In case some mistakes have been made and you need to start over, you can use this backup to restore the system and save some recovery time. Since the sources are located under"
+            },
+            {
+              "type": "code",
+              "text": "$LFS"
+            },
+            {
+              "type": "text",
+              "text": ", they are included in the backup archive as well, so they do not need to be downloaded again. After checking that"
+            },
+            {
+              "type": "code",
+              "text": "$LFS"
+            },
+            {
+              "type": "text",
+              "text": "is set properly, you can restore the backup by executing the following commands:"
+            }
+          ]
+        },
+        {
+          "type": "admonition",
+          "kind": "warning",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The following commands are extremely dangerous. If you run"
+                },
+                {
+                  "type": "code",
+                  "text": "rm -rf ./*"
+                },
+                {
+                  "type": "text",
+                  "text": "as the"
+                },
+                {
+                  "type": "code",
+                  "text": "root"
+                },
+                {
+                  "type": "text",
+                  "text": "user and you do not change to the $LFS directory or the"
+                },
+                {
+                  "type": "code",
+                  "text": "LFS"
+                },
+                {
+                  "type": "text",
+                  "text": "environment variable is not set for the"
+                },
+                {
+                  "type": "code",
+                  "text": "root"
+                },
+                {
+                  "type": "text",
+                  "text": "user, it will destroy your entire host system. YOU ARE WARNED."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "pre",
+          "text": "cd $LFS\nrm -rf ./*\ntar -xpf $HOME/lfs-temp-tools-13.1-systemd.tar.xz"
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Again, double check that the environment has been set up properly and continue building the rest of the system."
+            }
+          ]
+        },
+        {
+          "type": "admonition",
+          "kind": "important",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "If you left the chroot environment to create a backup or restart building using a restore, remember to check that the virtual file systems are still mounted ("
+                },
+                {
+                  "type": "code",
+                  "text": "findmnt | grep $LFS"
+                },
+                {
+                  "type": "text",
+                  "text": "should show at least"
+                },
+                {
+                  "type": "code",
+                  "text": "$LFS/dev"
+                },
+                {
+                  "type": "text",
+                  "text": ","
+                },
+                {
+                  "type": "code",
+                  "text": "$LFS/proc"
+                },
+                {
+                  "type": "text",
+                  "text": ", and"
+                },
+                {
+                  "type": "code",
+                  "text": "$LFS/sys"
+                },
+                {
+                  "type": "text",
+                  "text": "as mounted). If they are not mounted, remount them now as described in"
+                },
+                {
+                  "type": "xref",
+                  "target": "ch-tools-kernfs",
+                  "label": "Preparing Virtual Kernel File Systems"
+                },
+                {
+                  "type": "text",
+                  "text": "and re-enter the chroot environment (see"
+                },
+                {
+                  "type": "xref",
+                  "target": "ch-tools-chroot",
+                  "label": "Entering the Chroot Environment"
+                },
+                {
+                  "type": "text",
+                  "text": ") before continuing."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -434,7 +434,10 @@ def render_installation(
         elif kind == "admonition":
             tag = block.get("kind")
             require(tag in ("important", "note", "warning", "caution"), f"{package['name']}: invalid admonition")
-            node = ET.SubElement(install, tag, {"role": "editorial-admonition"})
+            attrs = {"role": "editorial-admonition"}
+            if isinstance(block.get("id"), str) and block["id"]:
+                attrs[XML_ID] = block["id"]
+            node = ET.SubElement(install, tag, attrs)
             if block.get("title"):
                 add_text(node, "title", block["title"])
             if "blocks" in block:
@@ -1240,7 +1243,10 @@ def render_chunked_html_package(name: str) -> str:
                     p = ET.SubElement(dd, "p")
                     _html_inline(p, para, source_document_id=document["section_id"])
         elif child.tag in ("important", "note", "warning", "caution"):
-            aside = ET.SubElement(body, "aside", {"data-kind": child.tag})
+            attrs = {"data-kind": child.tag}
+            if isinstance(child.attrib.get(XML_ID), str) and child.attrib[XML_ID]:
+                attrs["id"] = child.attrib[XML_ID]
+            aside = ET.SubElement(body, "aside", attrs)
             title = child.findtext("title")
             if title:
                 add_text(aside, "h3", title)
@@ -1385,6 +1391,61 @@ def bootstrap_stage(section_id: str) -> dict[str, Any]:
     return matches[0]
 
 
+def bootstrap_sequence(name: str) -> list[str]:
+    bootstrap = load_json(HERE / "bootstrap-13.1.json")
+    commands = bootstrap.get(name)
+    require(
+        name in ("chroot_setup", "cleanup")
+        and isinstance(commands, list)
+        and all(isinstance(command, str) and command for command in commands),
+        f"invalid bootstrap command sequence: {name}",
+    )
+    return commands
+
+
+def system_operations_document() -> dict[str, Any]:
+    document = load_json(HERE / "system-operations-13.1.json")
+    operations = document.get("operations")
+    require(
+        isinstance(operations, dict),
+        "system operations must be an object",
+    )
+    return document
+
+
+def system_operation(section_id: str) -> dict[str, Any]:
+    operation = system_operations_document()["operations"].get(section_id)
+    require(
+        isinstance(operation, dict),
+        f"{section_id}: system operation not found",
+    )
+    commands = operation.get("commands")
+    require(
+        isinstance(operation.get("context"), str)
+        and operation["context"]
+        and isinstance(commands, list)
+        and commands,
+        f"{section_id}: invalid system operation",
+    )
+    allowed_kinds = {
+        "procedure",
+        "template",
+        "check",
+        "interactive",
+        "session-transition",
+        "illustrative",
+    }
+    for index, command in enumerate(commands):
+        require(
+            isinstance(command, dict)
+            and isinstance(command.get("command"), str)
+            and command["command"]
+            and command.get("kind") in allowed_kinds,
+            f"{section_id}: invalid system operation command {index}",
+        )
+    return operation
+
+
 def _render_editorial_inline(
     parent: ET.Element,
     content: list[dict[str, Any]],
@@ -1504,16 +1565,76 @@ def _render_editorial_blocks(
                 commands[index],
                 **{"data-bootstrap-command": str(index)},
             )
+        elif kind == "bootstrap_sequence_command":
+            sequence_name = block.get("sequence")
+            index = block.get("index")
+            source_index = block.get("source_index")
+            commands = bootstrap_sequence(sequence_name)
+            require(
+                isinstance(index, int)
+                and 0 <= index < len(commands)
+                and isinstance(source_index, int)
+                and source_index >= 0,
+                f"{source_document_id}: bootstrap sequence command index out of range",
+            )
+            pre = ET.SubElement(parent, "pre")
+            add_text(
+                pre,
+                "code",
+                commands[index],
+                **{
+                    "data-bootstrap-sequence": sequence_name,
+                    "data-bootstrap-sequence-command": str(index),
+                    "data-operational-command": str(source_index),
+                },
+            )
+        elif kind == "system_operation_command":
+            operation = system_operation(source_document_id)
+            index = block.get("index")
+            source_index = block.get("source_index")
+            commands = operation["commands"]
+            require(
+                isinstance(index, int)
+                and 0 <= index < len(commands)
+                and isinstance(source_index, int)
+                and source_index >= 0,
+                f"{source_document_id}: system operation command index out of range",
+            )
+            command = commands[index]
+            pre = ET.SubElement(parent, "pre")
+            add_text(
+                pre,
+                "code",
+                command["command"],
+                **{
+                    "data-system-operation-command": str(index),
+                    "data-operational-command": str(source_index),
+                    "data-operation-kind": command["kind"],
+                    "data-operation-context": operation["context"],
+                },
+            )
         elif kind == "list":
             list_node = ET.SubElement(
                 parent,
                 "ol" if block.get("ordered") else "ul",
             )
             for item in block["items"]:
-                li = ET.SubElement(list_node, "li")
+                if isinstance(item, dict):
+                    item_blocks = item.get("blocks")
+                    require(
+                        isinstance(item_blocks, list),
+                        f"{source_document_id}: invalid list item blocks",
+                    )
+                    attrs = {}
+                    if isinstance(item.get("id"), str) and item["id"]:
+                        attrs["id"] = item["id"]
+                else:
+                    item_blocks = item
+                    attrs = {}
+                li = ET.SubElement(list_node, "li", attrs)
                 _render_editorial_blocks(
                     li,
-                    item,
+                    item_blocks,
                     source_document_id,
                     heading_level=heading_level,
                 )
@@ -1550,10 +1671,14 @@ def _render_editorial_blocks(
                 heading_level=min(heading_level + 1, 6),
             )
         elif kind == "heading":
+            attrs = {}
+            if isinstance(block.get("id"), str) and block["id"]:
+                attrs["id"] = block["id"]
             add_text(
                 parent,
                 f"h{min(heading_level, 6)}",
                 block["text"],
+                **attrs,
             )
         elif kind == "definition_list":
             if block.get("title"):
@@ -1968,6 +2093,18 @@ def self_test_nested_xrefs() -> None:
         "xref: unchunked license section target drift",
     )
 
+    for target_id, item in expected_nested.items():
+        rendered = ET.fromstring(
+            render_chunked_html_document(item["document_id"])
+        )
+        require(
+            any(
+                node.attrib.get("id") == target_id
+                for node in rendered.iter()
+            ),
+            f"xref: rendered nested target missing: {target_id}",
+        )
+
 
 def self_test_book() -> None:
     compiled = compose_book()
@@ -2190,10 +2327,31 @@ def _count_bootstrap_commands(blocks: list[dict[str, Any]]) -> int:
             count += _count_bootstrap_commands(block["blocks"])
         if block.get("type") == "list":
             for item in block["items"]:
-                count += _count_bootstrap_commands(item)
+                item_blocks = item.get("blocks", []) if isinstance(item, dict) else item
+                count += _count_bootstrap_commands(item_blocks)
         if block.get("type") == "definition_list":
             for entry in block["entries"]:
                 count += _count_bootstrap_commands(entry["blocks"])
+    return count
+
+
+def _count_operational_commands(blocks: list[dict[str, Any]]) -> int:
+    count = 0
+    for block in blocks:
+        if block.get("type") in (
+            "bootstrap_sequence_command",
+            "system_operation_command",
+        ):
+            count += 1
+        if isinstance(block.get("blocks"), list):
+            count += _count_operational_commands(block["blocks"])
+        if block.get("type") == "list":
+            for item in block["items"]:
+                item_blocks = item.get("blocks", []) if isinstance(item, dict) else item
+                count += _count_operational_commands(item_blocks)
+        if block.get("type") == "definition_list":
+            for entry in block["entries"]:
+                count += _count_operational_commands(entry["blocks"])
     return count
 
 
@@ -2321,13 +2479,13 @@ def self_test_editorial_bulk() -> None:
         "editorial-bulk: invalid golden manifest",
     )
     require(
-        len(complete) == golden.get("complete_document_count") == 89
-        and len(deferred) == golden.get("deferred_document_count") == 30,
+        len(complete) == golden.get("complete_document_count") == 119
+        and len(deferred) == golden.get("deferred_document_count") == 0,
         "editorial-bulk: migration counts drift",
     )
     require(
-        not set(complete).intersection(deferred),
-        "editorial-bulk: complete/deferred overlap",
+        not deferred,
+        "editorial-bulk: deferred operational documents remain",
     )
 
     non_package = {
@@ -2336,10 +2494,12 @@ def self_test_editorial_bulk() -> None:
         if not document.get("package")
     }
     require(
-        set(complete).union(deferred) == non_package
+        set(complete) == non_package
         and len(non_package) == 119,
         "editorial-bulk: non-package coverage drift",
     )
+
+    referenced_system_operations: set[str] = set()
 
     for section_id in complete:
         editorial = load_editorial_document(section_id)
@@ -2394,21 +2554,62 @@ def self_test_editorial_bulk() -> None:
                 f"{section_id}: bulk bootstrap command text/order drift",
             )
 
-    for section_id in deferred:
+        expected_operational = observation.get("operational_command_sha256", [])
         require(
-            load_editorial_document(section_id) is None,
-            f"{section_id}: deferred operational body became presentation authority",
+            _count_operational_commands(editorial["blocks"])
+            == observation.get("operational_command_count", 0)
+            == len(expected_operational),
+            f"{section_id}: operational command binding count drift",
         )
-        rendered = ET.fromstring(
-            render_chunked_html_document(section_id)
-        )
-        body = rendered.find("body")
+        rendered_operational = [
+            node.text or ""
+            for node in rendered.findall(".//code")
+            if "data-operational-command" in node.attrib
+        ]
         require(
-            body is not None
-            and body.attrib.get("data-body-status")
-            == "pending-editorial-migration",
-            f"{section_id}: deferred operational body lost pending status",
+            len(rendered_operational) == len(expected_operational),
+            f"{section_id}: rendered operational command count drift",
         )
+        actual_hashes = [
+            __import__("hashlib").sha256(
+                _canonical_source_command(command).encode()
+            ).hexdigest()
+            for command in rendered_operational
+        ]
+        require(
+            actual_hashes == expected_operational,
+            f"{section_id}: source/normalized operational command drift",
+        )
+        if any(
+            block.get("type") == "system_operation_command"
+            for block in _walk_editorial_blocks(editorial["blocks"])
+        ):
+            referenced_system_operations.add(section_id)
+
+    operations = system_operations_document()["operations"]
+    require(
+        set(operations) == referenced_system_operations,
+        "system-operation authority coverage drift",
+    )
+
+
+def _walk_editorial_blocks(
+    blocks: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    result: list[dict[str, Any]] = []
+    for block in blocks:
+        result.append(block)
+        if isinstance(block.get("blocks"), list):
+            result.extend(_walk_editorial_blocks(block["blocks"]))
+        if block.get("type") == "list":
+            for item in block["items"]:
+                item_blocks = item.get("blocks", []) if isinstance(item, dict) else item
+                result.extend(_walk_editorial_blocks(item_blocks))
+        if block.get("type") == "definition_list":
+            for entry in block["entries"]:
+                result.extend(_walk_editorial_blocks(entry["blocks"]))
+    return result
+
 
 
 def _canonical_source_command(value: str) -> str:
