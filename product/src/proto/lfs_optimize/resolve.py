@@ -20,11 +20,15 @@ def load_json(path: Path) -> dict[str, Any]:
 
 def substitute(value: Any, variables: dict[str, str]) -> Any:
     if isinstance(value, str):
-        return re.sub(
+        left_escape = "\x00LITERAL_LEFT_BRACE\x00"
+        right_escape = "\x00LITERAL_RIGHT_BRACE\x00"
+        protected = value.replace("{{", left_escape).replace("}}", right_escape)
+        substituted = re.sub(
             r"\{([A-Za-z_][A-Za-z0-9_]*)\}",
             lambda match: variables.get(match.group(1), match.group(0)),
-            value,
+            protected,
         )
+        return substituted.replace(left_escape, "{").replace(right_escape, "}")
     if isinstance(value, list):
         return [substitute(item, variables) for item in value]
     if isinstance(value, dict):

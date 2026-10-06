@@ -222,6 +222,20 @@ def main() -> int:
         "resolver: shell brace expansion was mistaken for a package parameter",
     )
 
+    binutils_resolved = resolve(["binutils"])["packages"][0]
+    binutils_commands = [
+        command["command"]
+        for step in binutils_resolved["procedure"]
+        for command in step["commands"]
+    ]
+    require(
+        any(
+            "lib{bfd,ctf,ctf-nobfd,gprofng,opcodes,sframe}.a" in command
+            for command in binutils_commands
+        ),
+        "resolver: escaped literal braces were not restored",
+    )
+
     artifact_self_test()
     presentation_self_test()
     for package in result["packages"]:
