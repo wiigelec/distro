@@ -2153,6 +2153,10 @@ def self_test_package_bulk() -> None:
     deferred = golden.get("deferred_authority_mismatches")
     observations = golden.get("packages")
     require(isinstance(complete, list) and isinstance(deferred, list) and isinstance(observations, dict), "package-bulk: invalid golden manifest")
+    require(
+        golden.get("command_scope") == "installation",
+        "package-bulk: command oracle must be scoped to the Installation section",
+    )
     require(len(complete) == golden.get("complete_package_count") == 71 and len(deferred) == golden.get("deferred_package_count") == 9, "package-bulk: package coverage drift")
     package_set = load_json(HERE / "package-set.json")["packages"]
     require(set(complete).union(deferred) == set(package_set) and not set(complete).intersection(deferred), "package-bulk: complete/deferred package split drift")

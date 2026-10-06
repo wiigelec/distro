@@ -565,13 +565,7 @@
         "b05fcf19d00f409e47fb4698a498c79bfbaf86e8d0256c909562363d98232526",
         "7f071a54c9d94f35b5cf34f66c111e39104fa77508dc42b5beef8133a2f98d50",
         "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
-        "a5fef677470d470751f52ee29a713419fa471713cc0004213f4ea259961af3fc",
-        "0a2c523d0446cee448b01d594b8162293305eb4f894be1dd9955037b451fc883",
-        "60247619d21b3af4adb8779fc0e08d528e99b2dad684707f122327c2db355740",
-        "1398709077397258807f8ec72f9cd981e7a26d597891a8f9ebd3f19bc658ab4a",
-        "3faaf10c898a4602fd174b848c9c199f69a6e08cc3060142a2f6c56c47722949",
-        "a88d5c76b78cd0dce4e954c7b10b15ce9ac915a7c1b5b5d196c3e0dcaf370be4",
-        "8a046637def20dd0e2daf49eed2e7c2e2db3bb631d890feb8a59897697c7259c"
+        "a5fef677470d470751f52ee29a713419fa471713cc0004213f4ea259961af3fc"
       ],
       "installed_labels": {
         "programs": "Installed programs",
@@ -1455,9 +1449,7 @@
         "4375901756686be9025237b1a9d450f27a4fc6cd144e1c2b11546f3e3c8c315f",
         "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f",
         "1acfc2deec207b23f9330f74ef608c69824583d2980e6e712cf4fd87f504e415",
-        "0cad1f6207c6cf0abf83e39079c69ab79d8207c71047b9afdcf8297c812b7d9e",
-        "c96dce00f9e484cd37581e06e505170cc0d36d56816fb53a4b7a79a6af3bec76",
-        "d33b54fe6d8fac53f690e4a1cce8e0d4efb2ac8a9d2588fd7933e21c15880318"
+        "0cad1f6207c6cf0abf83e39079c69ab79d8207c71047b9afdcf8297c812b7d9e"
       ],
       "installed_labels": {
         "programs": "Installed programs",
@@ -1663,8 +1655,7 @@
         "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f",
         "489a70a9342abb8eb305ba787fc315c53c87fb38a636c69dfe7f19ffd2c936c7",
         "55feaf1ee1d63b44b5223ae62a743ec715a79aeb3f22e3e1ca9fdd7a5c37ccf1",
-        "e9f0ffe57453406b104107629b3493bde64fbd7c16b3738d484153b4b8f8ad08",
-        "fae5efab7a10334bff6b7c4e9c9635c7a3b0f5d4fd1ae1a155164305111c3728"
+        "e9f0ffe57453406b104107629b3493bde64fbd7c16b3738d484153b4b8f8ad08"
       ],
       "installed_labels": {
         "programs": "Installed programs",
@@ -1707,5 +1698,6 @@
         "libss": "library"
       }
     }
-  }
+  },
+  "command_scope": "installation"
 }
