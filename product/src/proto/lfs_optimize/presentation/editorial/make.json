@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "package": "make",
+  "installation_title": "Installation of Make",
+  "contents_title": "Contents of Make",
+  "installed_labels": {
+    "programs": "Installed program"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "text": "Prepare Make for compilation:"
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "text": "Compile the package:"
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "text": "To test the results, issue:"
+    },
+    {
+      "type": "command-group",
+      "command_indices": [
+        2,
+        3
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Install the package:"
+    },
+    {
+      "type": "command",
+      "command_index": 4
+    }
+  ],
+  "installed_term_kinds": {
+    "make": "program"
+  }
+}

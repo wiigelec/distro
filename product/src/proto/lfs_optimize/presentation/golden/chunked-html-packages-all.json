@@ -6,8 +6,8 @@
     "published": "2026-09-01",
     "slice": "normalized Chapter 8 package rendering"
   },
-  "complete_package_count": 74,
-  "deferred_package_count": 6,
+  "complete_package_count": 75,
+  "deferred_package_count": 5,
   "complete_packages": [
     "man-pages",
     "iana-etc",
@@ -73,6 +73,7 @@
     "iproute2",
     "kbd",
     "libpipeline",
+    "make",
     "patch",
     "tar",
     "vim",
@@ -88,7 +89,6 @@
     "glibc",
     "groff",
     "grub",
-    "make",
     "texinfo",
     "util-linux"
   ],
@@ -1836,6 +1836,20 @@
         "whoami": "program",
         "yes": "program",
         "libstdbuf": "library"
+      }
+    },
+    "make": {
+      "command_sha256": [
+        "ddec2098f6c935422e438fab08b99270dc41312bdc5c0a0ec138a95a8665a65a",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "1e1f24ad14df77e2b3c2058fe45f201063b908ea1fb1c96c76500f35f603e5cf",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "programs": "Installed program"
+      },
+      "installed_term_kinds": {
+        "make": "program"
       }
     }
   },
