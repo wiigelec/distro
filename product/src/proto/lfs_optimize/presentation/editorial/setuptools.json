@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "package": "setuptools",
+  "installation_title": "Installation of Setuptools",
+  "contents_title": "Contents of Setuptools",
+  "installed_labels": {
+    "directories": "Installed directory"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Build the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    }
+  ]
+}

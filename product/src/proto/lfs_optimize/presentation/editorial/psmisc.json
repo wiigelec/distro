@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "package": "psmisc",
+  "installation_title": "Installation of Psmisc",
+  "contents_title": "Contents of Psmisc",
+  "installed_labels": {
+    "programs": "Installed programs"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Prepare Psmisc for compilation:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "To run the test suite, run:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "package": "libtool",
+  "installation_title": "Installation of Libtool",
+  "contents_title": "Contents of Libtool",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "libraries": "Installed libraries",
+    "directories": "Installed directories"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Prepare Libtool for compilation:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "To test the results, issue:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Remove a static library only useful for the test suite:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 4
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "package": "gettext",
+  "installation_title": "Installation of Gettext",
+  "contents_title": "Contents of Gettext",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "libraries": "Installed libraries",
+    "directories": "Installed directories"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Prepare Gettext for compilation:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "To test the results, issue:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    }
+  ]
+}

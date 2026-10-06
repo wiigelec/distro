@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "package": "markupsafe",
+  "installation_title": "Installation of MarkupSafe",
+  "contents_title": "Contents of MarkupSafe",
+  "installed_labels": {
+    "directories": "Installed directory"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile MarkupSafe with the following command:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "This package does not come with a test suite."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    }
+  ]
+}

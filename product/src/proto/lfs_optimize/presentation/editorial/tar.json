@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "package": "tar",
+  "installation_title": "Installation of Tar",
+  "contents_title": "Contents of Tar",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "directories": "Installed directory"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "First fix the package to build with acl-2.4.0:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Prepare Tar for compilation:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "definition-list",
+      "title": "The meaning of the configure option:",
+      "items": [
+        {
+          "term_content": [
+            {
+              "type": "envar",
+              "text": "FORCE_UNSAFE_CONFIGURE=1"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This forces the test for"
+                },
+                {
+                  "type": "function",
+                  "text": "mknod"
+                },
+                {
+                  "type": "text",
+                  "text": "to be run as"
+                },
+                {
+                  "type": "systemitem",
+                  "text": "root"
+                },
+                {
+                  "type": "text",
+                  "text": ". It is generally considered dangerous to run this test as the"
+                },
+                {
+                  "type": "systemitem",
+                  "text": "root"
+                },
+                {
+                  "type": "text",
+                  "text": "user, but as it is being run on a system that has only been partially built, overriding it is OK."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "To test the results, issue:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "One test, capabilities: binary store/restore, is known to fail if it is run because LFS lacks selinux, but will be skipped if the host kernel does not support extended attributes or security labels on the filesystem used for building LFS."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 4
+    }
+  ]
+}

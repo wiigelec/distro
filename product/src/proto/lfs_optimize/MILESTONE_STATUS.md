@@ -17,7 +17,7 @@ Roadmap:
 | M4 — Bootstrap proof | COMPLETE | Fresh Chapter 5–7 bootstrap hands directly to the normal executor; all 80 final-system packages build successfully without publication XML/book parsing. |
 | M5 — Development proof | COMPLETE | Accepted state, candidate identity, validation, definition binding/drift rejection, review evidence, and guarded transactional promotion are implemented. |
 | M6 — Release proof | SATISFIED BY COMPOSITION | M4 proves clean full-system realization from normalized state and M5 proves validated state identity and controlled promotion. Freezing accepted state under a release identity adds production plumbing but no unresolved prototype architecture question. |
-| M7 — Presentation proof | IN PROGRESS — EDITORIAL VOCABULARY PROVEN; 89/119 NON-PACKAGE BODIES COMPLETE | The generic editorial vocabulary is proven. This bulk slice completes every currently eligible non-package body, including all 30 bootstrap stages bound to bootstrap-13.1.json. Thirty operational pages remain explicit shells because their executable setup commands do not yet have normalized authority. Of the 80 normal Chapter 8 package pages, Zlib/Binutils remain the two proven rendered examples. |
+| M7 — Presentation proof | IN PROGRESS — 160/199 CHUNKS COMPLETE; 39 AUTHORITY GAPS DEFERRED | 89/119 non-package bodies are proven complete. This slice generalizes normalized package rendering to 71/80 Chapter 8 packages whose source command sequence maps cleanly to normalized state, and fixes exact installed-summary labels including Zlib's plural `Installed libraries`. Nine package pages and 30 operational non-package pages remain explicit shells pending normalized authority reconciliation. |
 | M8+ | NOT STARTED | BLFS, hard-BLFS, and user-system proofs remain later roadmap milestones. |
 
 ## M5 closure
@@ -359,6 +359,45 @@ boundary.
 digests, xref targets, bootstrap binding counts, and the complete/deferred
 coverage split. It is validation-only.
 
+## M7 bulk normalized package rendering
+
+The Chapter 8 package inventory now has an explicit authority split:
+
+```text
+80 normal package pages
+├── 71 clean source ↔ normalized command mappings
+└── 9 authority/grouping mismatches
+```
+
+The 71 clean packages render from normalized package/version state plus
+presentation-owned editorial overlays. Executable command text always comes
+from normalized package state. The source-derived golden stores only SHA-256
+values for command equivalence; source command strings are not runtime inputs.
+
+The nine deferred package pages are:
+
+```text
+glibc
+gmp
+libxcrypt
+ncurses
+coreutils
+grub
+make
+texinfo
+util-linux
+```
+
+They remain structural shells because source publication command grouping or
+coverage does not map cleanly to the current normalized procedure state.
+
+Installed-summary labels are now exact presentation semantics rather than being
+inferred from item count. This closes the known Zlib mismatch: the LFS source
+uses `Installed libraries` even though only one library is listed.
+
+Together with the 89 complete non-package chunks, this slice brings the book to
+160/199 complete chunk bodies.
+
 ## Resume instruction
 
 Run:
@@ -367,8 +406,6 @@ Run:
 python3 product/src/proto/lfs_optimize/validate.py
 ```
 
-If it passes, bulk eligible non-package migration is proven. The next lowest-risk
-M7 expansion is to generalize the normalized Chapter 8 package renderer from the
-two proven examples to all 80 package pages. The 30 deferred operational pages
-should only be completed after their command semantics have a normalized
-non-presentation owner.
+If it passes, treat 71-package normalized chunked HTML rendering as proven. The
+next architecture work is reconciling normalized authority for the nine deferred
+package pages, followed by the 30 deferred operational non-package pages.

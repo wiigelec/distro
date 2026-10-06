@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "package": "grep",
+  "installation_title": "Installation of Grep",
+  "contents_title": "Contents of Grep",
+  "installed_labels": {
+    "programs": "Installed programs"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "First, remove a warning about using egrep and fgrep that makes tests on some packages fail:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Prepare Grep for compilation:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "To test the results, issue:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 4
+    }
+  ]
+}

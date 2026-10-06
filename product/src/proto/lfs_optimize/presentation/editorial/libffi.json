@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "package": "libffi",
+  "installation_title": "Installation of Libffi",
+  "contents_title": "Contents of Libffi",
+  "installed_labels": {
+    "libraries": "Installed library"
+  },
+  "installation_blocks": [
+    {
+      "type": "admonition",
+      "kind": "note",
+      "paragraphs": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Like GMP, Libffi builds with optimizations specific to the processor in use. If building for another system, change the value of the"
+            },
+            {
+              "type": "parameter",
+              "text": "--with-gcc-arch="
+            },
+            {
+              "type": "text",
+              "text": "parameter in the following command to an architecture name fully implemented by"
+            },
+            {
+              "type": "emphasis",
+              "text": "both"
+            },
+            {
+              "type": "text",
+              "text": "the host CPU and the CPU on that system. If this is not done, all applications that link to"
+            },
+            {
+              "type": "filename",
+              "text": "libffi"
+            },
+            {
+              "type": "text",
+              "text": "will trigger Illegal Operation Errors. If you cannot figure out a value safe for both the CPUs, replace the parameter with"
+            },
+            {
+              "type": "option",
+              "text": "--without-gcc-arch"
+            },
+            {
+              "type": "text",
+              "text": "to produce a generic library."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Prepare Libffi for compilation:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "definition-list",
+      "title": "The meaning of the configure option:",
+      "items": [
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "--with-gcc-arch=native"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Ensure GCC optimizes for the current system. If this is not specified, the system is guessed and the code generated may not be correct. If the generated code will be copied from the native system to a less capable system, use the less capable system as a parameter. For details about alternative system types, see"
+                },
+                {
+                  "type": "link",
+                  "href": "https://gcc.gnu.org/onlinedocs/gcc-16.2.0/gcc/x86-Options.html",
+                  "label": "the x86 options in the GCC manual"
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "To test the results, issue:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    }
+  ]
+}

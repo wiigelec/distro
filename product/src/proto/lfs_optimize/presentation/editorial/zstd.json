@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "package": "zstd",
+  "installation_title": "Installation of Zstd",
+  "contents_title": "Contents of Zstd",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "libraries": "Installed library"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "admonition",
+      "kind": "note",
+      "paragraphs": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "In the test output there are several places that indicate 'failed'. These are expected and only 'FAIL' is an actual test failure. There should be no test failures."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "To test the results, issue:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Remove the static library:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    }
+  ]
+}

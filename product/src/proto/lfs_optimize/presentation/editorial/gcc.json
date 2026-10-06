@@ -1,0 +1,951 @@
+{
+  "schema_version": 1,
+  "package": "gcc",
+  "installation_title": "Installation of GCC",
+  "contents_title": "Contents of GCC",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "libraries": "Installed libraries",
+    "directories": "Installed directories"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "If building on x86_64, change the default directory name for 64-bit libraries to"
+        },
+        {
+          "type": "quote",
+          "text": "lib"
+        },
+        {
+          "type": "text",
+          "text": ":"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The GCC documentation recommends building GCC in a dedicated build directory:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Prepare GCC for compilation:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "We only enable C and C++ here to save the build time as no packages in LFS and BLFS require GCC to compile other languages. Append"
+        },
+        {
+          "type": "literal",
+          "text": "algol68"
+        },
+        {
+          "type": "text",
+          "text": "for Algol 68,"
+        },
+        {
+          "type": "literal",
+          "text": "fortran"
+        },
+        {
+          "type": "text",
+          "text": "for Fortran,"
+        },
+        {
+          "type": "literal",
+          "text": "go"
+        },
+        {
+          "type": "text",
+          "text": "for Go,"
+        },
+        {
+          "type": "literal",
+          "text": "objc"
+        },
+        {
+          "type": "text",
+          "text": "for Objective C,"
+        },
+        {
+          "type": "literal",
+          "text": "obj-c++"
+        },
+        {
+          "type": "text",
+          "text": "for Objective C++, and/or"
+        },
+        {
+          "type": "literal",
+          "text": "m2"
+        },
+        {
+          "type": "text",
+          "text": "for Modula 2 into the value of"
+        },
+        {
+          "type": "parameter",
+          "text": "--enable-languages"
+        },
+        {
+          "type": "text",
+          "text": "option if you want to compile programs in one or more of those languages with GCC."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "GCC also supports the Ada, COBOL, and D languages. But that would require some dependencies which are not available in the base LFS system and would exceed the scope of this book. Read"
+        },
+        {
+          "type": "link",
+          "href": "https://gcc.gnu.org/install/prerequisites.html",
+          "label": "the upstream documentation"
+        },
+        {
+          "type": "text",
+          "text": "for details."
+        }
+      ]
+    },
+    {
+      "type": "definition-list",
+      "title": "The meaning of the new configure parameters:",
+      "items": [
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "LD=ld"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This parameter makes the configure script use the ld program installed by the Binutils package built earlier in this chapter, rather than the cross-built version which would otherwise be used."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "--disable-bootstrap"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "By default, the build system of GCC will bootstrap it in 3 stages unless it's built as a cross-compiler or it is being cross-compiled. The bootstrap process is needed for robustness, especially when upgrading GCC to a new version. In LFS we are using a different method to bootstrap GCC (as we introduced in"
+                },
+                {
+                  "type": "xref",
+                  "target": "ch-tools-toolchaintechnotes",
+                  "label": "Toolchain Technical Notes"
+                },
+                {
+                  "type": "text",
+                  "text": "), so here we don't need the bootstrap process provided by the build system and we disable it to significantly reduce the build time. Remove this option when you upgrade GCC on a complete LFS system (instead of building LFS)."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "--with-system-zlib"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This switch tells GCC to link to the system installed copy of the Zlib library, rather than its own internal copy."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "--enable-targets=all"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This switch tells GCC to enable 64-bit code generation support even if we are building it for a 32-bit system. It's needed to build GRUB for 64-bit UEFI. This switch has no effect if building for 64-bit."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "admonition",
+      "kind": "note",
+      "paragraphs": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "PIE (position-independent executables) are binary programs that can be loaded anywhere in memory. Without PIE, the security feature named ASLR (Address Space Layout Randomization) can be applied for the shared libraries, but not for the executables themselves. Enabling PIE allows ASLR for the executables in addition to the shared libraries, and mitigates some attacks based on fixed addresses of sensitive code or data in the executables."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "SSP (Stack Smashing Protection) is a technique to ensure that the parameter stack is not corrupted. Stack corruption can, for example, alter the return address of a subroutine, thus transferring control to some dangerous code (existing in the program or shared libraries, or injected by the attacker somehow)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    },
+    {
+      "type": "admonition",
+      "kind": "important",
+      "paragraphs": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "In this section, the test suite for GCC is considered important, but it takes a long time. First-time builders are encouraged to run the test suite. The time to run the tests can be reduced significantly by adding -jx to the"
+            },
+            {
+              "type": "command",
+              "text": "make -k check"
+            },
+            {
+              "type": "text",
+              "text": "command below, where x is the number of CPU cores on your system."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "GCC may need more stack space compiling some extremely complex code patterns. As a precaution for the host distros with a tight stack limit, explicitly set the stack size hard limit to infinite. On most host distros (and the final LFS system) the hard limit is infinite by default, but there is no harm done by setting it explicitly. It's not necessary to change the stack size soft limit because GCC will automatically set it to an appropriate value, as long as the value does not exceed the hard limit:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 4
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Test the results as a non-privileged user, but do not stop at errors:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 5
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "To extract a summary of the test suite results, run:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 6
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "To filter out only the summaries, pipe the output through grep -A7 Summ ."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Results can be compared with those located at"
+        },
+        {
+          "type": "link",
+          "href": "https://www.linuxfromscratch.org/lfs/build-logs/13.1/",
+          "label": "https://www.linuxfromscratch.org/lfs/build-logs/13.1/"
+        },
+        {
+          "type": "text",
+          "text": "and"
+        },
+        {
+          "type": "link",
+          "href": "https://gcc.gnu.org/ml/gcc-testresults/",
+          "label": "https://gcc.gnu.org/ml/gcc-testresults/"
+        },
+        {
+          "type": "text",
+          "text": "."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "In the"
+        },
+        {
+          "type": "filename",
+          "text": "gcc.target/i386"
+        },
+        {
+          "type": "text",
+          "text": "tests, the tests named"
+        },
+        {
+          "type": "filename",
+          "text": "auto-init-padding-9.c"
+        },
+        {
+          "type": "text",
+          "text": ","
+        },
+        {
+          "type": "filename",
+          "text": "builtin-memmove-*.c"
+        },
+        {
+          "type": "text",
+          "text": ","
+        },
+        {
+          "type": "filename",
+          "text": "mem{cpy,set}-pr120683-*.c"
+        },
+        {
+          "type": "text",
+          "text": ","
+        },
+        {
+          "type": "filename",
+          "text": "pr111657-1.c"
+        },
+        {
+          "type": "text",
+          "text": ","
+        },
+        {
+          "type": "filename",
+          "text": "pr115102.c"
+        },
+        {
+          "type": "text",
+          "text": ","
+        },
+        {
+          "type": "filename",
+          "text": "pr116896.c"
+        },
+        {
+          "type": "text",
+          "text": ","
+        },
+        {
+          "type": "filename",
+          "text": "pr120881-2a.c"
+        },
+        {
+          "type": "text",
+          "text": ", and"
+        },
+        {
+          "type": "filename",
+          "text": "pr122343-4a.c"
+        },
+        {
+          "type": "text",
+          "text": "are known to fail. The test named"
+        },
+        {
+          "type": "filename",
+          "text": "shift-gf2p8affine-2.c"
+        },
+        {
+          "type": "text",
+          "text": "is known to fail if the processor does not support AVX512."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "In the"
+        },
+        {
+          "type": "filename",
+          "text": "g++.target/i386"
+        },
+        {
+          "type": "text",
+          "text": "tests, the tests named"
+        },
+        {
+          "type": "filename",
+          "text": "memset-pr108585-1{a,b}.C"
+        },
+        {
+          "type": "text",
+          "text": ","
+        },
+        {
+          "type": "filename",
+          "text": "mv{,c}-symbols*.C"
+        },
+        {
+          "type": "text",
+          "text": ","
+        },
+        {
+          "type": "filename",
+          "text": "pr112824-2.C"
+        },
+        {
+          "type": "text",
+          "text": ", and"
+        },
+        {
+          "type": "filename",
+          "text": "pr116896-1.C"
+        },
+        {
+          "type": "text",
+          "text": "are known to fail."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Additionally, the tests"
+        },
+        {
+          "type": "filename",
+          "text": "gcc.dg/ipa/pr122458.c"
+        },
+        {
+          "type": "text",
+          "text": ","
+        },
+        {
+          "type": "filename",
+          "text": "gcc.dg/lto/toplevel-*-asm-*"
+        },
+        {
+          "type": "text",
+          "text": ", and"
+        },
+        {
+          "type": "filename",
+          "text": "gcc.dg/plugin/crash-test-nested-*.c"
+        },
+        {
+          "type": "text",
+          "text": "are known to fail. The test"
+        },
+        {
+          "type": "filename",
+          "text": "g++.dg/gomp/deprecate-1.C"
+        },
+        {
+          "type": "text",
+          "text": "is known to fail sometimes."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The LFS editors have investigated those failures and confirmed none indicates a critical issue. Most of them are because the test case author did not anticipate"
+        },
+        {
+          "type": "parameter",
+          "text": "--enable-default-ssp"
+        },
+        {
+          "type": "text",
+          "text": "or"
+        },
+        {
+          "type": "parameter",
+          "text": "--enable-default-pie"
+        },
+        {
+          "type": "text",
+          "text": "."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "A few unexpected failures cannot always be avoided. In some cases test failures depend on the specific hardware of the system. Unless the test results are vastly different from those at the above URL, it is safe to continue."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 7
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The GCC build directory is owned by"
+        },
+        {
+          "type": "systemitem",
+          "text": "tester"
+        },
+        {
+          "type": "text",
+          "text": "now, and the ownership of the installed header directory (and its content) is incorrect. Change the ownership to the"
+        },
+        {
+          "type": "systemitem",
+          "text": "root"
+        },
+        {
+          "type": "text",
+          "text": "user and group:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 8
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Create a symlink required by the"
+        },
+        {
+          "type": "link",
+          "href": "https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch03s09.html",
+          "label": "FHS"
+        },
+        {
+          "type": "text",
+          "text": "for \"historical\" reasons."
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 9
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Many packages use the name"
+        },
+        {
+          "type": "command",
+          "text": "cc"
+        },
+        {
+          "type": "text",
+          "text": "to call the C compiler. We've already created"
+        },
+        {
+          "type": "command",
+          "text": "cc"
+        },
+        {
+          "type": "text",
+          "text": "as a symlink in"
+        },
+        {
+          "type": "xref",
+          "target": "ch-tools-gcc-pass2",
+          "label": "gcc-pass2"
+        },
+        {
+          "type": "text",
+          "text": ", create its man page as a symlink as well:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 10
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Add a compatibility symlink to enable building programs with Link Time Optimization (LTO):"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 11
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Now that our final toolchain is in place, it is important to again ensure that compiling and linking will work as expected. We do this by performing some sanity checks:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 12
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "There should be no errors, and the output of the last command will be (allowing for platform-specific differences in the dynamic linker name):"
+        }
+      ]
+    },
+    {
+      "type": "pre",
+      "text": "[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]"
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Now make sure that we're set up to use the correct start files:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 13
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The output of the last command should be:"
+        }
+      ]
+    },
+    {
+      "type": "pre",
+      "text": "/usr/lib/gcc/x86_64-pc-linux-gnu/16.2.0/../../../../lib/Scrt1.o succeeded\n/usr/lib/gcc/x86_64-pc-linux-gnu/16.2.0/../../../../lib/crti.o succeeded\n/usr/lib/gcc/x86_64-pc-linux-gnu/16.2.0/../../../../lib/crtn.o succeeded"
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Depending on your machine architecture, the above may differ slightly. The difference will be the name of the directory after"
+        },
+        {
+          "type": "filename",
+          "text": "/usr/lib/gcc"
+        },
+        {
+          "type": "text",
+          "text": ". The important thing to look for here is that"
+        },
+        {
+          "type": "command",
+          "text": "gcc"
+        },
+        {
+          "type": "text",
+          "text": "has found all three"
+        },
+        {
+          "type": "filename",
+          "text": "crt*.o"
+        },
+        {
+          "type": "text",
+          "text": "files under the"
+        },
+        {
+          "type": "filename",
+          "text": "/usr/lib"
+        },
+        {
+          "type": "text",
+          "text": "directory."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Verify that the compiler is searching for the correct header files:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 14
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "This command should return the following output:"
+        }
+      ]
+    },
+    {
+      "type": "pre",
+      "text": "#include <...> search starts here:\n /usr/lib/gcc/x86_64-pc-linux-gnu/16.2.0/include\n /usr/local/include\n /usr/lib/gcc/x86_64-pc-linux-gnu/16.2.0/include-fixed\n /usr/include"
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Again, the directory named after your target triplet may be different than the above, depending on your system architecture."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Next, verify that the new linker is being used with the correct search paths:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 15
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "References to paths that have components with '-linux-gnu' should be ignored, but otherwise the output of the last command should be:"
+        }
+      ]
+    },
+    {
+      "type": "pre",
+      "text": "SEARCH_DIR(\"/usr/x86_64-pc-linux-gnu/lib64\")\nSEARCH_DIR(\"/usr/lib\");\nSEARCH_DIR(\"/usr/x86_64-pc-linux-gnu/lib\")"
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "A 32-bit system may use a few other directories. For example, here is the output from an i686 machine:"
+        }
+      ]
+    },
+    {
+      "type": "pre",
+      "text": "SEARCH_DIR(\"/usr/i686-pc-linux-gnu/lib32\")\nSEARCH_DIR(\"/usr/local/lib32\")\nSEARCH_DIR(\"/lib32\")\nSEARCH_DIR(\"/usr/lib32\")\nSEARCH_DIR(\"/usr/i686-pc-linux-gnu/lib\")\nSEARCH_DIR(\"/usr/local/lib\")\nSEARCH_DIR(\"/lib\")\nSEARCH_DIR(\"/usr/lib\");"
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Next make sure that we're using the correct libc:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 16
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The output of the last command should be:"
+        }
+      ]
+    },
+    {
+      "type": "pre",
+      "text": "attempt to open /usr/lib/libc.so.6 succeeded"
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Make sure GCC is using the correct dynamic linker:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 17
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The output of the last command should be (allowing for platform-specific differences in dynamic linker name):"
+        }
+      ]
+    },
+    {
+      "type": "pre",
+      "text": "found ld-linux-x86-64.so.2 at /usr/lib/ld-linux-x86-64.so.2"
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "If the output does not appear as shown above or is not received at all, then something is seriously wrong. Investigate and retrace the steps to find out where the problem is and correct it. Any issues should be resolved before continuing with the process."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Once everything is working correctly, clean up the test files:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 18
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Finally, move a misplaced file:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 19
+    }
+  ]
+}

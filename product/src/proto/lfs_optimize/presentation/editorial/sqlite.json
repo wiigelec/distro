@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "package": "sqlite",
+  "installation_title": "Installation of Sqlite",
+  "contents_title": "Contents of Sqlite",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "libraries": "Installed libraries",
+    "directories": "Installed directories"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Unpack the documentation:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Prepare Sqlite for compilation with:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "definition-list",
+      "title": "The meaning of the configure options:",
+      "items": [
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "--enable-fts{4,5}"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "These switches enable support for version 4 and 5 of the full text search (FTS) extension."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "CPPFLAGS=\"-D SQLITE_ENABLE_COLUMN_METADATA=1 ..."
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Some applications require these options to be turned on. The only way to do this is to include them in the CFLAGS or CPPFLAGS. We use the latter so the default value (or any value set by the user) of CFLAGS won't be affected. For further information on what can be specified see https://www.sqlite.org/compile.html."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The"
+        },
+        {
+          "type": "parameter",
+          "text": "LDFLAGS.rpath=\"\""
+        },
+        {
+          "type": "text",
+          "text": "option prevents hard coding library search paths (rpath) into the shared library. This package does not need rpath for an installation into the standard location, and rpath may sometimes cause unwanted effects or even security issues."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "This package does not come with a test suite."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "If desired, install the documentation:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 4
+    }
+  ]
+}

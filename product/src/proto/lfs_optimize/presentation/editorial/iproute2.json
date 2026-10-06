@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "package": "iproute2",
+  "installation_title": "Installation of IPRoute2",
+  "contents_title": "Contents of IPRoute2",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "directories": "Installed directories"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The"
+        },
+        {
+          "type": "command",
+          "text": "arpd"
+        },
+        {
+          "type": "text",
+          "text": "program included in this package will not be built since it depends on Berkeley DB, which is not installed in LFS. However, a directory and a man page for"
+        },
+        {
+          "type": "command",
+          "text": "arpd"
+        },
+        {
+          "type": "text",
+          "text": "will still be installed. Prevent this by running the commands shown below."
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "This package does not have a working test suite."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "If desired, install the documentation:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    }
+  ]
+}

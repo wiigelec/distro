@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "package": "iana-etc",
+  "installation_title": "Installation of Iana-Etc",
+  "contents_title": "Contents of Iana-Etc",
+  "installed_labels": {
+    "files": "Installed files"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "For this package, we only need to copy the files into place:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    }
+  ]
+}

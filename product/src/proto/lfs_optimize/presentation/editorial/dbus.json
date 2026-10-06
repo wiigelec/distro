@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "package": "dbus",
+  "installation_title": "Installation of D-Bus",
+  "contents_title": "Contents of D-Bus",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "libraries": "Installed libraries",
+    "directories": "Installed directories"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Prepare D-Bus for compilation:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "definition-list",
+      "title": "The meaning of the meson options:",
+      "items": [
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "--wrap-mode=nofallback"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This switch prevents meson from attempting to download a copy of the Glib package for the tests."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "To test the results, issue:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Many tests are disabled because they require additional packages that are not included in LFS. Instructions for running the comprehensive test suite can be found in"
+        },
+        {
+          "type": "link",
+          "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/general/dbus.html",
+          "label": "the BLFS book"
+        },
+        {
+          "type": "text",
+          "text": "."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Create a symlink so that D-Bus and systemd can use the same"
+        },
+        {
+          "type": "filename",
+          "text": "machine-id"
+        },
+        {
+          "type": "text",
+          "text": "file:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 4
+    }
+  ]
+}

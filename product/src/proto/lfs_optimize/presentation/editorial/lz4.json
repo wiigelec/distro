@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "package": "lz4",
+  "installation_title": "Installation of Lz4",
+  "contents_title": "Contents of Lz4",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "libraries": "Installed library"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "To test the results, issue:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    }
+  ]
+}

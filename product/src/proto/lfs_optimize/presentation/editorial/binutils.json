@@ -170,5 +170,10 @@
       "type": "command",
       "command_id": "cleanup"
     }
-  ]
+  ],
+  "installed_labels": {
+    "programs": "Installed programs",
+    "libraries": "Installed libraries",
+    "directories": "Installed directory"
+  }
 }

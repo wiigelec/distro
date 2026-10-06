@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "package": "procps",
+  "installation_title": "Installation of Procps-ng",
+  "contents_title": "Contents of Procps-ng",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "libraries": "Installed library",
+    "directories": "Installed directories"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Prepare Procps-ng for compilation:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "definition-list",
+      "title": "The meaning of the configure option:",
+      "items": [
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "--disable-kill"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This switch disables building the"
+                },
+                {
+                  "type": "command",
+                  "text": "kill"
+                },
+                {
+                  "type": "text",
+                  "text": "command; it will be installed from the Util-linux package."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "--enable-watch8bit"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This switch enables the ncursesw support for the"
+                },
+                {
+                  "type": "command",
+                  "text": "watch"
+                },
+                {
+                  "type": "text",
+                  "text": "command, so it can handle 8-bit characters."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "To run the test suite, run:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "One test named"
+        },
+        {
+          "type": "literal",
+          "text": "ps with output flag bsdtime,cputime,etime,etimes"
+        },
+        {
+          "type": "text",
+          "text": "is known to fail if the host kernel is not built with"
+        },
+        {
+          "type": "literal",
+          "text": "CONFIG_BSD_PROCESS_ACCT"
+        },
+        {
+          "type": "text",
+          "text": "enabled."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    }
+  ]
+}

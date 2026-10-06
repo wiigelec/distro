@@ -44,5 +44,8 @@
       "type": "command",
       "command_id": "cleanup-static"
     }
-  ]
+  ],
+  "installed_labels": {
+    "libraries": "Installed libraries"
+  }
 }

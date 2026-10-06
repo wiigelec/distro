@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "package": "gdbm",
+  "installation_title": "Installation of GDBM",
+  "contents_title": "Contents of GDBM",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "libraries": "Installed libraries"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Prepare GDBM for compilation:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "definition-list",
+      "title": "The meaning of the configure option:",
+      "items": [
+        {
+          "term_content": [
+            {
+              "type": "envar",
+              "text": "--enable-libgdbm-compat"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This switch enables building the libgdbm compatibility library. Some packages outside of LFS may require the older DBM routines it provides."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "To test the results, issue:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    }
+  ]
+}

@@ -1,0 +1,202 @@
+{
+  "schema_version": 1,
+  "package": "ninja",
+  "installation_title": "Installation of Ninja",
+  "contents_title": "Contents of Ninja",
+  "installed_labels": {
+    "programs": "Installed programs"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "When run,"
+        },
+        {
+          "type": "command",
+          "text": "ninja"
+        },
+        {
+          "type": "text",
+          "text": "normally utilizes the greatest possible number of processes in parallel. By default this is the number of cores on the system, plus two. This may overheat the CPU, or make the system run out of memory. When"
+        },
+        {
+          "type": "command",
+          "text": "ninja"
+        },
+        {
+          "type": "text",
+          "text": "is invoked from the command line, passing the -jN parameter will limit the number of parallel processes. Some packages embed the execution of"
+        },
+        {
+          "type": "command",
+          "text": "ninja"
+        },
+        {
+          "type": "text",
+          "text": ", and do not pass the -j parameter on to it."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Using the"
+        },
+        {
+          "type": "emphasis",
+          "text": "optional"
+        },
+        {
+          "type": "text",
+          "text": "procedure below allows a user to limit the number of parallel processes via an environment variable, NINJAJOBS."
+        },
+        {
+          "type": "emphasis",
+          "text": "For example"
+        },
+        {
+          "type": "text",
+          "text": ", setting: export NINJAJOBS=4 will limit"
+        },
+        {
+          "type": "command",
+          "text": "ninja"
+        },
+        {
+          "type": "text",
+          "text": "to four parallel processes."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "If desired, make"
+        },
+        {
+          "type": "command",
+          "text": "ninja"
+        },
+        {
+          "type": "text",
+          "text": "recognize the environment variable NINJAJOBS by running the stream editor:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Build Ninja with:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "definition-list",
+      "title": "The meaning of the build option:",
+      "items": [
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "--bootstrap"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This parameter forces Ninja to rebuild itself for the current system."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "--verbose"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This parameter makes"
+                },
+                {
+                  "type": "command",
+                  "text": "configure.py"
+                },
+                {
+                  "type": "text",
+                  "text": "show the progress building Ninja."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The package tests cannot run in the chroot environment. They require"
+        },
+        {
+          "type": "link",
+          "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/general/cmake.html",
+          "label": "cmake"
+        },
+        {
+          "type": "text",
+          "text": ". But the basic function of this package is already tested by rebuilding itself (with the"
+        },
+        {
+          "type": "parameter",
+          "text": "--bootstrap"
+        },
+        {
+          "type": "text",
+          "text": "option) anyway."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    }
+  ]
+}

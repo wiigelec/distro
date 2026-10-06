@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "package": "libpipeline",
+  "installation_title": "Installation of Libpipeline",
+  "contents_title": "Contents of Libpipeline",
+  "installed_labels": {
+    "libraries": "Installed library"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Prepare Libpipeline for compilation:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The tests require the"
+        },
+        {
+          "type": "application",
+          "text": "Check"
+        },
+        {
+          "type": "text",
+          "text": "library that we've removed from LFS."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    }
+  ]
+}

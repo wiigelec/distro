@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "package": "kmod",
+  "installation_title": "Installation of Kmod",
+  "contents_title": "Contents of Kmod",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "libraries": "Installed library"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Prepare Kmod for compilation:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "definition-list",
+      "title": "The meaning of the configure options:",
+      "items": [
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "-D manpages=false"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This option disables generating the man pages which requires an external program."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The test suite of this package requires raw kernel headers (not the"
+        },
+        {
+          "type": "quote",
+          "text": "sanitized"
+        },
+        {
+          "type": "text",
+          "text": "kernel headers installed earlier), which are beyond the scope of LFS."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Now install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    }
+  ]
+}

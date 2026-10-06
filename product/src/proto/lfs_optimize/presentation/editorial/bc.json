@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "package": "bc",
+  "installation_title": "Installation of Bc",
+  "contents_title": "Contents of Bc",
+  "installed_labels": {
+    "programs": "Installed programs"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Prepare Bc for compilation:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "definition-list",
+      "title": "The meaning of the configure options:",
+      "items": [
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "CC='gcc -std=c99'"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This parameter specifies the compiler and C standard to use."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "-G"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Omit parts of the test suite that won't work until the bc program has been installed."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "-O3"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Specify the optimization to use."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "-r"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Enable the use of"
+                },
+                {
+                  "type": "application",
+                  "text": "Readline"
+                },
+                {
+                  "type": "text",
+                  "text": "to improve the line editing feature of bc."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "To test bc, run:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    }
+  ]
+}

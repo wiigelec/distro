@@ -1,0 +1,447 @@
+{
+  "schema_version": 1,
+  "package": "shadow",
+  "installation_title": "Installation of Shadow",
+  "contents_title": "Contents of Shadow",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "libraries": "Installed libraries",
+    "directories": "Installed directories"
+  },
+  "installation_blocks": [
+    {
+      "type": "admonition",
+      "kind": "important",
+      "paragraphs": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "If you've installed Linux-PAM, you should follow"
+            },
+            {
+              "type": "link",
+              "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/postlfs/shadow.html",
+              "label": "the BLFS instructions"
+            },
+            {
+              "type": "text",
+              "text": "instead of this page to build, rebuild, upgrade shadow."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "admonition",
+      "kind": "note",
+      "paragraphs": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "If you would like to enforce the use of strong passwords,"
+            },
+            {
+              "type": "link",
+              "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/postlfs/linux-pam.html",
+              "label": "install and configure Linux-PAM"
+            },
+            {
+              "type": "text",
+              "text": "first. Then"
+            },
+            {
+              "type": "link",
+              "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/postlfs/shadow.html",
+              "label": "install and configure shadow with the PAM support"
+            },
+            {
+              "type": "text",
+              "text": ". Finally"
+            },
+            {
+              "type": "link",
+              "href": "https://www.linuxfromscratch.org/blfs/view/13.1-systemd/postlfs/libpwquality.html",
+              "label": "install libpwquality and configure PAM to use it"
+            },
+            {
+              "type": "text",
+              "text": "."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Prevent the installation of manual pages that were already installed in"
+        },
+        {
+          "type": "xref",
+          "target": "ch-system-man-pages",
+          "label": "Man-pages-6.18"
+        },
+        {
+          "type": "text",
+          "text": ":"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Instead of using the default"
+        },
+        {
+          "type": "emphasis",
+          "text": "SHA512"
+        },
+        {
+          "type": "text",
+          "text": "method, use the more secure"
+        },
+        {
+          "type": "emphasis",
+          "text": "YESCRYPT"
+        },
+        {
+          "type": "text",
+          "text": "method of password encryption. It is also necessary to change the obsolete"
+        },
+        {
+          "type": "filename",
+          "text": "/var/spool/mail"
+        },
+        {
+          "type": "text",
+          "text": "location for user mailboxes that Shadow uses by default to the"
+        },
+        {
+          "type": "filename",
+          "text": "/var/mail"
+        },
+        {
+          "type": "text",
+          "text": "location used currently. And, remove"
+        },
+        {
+          "type": "filename",
+          "text": "/bin"
+        },
+        {
+          "type": "text",
+          "text": "and"
+        },
+        {
+          "type": "filename",
+          "text": "/sbin"
+        },
+        {
+          "type": "text",
+          "text": "from the"
+        },
+        {
+          "type": "envar",
+          "text": "PATH"
+        },
+        {
+          "type": "text",
+          "text": ", since they are simply symlinks to their counterparts in"
+        },
+        {
+          "type": "filename",
+          "text": "/usr"
+        },
+        {
+          "type": "text",
+          "text": "."
+        }
+      ]
+    },
+    {
+      "type": "admonition",
+      "kind": "warning",
+      "paragraphs": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Including"
+            },
+            {
+              "type": "filename",
+              "text": "/bin"
+            },
+            {
+              "type": "text",
+              "text": "and/or"
+            },
+            {
+              "type": "filename",
+              "text": "/sbin"
+            },
+            {
+              "type": "text",
+              "text": "in the"
+            },
+            {
+              "type": "envar",
+              "text": "PATH"
+            },
+            {
+              "type": "text",
+              "text": "variable may cause some BLFS packages fail to build, so don't do that in the"
+            },
+            {
+              "type": "filename",
+              "text": ".bashrc"
+            },
+            {
+              "type": "text",
+              "text": "file or anywhere else."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Prepare Shadow for compilation:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "definition-list",
+      "title": "The meaning of the new configuration options:",
+      "items": [
+        {
+          "term_content": [
+            {
+              "type": "command",
+              "text": "touch /usr/bin/passwd"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The file"
+                },
+                {
+                  "type": "filename",
+                  "text": "/usr/bin/passwd"
+                },
+                {
+                  "type": "text",
+                  "text": "needs to exist because its location is hardcoded in some programs; if it does not already exist, the installation script will create it in the wrong place."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "--with-{b,yes}crypt"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The shell expands this to two switches,"
+                },
+                {
+                  "type": "parameter",
+                  "text": "--with-bcrypt"
+                },
+                {
+                  "type": "text",
+                  "text": "and"
+                },
+                {
+                  "type": "parameter",
+                  "text": "--with-yescrypt"
+                },
+                {
+                  "type": "text",
+                  "text": ". They allow shadow to use the Bcrypt and Yescrypt algorithms implemented by"
+                },
+                {
+                  "type": "application",
+                  "text": "Libxcrypt"
+                },
+                {
+                  "type": "text",
+                  "text": "for hashing passwords. These algorithms are more secure (in particular, much more resistant to GPU-based attacks) than the traditional SHA algorithms."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "--with-group-name-max-length=32"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The longest permissible user name is 32 characters. Make the maximum length of a group name the same."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "--disable-logind"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This option makes Shadow (specifically, the"
+                },
+                {
+                  "type": "command",
+                  "text": "login"
+                },
+                {
+                  "type": "text",
+                  "text": "and"
+                },
+                {
+                  "type": "command",
+                  "text": "who"
+                },
+                {
+                  "type": "text",
+                  "text": "programs) use the"
+                },
+                {
+                  "type": "filename",
+                  "text": "/run/utmp"
+                },
+                {
+                  "type": "text",
+                  "text": "file instead of logind to track the active login sessions, as logind isn't available yet in the incomplete LFS system. But as we've discussed in"
+                },
+                {
+                  "type": "xref",
+                  "target": "ch-tools-createfiles",
+                  "label": "Creating Essential Files and Symlinks"
+                },
+                {
+                  "type": "text",
+                  "text": ", the"
+                },
+                {
+                  "type": "filename",
+                  "text": "/run/utmp"
+                },
+                {
+                  "type": "text",
+                  "text": "file format will be completely broken after year 2038. The LFS editors will attempt to resolve the issue before that year."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "--without-libbsd"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Do not use the readpassphrase function from libbsd which is not in LFS. Use the internal copy instead."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "This package does not come with a test suite."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 4
+    }
+  ]
+}

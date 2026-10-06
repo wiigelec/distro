@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "package": "libcap",
+  "installation_title": "Installation of Libcap",
+  "contents_title": "Contents of Libcap",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "libraries": "Installed library"
+  },
+  "installation_blocks": [
+    {
+      "type": "admonition",
+      "kind": "note",
+      "paragraphs": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "If updating this package on an existing system and the go compiler is installed, prevent a build error by using"
+            },
+            {
+              "type": "command",
+              "text": "export GOLANG=no"
+            },
+            {
+              "type": "text",
+              "text": "before running the commands below. Be sure to unset"
+            },
+            {
+              "type": "envar",
+              "text": "GOLANG"
+            },
+            {
+              "type": "text",
+              "text": "after installation is complete."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Prevent static libraries from being installed:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "definition-list",
+      "title": "The meaning of the make option:",
+      "items": [
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "lib=lib"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This parameter sets the library directory to"
+                },
+                {
+                  "type": "filename",
+                  "text": "/usr/lib"
+                },
+                {
+                  "type": "text",
+                  "text": "rather than"
+                },
+                {
+                  "type": "filename",
+                  "text": "/usr/lib64"
+                },
+                {
+                  "type": "text",
+                  "text": "on x86_64. It has no effect on x86."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "To test the results, issue:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    }
+  ]
+}

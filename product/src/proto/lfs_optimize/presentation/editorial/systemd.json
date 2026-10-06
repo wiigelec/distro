@@ -1,0 +1,585 @@
+{
+  "schema_version": 1,
+  "package": "systemd",
+  "installation_title": "Installation of systemd",
+  "contents_title": "Contents of systemd",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "libraries": "Installed libraries",
+    "directories": "Installed directories"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Remove two unneeded groups,"
+        },
+        {
+          "type": "systemitem",
+          "text": "render"
+        },
+        {
+          "type": "text",
+          "text": "and"
+        },
+        {
+          "type": "systemitem",
+          "text": "sgx"
+        },
+        {
+          "type": "text",
+          "text": ", from the default udev rules:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Prepare systemd for compilation:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "definition-list",
+      "title": "The meaning of the meson options:",
+      "items": [
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "--buildtype=release"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This switch overrides the default buildtype ("
+                },
+                {
+                  "type": "quote",
+                  "text": "debug"
+                },
+                {
+                  "type": "text",
+                  "text": "), which produces unoptimized binaries."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "-D default-dnssec=no"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This switch turns off the experimental DNSSEC support."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "-D firstboot=false"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This switch prevents installation of systemd services responsible for setting up the system for the first time. These are not useful in LFS, because everything is done manually."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "-D install-tests=false"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This switch prevents installation of the compiled tests."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "-D ldconfig=false"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This switch prevents installation of a systemd unit that runs"
+                },
+                {
+                  "type": "command",
+                  "text": "ldconfig"
+                },
+                {
+                  "type": "text",
+                  "text": "at boot; this is not useful for source distributions such as LFS, and makes the boot time longer. Remove this option to enable running"
+                },
+                {
+                  "type": "command",
+                  "text": "ldconfig"
+                },
+                {
+                  "type": "text",
+                  "text": "at boot."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "-D sysusers=false"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This switch prevents installation of systemd services responsible for setting up the"
+                },
+                {
+                  "type": "filename",
+                  "text": "/etc/group"
+                },
+                {
+                  "type": "text",
+                  "text": "and"
+                },
+                {
+                  "type": "filename",
+                  "text": "/etc/passwd"
+                },
+                {
+                  "type": "text",
+                  "text": "files. Both files were created in the previous chapter. This daemon is not useful on an LFS system since user accounts are manually created."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "-D rpmmacrosdir=no"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This switch disables installation of RPM Macros for use with systemd, because LFS does not support RPM."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "-D homed=disabled"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Remove a daemon which has dependencies that do not fit within the scope of LFS."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "-D man=disabled"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Prevent the generation of man pages to avoid extra dependencies. We will install pre-generated man pages for systemd from a tarball."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "-D mode=release"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Disable some features considered experimental by upstream."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "-D pamconfdir=no"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Prevent the installation of a PAM configuration file not functional on LFS."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "-D dev-kvm-mode=0660"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The default udev rule would allow all users to access"
+                },
+                {
+                  "type": "filename",
+                  "text": "/dev/kvm"
+                },
+                {
+                  "type": "text",
+                  "text": ". The editors consider it dangerous. This option overrides it."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "-D nobody-group=nogroup"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Tell the package the group name with GID 65534 is"
+                },
+                {
+                  "type": "systemitem",
+                  "text": "nogroup"
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "-D sysupdate=disabled"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Do not install the"
+                },
+                {
+                  "type": "command",
+                  "text": "systemd-sysupdate"
+                },
+                {
+                  "type": "text",
+                  "text": "tool. It's designed for automatically upgrading binary distros, so it's useless for a basic Linux system built from source. And it will report errors on boot if it's enabled but not properly configured."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "-D ukify=disabled"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Do not install the"
+                },
+                {
+                  "type": "command",
+                  "text": "systemd-ukify"
+                },
+                {
+                  "type": "text",
+                  "text": "script. At runtime this script requires the"
+                },
+                {
+                  "type": "application",
+                  "text": "pefile"
+                },
+                {
+                  "type": "text",
+                  "text": "Python module that neither LFS nor BLFS provides."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "One test creates a mount point in"
+        },
+        {
+          "type": "filename",
+          "text": "/tmp"
+        },
+        {
+          "type": "text",
+          "text": "that we cannot clean up so easily after running the test suite, and some tests need a basic"
+        },
+        {
+          "type": "filename",
+          "text": "/etc/os-release"
+        },
+        {
+          "type": "text",
+          "text": "file. To test the results, create this file and run the test suite in a separate mount namespace (so the mount point is only visible for the test suite and it gets cleaned up automatically after the test suite finishes):"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Three tests are known to fail in the LFS chroot environment but pass in a full installation:"
+        },
+        {
+          "type": "literal",
+          "text": "core - systemd:test-namespace"
+        },
+        {
+          "type": "text",
+          "text": ","
+        },
+        {
+          "type": "literal",
+          "text": "test - systemd:test-chase"
+        },
+        {
+          "type": "text",
+          "text": ", and"
+        },
+        {
+          "type": "literal",
+          "text": "tmpfiles - systemd:test-systemd-tmpfiles"
+        },
+        {
+          "type": "text",
+          "text": ". Some additional tests may fail because they depend on various kernel configuration options. The test named"
+        },
+        {
+          "type": "literal",
+          "text": "test - systemd:test-copy"
+        },
+        {
+          "type": "text",
+          "text": "may time out due to I/O congestion with a large parallel job number, but will pass if running alone with"
+        },
+        {
+          "type": "command",
+          "text": "meson test test-copy"
+        },
+        {
+          "type": "text",
+          "text": "."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 4
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the man pages:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 5
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Create the"
+        },
+        {
+          "type": "filename",
+          "text": "/etc/machine-id"
+        },
+        {
+          "type": "text",
+          "text": "file needed by"
+        },
+        {
+          "type": "command",
+          "text": "systemd-journald"
+        },
+        {
+          "type": "text",
+          "text": ":"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 6
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Set up the basic target structure:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 7
+    }
+  ]
+}

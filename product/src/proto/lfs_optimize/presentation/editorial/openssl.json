@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "package": "openssl",
+  "installation_title": "Installation of OpenSSL",
+  "contents_title": "Contents of OpenSSL",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "libraries": "Installed libraries",
+    "directories": "Installed directories"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Prepare OpenSSL for compilation:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "To test the results, issue:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "By default the test suite uses all available CPU cores. If you want to use less cores, prepend"
+        },
+        {
+          "type": "parameter",
+          "text": "HARNESS_JOBS=<N>"
+        },
+        {
+          "type": "text",
+          "text": "with N replaced by the number of logic CPU cores you want to use."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "One test, 30-test_afalg.t, is known to fail if the host kernel does not have"
+        },
+        {
+          "type": "option",
+          "text": "CONFIG_CRYPTO_USER_API_SKCIPHER"
+        },
+        {
+          "type": "text",
+          "text": "enabled, or does not have any options providing an AES with CBC implementation (for example, the combination of"
+        },
+        {
+          "type": "option",
+          "text": "CONFIG_CRYPTO_AES"
+        },
+        {
+          "type": "text",
+          "text": "and"
+        },
+        {
+          "type": "option",
+          "text": "CONFIG_CRYPTO_CBC"
+        },
+        {
+          "type": "text",
+          "text": ", or"
+        },
+        {
+          "type": "option",
+          "text": "CONFIG_CRYPTO_AES_NI_INTEL"
+        },
+        {
+          "type": "text",
+          "text": "if the CPU supports AES-NI) enabled. If it fails, it can safely be ignored."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package (setting an empty"
+        },
+        {
+          "type": "envar",
+          "text": "INSTALL_LIBS"
+        },
+        {
+          "type": "text",
+          "text": "prevents the installation of static libraries):"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Add the version to the documentation directory name, to be consistent with other packages:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 4
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "If desired, install some additional documentation:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 5
+    },
+    {
+      "type": "admonition",
+      "kind": "note",
+      "paragraphs": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "You should update OpenSSL when a new version which fixes vulnerabilities is announced. Since OpenSSL 3.0.0, the OpenSSL versioning scheme follows the MAJOR.MINOR.PATCH format. API/ABI compatibility is guaranteed for the same MAJOR version number. Because LFS installs only the shared libraries, there is no need to recompile packages which link to"
+            },
+            {
+              "type": "filename",
+              "text": "libcrypto.so"
+            },
+            {
+              "type": "text",
+              "text": "or"
+            },
+            {
+              "type": "filename",
+              "text": "libssl.so"
+            },
+            {
+              "type": "emphasis",
+              "text": "when upgrading to a version with the same MAJOR version number"
+            },
+            {
+              "type": "text",
+              "text": "."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "However, any running programs linked to those libraries need to be stopped and restarted. Read the related entries in"
+            },
+            {
+              "type": "xref",
+              "target": "pkgmgmt-upgrade-issues",
+              "label": "Upgrade Issues"
+            },
+            {
+              "type": "text",
+              "text": "for details."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1002 @@
+{
+  "schema_version": 1,
+  "source": {
+    "project": "Linux From Scratch",
+    "version": "13.1-systemd",
+    "published": "2026-09-01",
+    "slice": "normalized Chapter 8 package rendering"
+  },
+  "complete_package_count": 71,
+  "deferred_package_count": 9,
+  "complete_packages": [
+    "man-pages",
+    "iana-etc",
+    "zlib",
+    "bzip2",
+    "xz",
+    "lz4",
+    "zstd",
+    "file",
+    "readline",
+    "pcre2",
+    "m4",
+    "bc",
+    "flex",
+    "tcl",
+    "expect",
+    "dejagnu",
+    "ninja",
+    "pkgconf",
+    "binutils",
+    "mpfr",
+    "mpc",
+    "attr",
+    "acl",
+    "libcap",
+    "shadow",
+    "gawk",
+    "gcc",
+    "sed",
+    "psmisc",
+    "gettext",
+    "bison",
+    "grep",
+    "bash",
+    "libtool",
+    "gdbm",
+    "gperf",
+    "expat",
+    "inetutils",
+    "less",
+    "perl",
+    "autoconf",
+    "automake",
+    "openssl",
+    "libelf",
+    "libffi",
+    "sqlite",
+    "mpdecimal",
+    "Python",
+    "flit-core",
+    "packaging",
+    "wheel",
+    "setuptools",
+    "meson",
+    "kmod",
+    "diffutils",
+    "findutils",
+    "groff",
+    "gzip",
+    "iproute2",
+    "kbd",
+    "libpipeline",
+    "patch",
+    "tar",
+    "vim",
+    "markupsafe",
+    "jinja2",
+    "systemd",
+    "dbus",
+    "man-db",
+    "procps",
+    "e2fsprogs"
+  ],
+  "deferred_authority_mismatches": [
+    "coreutils",
+    "glibc",
+    "gmp",
+    "grub",
+    "libxcrypt",
+    "make",
+    "ncurses",
+    "texinfo",
+    "util-linux"
+  ],
+  "packages": {
+    "man-pages": {
+      "command_sha256": [
+        "d624a2175880a61df2cc9bcea4bf10294d779afab0880e2a42ec3fcc464f7ed6",
+        "cb8bb79704b6a1e8a6d8deb567072d15de8f6a8758c0f2f8f4aa3c7415cf7f30"
+      ],
+      "installed_labels": {
+        "files": "Installed files"
+      }
+    },
+    "iana-etc": {
+      "command_sha256": [
+        "42b0ead067ede778d2588ee4d7f1891120b3948046aba4a5ab178375ee6cfb1c"
+      ],
+      "installed_labels": {
+        "files": "Installed files"
+      }
+    },
+    "zlib": {
+      "command_sha256": [
+        "ddec2098f6c935422e438fab08b99270dc41312bdc5c0a0ec138a95a8665a65a",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f",
+        "82909d3a8ebaf7a5af69c6fa71764593431a9acca7104448708845e8221511a2"
+      ],
+      "installed_labels": {
+        "libraries": "Installed libraries"
+      }
+    },
+    "bzip2": {
+      "command_sha256": [
+        "aac761875ce8e3bbba02973fc3878391833b55df537a08d5be74f45b2eb5522b",
+        "18a398e0543440514a50bf60c89e48a137a16a691a719219d50be587ed61e194",
+        "3f4567c8a7caa11ad20301a506a84e75b5732898821b7eb28d308f6b635df57f",
+        "702fcdd77c1b34f0ec4b3902dfe602700526de561aa1df002fbbba8f025fed44",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "c595a6630ead1d5ca43fcab77f03d8e66d75472a1d8cb7fee2dab8ec2712085d",
+        "18fed86fec3cb71c5a3a6969b07225feeef252a1c5380ae0e8d75f3257b5b83a",
+        "ba5182fbc64195662e890cdcd2185270bdd180cc23c6aabcaea9638ca355d620",
+        "d351367bfcad03c73651186a193e5ded8f61fe883425258b591f98085a733132",
+        "37c89cbdda827bbf9f49f53773f582782d1edd8a1ffb874c95f7a62451eb8e1a"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed libraries",
+        "directories": "Installed directory"
+      }
+    },
+    "xz": {
+      "command_sha256": [
+        "3d122392c5febd4820ea4166637313c667ce23f3ccff8e7b3701041473301c12",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed libraries",
+        "directories": "Installed directories"
+      }
+    },
+    "lz4": {
+      "command_sha256": [
+        "fcbbd245e961171ebcf5a2339362e596c9dace5bb308da0dd9a58ff65a1aed3c",
+        "76d7528294e89de154bb43d576aac8bd337e11899bbfd22d2ce4dd468936016d",
+        "a40da5e98454af0386cd5a4edbdf3d8e0127bf3d52a21f508755fc83202846a7"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed library"
+      }
+    },
+    "zstd": {
+      "command_sha256": [
+        "5cc16e99d2b211d1d99d0f00cd290fc910795ea7379cdb474e13c0d2124293cf",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "2765e0670d886bc2425d05a14ae23b7043a419f2d1d2f41ac9aafbf6dc339173",
+        "1207f1b5e14771d77838ee8828258df442a9ed6386fefdfec7be6752d429e258"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed library"
+      }
+    },
+    "file": {
+      "command_sha256": [
+        "ddec2098f6c935422e438fab08b99270dc41312bdc5c0a0ec138a95a8665a65a",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed library"
+      }
+    },
+    "readline": {
+      "command_sha256": [
+        "b9aa6643a853e589fbfbdb7d5ff2497af8298cea200e356844b0c6c4b16f69d0",
+        "0fb3662dd14f092e52451365ebf601d174a04da8a59d57b8c104b87556d26914",
+        "af245a1c0db4d4a918628308e9e33a7ef4b48d69db8d0c23374987261cec14a3",
+        "72ca4f6a90540f1de49165c31184169623e9de2aaf7d508f55f8120208abbf6a",
+        "11645327aaaeecb6025b9f807de2ef0c506829008ee37e42119a05fa6a43a295",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f",
+        "a638bd656f0a359b35d00fbdbaa0d618154f042772bb952686ad749d298aaeb6"
+      ],
+      "installed_labels": {
+        "libraries": "Installed libraries",
+        "directories": "Installed directories"
+      }
+    },
+    "pcre2": {
+      "command_sha256": [
+        "fb31015a1d70535c1f55379213a0276649c35283c51cefc44b6c54a74506b64a",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed library"
+      }
+    },
+    "m4": {
+      "command_sha256": [
+        "ddec2098f6c935422e438fab08b99270dc41312bdc5c0a0ec138a95a8665a65a",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "programs": "Installed program"
+      }
+    },
+    "bc": {
+      "command_sha256": [
+        "28e79e569a4f95dfd284ddf228cac0bbf8c63811b9cf88ed71618daa6f60a613",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "22cc66aa7d2624b4eb4d5b61658614cd6c32477b123afbf7dbc7fc3d7d0f3713",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs"
+      }
+    },
+    "flex": {
+      "command_sha256": [
+        "9670cc8e50503b03412070e38dfa9a0abe9d81c30ace2037f76d33dee542c2a4",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f",
+        "9ed55281f9def03ebfe5931f4e3b4f23b50b1d42617fa2b3a45a7a12e35f6cac"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed libraries",
+        "directories": "Installed directory"
+      }
+    },
+    "tcl": {
+      "command_sha256": [
+        "e98bd06aebe08abf32bea8ed283b1446b114cbe401bbb3202d49851db7394bae",
+        "8fd8c9dc103ecc5e4c29038261b7f4330a7b7ede163f657e3bbc59b6fe85da61",
+        "554ce53ce569bf2bddd5de7bfa2fd2ca62ec8106bea434ae6f40e7a3b1a7c8d4",
+        "54380dd445a0c957a06c2fb1668755a220533a4530d9c013ca6fc8cb4df7276c",
+        "75d64a9587dc91b2a2c99450770bce380db31cf8087acc72b36dca87b2f64bab",
+        "d887f223967b8bb4e75ea8971f5f5c63d023c80f68485469b98444a26907f28a",
+        "55ab3d938f5c794e38d11f6f3100ba962903b231cd7520c0daa2bcc63391065c",
+        "5468c43c3b70947741fcaa0ef979dba44a1cd2d970b2cf5581d88cc8e1c39537",
+        "14e69abf1e736749f484f75fb7d305487d9f99f7100eff8e008322db8cad860f"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed library"
+      }
+    },
+    "expect": {
+      "command_sha256": [
+        "5e3d26a57371e2e3de3b694d383dc8c89bde1fcafa7a15ad811b68132f87d381",
+        "ec00af21b4921f46b43cf606173b6215d52882ee0275bc7013951c6d777067a7",
+        "f0dee5d889e8855dc13dcb4036120c5958444b20ece5f39e1ef753bb42083f00",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "22cc66aa7d2624b4eb4d5b61658614cd6c32477b123afbf7dbc7fc3d7d0f3713",
+        "b7288218b1e4d0da10de26252e54b89d99a51380d7cc1070777012471a5be26e"
+      ],
+      "installed_labels": {
+        "programs": "Installed program",
+        "libraries": "Installed library"
+      }
+    },
+    "dejagnu": {
+      "command_sha256": [
+        "2e2e13a6fedd45d15e32fdc1bd5aa2edcad1231e281827d1d3fb8131c5818617",
+        "7ac2bf9b48efc25ca16cd196a00a26add0479ecf7365ce0dceea3eec508fb11b",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "630eb6b5d6a2bc3d68b03631a8bf37a20b45cb44b8bb4c916b80279f9fdc0940"
+      ],
+      "installed_labels": {
+        "programs": "Installed program"
+      }
+    },
+    "ninja": {
+      "command_sha256": [
+        "caba150ad740c19e16cde34c982f58330fc8f4edf60e7e1b97e69a44df329b78",
+        "048b6fb3bcf97ab4599d4abd36f2961006113badedc0f7fa096e2b6ec16594e3",
+        "fc5cd2d1c9a6d8094b6aca413f0af8d9328f1f6cf694297f9c3f61f547eb4ee9"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs"
+      }
+    },
+    "pkgconf": {
+      "command_sha256": [
+        "6dbe8fbd83c249cb2d47ea64081b220051bbc0d895fce0aac49e7b2c1248eaed",
+        "895184d158289bb7bffa53c5eba35688cbdacb7fbcec95f2a756dc3556f3807f",
+        "54482595177116e6103b076dbf30648e5d0537dd1ed9cf5ae4562fa8a700d47b",
+        "0132e0f8ce96b55639dbaae705cb9df9dc759cf539d3471a462fc02c718e68cc",
+        "8d12342908b2275b6a4fb16f515567a0425479b3701b4499095c2cdd43215536",
+        "7ee38bbfb9eb1f3c3e3328d4ad27c2ea4132c485e8e7c4ab5f9f171fdf88391d"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed library",
+        "directories": "Installed directory"
+      }
+    },
+    "binutils": {
+      "command_sha256": [
+        "2e2e13a6fedd45d15e32fdc1bd5aa2edcad1231e281827d1d3fb8131c5818617",
+        "9fb9b7e6b09e240e137d0db30e5e88ac1d302d97be25b9ba1d9691d93ddd2010",
+        "31da749b09a68d7e9443e739d25a82c7c62cb53f38acf1b1bf507ad6c802177c",
+        "e36a0ac6c422abc7e412005eeedc07061d0842e71ad9eb4d6816b94bcdc8e32c",
+        "f15d7f1fb217c2013fabac5c883bc65ec29118ff291985b2b8513c50d2311e47",
+        "66a5f9ef25e690e7d3f6a504845f13fa0f9605c9247af6aca717bb9360c1b2d9",
+        "c05899d5b650a91d74f234da547f9d73e685e201436c253d43f61ad8132f659a"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed libraries",
+        "directories": "Installed directory"
+      }
+    },
+    "mpfr": {
+      "command_sha256": [
+        "93647da4e8787b8cda88ce427e3e2514cd70572e42b9cb4d03ff94b9cff575d0",
+        "76a0b71da8a740af0afd17d960f189081647506fd0e5cc032835303caec910f4",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "54fddb73e99c4fa65e34c80dc86855aa1412d7ede7cc61cb5d66f43c8d64b202"
+      ],
+      "installed_labels": {
+        "libraries": "Installed libraries",
+        "directories": "Installed directory"
+      }
+    },
+    "mpc": {
+      "command_sha256": [
+        "af1683b647a1e34b7ee56ade23a4a752a5b2f54ce6895f5d1a1436ea27e8fa80",
+        "76a0b71da8a740af0afd17d960f189081647506fd0e5cc032835303caec910f4",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "54fddb73e99c4fa65e34c80dc86855aa1412d7ede7cc61cb5d66f43c8d64b202"
+      ],
+      "installed_labels": {
+        "libraries": "Installed libraries",
+        "directories": "Installed directory"
+      }
+    },
+    "attr": {
+      "command_sha256": [
+        "51f643a7308857c854cf6a0ce579207412d5bc3f862fe386cf04dd69c39d2562",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed library",
+        "directories": "Installed directories"
+      }
+    },
+    "acl": {
+      "command_sha256": [
+        "474e8084e43c1bbff4f7cf2a592b17b0870527ae44a1ff3435fc95f613d16367",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed library",
+        "directories": "Installed directories"
+      }
+    },
+    "libcap": {
+      "command_sha256": [
+        "61a04fa517ec6440fa05f6f8545f72a82e7d72739bbf1d3c3970ddc7a7977179",
+        "30793740b747648ee47f428ec914067e9556564bf04cca6f792791f920f41c35",
+        "22cc66aa7d2624b4eb4d5b61658614cd6c32477b123afbf7dbc7fc3d7d0f3713",
+        "e1ff22d20cbf41334af6f3c324f35173a33d91c33ec15519ea994917811acd24"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed library"
+      }
+    },
+    "shadow": {
+      "command_sha256": [
+        "88850d7f3448396b7941513fbba992d13a81a5de9150e6d19671aa7efb4dda3f",
+        "a9fbcb3d461fd44843fcd3bf3f0f9142c1c32454634def4fa92932557fa6efd5",
+        "5d7fedb35ce31d0669ef232ac24bcd1c977479a6b78bfb0062544372a4cf73da",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "a5fef677470d470751f52ee29a713419fa471713cc0004213f4ea259961af3fc"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed libraries",
+        "directories": "Installed directories"
+      }
+    },
+    "gawk": {
+      "command_sha256": [
+        "366224a72fed10ea18cf1897200b93d80efb4bee89d3f80396f3b6fd6a2ae99c",
+        "ddec2098f6c935422e438fab08b99270dc41312bdc5c0a0ec138a95a8665a65a",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "1e1f24ad14df77e2b3c2058fe45f201063b908ea1fb1c96c76500f35f603e5cf",
+        "edc1562ff4675e3c79c34143b876ccd0da6c0f2b0df72d70354efa338e85a8a1",
+        "388ca16c40aac69de05c7803862b3a51c317dab76e457395a8aedb56b6608e48",
+        "8b29ac6acad765d6a9387aac37d9814c7075101ff10a00927d29164afefa10f3"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed libraries",
+        "directories": "Installed directories"
+      }
+    },
+    "gcc": {
+      "command_sha256": [
+        "8a13fcc898a15116a52106d3293b39333733bc5b4b77acc85e8ee2358e15aee4",
+        "2e2e13a6fedd45d15e32fdc1bd5aa2edcad1231e281827d1d3fb8131c5818617",
+        "0b41eb7748c66442d4751da1d5bc2b66b269d272b57220eb2c2b7bb5d8639c28",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "705e64d9ecc4e7b12b8d1dec7d2e381bec1fe608f34adbade93af01fb8de97cf",
+        "67725130545eac486c77abac328576beabfe3054eb5d41c83bb765fcbffa9e17",
+        "441a3044fb1d0c913d28c520736f8746bcb0b734ef8dfb4f27965ce43e9ebdb3",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f",
+        "cf28c57d59e5cb9f19b4689d51ece29cb58ec518f02ff2fef5cd3750a94c6d15",
+        "8687684925dbe8dde6632fb61b0e8bacd1107b29a7025d4870e884c190cdfb47",
+        "7365e30f30966f722b67a1e2b8dd73fa8903317459a314394fa5b43cb182b45f",
+        "a7dbf236b0d74e0c1e99619ceae439b90fc71a149d7d0ff0712052e3106920af",
+        "5eda913a9dba73fe7b6aa8e4e40384b4da4e64328f8a6cb68e5dbce3734f224c",
+        "025d3483e175913c3c87047502821b4f6314bd669b1d792d41a4af0eb140013d",
+        "b8932a7fb72f601563d1456f40484440a53266dad500ae662ef93a1cbc424fa5",
+        "2c045bdde6c4a449388ab9498161632dadfc709821e0abb14f962cb18bceca75",
+        "8f9b540652a97fa620ac071721892f3bd752edb0c687c2235ec28f6144ecc824",
+        "2587bd2b1cdb3c9dc9b2733ac3a1865a952f49c94878df441ae803d985f99cd0",
+        "6629b48be2e24fdb8bf8a6faeae5355c666ac6872c0ade5e73ee2e2e41943ad1",
+        "0d8ef7a974c3abaf43077e542804e2e1e68fdf34808742e9e647b142dd1a2d7e"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed libraries",
+        "directories": "Installed directories"
+      }
+    },
+    "sed": {
+      "command_sha256": [
+        "ddec2098f6c935422e438fab08b99270dc41312bdc5c0a0ec138a95a8665a65a",
+        "76a0b71da8a740af0afd17d960f189081647506fd0e5cc032835303caec910f4",
+        "1e1f24ad14df77e2b3c2058fe45f201063b908ea1fb1c96c76500f35f603e5cf",
+        "5df25caec406d34e3178b25c20a2966f9b71a6917f2cbecc297a9a44355740b2"
+      ],
+      "installed_labels": {
+        "programs": "Installed program",
+        "directories": "Installed directory"
+      }
+    },
+    "psmisc": {
+      "command_sha256": [
+        "ddec2098f6c935422e438fab08b99270dc41312bdc5c0a0ec138a95a8665a65a",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs"
+      }
+    },
+    "gettext": {
+      "command_sha256": [
+        "b497da3b91021df6a453d32411eff54a045cca2da5f842041c64ee3a380937e1",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "cf36fc97d0d74390f3c73dac1d396779876b82d016f904edc0452b31cbe10c4c"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed libraries",
+        "directories": "Installed directories"
+      }
+    },
+    "bison": {
+      "command_sha256": [
+        "f011215b95a60a25ee7bae82bf1f1973bf30d3e9b26ab893ca7cafc0daad6e7a",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed library",
+        "directories": "Installed directory"
+      }
+    },
+    "grep": {
+      "command_sha256": [
+        "c4f148e9a0eaf631a16c972eba3bb074645d48efd5dce753485beb52041c1271",
+        "ddec2098f6c935422e438fab08b99270dc41312bdc5c0a0ec138a95a8665a65a",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs"
+      }
+    },
+    "bash": {
+      "command_sha256": [
+        "21813f7d213e1df8242a36c1c4931503f082f73526bc02e599a77917981f314d",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "59c4c583ece40c877f9c16632cac77200d58331e59b7f55ab76748bb0deb6f4a",
+        "67c05235a6da2b5c34c17fb346b5b051743064063bdd50c230ae556ebc44e214",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f",
+        "f3ee6471e668cc0d157d514846c3d979d2aa41f8518804d565f66eec35b1f946"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "directories": "Installed directory"
+      }
+    },
+    "libtool": {
+      "command_sha256": [
+        "ddec2098f6c935422e438fab08b99270dc41312bdc5c0a0ec138a95a8665a65a",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f",
+        "a7f63f78fb47157f5bdf70ad4438a5b95aaa126eaea76597e3c2128cc83d2187"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed libraries",
+        "directories": "Installed directories"
+      }
+    },
+    "gdbm": {
+      "command_sha256": [
+        "bbef559713f59688dd61979059cf287fdbc35c96ba4bd0fb33d289104e3dd671",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed libraries"
+      }
+    },
+    "gperf": {
+      "command_sha256": [
+        "ebfe7ea249afdd7ab470a4d8baf4354dd498f3f9ad0c1d82c62c36f293096d02",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "programs": "Installed program",
+        "directories": "Installed directory"
+      }
+    },
+    "expat": {
+      "command_sha256": [
+        "5be9cfab34ecf54ae4e0bedbbe718e27112553352690cb8eaa64f0fbb1b40391",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f",
+        "a49de70bda87234ebd5ff0d0621bf747af85794989cff324933933df2fa97cab"
+      ],
+      "installed_labels": {
+        "programs": "Installed program",
+        "libraries": "Installed libraries",
+        "directories": "Installed directory"
+      }
+    },
+    "inetutils": {
+      "command_sha256": [
+        "627e4b01b7fb65855c27fd0a11ff2499cb45e9d4f753951daee7507d4125aa33",
+        "795af64ec95b4bde91c5e93dd745231350b55f8ab08b59780137b8e23e623dfa",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f",
+        "de1c0fa5b82d5496aa8f3fbb0cf212fa1f017b8e9950d4608ee5ab7de6f9c566"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs"
+      }
+    },
+    "less": {
+      "command_sha256": [
+        "3e28f89ac022e557b7041b7a175e68249ea4d8d949cd97ee9125e361533c9544",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs"
+      }
+    },
+    "perl": {
+      "command_sha256": [
+        "9b577f9e0acaa14465fa36cad4431fcce01a3d7d9c05bd7cf752cf6c25f070f5",
+        "d9d7fce85b2ecc5777990fdb3caab092547e6c72be386b689169f838f79da68e",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "0d93754a05bfb42a6160574ed251d7557a8c2f1146a4d871f7435fe31b028c0b",
+        "e1afa783342d81ebdd0b0e449a3e3621073e4f0b0fed1e0aece9339663321299"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed libraries",
+        "directories": "Installed directory"
+      }
+    },
+    "autoconf": {
+      "command_sha256": [
+        "ddec2098f6c935422e438fab08b99270dc41312bdc5c0a0ec138a95a8665a65a",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "directories": "Installed directory"
+      }
+    },
+    "automake": {
+      "command_sha256": [
+        "36f78eddb589f2c73e0fa97ae3a26f45f7e23b9edfa7188fbcc2ea940485441a",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "2653c8e86e8c79e9763b97effe3bf9287058f3708a8840473f160231072e67af",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "directories": "Installed directories"
+      }
+    },
+    "openssl": {
+      "command_sha256": [
+        "fadddd4e1f6205d2b9edc7c3dea4d274f775641367eafa74484239af1ae08a82",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "22cc66aa7d2624b4eb4d5b61658614cd6c32477b123afbf7dbc7fc3d7d0f3713",
+        "fa99c04541dd7fc60e35bb247bb56f5fc306834418845c1f6484d5cfa21e0644",
+        "a1e917dd534a054ecbc9d9c3472baa7489ed3625ef2b69889c9a9509234a4d75",
+        "49d9079094b4433f4db24454fe074cc9bc0c51d18376177613779cf5c6802558"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed libraries",
+        "directories": "Installed directories"
+      }
+    },
+    "libelf": {
+      "command_sha256": [
+        "3ce39a85b6cc1e1fb353367b1ae42d82ca0fc1a11fa1c6469855c2686389dced",
+        "7b14493b91230f1edff28428c209ce5e0b7243655bb95b05d41bf2d255476e1c",
+        "e36a0ac6c422abc7e412005eeedc07061d0842e71ad9eb4d6816b94bcdc8e32c",
+        "3cdb76b7659abd2edce45e230befd76e2388640440f35d34612e4411483160da"
+      ],
+      "installed_labels": {
+        "libraries": "Installed library",
+        "directories": "Installed directory"
+      }
+    },
+    "libffi": {
+      "command_sha256": [
+        "798d73b2c60247e174c5968e312959c022f533ebb5c74206ff580459d26f771a",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "libraries": "Installed library"
+      }
+    },
+    "sqlite": {
+      "command_sha256": [
+        "4f11b66f68eb14d6128d04b1ef2a97c43d96f36b77dc2f25158eb2582644427c",
+        "0f457f6bd0196746e2290c2959ecdec1513cd2023e1ed8128e8b65dd9ad15e06",
+        "37cc3441bdb65096f897a655a56906be5e4c8a1f0db97da5ae40a703e6124891",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f",
+        "e320880df874babb2e0f934262100003be7a112e7e7c962ce3d8bcf0986f654a"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed libraries",
+        "directories": "Installed directories"
+      }
+    },
+    "mpdecimal": {
+      "command_sha256": [
+        "e2db4c31adb02235f2f6539059d920363d5b5a66da2773b68ba72aeb6b16ce6d",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "c3901b5fe92c866adfad1be76e5c07668894b39ee6d8d7bc1540e1df8c0011f5",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "libraries": "Installed libraries",
+        "directories": "Installed directory"
+      }
+    },
+    "Python": {
+      "command_sha256": [
+        "aff08f7ceab2fd970a76e034b199051f4b237bfec445a10f89d13bac87835988",
+        "96552e11d38c0b0671a7ec79ab9f7733425d88dd917293fa0363353c52f22a13",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "a04bb0d7fa91adba4cf702418563722cb7d46c27ccc2610147285f3cc3613ff7",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f",
+        "9c4ec877932e2ce65921fa873e661d40e984a96253ab022df2c8ecf2798c67ce",
+        "1dfcbd8ccc278e850cb0b2ed12ee0507a37ab5c72f7bc7cecc7bf8f267052d56"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed library",
+        "directories": "Installed directories"
+      }
+    },
+    "flit-core": {
+      "command_sha256": [
+        "54528374e16b7ebed46ddb1a84804ed4275a277d12fe21cffffaeb0fb728b983",
+        "e677b6a397b94183e8ff5262d444bf39565a1e54959398bbd1f2e3d71e104c1a"
+      ],
+      "installed_labels": {
+        "directories": "Installed directory"
+      }
+    },
+    "packaging": {
+      "command_sha256": [
+        "54528374e16b7ebed46ddb1a84804ed4275a277d12fe21cffffaeb0fb728b983",
+        "707b03214dc9ddce8488a785f9f4f438760c295621c2fbdc1fdec0a60c77ba46"
+      ],
+      "installed_labels": {
+        "directories": "Installed directories"
+      }
+    },
+    "wheel": {
+      "command_sha256": [
+        "54528374e16b7ebed46ddb1a84804ed4275a277d12fe21cffffaeb0fb728b983",
+        "b60d1f6bbfa1fd88237ed3ed2cb3d5c45f6fe444e2e29b4ee8e34abd33d572cd"
+      ],
+      "installed_labels": {
+        "programs": "Installed program",
+        "directories": "Installed directories"
+      }
+    },
+    "setuptools": {
+      "command_sha256": [
+        "54528374e16b7ebed46ddb1a84804ed4275a277d12fe21cffffaeb0fb728b983",
+        "d95751cd65a20d6488aed27948a97ab7098ed0410bb7fa38c7b9547b638c1972"
+      ],
+      "installed_labels": {
+        "directories": "Installed directory"
+      }
+    },
+    "meson": {
+      "command_sha256": [
+        "54528374e16b7ebed46ddb1a84804ed4275a277d12fe21cffffaeb0fb728b983",
+        "a117f2d8bdb6ef0878722c871c9d2a7b2ed1ee59b86e95ec7f248ace3d2f829e"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "directories": "Installed directory"
+      }
+    },
+    "kmod": {
+      "command_sha256": [
+        "9508e82e43829a46a767b3d5de721b2cf7dd8c2b41b5851e28c62d28f74ea601",
+        "54482595177116e6103b076dbf30648e5d0537dd1ed9cf5ae4562fa8a700d47b",
+        "43102d0986bb2ab6da93e0ce7637a8de1fc7427e1ea08610063a8d3cb04226ba"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed library"
+      }
+    },
+    "diffutils": {
+      "command_sha256": [
+        "ddec2098f6c935422e438fab08b99270dc41312bdc5c0a0ec138a95a8665a65a",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs"
+      }
+    },
+    "findutils": {
+      "command_sha256": [
+        "a69262fb95d316a67f690256928f50b1f5763592506dd7f755abf2b8762d6988",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "3ef822211084c515bbde0205a9b02ca196c40c46ffe070aae104e9e91bd9a868",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "directories": "Installed directory"
+      }
+    },
+    "groff": {
+      "command_sha256": [
+        "db195eb36861f73b269e9d3aa00dcb3f806aebe8ca956d410012a628f404aa3f",
+        "09b8c984f9ca2f0bdc66595e5a1e8ac35c5bde3318ad573576a4b1ffd0b81256",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "directories": "Installed directories"
+      }
+    },
+    "gzip": {
+      "command_sha256": [
+        "ddec2098f6c935422e438fab08b99270dc41312bdc5c0a0ec138a95a8665a65a",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs"
+      }
+    },
+    "iproute2": {
+      "command_sha256": [
+        "93c317a338af0e53796f0e2bee590ca6bac6ec9ccbd1aeadb4f59da887faa2ca",
+        "f8560e4de48b86689e5e1f078963a184989c302eb15bc30bb47b6c388867d1a5",
+        "e7aa07d3853cffe9dd32685038895a85bd246e557ae5e44793c408fcb9e37c26",
+        "09249afb0fbcc3bde63739d0ea8f2a40d0ba0106ff1114bac02f2f3f489a7c6d"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "directories": "Installed directories"
+      }
+    },
+    "kbd": {
+      "command_sha256": [
+        "981e9f16abf5da849a762558be7957e88e31da0481c7fcc62d16691ddb9455db",
+        "e8da2287ed9d1cc1b915de51ea6cb4524801c69f8593ab81f0cdc037da7f7563",
+        "801411781be715b63e657dcaa130608adf9c8665b711c639b94ccf4acdfe31c8",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f",
+        "7b51084bf76c49aff0cc67edf6cdd28b72e8744a5ac706a532813c3e631c8f1b"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "directories": "Installed directories"
+      }
+    },
+    "libpipeline": {
+      "command_sha256": [
+        "ddec2098f6c935422e438fab08b99270dc41312bdc5c0a0ec138a95a8665a65a",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "libraries": "Installed library"
+      }
+    },
+    "patch": {
+      "command_sha256": [
+        "ddec2098f6c935422e438fab08b99270dc41312bdc5c0a0ec138a95a8665a65a",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "programs": "Installed program"
+      }
+    },
+    "tar": {
+      "command_sha256": [
+        "ddb29326a907d54d0f4b180315dd194ac31583c5bc808643efb7c93841b5d3f6",
+        "8dac7da02b4c077bd6d6d6ef23d8047f33f6de57673f24f0b529eb9a8b07b27c",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "c144224095e1aeabb74e5d0c007219c8044d207c324f2b89a882d12fadab85c7"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "directories": "Installed directory"
+      }
+    },
+    "vim": {
+      "command_sha256": [
+        "44fa6e2296783ceb5343254fddcefc112a0ebc66a4f9f740491dfa20ba571628",
+        "ddec2098f6c935422e438fab08b99270dc41312bdc5c0a0ec138a95a8665a65a",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "9b0fc2c9b63be32338c302cbb603a44f4e4e2442fc37383d0036db0a3b2c60f3",
+        "7fe09b1a957894ba439761d698363062805d3f101123b6a43c4ecb0e84f2084f",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f",
+        "1acfc2deec207b23f9330f74ef608c69824583d2980e6e712cf4fd87f504e415",
+        "0cad1f6207c6cf0abf83e39079c69ab79d8207c71047b9afdcf8297c812b7d9e"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "directories": "Installed directory"
+      }
+    },
+    "markupsafe": {
+      "command_sha256": [
+        "54528374e16b7ebed46ddb1a84804ed4275a277d12fe21cffffaeb0fb728b983",
+        "01e2a1e33642d944edc22c707bb0e7f09b8ee69375c903b92fb250d7b0b25676"
+      ],
+      "installed_labels": {
+        "directories": "Installed directory"
+      }
+    },
+    "jinja2": {
+      "command_sha256": [
+        "54528374e16b7ebed46ddb1a84804ed4275a277d12fe21cffffaeb0fb728b983",
+        "b84f84bc753cf4df7812ed8235504125e87fc7cb6fbb416b773176571b019890"
+      ],
+      "installed_labels": {
+        "directories": "Installed directory"
+      }
+    },
+    "systemd": {
+      "command_sha256": [
+        "d993336c3b992bf47961553e3ba53245619268c1a27624c2af1f2da5c34a7e9d",
+        "a0b712cf3c651eee8fa40ef0d99eea2b9c6e08521942480b91de43cca17b77e8",
+        "54482595177116e6103b076dbf30648e5d0537dd1ed9cf5ae4562fa8a700d47b",
+        "1be3c0a5ce6aadf5b4a1a1b9d89628b35ca7d5e6a1048bdc4e03d971de7ec257",
+        "43102d0986bb2ab6da93e0ce7637a8de1fc7427e1ea08610063a8d3cb04226ba",
+        "884e145b116efba62edd020beeec24babaa915c5af7cf355746664bc9715b305",
+        "6c0bcfc15ad62fa4aa19c7851763f203945b8037dbd17208f8b726e4d0248226",
+        "4653272c3af62781fab1cc381a3dc386bfb652b299d737bd9ad6be7524815b42"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed libraries",
+        "directories": "Installed directories"
+      }
+    },
+    "dbus": {
+      "command_sha256": [
+        "7e8a6ed555a5019a50ebdb47232155c3413614d050127638e2c4fedf2a764ed7",
+        "54482595177116e6103b076dbf30648e5d0537dd1ed9cf5ae4562fa8a700d47b",
+        "0132e0f8ce96b55639dbaae705cb9df9dc759cf539d3471a462fc02c718e68cc",
+        "43102d0986bb2ab6da93e0ce7637a8de1fc7427e1ea08610063a8d3cb04226ba",
+        "c6a0ba8a296f49c77fe1b609f85100961f90a58719a53bf4a23c0f9d41f5bc83"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed libraries",
+        "directories": "Installed directories"
+      }
+    },
+    "man-db": {
+      "command_sha256": [
+        "15e2276dc638f2d646dc419c60893417a6bdd3760ea6bdaf6c8d990642235f0f",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed libraries",
+        "directories": "Installed directories"
+      }
+    },
+    "procps": {
+      "command_sha256": [
+        "e7ef01007435d2a53bcff646ffc50b1e6ffdaed863ccf9b5e4889aad7cbedd9b",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "1e1f24ad14df77e2b3c2058fe45f201063b908ea1fb1c96c76500f35f603e5cf",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed library",
+        "directories": "Installed directories"
+      }
+    },
+    "e2fsprogs": {
+      "command_sha256": [
+        "2e2e13a6fedd45d15e32fdc1bd5aa2edcad1231e281827d1d3fb8131c5818617",
+        "25247d73aa4a2db13d02639429d1827e5f9ca2d337f1725ab7e4a74bb6e48f98",
+        "d05aa2a15fb3c40efeeb03bec445393f00074484cf01c8fb2da90ca6695a5531",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "d731793e684e47e90ce49cd6fbeacbeb29aaa02b65089288f96583563c15084f",
+        "489a70a9342abb8eb305ba787fc315c53c87fb38a636c69dfe7f19ffd2c936c7",
+        "55feaf1ee1d63b44b5223ae62a743ec715a79aeb3f22e3e1ca9fdd7a5c37ccf1",
+        "e9f0ffe57453406b104107629b3493bde64fbd7c16b3738d484153b4b8f8ad08"
+      ],
+      "installed_labels": {
+        "programs": "Installed programs",
+        "libraries": "Installed libraries",
+        "directories": "Installed directories"
+      }
+    }
+  }
+}

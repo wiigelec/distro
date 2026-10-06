@@ -24,6 +24,13 @@ INLINE_TAGS = {
     "parameter": "parameter",
     "quote": "quote",
     "emphasis": "emphasis",
+    "application": "application",
+    "systemitem": "systemitem",
+    "envar": "envar",
+    "option": "option",
+    "computeroutput": "computeroutput",
+    "replaceable": "replaceable",
+    "function": "function",
 }
 
 
@@ -73,7 +80,14 @@ def package_inputs(name: str) -> tuple[dict[str, Any], dict[str, Any], dict[str,
     forbidden = sorted(FORBIDDEN_EDITORIAL_KEYS.intersection(editorial))
     require(not forbidden, f"{name}: editorial duplicates authoritative data: {', '.join(forbidden)}")
     entry = next((x for x in structure.get("packages", []) if x.get("name") == name), None)
-    require(isinstance(entry, dict), f"{name}: missing package presentation structure")
+    document = package_document(name)
+    if entry is None:
+        entry = {
+            "name": name,
+            "title": document["title"],
+            "sections": ["package", "installation", "contents"],
+        }
+    require(isinstance(entry, dict), f"{name}: invalid package presentation structure")
     require(
         "document" not in entry,
         f"{name}: package composition must not own document identity",
@@ -83,7 +97,7 @@ def package_inputs(name: str) -> tuple[dict[str, Any], dict[str, Any], dict[str,
         f"{name}: unsupported section composition",
     )
     entry = dict(entry)
-    entry["document"] = package_document(name)
+    entry["document"] = document
     return resolve([name])["packages"][0], entry, editorial
 
 
@@ -111,6 +125,24 @@ def render_inline(parent: ET.Element, content: Any) -> None:
         if kind == "text":
             append_inline_text(parent, text)
             continue
+        if kind == "link":
+            href = part.get("href")
+            require(isinstance(href, str) and href, "link requires href")
+            node = ET.SubElement(parent, "ulink", {"url": href})
+            node.text = part.get("label", text)
+            continue
+        if kind == "xref":
+            target = part.get("target")
+            require(isinstance(target, str) and target, "xref requires target")
+            attrs = {"linkend": target}
+            label = part.get("label")
+            if isinstance(label, str):
+                attrs["label"] = label
+            if isinstance(part.get("suffix"), str):
+                attrs["suffix"] = part["suffix"]
+            node = ET.SubElement(parent, "xref", attrs)
+            node.text = label or text
+            continue
         tag = INLINE_TAGS.get(kind)
         require(tag is not None, f"unsupported inline content type: {kind}")
         node = ET.SubElement(parent, tag)
@@ -135,6 +167,16 @@ def add_rich_text(
     else:
         render_inline(node, source["content"])
     return node
+
+
+def command_sequence(
+    package: dict[str, Any],
+) -> list[tuple[dict[str, Any], dict[str, Any]]]:
+    return [
+        (step, command)
+        for step in package["procedure"]
+        for command in step["commands"]
+    ]
 
 
 def command_index(package: dict[str, Any]) -> tuple[dict[str, tuple[dict[str, Any], dict[str, Any]]], list[str]]:
@@ -175,16 +217,25 @@ def render_metrics(parent: ET.Element, package: dict[str, Any]) -> None:
 
 def render_definition_list(parent: ET.Element, block: dict[str, Any]) -> None:
     variable = ET.SubElement(parent, "variablelist", {"role": "editorial-definition-list"})
-    add_text(variable, "title", block["title"])
+    if block.get("title"):
+        add_text(variable, "title", block["title"])
     items = block.get("items")
     require(isinstance(items, list) and items, "definition-list requires items")
     for item in items:
-        require(isinstance(item.get("term"), str), "definition-list item requires term")
         entry = ET.SubElement(variable, "varlistentry")
         term = ET.SubElement(entry, "term")
-        add_text(term, "parameter", item["term"])
+        if isinstance(item.get("term"), str):
+            add_text(term, "parameter", item["term"])
+        else:
+            render_inline(term, item.get("term_content"))
         listitem = ET.SubElement(entry, "listitem")
-        add_rich_text(listitem, "para", item, role="editorial-definition")
+        if "blocks" in item:
+            for child in item["blocks"]:
+                require(child.get("type") == "paragraph", "unsupported definition-list block")
+                add_rich_text(listitem, "para", child, role="editorial-definition")
+        else:
+            add_rich_text(listitem, "para", item, role="editorial-definition")
+
 
 
 def render_installation(
@@ -194,88 +245,85 @@ def render_installation(
 ) -> None:
     install = ET.SubElement(root, "sect2", {"role": "installation"})
     add_text(install, "title", editorial["installation_title"])
-    commands, authoritative_order = command_index(package)
+    sequence = command_sequence(package)
+    commands_by_id: dict[str, tuple[dict[str, Any], dict[str, Any]]] = {}
+    for step, command in sequence:
+        command_id = command.get("id")
+        if isinstance(command_id, str) and command_id:
+            require(command_id not in commands_by_id, f"{package['name']}: duplicate command id {command_id}")
+            commands_by_id[command_id] = (step, command)
+
     blocks = editorial.get("installation_blocks")
     require(isinstance(blocks, list) and blocks, f"{package['name']}: missing installation blocks")
-    rendered_commands: list[str] = []
+    rendered_positions: list[int] = []
 
     for block in blocks:
         kind = block.get("type")
         if kind == "paragraph":
             add_rich_text(install, "para", block, role="editorial-paragraph")
         elif kind == "command":
-            command_id = block.get("command_id")
-            require(command_id in commands, f"{package['name']}: unknown command reference {command_id}")
-            require(command_id not in rendered_commands, f"{package['name']}: duplicate command reference {command_id}")
-            step, command = commands[command_id]
-            rendered_commands.append(command_id)
+            if "command_index" in block:
+                position = block["command_index"]
+                require(isinstance(position, int) and 0 <= position < len(sequence), f"{package['name']}: invalid command index {position}")
+                step, command = sequence[position]
+            else:
+                command_id = block.get("command_id")
+                require(command_id in commands_by_id, f"{package['name']}: unknown command reference {command_id}")
+                step, command = commands_by_id[command_id]
+                position = sequence.index((step, command))
+            require(position not in rendered_positions, f"{package['name']}: duplicate command position {position}")
+            rendered_positions.append(position)
+            attrs = {
+                "role": "build-command",
+                "command_index": str(position),
+                "remap": command_remap(step["phase"]),
+                "condition": step["condition"],
+                "user": command["user"],
+            }
+            if isinstance(command.get("id"), str):
+                attrs["command_id"] = command["id"]
             screen = ET.SubElement(install, "screen", {"format": "linespecific"})
-            add_text(
-                screen,
-                "userinput",
-                command["command"],
-                role="build-command",
-                command_id=command_id,
-                remap=command_remap(step["phase"]),
-                condition=step["condition"],
-                user=command["user"],
-            )
+            add_text(screen, "userinput", command["command"], **attrs)
+        elif kind == "pre":
+            screen = ET.SubElement(install, "screen", {"format": "linespecific", "role": "editorial-output"})
+            add_text(screen, "computeroutput", block["text"])
         elif kind == "admonition":
             tag = block.get("kind")
-            require(
-                tag in ("important", "note", "warning", "caution"),
-                f"{package['name']}: invalid admonition",
-            )
+            require(tag in ("important", "note", "warning", "caution"), f"{package['name']}: invalid admonition")
             node = ET.SubElement(install, tag, {"role": "editorial-admonition"})
             if block.get("title"):
                 add_text(node, "title", block["title"])
             paragraphs = block.get("paragraphs")
-            require(
-                isinstance(paragraphs, list) and paragraphs,
-                f"{package['name']}: empty admonition",
-            )
+            require(isinstance(paragraphs, list) and paragraphs, f"{package['name']}: empty admonition")
             for paragraph in paragraphs:
                 if isinstance(paragraph, str):
                     add_text(node, "para", paragraph, role="admonition-text")
                 else:
-                    require(
-                        isinstance(paragraph, dict),
-                        f"{package['name']}: invalid admonition paragraph",
-                    )
                     add_rich_text(node, "para", paragraph, role="admonition-text")
         elif kind == "definition-list":
             render_definition_list(install, block)
         else:
             raise RuntimeError(f"{package['name']}: unsupported editorial block {kind}")
 
-    require(
-        rendered_commands == authoritative_order,
-        f"{package['name']}: editorial command order/coverage drift",
-    )
+    require(rendered_positions == list(range(len(sequence))), f"{package['name']}: editorial command order/coverage drift")
 
 
-def category_label(key: str, count: int) -> str:
-    if key == "programs":
-        return "Installed program" if count == 1 else "Installed programs"
-    if key == "libraries":
-        return "Installed library" if count == 1 else "Installed libraries"
-    if key == "directories":
-        return "Installed directory" if count == 1 else "Installed directories"
-    raise RuntimeError(f"unsupported installed category: {key}")
 
-
-def render_installed_summary(parent: ET.Element, package: dict[str, Any]) -> None:
+def render_installed_summary(
+    parent: ET.Element,
+    package: dict[str, Any],
+    editorial: dict[str, Any],
+) -> None:
     installed = package.get("installed")
     require(isinstance(installed, dict), f"{package['name']}: missing installed summary")
     present = [(key, values) for key, values in installed.items() if values]
     require(present, f"{package['name']}: empty installed summary")
+    labels = editorial.get("installed_labels")
+    require(isinstance(labels, dict), f"{package['name']}: missing installed labels")
+    require(set(labels) == {key for key, _values in present}, f"{package['name']}: installed label/category drift")
     segmented = ET.SubElement(parent, "segmentedlist", {"role": "installed-summary"})
     for key, values in present:
-        require(
-            isinstance(values, list) and all(isinstance(value, str) and value for value in values),
-            f"{package['name']}: invalid installed {key}",
-        )
-        add_text(segmented, "segtitle", category_label(key, len(values)))
+        add_text(segmented, "segtitle", labels[key])
     item = ET.SubElement(segmented, "seglistitem")
     for key, values in present:
         if len(values) == 1:
@@ -285,6 +333,7 @@ def render_installed_summary(parent: ET.Element, package: dict[str, Any]) -> Non
         else:
             rendered_values = ", ".join(values[:-1]) + ", and " + values[-1]
         add_text(item, "seg", rendered_values, role=f"installed-{key}")
+
 
 
 def render_installed_term(parent: ET.Element, item: dict[str, Any]) -> None:
@@ -317,7 +366,7 @@ def render_contents(
         },
     )
     add_text(contents, "title", editorial["contents_title"])
-    render_installed_summary(contents, package)
+    render_installed_summary(contents, package, editorial)
     variable = ET.SubElement(contents, "variablelist")
     add_text(variable, "bridgehead", "Short Descriptions", renderas="sect3")
     for item in package["installed_descriptions"]:
@@ -812,20 +861,38 @@ def package_book_document(name: str) -> dict[str, Any]:
 def package_nav(name: str) -> dict[str, str]:
     return document_nav(package_book_document(name))
 
-def _html_inline(parent: ET.Element, source: ET.Element) -> None:
+def _html_inline(
+    parent: ET.Element,
+    source: ET.Element,
+    *,
+    source_document_id: str | None = None,
+) -> None:
     if source.text:
         parent.text = source.text
     for child in source:
-        if child.tag in ("filename", "literal", "command", "parameter"):
+        if child.tag in ("filename", "literal", "command", "parameter", "application", "systemitem", "envar", "option", "computeroutput", "function"):
             target = ET.SubElement(parent, "code")
+        elif child.tag == "replaceable":
+            target = ET.SubElement(parent, "var")
         elif child.tag == "quote":
             target = ET.SubElement(parent, "q")
         elif child.tag == "emphasis":
             target = ET.SubElement(parent, "em")
+        elif child.tag == "ulink":
+            target = ET.SubElement(parent, "a", {"href": child.attrib["url"]})
+        elif child.tag == "xref":
+            require(source_document_id is not None, "package xref requires source document identity")
+            target = ET.SubElement(parent, "a", {
+                "href": resolve_chunked_xref(source_document_id, child.attrib["linkend"]),
+                "data-xref-target": child.attrib["linkend"],
+            })
         else:
             target = ET.SubElement(parent, "span")
         target.text = child.text
         target.tail = child.tail
+        if child.tag == "xref" and child.attrib.get("suffix"):
+            target.tail = (target.tail or "") + child.attrib["suffix"]
+
 
 
 def render_chunked_html_package(name: str) -> str:
@@ -901,33 +968,38 @@ def render_chunked_html_package(name: str) -> str:
             continue
         if child.tag == "para":
             p = ET.SubElement(body, "p", {"data-role": child.attrib.get("role", "")})
-            _html_inline(p, child)
+            _html_inline(p, child, source_document_id=document["section_id"])
         elif child.tag == "screen":
             pre = ET.SubElement(body, "pre")
             command = child.find("userinput")
-            require(command is not None, f"{name}: command payload missing")
-            add_text(
-                pre,
-                "code",
-                command.text or "",
-                **{
-                    "data-command-id": command.attrib["command_id"],
+            output = child.find("computeroutput")
+            require((command is None) != (output is None), f"{name}: invalid screen payload")
+            if command is not None:
+                attrs = {
+                    "data-command-index": command.attrib["command_index"],
                     "data-phase": command.attrib["remap"],
-                },
-            )
+                }
+                if "command_id" in command.attrib:
+                    attrs["data-command-id"] = command.attrib["command_id"]
+                add_text(pre, "code", command.text or "", **attrs)
+            else:
+                add_text(pre, "samp", output.text or "", **{"data-role": "editorial-output"})
         elif child.tag == "variablelist":
             title = child.findtext("title")
             if title:
                 add_text(body, "h3", title)
             dl = ET.SubElement(body, "dl", {"data-role": "editorial-definition-list"})
             for entry in child.findall("varlistentry"):
-                term = entry.find("term/parameter")
+                term = entry.find("term")
                 require(term is not None, f"{name}: definition term missing")
-                add_text(dl, "dt", term.text or "")
-                para = entry.find("listitem/para")
-                require(para is not None, f"{name}: definition text missing")
+                dt = ET.SubElement(dl, "dt")
+                _html_inline(dt, term, source_document_id=document["section_id"])
+                paras = entry.findall("listitem/para")
+                require(paras, f"{name}: definition text missing")
                 dd = ET.SubElement(dl, "dd")
-                _html_inline(dd, para)
+                for para in paras:
+                    p = ET.SubElement(dd, "p")
+                    _html_inline(p, para, source_document_id=document["section_id"])
         elif child.tag in ("important", "note", "warning", "caution"):
             aside = ET.SubElement(body, "aside", {"data-kind": child.tag})
             title = child.findtext("title")
@@ -935,7 +1007,7 @@ def render_chunked_html_package(name: str) -> str:
                 add_text(aside, "h3", title)
             for para in child.findall("para"):
                 p = ET.SubElement(aside, "p")
-                _html_inline(p, para)
+                _html_inline(p, para, source_document_id=document["section_id"])
         else:
             raise RuntimeError(f"{name}: unsupported HTML source node {child.tag}")
 
@@ -1304,7 +1376,7 @@ def render_chunked_html_document(section_id: str) -> str:
     document = index[section_id]
 
     package_name = document.get("package")
-    if package_name in PROOF_PACKAGES:
+    if package_name and (PRESENTATION / "editorial" / f"{package_name}.json").is_file():
         return render_chunked_html_package(package_name)
 
     editorial = load_editorial_document(section_id)
@@ -2039,6 +2111,44 @@ def self_test_editorial_bulk() -> None:
         )
 
 
+def _resolved_command_hashes(name: str) -> list[str]:
+    import hashlib
+    package = resolve([name])["packages"][0]
+    return [
+        hashlib.sha256(command["command"].strip().encode()).hexdigest()
+        for _step, command in command_sequence(package)
+    ]
+
+
+def self_test_package_bulk() -> None:
+    golden = load_presentation(PRESENTATION / "golden" / "chunked-html-packages-all.json")
+    complete = golden.get("complete_packages")
+    deferred = golden.get("deferred_authority_mismatches")
+    observations = golden.get("packages")
+    require(isinstance(complete, list) and isinstance(deferred, list) and isinstance(observations, dict), "package-bulk: invalid golden manifest")
+    require(len(complete) == golden.get("complete_package_count") == 71 and len(deferred) == golden.get("deferred_package_count") == 9, "package-bulk: package coverage drift")
+    package_set = load_json(HERE / "package-set.json")["packages"]
+    require(set(complete).union(deferred) == set(package_set) and not set(complete).intersection(deferred), "package-bulk: complete/deferred package split drift")
+
+    for name in complete:
+        editorial = load_presentation(PRESENTATION / "editorial" / f"{name}.json")
+        require(editorial.get("installed_labels") == observations[name]["installed_labels"], f"{name}: installed source-label drift")
+        require(_resolved_command_hashes(name) == observations[name]["command_sha256"], f"{name}: source/normalized command drift")
+        rendered = ET.fromstring(render_chunked_html_package(name))
+        require(rendered.find("body/dl[@data-role='installed-summary']") is not None, f"{name}: installed summary missing")
+
+    for name in deferred:
+        require(not (PRESENTATION / "editorial" / f"{name}.json").is_file(), f"{name}: authority-mismatch package unexpectedly has editorial overlay")
+        document = package_book_document(name)
+        rendered = ET.fromstring(render_chunked_html_document(document["section_id"]))
+        body = rendered.find("body")
+        require(body is not None and body.attrib.get("data-body-status") == "pending-editorial-migration", f"{name}: deferred package lost pending status")
+
+    zlib_html = ET.fromstring(render_chunked_html_package("zlib"))
+    zlib_labels = [node.text or "" for node in zlib_html.findall("body/dl[@data-role='installed-summary']/dt")]
+    require(zlib_labels == ["Installed libraries"], "zlib: source installed label drift")
+
+
 def self_test() -> None:
     for name in PROOF_PACKAGES:
         self_test_package(name)
@@ -2070,6 +2180,7 @@ def self_test() -> None:
     self_test_chunked_html_book()
     self_test_editorial_slice()
     self_test_editorial_bulk()
+    self_test_package_bulk()
 
 
 def main() -> int:
@@ -2104,8 +2215,10 @@ def main() -> int:
                         "editorial_vocabulary_complete": True,
                         "editorial_bulk_complete": 89,
                         "editorial_operational_deferred": 30,
+                        "package_bulk_complete": 71,
+                        "package_authority_deferred": 9,
                         "equivalence":
-                            "package-semantics-book-routing-and-bulk-editorial-migration",
+                            "package-semantics-book-routing-editorial-and-package-bulk",
                     },
                     indent=2,
                 )

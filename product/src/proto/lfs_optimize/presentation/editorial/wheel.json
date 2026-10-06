@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "package": "wheel",
+  "installation_title": "Installation of Wheel",
+  "contents_title": "Contents of Wheel",
+  "installed_labels": {
+    "programs": "Installed program",
+    "directories": "Installed directories"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile Wheel with the following command:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install Wheel with the following command:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    }
+  ]
+}

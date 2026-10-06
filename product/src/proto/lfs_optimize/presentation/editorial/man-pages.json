@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "package": "man-pages",
+  "installation_title": "Installation of Man-pages",
+  "contents_title": "Contents of Man-pages",
+  "installed_labels": {
+    "files": "Installed files"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Remove two man pages for password hashing functions."
+        },
+        {
+          "type": "application",
+          "text": "Libxcrypt"
+        },
+        {
+          "type": "text",
+          "text": "will provide a better version of these man pages:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install Man-pages by running:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "definition-list",
+      "title": "The meaning of the options:",
+      "items": [
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "-R"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This prevents"
+                },
+                {
+                  "type": "command",
+                  "text": "make"
+                },
+                {
+                  "type": "text",
+                  "text": "from setting any built-in variables. The building system of man-pages does not work well with built-in variables, but currently there is no way to disable them except passing"
+                },
+                {
+                  "type": "parameter",
+                  "text": "-R"
+                },
+                {
+                  "type": "text",
+                  "text": "explicitly via the command line."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "GIT=false"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This prevents the building system from emitting many"
+                },
+                {
+                  "type": "computeroutput",
+                  "text": "git: command not found"
+                },
+                {
+                  "type": "text",
+                  "text": "warnings lines."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "package": "meson",
+  "installation_title": "Installation of Meson",
+  "contents_title": "Contents of Meson",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "directories": "Installed directory"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile Meson with the following command:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The test suite requires some packages outside the scope of LFS."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "definition-list",
+      "title": "The meaning of the install parameters:",
+      "items": [
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "-w dist"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Puts the created wheels into the"
+                },
+                {
+                  "type": "filename",
+                  "text": "dist"
+                },
+                {
+                  "type": "text",
+                  "text": "directory."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "--find-links dist"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Installs wheels from the"
+                },
+                {
+                  "type": "filename",
+                  "text": "dist"
+                },
+                {
+                  "type": "text",
+                  "text": "directory."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

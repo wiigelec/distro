@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "package": "flit-core",
+  "installation_title": "Installation of Flit-Core",
+  "contents_title": "Contents of Flit-Core",
+  "installed_labels": {
+    "directories": "Installed directory"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Build the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "definition-list",
+      "title": "The meaning of the pip3 configuration options and commands:",
+      "items": [
+        {
+          "term_content": [
+            {
+              "type": "command",
+              "text": "wheel"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This command builds the wheel archive for this package."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "-w dist"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Instructs pip to put the created wheel into the"
+                },
+                {
+                  "type": "filename",
+                  "text": "dist"
+                },
+                {
+                  "type": "text",
+                  "text": "directory."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "--no-cache-dir"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Prevents pip from copying the created wheel into the"
+                },
+                {
+                  "type": "filename",
+                  "text": "/root/.cache/pip"
+                },
+                {
+                  "type": "text",
+                  "text": "directory."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "command",
+              "text": "install"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This command installs the package."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "--no-build-isolation"
+            },
+            {
+              "type": "text",
+              "text": ","
+            },
+            {
+              "type": "parameter",
+              "text": "--no-deps"
+            },
+            {
+              "type": "text",
+              "text": ", and"
+            },
+            {
+              "type": "parameter",
+              "text": "--no-index"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "These options prevent fetching files from the online package repository (PyPI). If packages are installed in the correct order, pip won't need to fetch any files in the first place; these options add some safety in case of user error."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "--find-links dist"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Instructs pip to search for wheel archives in the"
+                },
+                {
+                  "type": "filename",
+                  "text": "dist"
+                },
+                {
+                  "type": "text",
+                  "text": "directory."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

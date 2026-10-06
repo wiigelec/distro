@@ -1,0 +1,264 @@
+{
+  "schema_version": 1,
+  "package": "bzip2",
+  "installation_title": "Installation of Bzip2",
+  "contents_title": "Contents of Bzip2",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "libraries": "Installed libraries",
+    "directories": "Installed directory"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Apply a patch that will install the documentation for this package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The following command ensures installation of symbolic links are relative:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Ensure the man pages are installed into the correct location:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Prepare Bzip2 for compilation with:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    },
+    {
+      "type": "definition-list",
+      "title": "The meaning of the make parameter:",
+      "items": [
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "-f Makefile-libbz2_so"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This will cause Bzip2 to be built using a different"
+                },
+                {
+                  "type": "filename",
+                  "text": "Makefile"
+                },
+                {
+                  "type": "text",
+                  "text": "file, in this case the"
+                },
+                {
+                  "type": "filename",
+                  "text": "Makefile-libbz2_so"
+                },
+                {
+                  "type": "text",
+                  "text": "file, which creates a dynamic"
+                },
+                {
+                  "type": "filename",
+                  "text": "libbz2.so"
+                },
+                {
+                  "type": "text",
+                  "text": "library and links the Bzip2 utilities against it."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile and test the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 4
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the programs:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 5
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the shared library:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 6
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The name of the shared library isn't standardized and it varies among distros. The instruction above has installed"
+        },
+        {
+          "type": "filename",
+          "text": "libbz2.so.1.0"
+        },
+        {
+          "type": "text",
+          "text": ", but some applications, for example Kbd, expects a different name"
+        },
+        {
+          "type": "filename",
+          "text": "libbz2.so.1"
+        },
+        {
+          "type": "text",
+          "text": "that some other distros are using. Create a compatibility symlink for them:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 7
+    },
+    {
+      "type": "admonition",
+      "kind": "note",
+      "paragraphs": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The symlink approach is only valid here because the library name difference is a result of different aesthetic views of the distro maintainers, not real ABI incompatibilities. In general a library name difference most likely indicates an ABI incompatibility and it would be very likely invalid to"
+            },
+            {
+              "type": "quote",
+              "text": "hide"
+            },
+            {
+              "type": "text",
+              "text": "the difference via a symlink. Read"
+            },
+            {
+              "type": "xref",
+              "target": "pkgmgmt-upgrade-issues",
+              "label": "Upgrade Issues"
+            },
+            {
+              "type": "text",
+              "text": "for details about library names."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the shared"
+        },
+        {
+          "type": "command",
+          "text": "bzip2"
+        },
+        {
+          "type": "text",
+          "text": "binary into the"
+        },
+        {
+          "type": "filename",
+          "text": "/usr/bin"
+        },
+        {
+          "type": "text",
+          "text": "directory, and replace two copies of"
+        },
+        {
+          "type": "command",
+          "text": "bzip2"
+        },
+        {
+          "type": "text",
+          "text": "with symlinks:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 8
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Remove a useless static library:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 9
+    }
+  ]
+}

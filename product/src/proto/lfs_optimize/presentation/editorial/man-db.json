@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "package": "man-db",
+  "installation_title": "Installation of Man-DB",
+  "contents_title": "Contents of Man-DB",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "libraries": "Installed libraries",
+    "directories": "Installed directories"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Prepare Man-DB for compilation:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "definition-list",
+      "title": "The meaning of the configure options:",
+      "items": [
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "--disable-setuid"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This disables making the"
+                },
+                {
+                  "type": "command",
+                  "text": "man"
+                },
+                {
+                  "type": "text",
+                  "text": "program setuid to user"
+                },
+                {
+                  "type": "systemitem",
+                  "text": "man"
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "--enable-cache-owner=bin"
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This changes ownership of the system-wide cache files to user"
+                },
+                {
+                  "type": "systemitem",
+                  "text": "bin"
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "term_content": [
+            {
+              "type": "parameter",
+              "text": "--with-..."
+            }
+          ],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "These three parameters are used to set some default programs."
+                },
+                {
+                  "type": "command",
+                  "text": "lynx"
+                },
+                {
+                  "type": "text",
+                  "text": "is a text-based web browser (see BLFS for installation instructions),"
+                },
+                {
+                  "type": "command",
+                  "text": "vgrind"
+                },
+                {
+                  "type": "text",
+                  "text": "converts program sources to Groff input, and"
+                },
+                {
+                  "type": "command",
+                  "text": "grap"
+                },
+                {
+                  "type": "text",
+                  "text": "is useful for typesetting graphs in Groff documents. The"
+                },
+                {
+                  "type": "command",
+                  "text": "vgrind"
+                },
+                {
+                  "type": "text",
+                  "text": "and"
+                },
+                {
+                  "type": "command",
+                  "text": "grap"
+                },
+                {
+                  "type": "text",
+                  "text": "programs are not normally needed for viewing manual pages. They are not part of LFS or BLFS, but you should be able to install them yourself after finishing LFS if you wish to do so."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Compile the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "To test the results, issue:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    }
+  ]
+}

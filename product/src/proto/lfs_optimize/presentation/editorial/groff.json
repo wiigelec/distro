@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "package": "groff",
+  "installation_title": "Installation of Groff",
+  "contents_title": "Contents of Groff",
+  "installed_labels": {
+    "programs": "Installed programs",
+    "directories": "Installed directories"
+  },
+  "installation_blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Groff expects the environment variable"
+        },
+        {
+          "type": "envar",
+          "text": "PAGE"
+        },
+        {
+          "type": "text",
+          "text": "to contain the default paper size. For users in the United States,"
+        },
+        {
+          "type": "parameter",
+          "text": "PAGE=letter"
+        },
+        {
+          "type": "text",
+          "text": "is appropriate. Elsewhere,"
+        },
+        {
+          "type": "parameter",
+          "text": "PAGE=A4"
+        },
+        {
+          "type": "text",
+          "text": "may be more suitable. While the default paper size is configured during compilation, it can be overridden later by echoing either"
+        },
+        {
+          "type": "quote",
+          "text": "A4"
+        },
+        {
+          "type": "text",
+          "text": "or"
+        },
+        {
+          "type": "quote",
+          "text": "letter"
+        },
+        {
+          "type": "text",
+          "text": "to the"
+        },
+        {
+          "type": "filename",
+          "text": "/etc/papersize"
+        },
+        {
+          "type": "text",
+          "text": "file."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Prepare Groff for compilation:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 0
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Build the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 1
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "To test the results, issue:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 2
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "One test, neqn-smoke-test.sh, is known to fail."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Install the package:"
+        }
+      ]
+    },
+    {
+      "type": "command",
+      "command_index": 3
+    }
+  ]
+}

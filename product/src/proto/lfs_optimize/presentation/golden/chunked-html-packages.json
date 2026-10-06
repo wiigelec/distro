@@ -34,7 +34,7 @@
         "Required disk space": "5.4 MB"
       },
       "installed_summary": {
-        "Installed library": "libz.so"
+        "Installed libraries": "libz.so"
       }
     },
     "binutils": {
