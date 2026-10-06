@@ -416,10 +416,6 @@ def render_installation(
                     "format": "linespecific",
                     "role": "supplemental-build-command",
                     "supplemental_procedure": procedure_name,
-                    "command_index": str(position),
-                    "remap": command_remap(step["phase"]),
-                    "condition": step["condition"],
-                    "user": command["user"],
                 },
             )
             add_text(
@@ -427,6 +423,10 @@ def render_installation(
                 "userinput",
                 command.get("source_command", command["command"]),
                 role="supplemental-command",
+                command_index=str(position),
+                remap=command_remap(step["phase"]),
+                condition=step["condition"],
+                user=command["user"],
             )
         elif kind == "pre":
             screen = ET.SubElement(install, "screen", {"format": "linespecific", "role": "editorial-output"})
