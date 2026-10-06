@@ -6,8 +6,8 @@
     "published": "2026-09-01",
     "slice": "normalized Chapter 8 package rendering"
   },
-  "complete_package_count": 70,
-  "deferred_package_count": 10,
+  "complete_package_count": 71,
+  "deferred_package_count": 9,
   "complete_packages": [
     "man-pages",
     "iana-etc",
@@ -28,6 +28,7 @@
     "ninja",
     "pkgconf",
     "binutils",
+    "gmp",
     "mpfr",
     "mpc",
     "attr",
@@ -83,7 +84,6 @@
   "deferred_authority_mismatches": [
     "coreutils",
     "glibc",
-    "gmp",
     "groff",
     "grub",
     "libxcrypt",
@@ -1633,6 +1633,27 @@
         "libe2p": "library",
         "libext2fs": "library",
         "libss": "library"
+      }
+    },
+    "gmp": {
+      "command_sha256": [
+        "0cb1188e10b15d454bf05feeadfb05bd085bcee7e1ce2d2ced386ab8fba4f1f1",
+        "4386d863f28879cc7e92ce81a0cac07dd0753e433fd35b49d7631f3b99bb5bf3",
+        "76a0b71da8a740af0afd17d960f189081647506fd0e5cc032835303caec910f4",
+        "4a5b5cf7d4522d9fa9333a49af09b49b60b3cbcab91159faaa058aae59154d84",
+        "25fe481de0503fe4b393c8d56c9fb6031deeca2d30bc36441369cde989a93744",
+        "54fddb73e99c4fa65e34c80dc86855aa1412d7ede7cc61cb5d66f43c8d64b202"
+      ],
+      "illustrative_command_sha256": [
+        "66b902753528b782b86989f26afcd9a72dc014a4d504099d8f2fdbda71726f02"
+      ],
+      "installed_labels": {
+        "libraries": "Installed libraries",
+        "directories": "Installed directory"
+      },
+      "installed_term_kinds": {
+        "libgmp": "library",
+        "libgmpxx": "library"
       }
     }
   },

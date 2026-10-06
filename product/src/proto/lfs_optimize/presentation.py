@@ -300,13 +300,48 @@ def render_installation(
             node = ET.SubElement(install, tag, {"role": "editorial-admonition"})
             if block.get("title"):
                 add_text(node, "title", block["title"])
-            paragraphs = block.get("paragraphs")
-            require(isinstance(paragraphs, list) and paragraphs, f"{package['name']}: empty admonition")
-            for paragraph in paragraphs:
-                if isinstance(paragraph, str):
-                    add_text(node, "para", paragraph, role="admonition-text")
-                else:
-                    add_rich_text(node, "para", paragraph, role="admonition-text")
+            if "blocks" in block:
+                children = block["blocks"]
+                require(
+                    isinstance(children, list) and children and "paragraphs" not in block,
+                    f"{package['name']}: invalid admonition blocks",
+                )
+                for child in children:
+                    child_kind = child.get("type")
+                    if child_kind == "paragraph":
+                        add_rich_text(node, "para", child, role="admonition-text")
+                    elif child_kind == "illustrative-command":
+                        text = child.get("text")
+                        require(
+                            isinstance(text, str) and "..." in text,
+                            f"{package['name']}: illustrative command must contain a placeholder",
+                        )
+                        screen = ET.SubElement(
+                            node,
+                            "screen",
+                            {
+                                "format": "linespecific",
+                                "role": "editorial-illustrative-command",
+                            },
+                        )
+                        add_text(
+                            screen,
+                            "userinput",
+                            text,
+                            role="illustrative-command",
+                        )
+                    else:
+                        raise RuntimeError(
+                            f"{package['name']}: unsupported admonition block {child_kind}"
+                        )
+            else:
+                paragraphs = block.get("paragraphs")
+                require(isinstance(paragraphs, list) and paragraphs, f"{package['name']}: empty admonition")
+                for paragraph in paragraphs:
+                    if isinstance(paragraph, str):
+                        add_text(node, "para", paragraph, role="admonition-text")
+                    else:
+                        add_rich_text(node, "para", paragraph, role="admonition-text")
         elif kind == "definition-list":
             render_definition_list(install, block)
         else:
@@ -1023,9 +1058,42 @@ def render_chunked_html_package(name: str) -> str:
             title = child.findtext("title")
             if title:
                 add_text(aside, "h3", title)
-            for para in child.findall("para"):
-                p = ET.SubElement(aside, "p")
-                _html_inline(p, para, source_document_id=document["section_id"])
+            for admonition_child in child:
+                if admonition_child.tag == "title":
+                    continue
+                if admonition_child.tag == "para":
+                    p = ET.SubElement(aside, "p")
+                    _html_inline(
+                        p,
+                        admonition_child,
+                        source_document_id=document["section_id"],
+                    )
+                elif (
+                    admonition_child.tag == "screen"
+                    and admonition_child.attrib.get("role")
+                    == "editorial-illustrative-command"
+                ):
+                    userinput = admonition_child.find("userinput")
+                    require(
+                        userinput is not None
+                        and userinput.attrib.get("role") == "illustrative-command",
+                        f"{name}: invalid illustrative command screen",
+                    )
+                    pre = ET.SubElement(
+                        aside,
+                        "pre",
+                        {"data-role": "editorial-illustrative-command"},
+                    )
+                    add_text(
+                        pre,
+                        "code",
+                        userinput.text or "",
+                        **{"data-role": "illustrative-command"},
+                    )
+                else:
+                    raise RuntimeError(
+                        f"{name}: unsupported HTML admonition node {admonition_child.tag}"
+                    )
         else:
             raise RuntimeError(f"{name}: unsupported HTML source node {child.tag}")
 
@@ -2147,6 +2215,38 @@ def _resolved_command_hashes(name: str) -> list[str]:
     ]
 
 
+def _editorial_illustrative_command_hashes(editorial: dict[str, Any]) -> list[str]:
+    import hashlib
+    hashes: list[str] = []
+
+    def visit(blocks: list[dict[str, Any]]) -> None:
+        for block in blocks:
+            kind = block.get("type")
+            if kind == "illustrative-command":
+                value = block.get("text")
+                require(
+                    isinstance(value, str) and "..." in value,
+                    "illustrative command must contain a placeholder",
+                )
+                hashes.append(
+                    hashlib.sha256(
+                        _canonical_source_command(value).encode()
+                    ).hexdigest()
+                )
+            elif kind == "admonition" and "blocks" in block:
+                nested = block["blocks"]
+                require(
+                    isinstance(nested, list),
+                    "admonition blocks must be a list",
+                )
+                visit(nested)
+
+    blocks = editorial.get("installation_blocks")
+    require(isinstance(blocks, list), "editorial installation blocks must be a list")
+    visit(blocks)
+    return hashes
+
+
 def self_test_package_bulk() -> None:
     golden = load_presentation(PRESENTATION / "golden" / "chunked-html-packages-all.json")
     complete = golden.get("complete_packages")
@@ -2157,7 +2257,7 @@ def self_test_package_bulk() -> None:
         golden.get("command_scope") == "installation-screen-userinput",
         "package-bulk: command oracle must be scoped to Installation screen/userinput commands",
     )
-    require(len(complete) == golden.get("complete_package_count") == 70 and len(deferred) == golden.get("deferred_package_count") == 10, "package-bulk: package coverage drift")
+    require(len(complete) == golden.get("complete_package_count") == 71 and len(deferred) == golden.get("deferred_package_count") == 9, "package-bulk: package coverage drift")
     package_set = load_json(HERE / "package-set.json")["packages"]
     require(set(complete).union(deferred) == set(package_set) and not set(complete).intersection(deferred), "package-bulk: complete/deferred package split drift")
 
@@ -2170,6 +2270,11 @@ def self_test_package_bulk() -> None:
             f"{name}: installed term-kind drift",
         )
         require(_resolved_command_hashes(name) == observations[name]["command_sha256"], f"{name}: source/normalized command drift")
+        require(
+            _editorial_illustrative_command_hashes(editorial)
+            == observations[name].get("illustrative_command_sha256", []),
+            f"{name}: illustrative command drift",
+        )
         rendered = ET.fromstring(render_chunked_html_package(name))
         require(rendered.find("body/dl[@data-role='installed-summary']") is not None, f"{name}: installed summary missing")
 
@@ -2251,8 +2356,8 @@ def main() -> int:
                         "editorial_vocabulary_complete": True,
                         "editorial_bulk_complete": 89,
                         "editorial_operational_deferred": 30,
-                        "package_bulk_complete": 70,
-                        "package_authority_deferred": 10,
+                        "package_bulk_complete": 71,
+                        "package_authority_deferred": 9,
                         "equivalence":
                             "package-semantics-book-routing-editorial-and-package-bulk",
                     },
