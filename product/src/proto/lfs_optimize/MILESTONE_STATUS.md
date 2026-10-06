@@ -18,7 +18,7 @@ Roadmap:
 | M5 — Development proof | COMPLETE | Accepted state, candidate identity, validation, definition binding/drift rejection, review evidence, and guarded transactional promotion are implemented. |
 | M6 — Release proof | SATISFIED BY COMPOSITION | M4 proves clean full-system realization from normalized state and M5 proves validated state identity and controlled promotion. Freezing accepted state under a release identity adds production plumbing but no unresolved prototype architecture question. |
 | M7 — Presentation proof | COMPLETE — 199/199 CHUNKS COMPLETE; 0 AUTHORITY GAPS | All 80/80 Chapter 8 package pages and all 119/119 non-package bodies render from normalized authority plus presentation-owned editorial state. All 38 referenced nested targets are physically present in rendered HTML. |
-| M8 — BLFS proof | IN PROGRESS | First slice models Linux-PAM 1.7.3, the required Shadow 4.20.2 PAM rebuild/configuration, and a named PAM-enabled systemd 261.3 rebuild through the normal executor. |
+| M8 — BLFS proof | IN PROGRESS | PAM/Shadow/systemd semantics are modeled; a QEMU direct-kernel boot harness now bridges the M4 filesystem result to the booted-LFS environment required for real BLFS execution. Boot execution is still required before BLFS build claims. |
 | M9+ | NOT STARTED | Hard-BLFS collections/catalogs and user-system proofs remain later roadmap milestones. |
 
 ## M5 closure
@@ -460,3 +460,36 @@ the authentication-critical configuration transition: BLFS PAM service files,
 that is recorded as review evidence rather than executed inside the disposable
 chroot. The systemd build then enables PAM, installs its PAM configuration, and
 records `systemctl daemon-reexec` as a session transition.
+
+## M8 booted-LFS prerequisite
+
+BLFS execution must be proven on a booted LFS system, not only against a cloned
+filesystem/chroot. The prototype therefore adds a boot harness between the M4
+filesystem result and BLFS execution:
+
+```text
+M4 completed LFS filesystem
+        ↓
+LFS 7.1.8 kernel built inside that filesystem
+        ↓
+QEMU virtio ext4 root
+        ↓
+systemd PID 1 → multi-user.target
+        ↓
+DISTRO_BOOT_PROOF_OK on ttyS0
+        ↓
+booted environment eligible for BLFS execution
+```
+
+The harness uses QEMU direct-kernel boot intentionally. GRUB remains represented
+by normalized Chapter 10 system operations, but bootloader deployment is not
+required to answer the M8 prerequisite: whether the normalized LFS result can
+run as a real system with its own kernel and systemd PID 1.
+
+The boot kernel forces the QEMU root/console drivers built-in and also enables
+`CONFIG_AUDIT=y`, satisfying the kernel requirement already modeled by the
+Linux-PAM/systemd BLFS slice. `validate_boot.py` validates the plan without
+requiring root or QEMU. `boot.py` performs the actual proof and writes
+`boot/result.json` plus the QEMU serial log.
+
+M8 must not claim real BLFS package execution until this boot proof succeeds.

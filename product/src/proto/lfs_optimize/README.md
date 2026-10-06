@@ -305,3 +305,39 @@ Plan without root access:
 python3 product/src/proto/lfs_optimize/validate_m8.py
 python3 product/src/proto/lfs_optimize/blfs.py --plan
 ```
+
+## Booted-LFS prerequisite for BLFS execution
+
+The Chapter 5–8 build result is a complete LFS filesystem, but BLFS is intended
+to be built on a running LFS system. `boot.py` supplies the missing validation
+boundary without introducing a second package/build model.
+
+It builds the LFS 13.1 Linux 7.1.8 kernel inside a clone of the completed LFS
+root, forces the QEMU-critical drivers and `CONFIG_AUDIT` built-in, creates an
+ext4 virtio root image, and boots that root with QEMU. A one-shot systemd unit
+emits `DISTRO_BOOT_PROOF_OK` on `ttyS0` only after confirming PID 1 is systemd,
+then powers the guest off.
+
+QEMU direct-kernel boot is deliberate here. It proves the runtime environment
+needed by BLFS; GRUB installation is a deployment/bootloader realization concern
+and remains represented by `ch-bootable-grub` in normalized system operations.
+
+Inspect the boot plan:
+
+```sh
+python3 product/src/proto/lfs_optimize/validate_boot.py
+python3 product/src/proto/lfs_optimize/boot.py --plan
+```
+
+Run the real boot proof against the completed M4 system root:
+
+```sh
+sudo python3 product/src/proto/lfs_optimize/boot.py \
+  --root /path/to/completed-m4/system/root \
+  --work /tmp/lfs-optimize-boot \
+  --cache /tmp/lfs-optimize-cache
+```
+
+Successful execution writes `/tmp/lfs-optimize-boot/boot/result.json` and
+`qemu-console.log`. Real BLFS package execution should be gated on this proof;
+chroot-only BLFS builds remain smoke tests, not acceptance evidence.

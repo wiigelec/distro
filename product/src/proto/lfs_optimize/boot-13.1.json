@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "name": "lfs-13.1-qemu-boot-proof",
+  "basis": "LFS 13.1-systemd",
+  "authority": {
+    "system_operations": [
+      "ch-bootable-fstab",
+      "ch-bootable-kernel",
+      "ch-finish-theend",
+      "ch-finish-reboot"
+    ],
+    "note": "QEMU direct-kernel boot is a validation harness. GRUB remains deployment/bootloader realization, not a prerequisite for proving a booted LFS userspace."
+  },
+  "kernel": {
+    "version": "7.1.8",
+    "source": {
+      "url": "https://www.kernel.org/pub/linux/kernel/v7.x/linux-7.1.8.tar.xz",
+      "md5": "807584f564568b40162e9e4a72bf191f",
+      "size": "154722 KB",
+      "home": "https://www.kernel.org/"
+    },
+    "required_builtin": [
+      "AUDIT",
+      "CGROUPS",
+      "DEVTMPFS",
+      "DEVTMPFS_MOUNT",
+      "EXT4_FS",
+      "FHANDLE",
+      "INOTIFY_USER",
+      "PCI",
+      "PROC_FS",
+      "SERIAL_8250",
+      "SERIAL_8250_CONSOLE",
+      "SYSFS",
+      "TMPFS",
+      "UNIX",
+      "VIRTIO",
+      "VIRTIO_BLK",
+      "VIRTIO_NET",
+      "VIRTIO_PCI"
+    ]
+  },
+  "qemu": {
+    "memory_mib": 2048,
+    "cpus": 2,
+    "timeout_seconds": 180,
+    "root_device": "/dev/vda",
+    "console": "ttyS0"
+  },
+  "proof": {
+    "unit": "distro-boot-proof.service",
+    "marker": "DISTRO_BOOT_PROOF_OK",
+    "expected_pid1": "systemd",
+    "target": "multi-user.target"
+  }
+}
