@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "name": "dejavu-fonts",
+  "reference": {
+    "blfs_section": "TTF-and-OTF-fonts",
+    "edition": "13.1-systemd"
+  },
+  "procedure": [
+    {
+      "phase": "install",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "install -v -d -m755 /usr/share/fonts/dejavu && install -v -m644 ttf/*.ttf /usr/share/fonts/dejavu && fc-cache -v /usr/share/fonts/dejavu"
+        }
+      ]
+    }
+  ],
+  "description": "DejaVu TrueType fonts provide a deterministic scalable font payload for the M9 IceWM/Xft runtime proof.",
+  "dependencies": {
+    "build": [
+      "fontconfig"
+    ],
+    "runtime": [
+      "fontconfig"
+    ],
+    "test": [],
+    "before": [
+      "icewm"
+    ],
+    "recommended": [],
+    "optional": []
+  },
+  "installed": {
+    "programs": [],
+    "libraries": [],
+    "directories": [
+      "/usr/share/fonts/dejavu"
+    ]
+  }
+}

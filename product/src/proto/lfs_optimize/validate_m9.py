@@ -69,12 +69,32 @@ def main() -> int:
         "xinit must resolve after Xorg Server and before IceWM",
     )
     require(names.index("imlib2") < names.index("icewm"), "imlib2 must precede IceWM")
+    require(
+        names.index("dejavu-fonts") < names.index("icewm"),
+        "scalable font payload must precede IceWM",
+    )
+
+    fonts = by_name["dejavu-fonts"]
+    require(
+        fonts["dependencies"]["build"] == ["fontconfig"]
+        and any("fc-cache -v /usr/share/fonts/dejavu" in c for c in commands(fonts)),
+        "DejaVu/Fontconfig runtime font contract drift",
+    )
 
     icewm = by_name["icewm"]
     require(
-        icewm["dependencies"]["build"] == ["cmake", "imlib2", "xorg-libraries"]
-        and icewm["dependencies"]["runtime"] == ["xorg-server"],
-        "IceWM normalized dependency closure drift",
+        icewm["dependencies"]["build"] == ["cmake", "imlib2", "xorg-libraries"],
+        "IceWM normalized build dependency closure drift",
+    )
+    require(
+        icewm["dependencies"]["runtime"] == ["xorg-server", "dejavu-fonts"],
+        "IceWM runtime server/font dependency closure drift",
+    )
+    require(
+        icewm["integration"]["session"]["command"] == "icewm-session"
+        and icewm["integration"]["session"]["launcher"] == "xinit"
+        and icewm["integration"]["graphical_environment"]["server"] == "xorg-server",
+        "IceWM executable X11 session integration drift",
     )
 
     server = by_name["xorg-server"]
@@ -97,9 +117,14 @@ def main() -> int:
             for item in planned["glib"]["commands"]),
         "planned GLib minimal build policy missing",
     )
+    require(
+        any("fc-cache -v /usr/share/fonts/dejavu" in item["command"]
+            for item in planned["dejavu-fonts"]["commands"]),
+        "planned DejaVu installation policy missing",
+    )
 
-    print("M9 buildable package closure proof: success")
-    print("GLib is explicit and NetworkManager uses a wired-minimal build without newt/NSS.")
+    print("M9 buildable functional-system model proof: success")
+    print("NetworkManager wired closure, Xvfb/IceWM closure, and a scalable font payload are explicit.")
     print("Booted runtime acceptance is the remaining M9 proof.")
     return 0
 

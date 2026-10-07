@@ -527,6 +527,16 @@
         "build_time": "0.7 SBU (using parallelism=4; without tests)",
         "disk_space": "430 MB reference maximum with tests/documentation"
       }
+    },
+    "dejavu-fonts": {
+      "version": "2.37",
+      "source": {
+        "url": "https://downloads.sourceforge.net/dejavu/dejavu-fonts-ttf-2.37.tar.bz2",
+        "md5": "d0efec10b9f110a32e9b8f796e21782c",
+        "size": "5.2 MB",
+        "home": "https://dejavu-fonts.github.io/",
+        "mirror": "direct"
+      }
     }
   }
 }

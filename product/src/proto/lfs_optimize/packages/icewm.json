@@ -52,7 +52,8 @@
       "xorg-libraries"
     ],
     "runtime": [
-      "xorg-server"
+      "xorg-server",
+      "dejavu-fonts"
     ],
     "test": [],
     "before": [],

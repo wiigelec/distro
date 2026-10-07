@@ -39,6 +39,7 @@
     },
     "xinit",
     "imlib2",
+    "dejavu-fonts",
     "icewm"
   ]
 }
