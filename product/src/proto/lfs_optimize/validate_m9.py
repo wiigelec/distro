@@ -100,6 +100,10 @@ def main() -> int:
     server = by_name["xorg-server"]
     require(server["build"] == "m9-xvfb", "M9 Xvfb build selection drift")
     require("Xvfb" in server["installed"]["programs"], "M9 Xvfb capability missing")
+    require(
+        not server.get("resources"),
+        "M9 Xvfb build must not retain unused default-Xorg patch resources",
+    )
 
     plan = plan_blfs(
         run_tests=True,

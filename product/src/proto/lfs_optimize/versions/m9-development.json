@@ -475,12 +475,6 @@
         "home": "https://www.x.org/",
         "mirror": "direct"
       },
-      "resources": {
-        "tearfree_patch": {
-          "url": "https://www.linuxfromscratch.org/patches/blfs/13.1/xorg-server-21.1.24-tearfree_backport-1.patch",
-          "purpose": "Optional for normal builds; recommended by BLFS for IceWM and other non-compositing window managers."
-        }
-      },
       "reference_metrics": {
         "build_time": "0.3 SBU (using parallelism=4; with tests)",
         "disk_space": "199 MB (with tests)"
