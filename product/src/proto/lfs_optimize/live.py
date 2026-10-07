@@ -88,6 +88,78 @@ def live_snapshot(root: Path) -> dict[str, dict[str, Any]]:
         result[relative] = record
     return result
 
+
+def report_cache_miss(
+    package: dict[str, Any],
+    cache: Path,
+    cache_key: str,
+    base_digest: str,
+    definition_digest: str,
+    jobs: int,
+    notify: Callable[[str], None],
+) -> None:
+    label = f"{package['name']} {package['version']}"
+    evidence_dir = cache / "evidence"
+    pattern = f"{package['name']}-{package['version']}-*.json"
+    candidates = (
+        sorted(
+            evidence_dir.glob(pattern),
+            key=lambda path: path.stat().st_mtime,
+            reverse=True,
+        )
+        if evidence_dir.is_dir()
+        else []
+    )
+
+    notify(
+        f"{label}: cache-debug expected-key={cache_key[:16]} "
+        f"baseline={base_digest[:16]} definition={definition_digest[:16]} jobs={jobs}"
+    )
+    if not candidates:
+        notify(f"{label}: cache-debug candidates=0")
+        return
+
+    notify(
+        f"{label}: cache-debug candidates={len(candidates)} "
+        f"showing={min(5, len(candidates))}"
+    )
+    for candidate_path in candidates[:5]:
+        try:
+            evidence = json.loads(candidate_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            notify(
+                f"{label}: cache-debug candidate={candidate_path.name} "
+                f"unreadable={type(exc).__name__}"
+            )
+            continue
+
+        candidate_key = evidence.get("cache_key")
+        candidate_artifact = (
+            cache
+            / "artifacts"
+            / f"{package['name']}-{package['version']}-{candidate_key}.tar.xz"
+            if isinstance(candidate_key, str) and candidate_key
+            else None
+        )
+        artifact_exists = bool(candidate_artifact and candidate_artifact.is_file())
+        artifact_sha_ok = False
+        if artifact_exists:
+            expected_artifact_sha = evidence.get("artifact_sha256")
+            artifact_sha_ok = (
+                isinstance(expected_artifact_sha, str)
+                and expected_artifact_sha == sha256_file(candidate_artifact)
+            )
+
+        notify(
+            f"{label}: cache-debug candidate-key={str(candidate_key)[:16]} "
+            f"status={evidence.get('status')} "
+            f"mode={evidence.get('execution_mode')} "
+            f"baseline={'match' if evidence.get('baseline_root_sha256') == base_digest else 'DIFF'} "
+            f"definition={'match' if evidence.get('resolved_package_sha256') == definition_digest else 'DIFF'} "
+            f"jobs={'match' if evidence.get('jobs') == jobs else 'DIFF'} "
+            f"artifact={'ok' if artifact_exists and artifact_sha_ok else 'missing-or-bad'}"
+        )
+
 def live_command(
     command: dict[str, Any], cwd: str, log, index: int, jobs: int
 ) -> dict[str, Any]:
@@ -276,6 +348,15 @@ def build_package_live(
             return result
 
     notify(f"{label}: cache-miss")
+    report_cache_miss(
+        package,
+        cache,
+        cache_key,
+        base_digest,
+        definition_digest,
+        jobs,
+        notify,
+    )
     source_cwd = prepare_sources(package, root, cache)
     command_results: list[dict[str, Any]] = []
     manual_checks: list[dict[str, Any]] = []
