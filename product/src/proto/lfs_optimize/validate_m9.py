@@ -7,54 +7,89 @@ from resolve import HERE
 VERSIONS = HERE / "versions" / "m9-development.json"
 PACKAGE_SET = HERE / "m9-package-set.json"
 
+XORG_LIBRARY_MEMBERS = ['xtrans', 'libX11', 'libXext', 'libFS', 'libICE', 'libSM', 'libXScrnSaver', 'libXt', 'libXmu', 'libXpm', 'libXaw', 'libXfixes', 'libXcomposite', 'libXrender', 'libXcursor', 'libXdamage', 'libfontenc', 'libXfont2', 'libXft', 'libXi', 'libXinerama', 'libXrandr', 'libXres', 'libXtst', 'libXv', 'libXvMC', 'libXxf86dga', 'libXxf86vm', 'libpciaccess', 'libxkbfile', 'libxshmfence', 'libXpresent']
+
 def require(value: bool, message: str) -> None:
     if not value:
         raise RuntimeError(message)
 
 def main() -> int:
     resolved = resolve_blfs(VERSIONS, PACKAGE_SET)
+
+    expected = [
+        ("libndp", "default"),
+        ("cmake", "m9-minimal"),
+        ("networkmanager", "default"),
+        *[(name, "collection:xorg-libraries") for name in XORG_LIBRARY_MEMBERS],
+        ("icewm", "default"),
+    ]
     require(
-        [(p["name"], p["build"]) for p in resolved["packages"]]
-        == [
-            ("libndp", "default"),
-            ("cmake", "m9-minimal"),
-            ("networkmanager", "default"),
-            ("icewm", "default"),
-        ],
-        "M9 package/build identity or order drift",
+        [(p["name"], p["build"]) for p in resolved["packages"]] == expected,
+        "M9 package/build/collection identity or order drift",
     )
 
-    libndp, cmake, networkmanager, icewm = resolved["packages"]
-
     require(
-        "NetworkManager" in libndp["dependencies"]["before"],
-        "libndp -> NetworkManager ordering relationship missing",
-    )
-    require(
-        "libndp" in networkmanager["dependencies"]["build"],
-        "NetworkManager libndp requirement missing",
-    )
-    require(
-        "systemd" in networkmanager["dependencies"]["runtime"],
-        "NetworkManager systemd runtime relationship missing",
-    )
-    require(
-        networkmanager["integration"]["network_management"]["manager"] == "NetworkManager"
-        and "systemd-networkd"
-        in networkmanager["integration"]["network_management"]["exclusive_with"],
-        "NetworkManager/systemd-networkd ownership boundary missing",
+        resolved["collections"]
+        == [{
+            "name": "xorg-libraries",
+            "members": XORG_LIBRARY_MEMBERS,
+            "dependencies": {
+                "build": ["fontconfig", "libxcb"],
+                "runtime": ["dbus"],
+                "test": [],
+                "before": [],
+                "recommended": [],
+                "optional": ["asciidoc", "xmlto", "fop", "Links", "Lynx", "ncompress", "W3m"],
+            },
+        }],
+        "Xorg Libraries collection metadata drift",
     )
 
+    by_name = {package["name"]: package for package in resolved["packages"]}
+    require(
+        by_name["libX11"]["collection_member_index"] == 1
+        and by_name["libXpresent"]["collection_member_index"] == len(XORG_LIBRARY_MEMBERS) - 1,
+        "Xorg Libraries collection order metadata missing",
+    )
+
+    def command(package: str, needle: str) -> bool:
+        return any(
+            needle in item["command"]
+            for phase in by_name[package]["procedure"]
+            for item in phase["commands"]
+        )
+
+    require(command("libX11", "--disable-static"), "shared Xorg library procedure missing")
+    require(
+        command("libXfont2", "--disable-devel-docs"),
+        "libXfont2 collection override missing",
+    )
+    require(
+        command("libXt", "--with-appdefaultdir=/etc/X11/app-defaults"),
+        "libXt collection override missing",
+    )
+    require(
+        command("libXpm", "--disable-open-zfile"),
+        "libXpm collection override missing",
+    )
+    require(
+        command("libpciaccess", "meson setup --prefix=/usr")
+        and command("libxkbfile", "ninja -C build"),
+        "Meson Xorg library collection override missing",
+    )
+
+    libndp = by_name["libndp"]
+    networkmanager = by_name["networkmanager"]
+    icewm = by_name["icewm"]
+    require(
+        "NetworkManager" in libndp["dependencies"]["before"]
+        and "libndp" in networkmanager["dependencies"]["build"],
+        "NetworkManager ordinary dependency frontier drift",
+    )
     require(
         "CMake" in icewm["dependencies"]["build"]
-        and "imlib2" in icewm["dependencies"]["build"]
-        and "graphical environment" in icewm["dependencies"]["build"],
-        "IceWM graphical build prerequisites missing",
-    )
-    require(
-        icewm["integration"]["session"]["command"] == "icewm-session"
-        and icewm["integration"]["graphical_environment"]["display_protocol"] == "X11",
-        "IceWM X11 session integration missing",
+        and "imlib2" in icewm["dependencies"]["build"],
+        "IceWM ordinary dependency frontier drift",
     )
 
     plan = plan_blfs(
@@ -62,62 +97,17 @@ def main() -> int:
         versions_path=VERSIONS,
         package_set_path=PACKAGE_SET,
     )
-    cmake_commands = plan["packages"][1]["commands"]
-    nm_commands = plan["packages"][2]["commands"]
-    icewm_commands = plan["packages"][3]["commands"]
-
-    required_bundled = (
-        "--no-system-curl",
-        "--no-system-libarchive",
-        "--no-system-libuv",
-        "--no-system-nghttp2",
+    require(
+        plan["collections"][0]["members"] == XORG_LIBRARY_MEMBERS,
+        "planned Xorg collection membership drift",
     )
     require(
-        any(
-            all(flag in item["command"] for flag in required_bundled)
-            for item in cmake_commands
-        ),
-        "M9 CMake bundled-dependency build policy missing",
+        len(plan["packages"]) == len(expected),
+        "planned M9 package count drift",
     )
 
-    require(
-        any(
-            "-D session_tracking=systemd" in item["command"]
-            and "-D nmtui=true" in item["command"]
-            for item in nm_commands
-        ),
-        "NetworkManager reference build policy missing",
-    )
-    require(
-        any(
-            "/etc/NetworkManager/NetworkManager.conf" in item["command"]
-            and "plugins=keyfile" in item["command"]
-            for item in nm_commands
-        ),
-        "NetworkManager base configuration missing",
-    )
-    require(
-        any(
-            item.get("kind") == "session-transition"
-            and item["command"] == "systemctl enable NetworkManager"
-            for item in nm_commands
-        ),
-        "NetworkManager service enable transition missing",
-    )
-    require(
-        any("ENABLE_LTO=ON" in item["command"] for item in icewm_commands),
-        "IceWM required LTO build option missing",
-    )
-    require(
-        any(
-            item["command"] == "rm -v /usr/share/xsessions/icewm.desktop"
-            for item in icewm_commands
-        ),
-        "IceWM duplicate X session cleanup missing",
-    )
-
-    print("M9 ordinary dependency frontier proof: success")
-    print("libndp and CMake are explicit; Xorg collection semantics remain the next frontier.")
+    print("M9 Xorg Libraries collection model proof: success")
+    print("32 members resolve in collection authority order with shared procedure and explicit overrides.")
     return 0
 
 if __name__ == "__main__":

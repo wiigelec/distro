@@ -12,20 +12,26 @@ from execute import build_package, clone_root, plan, require_root
 from resolve import HERE, load_json, resolve_package, substitute
 
 BUILDS = HERE / "blfs-builds"
+COLLECTIONS = HERE / "collections"
 
 
-def package_set_entry(value: Any) -> tuple[str, str | None]:
+def package_set_entry(value: Any) -> dict[str, Any]:
     if isinstance(value, str) and value:
-        return value, None
+        return {"kind": "package", "name": value, "build": None}
     if isinstance(value, dict):
+        if set(value) == {"collection"}:
+            name = value.get("collection")
+            if isinstance(name, str) and name:
+                return {"kind": "collection", "name": name}
         name = value.get("name")
         build = value.get("build")
         if (
-            isinstance(name, str)
+            set(value).issubset({"name", "build"})
+            and isinstance(name, str)
             and name
             and (build is None or (isinstance(build, str) and build))
         ):
-            return name, build
+            return {"kind": "package", "name": name, "build": build}
     raise RuntimeError("invalid BLFS package-set entry")
 
 
@@ -48,9 +54,101 @@ def apply_build(package: dict[str, Any], build: str | None) -> dict[str, Any]:
     package["procedure"] = copy.deepcopy(procedure)
     if "dependencies" in selected:
         package["dependencies"] = copy.deepcopy(selected["dependencies"])
+    if "installed" in selected:
+        package["installed"] = copy.deepcopy(selected["installed"])
     package["build"] = build
     package["build_description"] = selected.get("description")
     return package
+
+
+def load_collection(name: str) -> dict[str, Any]:
+    path = COLLECTIONS / f"{name}.json"
+    definition = load_json(path)
+    if definition.get("name") != name:
+        raise RuntimeError(f"{path}: collection identity mismatch")
+    procedure = definition.get("procedure")
+    members = definition.get("members")
+    if not isinstance(procedure, list) or not procedure:
+        raise RuntimeError(f"{name}: collection procedure missing")
+    if not isinstance(members, list) or not members:
+        raise RuntimeError(f"{name}: collection members missing")
+    return definition
+
+
+def enabled_collection_members(definition: dict[str, Any]) -> list[dict[str, Any]]:
+    result: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for raw in definition["members"]:
+        if isinstance(raw, str):
+            member = {"name": raw, "enabled": True}
+        elif isinstance(raw, dict):
+            member = copy.deepcopy(raw)
+        else:
+            raise RuntimeError(f"{definition['name']}: invalid collection member")
+
+        name = member.get("name")
+        enabled = member.get("enabled", True)
+        if not isinstance(name, str) or not name or not isinstance(enabled, bool):
+            raise RuntimeError(f"{definition['name']}: invalid collection member")
+        if name in seen:
+            raise RuntimeError(f"{definition['name']}: duplicate collection member {name}")
+        seen.add(name)
+        if enabled:
+            result.append(member)
+    if not result:
+        raise RuntimeError(f"{definition['name']}: collection has no enabled members")
+    return result
+
+
+def resolve_collection_member(
+    definition: dict[str, Any],
+    member: dict[str, Any],
+    versions: dict[str, Any],
+    index: int,
+) -> dict[str, Any]:
+    name = member["name"]
+    selected = versions.get(name)
+    if not isinstance(selected, dict):
+        raise RuntimeError(f"development version missing for collection member: {name}")
+
+    version = selected.get("version")
+    source = selected.get("source")
+    if not isinstance(version, str) or not version:
+        raise RuntimeError(f"invalid version selection: {name}")
+    if not isinstance(source, dict) or not source.get("url") or not source.get("md5"):
+        raise RuntimeError(f"invalid source selection: {name}")
+
+    procedure = member.get("procedure", definition["procedure"])
+    if not isinstance(procedure, list) or not procedure:
+        raise RuntimeError(f"{definition['name']}:{name}: missing procedure")
+
+    variables = {"name": name, "version": version}
+    resolved = {
+        "schema_version": 1,
+        "name": name,
+        "description": member.get(
+            "description",
+            f"{name}, member of the {definition['name']} executable collection",
+        ),
+        "dependencies": copy.deepcopy(
+            member.get("dependencies", definition.get("dependencies", {}))
+        ),
+        "procedure": substitute(copy.deepcopy(procedure), variables),
+        "installed": copy.deepcopy(
+            member.get(
+                "installed",
+                {"programs": [], "libraries": [], "directories": []},
+            )
+        ),
+        "version": version,
+        "source": copy.deepcopy(source),
+        "resources": copy.deepcopy(selected.get("resources", {})),
+        "reference_metrics": copy.deepcopy(selected.get("reference_metrics", {})),
+        "build": f"collection:{definition['name']}",
+        "collection": definition["name"],
+        "collection_member_index": index,
+    }
+    return resolved
 
 
 def resolve_blfs(
@@ -70,21 +168,55 @@ def resolve_blfs(
         raise RuntimeError("BLFS package set must contain packages")
 
     entries = [package_set_entry(entry) for entry in raw_entries]
-    names = [name for name, _ in entries]
-    if len(names) != len(set(names)):
-        raise RuntimeError("BLFS package set contains duplicate packages")
-    if set(names) != set(versions):
-        raise RuntimeError("BLFS package set/version manifest mismatch")
+    packages: list[dict[str, Any]] = []
+    resolved_names: list[str] = []
+    collections: list[dict[str, Any]] = []
 
-    packages = [
-        apply_build(resolve_package(name, versions), build)
-        for name, build in entries
-    ]
+    for entry in entries:
+        if entry["kind"] == "package":
+            name = entry["name"]
+            packages.append(
+                apply_build(resolve_package(name, versions), entry.get("build"))
+            )
+            resolved_names.append(name)
+            continue
+
+        definition = load_collection(entry["name"])
+        members = enabled_collection_members(definition)
+        member_names = [member["name"] for member in members]
+        collections.append(
+            {
+                "name": definition["name"],
+                "members": member_names,
+                "dependencies": copy.deepcopy(definition.get("dependencies", {})),
+            }
+        )
+        for index, member in enumerate(members):
+            packages.append(
+                resolve_collection_member(definition, member, versions, index)
+            )
+            resolved_names.append(member["name"])
+
+    if len(resolved_names) != len(set(resolved_names)):
+        raise RuntimeError("BLFS package set expands to duplicate packages")
+    if set(resolved_names) != set(versions):
+        missing = sorted(set(resolved_names) - set(versions))
+        extra = sorted(set(versions) - set(resolved_names))
+        details = []
+        if missing:
+            details.append("missing versions: " + ", ".join(missing))
+        if extra:
+            details.append("unmanaged versions: " + ", ".join(extra))
+        raise RuntimeError(
+            "BLFS package set/version manifest mismatch (" + "; ".join(details) + ")"
+        )
+
     return {
         "schema_version": 1,
         "package_set": package_set["name"],
         "version_manifest": versions_doc["name"],
         "basis": versions_doc.get("basis"),
+        "collections": collections,
         "packages": packages,
     }
 
@@ -101,6 +233,7 @@ def plan_blfs(
         "mode": "plan",
         "package_set": resolved["package_set"],
         "version_manifest": resolved["version_manifest"],
+        "collections": resolved.get("collections", []),
         "packages": [plan(package, run_tests) for package in resolved["packages"]],
     }
 
@@ -139,6 +272,7 @@ def build_blfs(
                 "status": "failure",
                 "package_set": resolved["package_set"],
                 "version_manifest": resolved["version_manifest"],
+                "collections": resolved.get("collections", []),
                 "initial_root_sha256": initial_digest,
                 "failed_package": package["name"],
                 "packages": package_results,
@@ -151,6 +285,7 @@ def build_blfs(
         "status": "success",
         "package_set": resolved["package_set"],
         "version_manifest": resolved["version_manifest"],
+        "collections": resolved.get("collections", []),
         "initial_root_sha256": initial_digest,
         "final_root_sha256": snapshot_digest(snapshot(system_root)),
         "root": str(system_root),
@@ -162,7 +297,7 @@ def build_blfs(
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="M8 BLFS package/build proof")
+    parser = argparse.ArgumentParser(description="BLFS package/build/collection proof")
     parser.add_argument("--root", type=Path)
     parser.add_argument("--work", type=Path, default=Path("/tmp/lfs-optimize-m8"))
     parser.add_argument("--cache", type=Path, default=Path("/tmp/lfs-optimize-cache"))
