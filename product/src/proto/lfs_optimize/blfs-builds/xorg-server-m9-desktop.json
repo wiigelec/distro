@@ -1,25 +1,30 @@
 {
   "schema_version": 1,
   "package": "xorg-server",
-  "build": "m9-xvfb",
-  "description": "M9 headless X server build for executable IceWM proof without the Mesa/libepoxy Glamor stack.",
+  "build": "m9-desktop",
+  "description": "M9 real Xorg desktop build: modesetting driver plus Xvfb, without Mesa/GLX/glamor acceleration.",
   "dependencies": {
     "build": [
       "xorg-libraries",
       "libxcvt",
       "pixman",
-      "font-util"
+      "font-util",
+      "libdrm"
     ],
     "runtime": [
       "xkeyboard-config",
-      "systemd"
+      "systemd",
+      "libdrm"
     ],
     "test": [],
     "before": [
       "icewm"
     ],
     "recommended": [],
-    "optional": []
+    "optional": [
+      "libepoxy",
+      "Mesa"
+    ]
   },
   "installed": {
     "programs": [
@@ -29,7 +34,9 @@
       "Xorg",
       "Xvfb"
     ],
-    "libraries": [],
+    "libraries": [
+      "modesetting_drv.so"
+    ],
     "directories": [
       "/etc/X11/xorg.conf.d",
       "/usr/include/xorg",
@@ -45,7 +52,7 @@
       "commands": [
         {
           "user": "root",
-          "command": "mkdir build && cd build && meson setup .. --prefix=/usr --localstatedir=/var -D glamor=false -D secure-rpc=false -D xkb_output_dir=/var/lib/xkb"
+          "command": "mkdir build && cd build && meson setup .. --prefix=/usr --localstatedir=/var -D glamor=false -D glx=false -D secure-rpc=false -D xkb_output_dir=/var/lib/xkb"
         }
       ]
     },

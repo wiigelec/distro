@@ -19,7 +19,8 @@ def main() -> int:
     for required in (
         ("glib", "m9-minimal"),
         ("networkmanager", "m9-wired-minimal"),
-        ("xorg-server", "m9-xvfb"),
+        ("libdrm", "default"),
+        ("xorg-server", "m9-desktop"),
         ("dejavu-fonts", "default"),
         ("icewm", "default"),
     ):

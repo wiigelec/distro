@@ -466,6 +466,20 @@
         "mirror": "direct"
       }
     },
+    "libdrm": {
+      "version": "2.4.134",
+      "source": {
+        "url": "https://dri.freedesktop.org/libdrm/libdrm-2.4.134.tar.xz",
+        "md5": "0e70607bb5c2f7ecbc411e6a2fab8b22",
+        "size": "428 KB",
+        "home": "https://dri.freedesktop.org/",
+        "mirror": "direct"
+      },
+      "reference_metrics": {
+        "build_time": "0.1 SBU (with tests)",
+        "disk_space": "7.8 MB (with tests)"
+      }
+    },
     "xorg-server": {
       "version": "21.1.24",
       "source": {

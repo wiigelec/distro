@@ -33,13 +33,13 @@
     "pixman",
     "font-util",
     "xkeyboard-config",
+    "libdrm",
     {
       "name": "xorg-server",
-      "build": "m9-xvfb"
+      "build": "m9-desktop"
     },
     "xinit",
     "imlib2",
-    "dejavu-fonts",
     "icewm"
   ]
 }
