@@ -7,7 +7,14 @@
       "name": "cmake",
       "build": "m9-minimal"
     },
-    "networkmanager",
+    {
+      "name": "glib",
+      "build": "m9-minimal"
+    },
+    {
+      "name": "networkmanager",
+      "build": "m9-wired-minimal"
+    },
     {
       "name": "freetype2",
       "build": "m9-bootstrap"

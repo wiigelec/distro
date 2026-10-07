@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "package": "networkmanager",
+  "build": "m9-wired-minimal",
+  "description": "M9 wired-only proof build without nmtui or certificate crypto dependencies.",
+  "dependencies": {
+    "build": [
+      "glib",
+      "libndp"
+    ],
+    "runtime": [
+      "glib",
+      "systemd",
+      "dbus"
+    ],
+    "test": [],
+    "before": [],
+    "recommended": [],
+    "optional": []
+  },
+  "installed": {
+    "programs": [
+      "NetworkManager",
+      "nmcli",
+      "nm-online"
+    ],
+    "libraries": [
+      "libnm.so"
+    ],
+    "directories": [
+      "/etc/NetworkManager",
+      "/usr/include/libnm",
+      "/usr/lib/NetworkManager",
+      "/usr/share/doc/NetworkManager-{version}",
+      "/var/lib/NetworkManager"
+    ]
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "grep -rl '^#!.*python$' | xargs sed -i '1s/python/&3/'"
+        }
+      ]
+    },
+    {
+      "phase": "configure",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "mkdir build &&\ncd build &&\n\nmeson setup ..                    \\\n      --prefix=/usr               \\\n      --buildtype=release         \\\n      -D libaudit=no              \\\n      -D nmtui=false              \\\n      -D crypto=null              \\\n      -D ovs=false                \\\n      -D ppp=false                \\\n      -D nbft=false               \\\n      -D selinux=false            \\\n      -D qt=false                 \\\n      -D session_tracking=systemd \\\n      -D nm_cloud_setup=false     \\\n      -D clat=false               \\\n      -D modem_manager=false"
+        }
+      ]
+    },
+    {
+      "phase": "build",
+      "working_directory": "build",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "ninja"
+        }
+      ]
+    },
+    {
+      "phase": "install",
+      "working_directory": "build",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "ninja install &&\nrm -rf /usr/share/doc/NetworkManager-{version} &&\nmv -v /usr/share/doc/NetworkManager{,-{version}}"
+        },
+        {
+          "user": "root",
+          "command": "for file in $(echo ../man/*.[1578]); do\n    section=${file##*.} &&\n    install -vdm 755 /usr/share/man/man$section\n    install -vm 644 $file /usr/share/man/man$section/\ndone"
+        },
+        {
+          "user": "root",
+          "command": "cp -Rv ../docs/{api,libnm} /usr/share/doc/NetworkManager-{version}"
+        }
+      ]
+    },
+    {
+      "phase": "system",
+      "working_directory": "build",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "install -vdm755 /etc/NetworkManager/conf.d &&\ncat > /etc/NetworkManager/NetworkManager.conf << \"EOF\"\n[main]\nplugins=keyfile\nEOF"
+        },
+        {
+          "user": "root",
+          "command": "systemctl enable NetworkManager",
+          "kind": "session-transition",
+          "source_command": "systemctl enable NetworkManager"
+        }
+      ]
+    }
+  ]
+}

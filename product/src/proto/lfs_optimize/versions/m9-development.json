@@ -513,6 +513,20 @@
         "build_time": "0.2 SBU (with docs)",
         "disk_space": "20 MB (with docs)"
       }
+    },
+    "glib": {
+      "version": "2.88.3",
+      "source": {
+        "url": "https://download.gnome.org/sources/glib/2.88/glib-2.88.3.tar.xz",
+        "md5": "b61c04cfbf55b0d24fbe64e4ac9e9d56",
+        "size": "5.6 MB",
+        "home": "https://www.gtk.org/",
+        "mirror": "direct"
+      },
+      "reference_metrics": {
+        "build_time": "0.7 SBU (using parallelism=4; without tests)",
+        "disk_space": "430 MB reference maximum with tests/documentation"
+      }
     }
   }
 }

@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "name": "glib",
+  "reference": {
+    "blfs_section": "glib2",
+    "edition": "13.1-systemd"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "mkdir build && cd build && meson setup .. --prefix=/usr --buildtype=release -D introspection=disabled -D glib_debug=disabled -D man-pages=enabled -D sysprof=disabled"
+        }
+      ]
+    },
+    {
+      "phase": "build",
+      "working_directory": "build",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "ninja"
+        }
+      ]
+    },
+    {
+      "phase": "install",
+      "working_directory": "build",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "ninja install"
+        }
+      ]
+    }
+  ],
+  "description": "GLib provides the core event-loop, object, and utility libraries used by NetworkManager.",
+  "dependencies": {
+    "build": [],
+    "runtime": [],
+    "test": [],
+    "before": [
+      "networkmanager"
+    ],
+    "recommended": [
+      "docutils",
+      "libxslt"
+    ],
+    "optional": [
+      "cairo",
+      "dbus",
+      "fuse3",
+      "bindfs",
+      "gdb",
+      "gjs",
+      "gtk-doc",
+      "docbook-xml",
+      "docbook-xsl-nons",
+      "gi-docgen",
+      "glib-networking",
+      "mako",
+      "markdown",
+      "sysprof"
+    ]
+  },
+  "installed": {
+    "programs": [
+      "gapplication",
+      "gdbus",
+      "gdbus-codegen",
+      "gio",
+      "gio-querymodules",
+      "glib-compile-resources",
+      "glib-compile-schemas",
+      "glib-genmarshal",
+      "glib-gettextize",
+      "glib-mkenums",
+      "gobject-query",
+      "gresource",
+      "gsettings",
+      "gtester",
+      "gtester-report"
+    ],
+    "libraries": [
+      "libgio-2.0.so",
+      "libglib-2.0.so",
+      "libgmodule-2.0.so",
+      "libgobject-2.0.so",
+      "libgthread-2.0.so"
+    ],
+    "directories": [
+      "/usr/include/glib-2.0",
+      "/usr/lib/glib-2.0",
+      "/usr/share/glib-2.0"
+    ]
+  }
+}
