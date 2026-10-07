@@ -96,6 +96,7 @@ def report_cache_miss(
     base_digest: str,
     definition_digest: str,
     jobs: int,
+    before: dict[str, dict[str, Any]],
     notify: Callable[[str], None],
 ) -> None:
     label = f"{package['name']} {package['version']}"
@@ -114,6 +115,65 @@ def report_cache_miss(
     notify(
         f"{label}: cache-debug expected-key={cache_key[:16]} "
         f"baseline={base_digest[:16]} definition={definition_digest[:16]} jobs={jobs}"
+    )
+
+    debug_dir = evidence_dir / ".baseline-debug"
+    debug_dir.mkdir(parents=True, exist_ok=True)
+    debug_path = debug_dir / f"{package['name']}-{package['version']}.json"
+    previous_snapshot = None
+    if debug_path.is_file():
+        try:
+            previous_payload = json.loads(debug_path.read_text(encoding="utf-8"))
+            if isinstance(previous_payload, dict) and isinstance(
+                previous_payload.get("snapshot"), dict
+            ):
+                previous_snapshot = previous_payload["snapshot"]
+        except (OSError, json.JSONDecodeError):
+            previous_snapshot = None
+
+    if previous_snapshot is None:
+        notify(f"{label}: cache-debug baseline-diff=seeded")
+    else:
+        previous_paths = set(previous_snapshot)
+        current_paths = set(before)
+        added = sorted(current_paths - previous_paths)
+        removed = sorted(previous_paths - current_paths)
+        changed = sorted(
+            path
+            for path in previous_paths & current_paths
+            if previous_snapshot[path] != before[path]
+        )
+        notify(
+            f"{label}: cache-debug baseline-diff "
+            f"added={len(added)} removed={len(removed)} changed={len(changed)}"
+        )
+        differences = (
+            [("added", path) for path in added]
+            + [("removed", path) for path in removed]
+            + [("changed", path) for path in changed]
+        )
+        for kind, path in differences[:40]:
+            notify(f"{label}: cache-debug baseline-{kind} {path}")
+        if len(differences) > 40:
+            notify(
+                f"{label}: cache-debug baseline-diff-truncated "
+                f"remaining={len(differences) - 40}"
+            )
+
+    debug_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "package": package["name"],
+                "version": package["version"],
+                "baseline_root_sha256": base_digest,
+                "snapshot": before,
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n",
+        encoding="utf-8",
     )
     if not candidates:
         notify(f"{label}: cache-debug candidates=0")
@@ -355,6 +415,7 @@ def build_package_live(
         base_digest,
         definition_digest,
         jobs,
+        before,
         notify,
     )
     source_cwd = prepare_sources(package, root, cache)
