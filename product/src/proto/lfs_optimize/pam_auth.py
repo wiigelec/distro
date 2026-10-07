@@ -27,6 +27,7 @@ def auth_plan() -> dict[str, Any]:
         "caller": "root login process (agetty-equivalent privilege)",
         "test_user": "disposable local account",
         "session_proof": "authenticated login shell reports expected UID and user",
+        "credential_seed": "direct shadow hash via openssl + usermod; PAM bypassed for fixture setup",
         "cleanup": "test account removed before shutdown",
         "success_marker": AUTH_MARKER_OK,
         "failure_marker": AUTH_MARKER_FAILED,
@@ -135,7 +136,14 @@ def main() -> int:
     try:
         run(["useradd", "-m", "-s", "/bin/bash", TEST_USER])
         test_uid = pwd.getpwnam(TEST_USER).pw_uid
-        run(["chpasswd"], input=f"{TEST_USER}:{TEST_PASSWORD}\n")
+        password_hash = run(
+            ["openssl", "passwd", "-6", "-stdin"],
+            input=TEST_PASSWORD + "\n",
+            capture_output=True,
+        ).stdout.strip()
+        if not password_hash.startswith("$6$"):
+            raise RuntimeError("openssl did not produce a SHA-512 shadow hash")
+        run(["usermod", "-p", password_hash, TEST_USER])
 
         pid, fd = pty.fork()
         if pid == 0:
@@ -183,6 +191,7 @@ def main() -> int:
             "login_process_uid": 0,
             "test_user": TEST_USER,
             "test_uid": test_uid,
+            "credential_seed": "direct-shadow-sha512",
             "session_marker": expected,
             "session_marker_seen": True,
             "child": status,

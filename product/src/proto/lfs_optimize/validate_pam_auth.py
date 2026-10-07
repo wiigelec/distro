@@ -23,6 +23,11 @@ def main() -> int:
         plan["session_proof"] == "authenticated login shell reports expected UID and user",
         "session proof drift",
     )
+    require(
+        plan["credential_seed"]
+        == "direct shadow hash via openssl + usermod; PAM bypassed for fixture setup",
+        "credential-seed contract drift",
+    )
     require(plan["cleanup"] == "test account removed before shutdown", "cleanup contract drift")
     require(plan["success_marker"] == AUTH_MARKER_OK, "auth success marker drift")
     print("booted PAM login/session plan proof: success")
