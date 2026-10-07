@@ -27,7 +27,7 @@ def guest_plan() -> dict[str, Any]:
         "status": "success",
         "mode": "plan",
         "kind": "booted-m9-functional-system-proof",
-        "base_requirement": "successful M8 booted BLFS guest image",
+        "base_requirement": "successful review-clean M8 PAM login proof image",
         "package_set": resolved["package_set"],
         "version_manifest": resolved["version_manifest"],
         "packages": [
@@ -159,7 +159,7 @@ def inject_runner(root: Path) -> None:
     link.symlink_to("/etc/systemd/system/distro-m9-proof.service")
 
 
-def run_guest(boot_work: Path, m8_work: Path, work: Path, cache: Path, timeout: int) -> dict[str, Any]:
+def run_guest(boot_work: Path, m8_auth_work: Path, work: Path, cache: Path, timeout: int) -> dict[str, Any]:
     require_root()
     for tool in ("qemu-system-x86_64", "losetup", "mount", "umount", "cp"):
         require_tool(tool)
@@ -171,20 +171,21 @@ def run_guest(boot_work: Path, m8_work: Path, work: Path, cache: Path, timeout: 
     if boot_result.get("status") != "success" or not boot_result.get("proof_marker_seen"):
         raise RuntimeError("boot-work does not contain a successful booted-LFS proof")
 
-    m8_result_path = m8_work.resolve() / "guest/result.json"
-    if not m8_result_path.is_file():
-        raise RuntimeError(f"missing M8 guest result: {m8_result_path}")
-    m8_result = json.loads(m8_result_path.read_text(encoding="utf-8"))
+    m8_auth_result_path = m8_auth_work.resolve() / "auth/result.json"
+    if not m8_auth_result_path.is_file():
+        raise RuntimeError(f"missing M8 PAM acceptance result: {m8_auth_result_path}")
+    m8_auth_result = json.loads(m8_auth_result_path.read_text(encoding="utf-8"))
     if (
-        m8_result.get("status") != "success"
-        or not m8_result.get("proof_marker_seen")
-        or not m8_result.get("guest_result")
-        or m8_result["guest_result"].get("status") != "success"
-        or m8_result.get("review_required")
+        m8_auth_result.get("status") != "success"
+        or not m8_auth_result.get("proof_marker_seen")
+        or not m8_auth_result.get("pam_login_verified")
+        or m8_auth_result.get("review_required")
     ):
-        raise RuntimeError("m8-work does not contain a successful review-clean M8 guest proof")
+        raise RuntimeError(
+            "m8-auth-work does not contain a successful review-clean M8 PAM login proof"
+        )
 
-    base_image = Path(m8_result["guest_image"])
+    base_image = Path(m8_auth_result["auth_image"])
     kernel = Path(boot_result["kernel"])
     if not base_image.is_file() or not kernel.is_file():
         raise RuntimeError("M8/boot evidence references a missing guest image or kernel")
@@ -249,7 +250,7 @@ def run_guest(boot_work: Path, m8_work: Path, work: Path, cache: Path, timeout: 
         and not guest_result.get("review_required")
         else "failure",
         "kind": "booted-m9-functional-system-proof",
-        "m8_input_result": str(m8_result_path),
+        "m8_auth_input_result": str(m8_auth_result_path),
         "base_image": str(base_image),
         "guest_image": str(image),
         "kernel": str(kernel),
@@ -271,10 +272,10 @@ def run_guest(boot_work: Path, m8_work: Path, work: Path, cache: Path, timeout: 
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="boot the successful M8 guest image and execute the M9 functional-system proof"
+        description="boot the review-clean M8 PAM acceptance image and execute the M9 functional-system proof"
     )
     parser.add_argument("--boot-work", type=Path)
-    parser.add_argument("--m8-work", type=Path)
+    parser.add_argument("--m8-auth-work", type=Path)
     parser.add_argument("--work", type=Path, default=Path("/tmp/lfs-optimize-m9-guest"))
     parser.add_argument("--cache", type=Path, default=Path("/tmp/lfs-optimize-cache"))
     parser.add_argument("--timeout", type=int, default=10800)
@@ -284,9 +285,9 @@ def main() -> int:
     if args.plan:
         result = guest_plan()
     else:
-        if args.boot_work is None or args.m8_work is None:
-            parser.error("--boot-work and --m8-work are required unless --plan is used")
-        result = run_guest(args.boot_work, args.m8_work, args.work, args.cache, args.timeout)
+        if args.boot_work is None or args.m8_auth_work is None:
+            parser.error("--boot-work and --m8-auth-work are required unless --plan is used")
+        result = run_guest(args.boot_work, args.m8_auth_work, args.work, args.cache, args.timeout)
 
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0 if result["status"] == "success" else 1

@@ -12,8 +12,8 @@ def main() -> int:
     require(plan["status"] == "success", "M9 guest plan failed")
     require(
         plan["kind"] == "booted-m9-functional-system-proof"
-        and plan["base_requirement"] == "successful M8 booted BLFS guest image",
-        "M9 guest must consume the proven M8 runtime image",
+        and plan["base_requirement"] == "successful review-clean M8 PAM login proof image",
+        "M9 guest must consume the review-clean M8 PAM acceptance image",
     )
     packages = {(item["name"], item["build"]) for item in plan["packages"]}
     for required in (
