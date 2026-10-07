@@ -41,8 +41,8 @@
     ]
   },
   "qemu": {
-    "memory_mib": 2048,
-    "cpus": 2,
+    "memory_mib": 32768,
+    "cpus": 32,
     "timeout_seconds": 180,
     "root_device": "/dev/vda",
     "console": "ttyS0"
