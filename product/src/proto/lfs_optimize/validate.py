@@ -14,6 +14,10 @@ from execute import command_failure_disposition, plan
 from presentation import self_test as presentation_self_test
 from resolve import HERE, load_json, resolve, substitute_string
 from system import plan_system
+from validate_boot import main as validate_boot_contract
+from validate_guest import main as validate_guest_contract
+from validate_m8 import main as validate_m8_contract
+from validate_pam_auth import main as validate_pam_auth_contract
 
 DEPENDENCY_CLASSES = ("build", "runtime", "test", "before", "optional")
 
@@ -301,6 +305,11 @@ def main() -> int:
         [item["package"] for item in system_plan["packages"]] == names,
         "system execution plan does not preserve package-set order",
     )
+
+    validate_m8_contract()
+    validate_boot_contract()
+    validate_guest_contract()
+    validate_pam_auth_contract()
 
     print(json.dumps({
         "status": "success",

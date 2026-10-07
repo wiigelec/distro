@@ -293,11 +293,13 @@ mirror.
 
 Linux-PAM records the BLFS requirement to rebuild/reconfigure both Shadow and
 systemd after PAM is installed. Shadow is represented as a named `blfs-pam`
-Build and carries the BLFS PAM configuration transition. Its required live-login
-verification is a `manual-check`: the executor records it as review evidence and
-does not attempt to perform an interactive authentication test inside the
-disposable chroot. Systemd follows with its PAM-enabled rebuild and recorded
-daemon-reexec session transition.
+Build and carries the BLFS PAM configuration transition. Its BLFS live-login
+instruction remains modeled as a `manual-check`, so chroot execution preserves
+the source semantics without pretending an interactive login happened there.
+M8 acceptance closes that review boundary separately with `pam_auth.py`, which
+boots the completed BLFS guest and performs a real `/usr/bin/login` PAM
+authentication/session proof. Systemd follows Shadow with its PAM-enabled
+rebuild and live daemon-reexec session transition.
 
 Plan without root access:
 
@@ -339,5 +341,63 @@ sudo python3 product/src/proto/lfs_optimize/boot.py \
 ```
 
 Successful execution writes `/tmp/lfs-optimize-boot/boot/result.json` and
-`qemu-console.log`. Real BLFS package execution should be gated on this proof;
+`qemu-console.log`. Real BLFS package execution is gated on this proof;
 chroot-only BLFS builds remain smoke tests, not acceptance evidence.
+
+## Booted BLFS execution and PAM login acceptance
+
+`guest.py` consumes the successful boot image, injects the normalized BLFS
+executor plus prefetched sources, and boots a disposable copy under QEMU/KVM.
+The guest reuses `resolve_blfs()` rather than carrying a second recipe model.
+Linux-PAM, Shadow `[build: blfs-pam]`, and systemd `[build: blfs-pam]` execute on
+the running LFS system with systemd as PID 1. Session-transition commands execute
+live; in particular, the systemd rebuild performs `systemctl daemon-reexec`.
+
+The live BLFS proof succeeds with:
+
+```text
+Linux-PAM 1.7.3
+    ↓
+Shadow 4.20.2 [blfs-pam]
+    ↓
+systemd 261.3 [blfs-pam]
+    ↓
+systemctl daemon-reexec
+    ↓
+DISTRO_BLFS_EXECUTION_OK
+```
+
+The resulting guest image is then consumed by `pam_auth.py`. Fixture credential
+creation deliberately bypasses PAM by installing a direct SHA-512 shadow hash;
+PAM is exercised only by the acceptance action itself. The probe launches
+`/usr/bin/login` as a root login process on a controlling PTY, authenticates the
+disposable user, and requires the resulting shell to report the expected UID and
+username. Teardown terminates the systemd user session, waits for UID-owned
+processes to disappear, and removes the account.
+
+Successful M8 authentication evidence includes:
+
+```text
+DISTRO_PAM_LOGIN_SESSION_OK uid=1000 user=distro-m8-auth
+DISTRO_PAM_LOGIN_PROOF_OK
+authenticated_login_shell: true
+pam_session_opened: true
+test_user_removed: true
+pam_login_verified: true
+review_required: false
+status: success
+```
+
+Plan/static validation remains rootless:
+
+```sh
+python3 product/src/proto/lfs_optimize/validate_m8.py
+python3 product/src/proto/lfs_optimize/validate_boot.py
+python3 product/src/proto/lfs_optimize/validate_guest.py
+python3 product/src/proto/lfs_optimize/validate_pam_auth.py
+```
+
+The successful runtime proof closes M8: ordinary BLFS packages, dependency
+semantics, kernel requirements, configuration transitions, named rebuilds, and
+booted-system integration all execute through the normalized model. Composite
+KDE/Xorg collections and catalogs remain M9 work.

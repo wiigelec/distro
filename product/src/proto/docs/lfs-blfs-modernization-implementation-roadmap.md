@@ -690,7 +690,7 @@ No rendered book feeds semantics back into the system.
 5. **Development proof** — scheduled discovery → candidate → test → promote/fail.
 6. **Release proof** — freeze manifest → clean full release build.
 7. **Presentation proof** — generate an equivalent LFS book from structure + package + editorial data.
-8. **BLFS proof** — ordinary BLFS packages plus dependency/kernel/configuration semantics.
+8. **BLFS proof** — ordinary BLFS packages plus dependency/kernel/configuration semantics. **Prototype complete 2026-10-07:** Linux-PAM → Shadow/PAM → systemd/PAM executes on a booted LFS guest with live PAM login/session evidence and no review-required remainder.
 9. **Hard-BLFS proof** — KDE/Xorg collections and composite catalogs without document heuristics.
 10. **User-system proof** — selected profile → generated scripts → packaging plugin → maintained/installable system.
 

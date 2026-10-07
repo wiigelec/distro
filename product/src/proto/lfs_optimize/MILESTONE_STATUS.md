@@ -1,6 +1,6 @@
 # LFS optimize prototype — milestone status
 
-Last updated: 2026-10-06
+Last updated: 2026-10-07
 
 Authoritative branch: `proto/lfs-optimize`
 
@@ -18,8 +18,62 @@ Roadmap:
 | M5 — Development proof | COMPLETE | Accepted state, candidate identity, validation, definition binding/drift rejection, review evidence, and guarded transactional promotion are implemented. |
 | M6 — Release proof | SATISFIED BY COMPOSITION | M4 proves clean full-system realization from normalized state and M5 proves validated state identity and controlled promotion. Freezing accepted state under a release identity adds production plumbing but no unresolved prototype architecture question. |
 | M7 — Presentation proof | COMPLETE — 199/199 CHUNKS COMPLETE; 0 AUTHORITY GAPS | All 80/80 Chapter 8 package pages and all 119/119 non-package bodies render from normalized authority plus presentation-owned editorial state. All 38 referenced nested targets are physically present in rendered HTML. |
-| M8 — BLFS proof | IN PROGRESS | PAM/Shadow/systemd semantics are modeled; a QEMU direct-kernel boot harness now bridges the M4 filesystem result to the booted-LFS environment required for real BLFS execution. Boot execution is still required before BLFS build claims. |
+| M8 — BLFS proof | COMPLETE | Linux-PAM 1.7.3 → Shadow 4.20.2 [blfs-pam] → systemd 261.3 [blfs-pam] resolves through the common model and executes on a booted LFS guest with systemd PID 1, live daemon-reexec, real PAM login/session authentication, UID transition, and clean account teardown. |
 | M9+ | NOT STARTED | Hard-BLFS collections/catalogs and user-system proofs remain later roadmap milestones. |
+
+## M8 closure
+
+M8 proves the roadmap requirement for ordinary BLFS packages plus
+dependency/kernel/configuration semantics through one concrete integration chain:
+
+```text
+normalized M4 LFS filesystem
+        ↓
+Linux 7.1.8 / QEMU / systemd PID 1
+        ↓
+Linux-PAM 1.7.3
+        ↓
+Shadow 4.20.2 [build: blfs-pam]
+        ↓
+systemd 261.3 [build: blfs-pam]
+        ↓
+systemctl daemon-reexec
+        ↓
+/usr/bin/login on a controlling PTY
+        ↓
+PAM authentication + PAM session
+        ↓
+uid=1000 user=distro-m8-auth
+        ↓
+logout + deterministic test-account cleanup
+```
+
+Acceptance evidence includes:
+
+- the M4 artifact-reconstructed root booting Linux 7.1.8 under QEMU/KVM;
+- systemd as PID 1 reaching `multi-user.target`;
+- `CONFIG_AUDIT` represented as a required kernel capability for Linux-PAM;
+- required build/runtime dependency edges and rebuild-after integration from
+  Linux-PAM to Shadow and systemd;
+- BLFS-specific Shadow and systemd named builds without changing package
+  identity;
+- live package installation on the booted LFS system;
+- live `systemctl daemon-reexec` after the PAM-enabled systemd rebuild;
+- a real `/usr/bin/login` authentication flow on a controlling PTY;
+- an authenticated shell proving `uid=1000 user=distro-m8-auth`;
+- PAM session establishment, clean login exit, and deterministic removal of the
+  disposable test user;
+- outer proof status `success`, `pam_login_verified: true`,
+  `proof_marker_seen: true`, and `review_required: false`.
+
+The Shadow recipe retains the BLFS manual login-safety instruction as modeled
+source semantics, but M8 acceptance no longer depends on human review of that
+instruction: `pam_auth.py` provides executable booted-system evidence for the
+same safety boundary.
+
+This is sufficient for the roadmap's BLFS proof. Broader BLFS package coverage
+is migration breadth, while composite collections/catalogs and document-order
+stress cases belong to M9.
 
 ## M5 closure
 
@@ -443,8 +497,8 @@ Run:
 python3 product/src/proto/lfs_optimize/validate.py
 ```
 
-Direct validation should pass with M7 treated as complete. The next roadmap work
-is M8 — BLFS.
+Direct validation should pass with M8 treated as complete. The next roadmap work
+is M9 — Hard-BLFS collections and composite catalogs.
 
 ## M8 first slice — Linux-PAM + systemd
 
