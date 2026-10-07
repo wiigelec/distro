@@ -28,7 +28,7 @@ def auth_plan() -> dict[str, Any]:
         "test_user": "disposable local account",
         "session_proof": "authenticated login shell reports expected UID and user",
         "credential_seed": "direct shadow hash via openssl + usermod; PAM bypassed for fixture setup",
-        "cleanup": "test account removed before shutdown",
+        "cleanup": "terminate systemd user session, wait for UID processes to exit, then remove test account",
         "success_marker": AUTH_MARKER_OK,
         "failure_marker": AUTH_MARKER_FAILED,
     }
@@ -78,9 +78,41 @@ def user_exists(name: str) -> bool:
         return False
 
 
-def cleanup_user() -> None:
-    if user_exists(TEST_USER):
-        subprocess.run(["userdel", "-r", TEST_USER], check=False)
+def uid_processes(uid: int) -> list[int]:
+    processes: list[int] = []
+    for entry in Path("/proc").iterdir():
+        if not entry.name.isdigit():
+            continue
+        try:
+            status = (entry / "status").read_text(encoding="utf-8")
+        except (FileNotFoundError, PermissionError, ProcessLookupError):
+            continue
+        for line in status.splitlines():
+            if line.startswith("Uid:"):
+                if int(line.split()[1]) == uid:
+                    processes.append(int(entry.name))
+                break
+    return sorted(processes)
+
+
+def cleanup_user() -> bool:
+    if not user_exists(TEST_USER):
+        return True
+
+    uid = pwd.getpwnam(TEST_USER).pw_uid
+    subprocess.run(
+        ["loginctl", "terminate-user", TEST_USER],
+        check=False,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
+    deadline = time.monotonic() + 10.0
+    while uid_processes(uid) and time.monotonic() < deadline:
+        time.sleep(0.1)
+
+    subprocess.run(["userdel", "-r", TEST_USER], check=False)
+    return not user_exists(TEST_USER)
 
 
 def read_until(fd: int, transcript: bytearray, needles: tuple[bytes, ...], timeout: float) -> bytes:
@@ -125,7 +157,8 @@ def main() -> int:
     if not login_owned_by_root:
         raise RuntimeError(f"{login_path}: login is not owned by root")
 
-    cleanup_user()
+    if not cleanup_user():
+        raise RuntimeError("unable to remove stale PAM proof test user")
     transcript = bytearray()
     pid: int | None = None
     status: dict[str, int | None] = {"exit_code": None, "signal": None}
@@ -230,8 +263,7 @@ def main() -> int:
             except ChildProcessError:
                 pass
         TRANSCRIPT.write_bytes(bytes(transcript))
-        cleanup_user()
-        payload["test_user_removed"] = not user_exists(TEST_USER)
+        payload["test_user_removed"] = cleanup_user()
         RESULT.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     return return_code
