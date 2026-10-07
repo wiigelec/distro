@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "name": "blfs-networkmanager-icewm-target-proof",
+  "packages": [
+    "networkmanager",
+    "icewm"
+  ]
+}

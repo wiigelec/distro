@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "name": "blfs-m9-development",
+  "basis": "BLFS r13.1-292 systemd, 2026-09-30",
+  "packages": {
+    "networkmanager": {
+      "version": "1.58.1",
+      "source": {
+        "url": "https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/releases/1.58.1/downloads/NetworkManager-1.58.1.tar.xz",
+        "md5": "7b06b1dd7b56adffc1dbbf3d04bedf8e",
+        "size": "6.2 MB",
+        "home": "https://networkmanager.dev",
+        "mirror": "direct"
+      },
+      "reference_metrics": {
+        "build_time": "0.7 SBU (with tests, using parallelism=4)",
+        "disk_space": "327 MB (with tests and documentation)"
+      }
+    },
+    "icewm": {
+      "version": "4.1.0",
+      "source": {
+        "url": "https://github.com/ice-wm/icewm/archive/4.1.0/icewm-4.1.0.tar.gz",
+        "md5": "0b02f3c3068b9e865a7538c6f476529a",
+        "size": "2.6 MB",
+        "home": "https://ice-wm.org",
+        "mirror": "direct"
+      },
+      "reference_metrics": {
+        "build_time": "0.2 SBU (using parallelism=4)",
+        "disk_space": "62 MB"
+      }
+    }
+  }
+}

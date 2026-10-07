@@ -19,7 +19,8 @@ Roadmap:
 | M6 — Release proof | SATISFIED BY COMPOSITION | M4 proves clean full-system realization from normalized state and M5 proves validated state identity and controlled promotion. Freezing accepted state under a release identity adds production plumbing but no unresolved prototype architecture question. |
 | M7 — Presentation proof | COMPLETE — 199/199 CHUNKS COMPLETE; 0 AUTHORITY GAPS | All 80/80 Chapter 8 package pages and all 119/119 non-package bodies render from normalized authority plus presentation-owned editorial state. All 38 referenced nested targets are physically present in rendered HTML. |
 | M8 — BLFS proof | COMPLETE | Linux-PAM 1.7.3 → Shadow 4.20.2 [blfs-pam] → systemd 261.3 [blfs-pam] resolves through the common model and executes on a booted LFS guest with systemd PID 1, live daemon-reexec, real PAM login/session authentication, UID transition, and clean account teardown. |
-| M9+ | NOT STARTED | Hard-BLFS collections/catalogs and user-system proofs remain later roadmap milestones. |
+| M9 — NetworkManager + IceWM system proof | IN PROGRESS | Target package models and static validation are established. Dependency closure, X11 realization, NetworkManager interface ownership, and booted IceWM runtime acceptance remain open. |
+| M10+ | NOT STARTED | Generalized hard-BLFS collections/catalogs and broader user-system/profile proofs remain later roadmap milestones. |
 
 ## M8 closure
 
@@ -547,3 +548,20 @@ requiring root or QEMU. `boot.py` performs the actual proof and writes
 `boot/result.json` plus the QEMU serial log.
 
 M8 must not claim real BLFS package execution until this boot proof succeeds.
+
+## M9 start — NetworkManager + IceWM
+
+M9 now targets a recognizable functional BLFS system rather than another isolated
+package build. The first slice establishes version-independent NetworkManager and
+IceWM package definitions plus a dedicated target manifest and static validator.
+
+The runtime acceptance boundary is intentionally still open. Completion requires:
+
+- explicit dependency closure from the proven M8 system to NetworkManager and IceWM;
+- an X11 graphical environment sufficient to run IceWM;
+- NetworkManager owning the guest network interface without competing
+  systemd-networkd configuration;
+- a booted guest proving NetworkManager active with a managed interface; and
+- an actual IceWM X11 session reaching a machine-verifiable success marker.
+
+The target model must not be mistaken for runtime acceptance.

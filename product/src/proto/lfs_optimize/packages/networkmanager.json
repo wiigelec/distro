@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "name": "networkmanager",
+  "reference": {
+    "blfs_section": "networkmanager",
+    "edition": "r13.1-292-systemd"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "grep -rl '^#!.*python$' | xargs sed -i '1s/python/&3/'"
+        }
+      ]
+    },
+    {
+      "phase": "configure",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "mkdir build &&\ncd build &&\n\nmeson setup ..                    \\\n      --prefix=/usr               \\\n      --buildtype=release         \\\n      -D libaudit=no              \\\n      -D nmtui=true               \\\n      -D ovs=false                \\\n      -D ppp=false                \\\n      -D nbft=false               \\\n      -D selinux=false            \\\n      -D qt=false                 \\\n      -D session_tracking=systemd \\\n      -D nm_cloud_setup=false     \\\n      -D clat=false               \\\n      -D modem_manager=false"
+        }
+      ]
+    },
+    {
+      "phase": "build",
+      "working_directory": "build",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "ninja"
+        }
+      ]
+    },
+    {
+      "phase": "test",
+      "working_directory": "build",
+      "condition": "tests-enabled",
+      "commands": [
+        {
+          "user": "root",
+          "command": "ninja test"
+        }
+      ]
+    },
+    {
+      "phase": "install",
+      "working_directory": "build",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "ninja install &&\nrm -rf /usr/share/doc/NetworkManager-{version} &&\nmv -v /usr/share/doc/NetworkManager{,-{version}}"
+        },
+        {
+          "user": "root",
+          "command": "for file in $(echo ../man/*.[1578]); do\n    section=${file##*.} &&\n    install -vdm 755 /usr/share/man/man$section\n    install -vm 644 $file /usr/share/man/man$section/\ndone"
+        },
+        {
+          "user": "root",
+          "command": "cp -Rv ../docs/{api,libnm} /usr/share/doc/NetworkManager-{version}"
+        }
+      ]
+    },
+    {
+      "phase": "system",
+      "working_directory": "build",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "install -vdm755 /etc/NetworkManager/conf.d &&\ncat > /etc/NetworkManager/NetworkManager.conf << \"EOF\"\n[main]\nplugins=keyfile\nEOF"
+        },
+        {
+          "user": "root",
+          "command": "systemctl enable NetworkManager",
+          "kind": "session-transition",
+          "source_command": "systemctl enable NetworkManager"
+        }
+      ]
+    }
+  ],
+  "description": "NetworkManager provides managed wired, wireless, and other network connections with systemd-logind session tracking.",
+  "dependencies": {
+    "build": [
+      "libndp"
+    ],
+    "runtime": [
+      "systemd"
+    ],
+    "test": [
+      "graphical session with a D-Bus address"
+    ],
+    "before": [],
+    "recommended": [
+      "cURL",
+      "GLib",
+      "iptables",
+      "libpsl",
+      "newt",
+      "NSS",
+      "Polkit",
+      "PyGObject",
+      "systemd",
+      "Vala",
+      "wpa_supplicant"
+    ],
+    "optional": [
+      "BlueZ",
+      "D-Bus Python",
+      "GnuTLS",
+      "GTK-Doc",
+      "jansson",
+      "libnvme",
+      "LLVM",
+      "ModemManager",
+      "UPower",
+      "Valgrind",
+      "dnsmasq",
+      "firewalld",
+      "libaudit",
+      "libteam",
+      "mobile-broadband-provider-info",
+      "libbpf",
+      "PPP",
+      "RP-PPPoE"
+    ]
+  },
+  "integration": {
+    "network_management": {
+      "manager": "NetworkManager",
+      "exclusive_with": [
+        "systemd-networkd"
+      ],
+      "requirement": "systemd-networkd must be disabled or configured not to manage interfaces assigned to NetworkManager"
+    },
+    "service": {
+      "unit": "NetworkManager.service",
+      "enabled": true
+    }
+  },
+  "installed": {
+    "programs": [
+      "NetworkManager",
+      "nmcli",
+      "nm-online",
+      "nmtui",
+      "nmtui-connect",
+      "nmtui-edit",
+      "nmtui-hostname"
+    ],
+    "libraries": [
+      "libnm.so"
+    ],
+    "directories": [
+      "/etc/NetworkManager",
+      "/usr/include/libnm",
+      "/usr/lib/NetworkManager",
+      "/usr/share/doc/NetworkManager-{version}",
+      "/var/lib/NetworkManager"
+    ]
+  }
+}

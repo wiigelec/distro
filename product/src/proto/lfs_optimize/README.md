@@ -401,3 +401,27 @@ The successful runtime proof closes M8: ordinary BLFS packages, dependency
 semantics, kernel requirements, configuration transitions, named rebuilds, and
 booted-system integration all execute through the normalized model. Composite
 KDE/Xorg collections and catalogs remain M9 work.
+
+## Milestone 9 — NetworkManager + IceWM functional-system proof
+
+M9 begins the transition from a bootable BLFS integration proof to a recognizable
+usable system. The selected targets are NetworkManager and IceWM.
+
+The first slice is model-only:
+
+```sh
+python3 product/src/proto/lfs_optimize/validate_m9.py
+python3 product/src/proto/lfs_optimize/blfs.py \
+  --plan \
+  --package-set product/src/proto/lfs_optimize/m9-package-set.json \
+  --versions product/src/proto/lfs_optimize/versions/m9-development.json
+```
+
+NetworkManager carries the BLFS systemd session-tracking build policy, minimal
+keyfile configuration, service enablement, and the explicit interface-ownership
+boundary with systemd-networkd. IceWM carries its required CMake/imlib2/X11
+environment dependency and the `icewm-session` runtime integration.
+
+This does not yet close M9. The next work is dependency closure, X11 realization,
+and extension of the booted guest harness so acceptance proves a managed network
+interface and a real IceWM graphical session.
