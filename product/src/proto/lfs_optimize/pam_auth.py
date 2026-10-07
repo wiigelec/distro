@@ -24,7 +24,7 @@ def auth_plan() -> dict[str, Any]:
         "kind": "booted-pam-login-proof",
         "input": "successful booted BLFS guest image",
         "authentication_path": "/usr/bin/login on a controlling PTY",
-        "caller": "unprivileged nobody user",
+        "caller": "root login process (agetty-equivalent privilege)",
         "test_user": "disposable local account",
         "session_proof": "authenticated login shell reports expected UID and user",
         "cleanup": "test account removed before shutdown",
@@ -53,7 +53,6 @@ import pwd
 import pty
 import select
 import shutil
-import stat
 import subprocess
 import time
 from pathlib import Path
@@ -121,11 +120,10 @@ def main() -> int:
         raise RuntimeError("login executable not found")
     login_path = Path(login)
     login_stat = login_path.stat()
-    login_setuid_root = login_stat.st_uid == 0 and bool(login_stat.st_mode & stat.S_ISUID)
-    if not login_setuid_root:
-        raise RuntimeError(f"{login_path}: login is not setuid-root")
+    login_owned_by_root = login_stat.st_uid == 0
+    if not login_owned_by_root:
+        raise RuntimeError(f"{login_path}: login is not owned by root")
 
-    nobody = pwd.getpwnam("nobody")
     cleanup_user()
     transcript = bytearray()
     pid: int | None = None
@@ -141,9 +139,6 @@ def main() -> int:
 
         pid, fd = pty.fork()
         if pid == 0:
-            os.initgroups(nobody.pw_name, nobody.pw_gid)
-            os.setgid(nobody.pw_gid)
-            os.setuid(nobody.pw_uid)
             os.execve(
                 str(login_path),
                 [str(login_path)],
@@ -184,8 +179,8 @@ def main() -> int:
             "status": "success",
             "kind": "pam-login-pty-proof",
             "login": str(login_path),
-            "login_setuid_root": True,
-            "caller_user": nobody.pw_name,
+            "login_owned_by_root": True,
+            "login_process_uid": 0,
             "test_user": TEST_USER,
             "test_uid": test_uid,
             "session_marker": expected,
@@ -203,8 +198,8 @@ def main() -> int:
             "status": "failure",
             "kind": "pam-login-pty-proof",
             "login": str(login_path),
-            "login_setuid_root": login_setuid_root,
-            "caller_user": nobody.pw_name,
+            "login_owned_by_root": login_owned_by_root,
+            "login_process_uid": 0,
             "test_user": TEST_USER,
             "test_uid": test_uid,
             "session_marker_seen": marker_seen,

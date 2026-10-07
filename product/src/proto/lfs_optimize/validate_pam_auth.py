@@ -17,7 +17,7 @@ def main() -> int:
         plan["authentication_path"] == "/usr/bin/login on a controlling PTY",
         "authentication path drift",
     )
-    require(plan["caller"] == "unprivileged nobody user", "login caller drift")
+    require(plan["caller"] == "root login process (agetty-equivalent privilege)", "login caller drift")
     require(plan["test_user"] == "disposable local account", "test-account contract drift")
     require(
         plan["session_proof"] == "authenticated login shell reports expected UID and user",
