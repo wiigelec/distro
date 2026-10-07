@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "name": "xorgproto",
+  "reference": {
+    "blfs_section": "xorgproto",
+    "edition": "13.1-systemd"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "mkdir build && cd build && meson setup --prefix=/usr .."
+        }
+      ]
+    },
+    {
+      "phase": "build",
+      "working_directory": "build",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "ninja"
+        }
+      ]
+    },
+    {
+      "phase": "install",
+      "working_directory": "build",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "ninja install && mv -v /usr/share/doc/xorgproto{,-{version}}"
+        }
+      ]
+    }
+  ],
+  "description": "xorgproto provides protocol headers required by the X Window stack.",
+  "dependencies": {
+    "build": [
+      "util-macros"
+    ],
+    "runtime": [],
+    "test": [],
+    "before": [
+      "libXau",
+      "libXdmcp"
+    ],
+    "recommended": [],
+    "optional": [
+      "fop",
+      "libxslt",
+      "xmlto",
+      "asciidoc"
+    ]
+  },
+  "installed": {
+    "programs": [],
+    "libraries": [],
+    "directories": [
+      "/usr/include/GL",
+      "/usr/include/X11",
+      "/usr/share/doc/xorgproto-{version}"
+    ]
+  }
+}

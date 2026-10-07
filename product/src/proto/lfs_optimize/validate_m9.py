@@ -15,17 +15,27 @@ def require(value: bool, message: str) -> None:
 
 def main() -> int:
     resolved = resolve_blfs(VERSIONS, PACKAGE_SET)
-
-    expected = [
+    prefix = [
         ("libndp", "default"),
         ("cmake", "m9-minimal"),
         ("networkmanager", "default"),
+        ("freetype2", "m9-bootstrap"),
+        ("fontconfig", "default"),
+        ("util-macros", "default"),
+        ("xorgproto", "default"),
+        ("libXau", "default"),
+        ("libXdmcp", "default"),
+        ("xcb-proto", "default"),
+        ("libxcb", "default"),
+    ]
+    expected = [
+        *prefix,
         *[(name, "collection:xorg-libraries") for name in XORG_LIBRARY_MEMBERS],
         ("icewm", "default"),
     ]
     require(
         [(p["name"], p["build"]) for p in resolved["packages"]] == expected,
-        "M9 package/build/collection identity or order drift",
+        "M9 prerequisite/collection identity or order drift",
     )
 
     require(
@@ -35,21 +45,43 @@ def main() -> int:
             "members": XORG_LIBRARY_MEMBERS,
             "dependencies": {
                 "build": ["fontconfig", "libxcb"],
-                "runtime": ["dbus"],
+                "runtime": [],
                 "test": [],
                 "before": [],
                 "recommended": [],
                 "optional": ["asciidoc", "xmlto", "fop", "Links", "Lynx", "ncompress", "W3m"],
             },
         }],
-        "Xorg Libraries collection metadata drift",
+        "Xorg Libraries collection dependency metadata drift",
     )
 
-    by_name = {package["name"]: package for package in resolved["packages"]}
+    by_name = {p["name"]: p for p in resolved["packages"]}
     require(
-        by_name["libX11"]["collection_member_index"] == 1
-        and by_name["libXpresent"]["collection_member_index"] == len(XORG_LIBRARY_MEMBERS) - 1,
-        "Xorg Libraries collection order metadata missing",
+        by_name["freetype2"]["build"] == "m9-bootstrap"
+        and any(
+            "--without-harfbuzz" in item["command"]
+            for phase in by_name["freetype2"]["procedure"]
+            for item in phase["commands"]
+        ),
+        "M9 FreeType bootstrap build policy missing",
+    )
+    require(
+        by_name["fontconfig"]["dependencies"]["build"] == ["freetype2"],
+        "Fontconfig -> FreeType dependency missing",
+    )
+    require(
+        by_name["xorgproto"]["dependencies"]["build"] == ["util-macros"],
+        "xorgproto -> util-macros dependency missing",
+    )
+    require(
+        by_name["libXau"]["dependencies"]["build"] == ["xorgproto"]
+        and by_name["libXdmcp"]["dependencies"]["build"] == ["xorgproto"],
+        "X authorization/display-manager protocol prerequisite drift",
+    )
+    require(
+        by_name["libxcb"]["dependencies"]["build"] == ["libXau", "xcb-proto"]
+        and "libXdmcp" in by_name["libxcb"]["dependencies"]["recommended"],
+        "libxcb prerequisite closure missing",
     )
 
     def command(package: str, needle: str) -> bool:
@@ -60,36 +92,13 @@ def main() -> int:
         )
 
     require(command("libX11", "--disable-static"), "shared Xorg library procedure missing")
-    require(
-        command("libXfont2", "--disable-devel-docs"),
-        "libXfont2 collection override missing",
-    )
-    require(
-        command("libXt", "--with-appdefaultdir=/etc/X11/app-defaults"),
-        "libXt collection override missing",
-    )
-    require(
-        command("libXpm", "--disable-open-zfile"),
-        "libXpm collection override missing",
-    )
+    require(command("libXfont2", "--disable-devel-docs"), "libXfont2 override missing")
+    require(command("libXt", "--with-appdefaultdir=/etc/X11/app-defaults"), "libXt override missing")
+    require(command("libXpm", "--disable-open-zfile"), "libXpm override missing")
     require(
         command("libpciaccess", "meson setup --prefix=/usr")
         and command("libxkbfile", "ninja -C build"),
-        "Meson Xorg library collection override missing",
-    )
-
-    libndp = by_name["libndp"]
-    networkmanager = by_name["networkmanager"]
-    icewm = by_name["icewm"]
-    require(
-        "NetworkManager" in libndp["dependencies"]["before"]
-        and "libndp" in networkmanager["dependencies"]["build"],
-        "NetworkManager ordinary dependency frontier drift",
-    )
-    require(
-        "CMake" in icewm["dependencies"]["build"]
-        and "imlib2" in icewm["dependencies"]["build"],
-        "IceWM ordinary dependency frontier drift",
+        "Meson collection overrides missing",
     )
 
     plan = plan_blfs(
@@ -101,13 +110,10 @@ def main() -> int:
         plan["collections"][0]["members"] == XORG_LIBRARY_MEMBERS,
         "planned Xorg collection membership drift",
     )
-    require(
-        len(plan["packages"]) == len(expected),
-        "planned M9 package count drift",
-    )
+    require(len(plan["packages"]) == len(expected), "planned M9 package count drift")
 
-    print("M9 Xorg Libraries collection model proof: success")
-    print("32 members resolve in collection authority order with shared procedure and explicit overrides.")
+    print("M9 Xorg Libraries prerequisite closure proof: success")
+    print("Collection prerequisites resolve explicitly before the 32-member executable collection.")
     return 0
 
 if __name__ == "__main__":

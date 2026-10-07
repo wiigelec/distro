@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "name": "fontconfig",
+  "reference": {
+    "blfs_section": "fontconfig",
+    "edition": "13.1-systemd"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-docs --docdir=/usr/share/doc/fontconfig-{version}"
+        }
+      ]
+    },
+    {
+      "phase": "build",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "make"
+        }
+      ]
+    },
+    {
+      "phase": "test",
+      "working_directory": "source",
+      "condition": "tests-enabled",
+      "commands": [
+        {
+          "user": "root",
+          "command": "make check"
+        }
+      ]
+    },
+    {
+      "phase": "install",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "make install"
+        }
+      ]
+    }
+  ],
+  "description": "Fontconfig provides font discovery and configuration used by the Xorg library stack.",
+  "dependencies": {
+    "build": [
+      "freetype2"
+    ],
+    "runtime": [
+      "freetype2"
+    ],
+    "test": [],
+    "before": [
+      "xorg-libraries"
+    ],
+    "recommended": [],
+    "optional": [
+      "bubblewrap",
+      "cURL",
+      "libarchive",
+      "json-c",
+      "docbook-utils",
+      "libxml2",
+      "texlive"
+    ]
+  },
+  "installed": {
+    "programs": [
+      "fc-cache",
+      "fc-cat",
+      "fc-conflist",
+      "fc-list",
+      "fc-match",
+      "fc-pattern",
+      "fc-query",
+      "fc-scan",
+      "fc-validate"
+    ],
+    "libraries": [
+      "libfontconfig.so"
+    ],
+    "directories": [
+      "/etc/fonts",
+      "/usr/include/fontconfig",
+      "/usr/share/fontconfig",
+      "/usr/share/xml/fontconfig",
+      "/var/cache/fontconfig"
+    ]
+  }
+}

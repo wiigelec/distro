@@ -346,6 +346,86 @@
         "home": "https://www.x.org/",
         "mirror": "direct"
       }
+    },
+    "freetype2": {
+      "version": "2.14.3",
+      "source": {
+        "url": "https://downloads.sourceforge.net/freetype/freetype-2.14.3.tar.xz",
+        "md5": "5e78e6fdce5a61d3075e4c25e9852f84",
+        "size": "2.6 MB",
+        "home": "https://freetype.org/",
+        "mirror": "direct"
+      }
+    },
+    "fontconfig": {
+      "version": "2.18.3",
+      "source": {
+        "url": "https://gitlab.freedesktop.org/api/v4/projects/890/packages/generic/fontconfig/2.18.3/fontconfig-2.18.3.tar.xz",
+        "md5": "ce819e229ca6fb7d1be47a192d6681a3",
+        "size": "1.2 MB",
+        "home": "https://www.freedesktop.org/wiki/Software/fontconfig/",
+        "mirror": "direct"
+      }
+    },
+    "util-macros": {
+      "version": "1.20.2",
+      "source": {
+        "url": "https://www.x.org/pub/individual/util/util-macros-1.20.2.tar.xz",
+        "md5": "5f683a1966834b0a6ae07b3680bcb863",
+        "size": "84 KB",
+        "home": "https://www.x.org/",
+        "mirror": "direct"
+      }
+    },
+    "xorgproto": {
+      "version": "2025.1",
+      "source": {
+        "url": "https://xorg.freedesktop.org/archive/individual/proto/xorgproto-2025.1.tar.xz",
+        "md5": "15534fa6fb13a6a70afe7561c1424f3c",
+        "size": "752 KB",
+        "home": "https://www.x.org/",
+        "mirror": "direct"
+      }
+    },
+    "libXau": {
+      "version": "1.0.12",
+      "source": {
+        "url": "https://www.x.org/pub/individual/lib/libXau-1.0.12.tar.xz",
+        "md5": "4c9f81acf00b62e5de56a912691bd737",
+        "size": "276 KB",
+        "home": "https://www.x.org/",
+        "mirror": "direct"
+      }
+    },
+    "libXdmcp": {
+      "version": "1.1.5",
+      "source": {
+        "url": "https://www.x.org/pub/individual/lib/libXdmcp-1.1.5.tar.xz",
+        "md5": "ce0af51de211e4c99a111e64ae1df290",
+        "size": "292 KB",
+        "home": "https://www.x.org/",
+        "mirror": "direct"
+      }
+    },
+    "xcb-proto": {
+      "version": "1.17.0",
+      "source": {
+        "url": "https://xorg.freedesktop.org/archive/individual/proto/xcb-proto-1.17.0.tar.xz",
+        "md5": "c415553d2ee1a8cea43c3234a079b53f",
+        "size": "152 KB",
+        "home": "https://www.x.org/",
+        "mirror": "direct"
+      }
+    },
+    "libxcb": {
+      "version": "1.17.0",
+      "source": {
+        "url": "https://xorg.freedesktop.org/archive/individual/lib/libxcb-1.17.0.tar.xz",
+        "md5": "96565523e9f9b701fcb35d31f1d4086e",
+        "size": "448 KB",
+        "home": "https://www.x.org/",
+        "mirror": "direct"
+      }
     }
   }
 }

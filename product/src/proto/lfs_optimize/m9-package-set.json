@@ -9,6 +9,17 @@
     },
     "networkmanager",
     {
+      "name": "freetype2",
+      "build": "m9-bootstrap"
+    },
+    "fontconfig",
+    "util-macros",
+    "xorgproto",
+    "libXau",
+    "libXdmcp",
+    "xcb-proto",
+    "libxcb",
+    {
       "collection": "xorg-libraries"
     },
     "icewm"

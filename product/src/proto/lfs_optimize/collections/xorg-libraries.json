@@ -11,9 +11,7 @@
       "fontconfig",
       "libxcb"
     ],
-    "runtime": [
-      "dbus"
-    ],
+    "runtime": [],
     "test": [],
     "before": [],
     "recommended": [],
