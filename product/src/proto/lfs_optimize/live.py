@@ -30,6 +30,7 @@ from execute import (
 )
 
 LIVE_EXCLUDED_PREFIXES = (
+    "opt/distro-lfs-optimize",
     "var/cache/distro-lfs-optimize",
     "var/lib/distro-m8",
 )
