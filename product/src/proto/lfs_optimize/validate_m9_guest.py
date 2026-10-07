@@ -45,6 +45,15 @@ def main() -> int:
         and "DejaVu" in desktop["font"],
         "M9 IceWM acceptance contract drift",
     )
+    require(
+        plan["superseded_proof_units"]
+        == [
+            "distro-boot-proof.service",
+            "distro-blfs-proof.service",
+            "distro-pam-login-proof.service",
+        ],
+        "M9 must disable all earlier proof units before boot",
+    )
     require(GUEST_MARKER_OK == "DISTRO_DESKTOP_PROOF_OK", "M9 success marker drift")
 
     print("M9 guest acceptance contract: success")

@@ -58,6 +58,11 @@ def guest_plan() -> dict[str, Any]:
         },
         "success_marker": GUEST_MARKER_OK,
         "failure_marker": GUEST_MARKER_FAILED,
+        "superseded_proof_units": [
+            "distro-boot-proof.service",
+            "distro-blfs-proof.service",
+            "distro-pam-login-proof.service",
+        ],
     }
 
 
@@ -137,7 +142,11 @@ def inject_runner(root: Path) -> None:
     wants = unit_dir / "multi-user.target.wants"
     wants.mkdir(parents=True, exist_ok=True)
 
-    for old in ("distro-boot-proof.service", "distro-blfs-proof.service"):
+    for old in (
+        "distro-boot-proof.service",
+        "distro-blfs-proof.service",
+        "distro-pam-login-proof.service",
+    ):
         (wants / old).unlink(missing_ok=True)
         (unit_dir / old).unlink(missing_ok=True)
 
