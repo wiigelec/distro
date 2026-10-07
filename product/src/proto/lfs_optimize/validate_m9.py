@@ -15,18 +15,33 @@ def main() -> int:
     resolved = resolve_blfs(VERSIONS, PACKAGE_SET)
     require(
         [(p["name"], p["build"]) for p in resolved["packages"]]
-        == [("networkmanager", "default"), ("icewm", "default")],
-        "M9 target package identity or order drift",
+        == [
+            ("libndp", "default"),
+            ("cmake", "m9-minimal"),
+            ("networkmanager", "default"),
+            ("icewm", "default"),
+        ],
+        "M9 package/build identity or order drift",
     )
-    networkmanager, icewm = resolved["packages"]
 
-    require("libndp" in networkmanager["dependencies"]["build"],
-            "NetworkManager libndp requirement missing")
-    require("systemd" in networkmanager["dependencies"]["runtime"],
-            "NetworkManager systemd runtime relationship missing")
+    libndp, cmake, networkmanager, icewm = resolved["packages"]
+
+    require(
+        "NetworkManager" in libndp["dependencies"]["before"],
+        "libndp -> NetworkManager ordering relationship missing",
+    )
+    require(
+        "libndp" in networkmanager["dependencies"]["build"],
+        "NetworkManager libndp requirement missing",
+    )
+    require(
+        "systemd" in networkmanager["dependencies"]["runtime"],
+        "NetworkManager systemd runtime relationship missing",
+    )
     require(
         networkmanager["integration"]["network_management"]["manager"] == "NetworkManager"
-        and "systemd-networkd" in networkmanager["integration"]["network_management"]["exclusive_with"],
+        and "systemd-networkd"
+        in networkmanager["integration"]["network_management"]["exclusive_with"],
         "NetworkManager/systemd-networkd ownership boundary missing",
     )
 
@@ -42,28 +57,67 @@ def main() -> int:
         "IceWM X11 session integration missing",
     )
 
-    plan = plan_blfs(run_tests=True, versions_path=VERSIONS, package_set_path=PACKAGE_SET)
-    nm_commands = plan["packages"][0]["commands"]
-    icewm_commands = plan["packages"][1]["commands"]
+    plan = plan_blfs(
+        run_tests=True,
+        versions_path=VERSIONS,
+        package_set_path=PACKAGE_SET,
+    )
+    cmake_commands = plan["packages"][1]["commands"]
+    nm_commands = plan["packages"][2]["commands"]
+    icewm_commands = plan["packages"][3]["commands"]
 
-    require(any("-D session_tracking=systemd" in x["command"] and "-D nmtui=true" in x["command"]
-                for x in nm_commands),
-            "NetworkManager systemd/nmtui build policy missing")
-    require(any("/etc/NetworkManager/NetworkManager.conf" in x["command"]
-                and "plugins=keyfile" in x["command"] for x in nm_commands),
-            "NetworkManager base configuration missing")
-    require(any(x.get("kind") == "session-transition"
-                and x["command"] == "systemctl enable NetworkManager"
-                for x in nm_commands),
-            "NetworkManager service enable transition missing")
-    require(any("ENABLE_LTO=ON" in x["command"] for x in icewm_commands),
-            "IceWM required LTO build option missing")
-    require(any(x["command"] == "rm -v /usr/share/xsessions/icewm.desktop"
-                for x in icewm_commands),
-            "IceWM duplicate X session cleanup missing")
+    required_bundled = (
+        "--no-system-curl",
+        "--no-system-libarchive",
+        "--no-system-libuv",
+        "--no-system-nghttp2",
+    )
+    require(
+        any(
+            all(flag in item["command"] for flag in required_bundled)
+            for item in cmake_commands
+        ),
+        "M9 CMake bundled-dependency build policy missing",
+    )
 
-    print("M9 NetworkManager/IceWM target model proof: success")
-    print("Runtime acceptance remains open pending dependency closure and booted guest proof.")
+    require(
+        any(
+            "-D session_tracking=systemd" in item["command"]
+            and "-D nmtui=true" in item["command"]
+            for item in nm_commands
+        ),
+        "NetworkManager reference build policy missing",
+    )
+    require(
+        any(
+            "/etc/NetworkManager/NetworkManager.conf" in item["command"]
+            and "plugins=keyfile" in item["command"]
+            for item in nm_commands
+        ),
+        "NetworkManager base configuration missing",
+    )
+    require(
+        any(
+            item.get("kind") == "session-transition"
+            and item["command"] == "systemctl enable NetworkManager"
+            for item in nm_commands
+        ),
+        "NetworkManager service enable transition missing",
+    )
+    require(
+        any("ENABLE_LTO=ON" in item["command"] for item in icewm_commands),
+        "IceWM required LTO build option missing",
+    )
+    require(
+        any(
+            item["command"] == "rm -v /usr/share/xsessions/icewm.desktop"
+            for item in icewm_commands
+        ),
+        "IceWM duplicate X session cleanup missing",
+    )
+
+    print("M9 ordinary dependency frontier proof: success")
+    print("libndp and CMake are explicit; Xorg collection semantics remain the next frontier.")
     return 0
 
 if __name__ == "__main__":

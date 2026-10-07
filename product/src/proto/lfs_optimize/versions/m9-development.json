@@ -3,6 +3,34 @@
   "name": "blfs-m9-development",
   "basis": "BLFS r13.1-292 systemd, 2026-09-30",
   "packages": {
+    "libndp": {
+      "version": "1.9",
+      "source": {
+        "url": "http://libndp.org/files/libndp-1.9.tar.gz",
+        "md5": "9d486750569e7025e5d0afdcc509b93c",
+        "size": "368 KB",
+        "home": "http://libndp.org/",
+        "mirror": "direct"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "2.5 MB"
+      }
+    },
+    "cmake": {
+      "version": "4.4.2",
+      "source": {
+        "url": "https://cmake.org/files/v4.4/cmake-4.4.2.tar.gz",
+        "md5": "6911f0379d901db23619413f092b99ef",
+        "size": "13 MB",
+        "home": "https://cmake.org/",
+        "mirror": "direct"
+      },
+      "reference_metrics": {
+        "build_time": "2.2 SBU (add 4.3 SBU for tests, both using parallelism=4)",
+        "disk_space": "2.3 GB (with tests)"
+      }
+    },
     "networkmanager": {
       "version": "1.58.1",
       "source": {

@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "name": "cmake",
+  "reference": {
+    "blfs_section": "cmake",
+    "edition": "13.1-systemd"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "sed -i '/\"lib64\"/s/64//' Modules/GNUInstallDirs.cmake"
+        }
+      ]
+    },
+    {
+      "phase": "configure",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "./bootstrap --prefix=/usr        \\\n            --system-libs        \\\n            --mandir=/share/man  \\\n            --no-system-jsoncpp  \\\n            --no-system-cppdap   \\\n            --no-system-librhash \\\n            --docdir=/share/doc/cmake-{version}"
+        }
+      ]
+    },
+    {
+      "phase": "build",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "make"
+        }
+      ]
+    },
+    {
+      "phase": "test",
+      "working_directory": "source",
+      "condition": "tests-enabled",
+      "commands": [
+        {
+          "user": "root",
+          "command": "bin/ctest -j$(nproc)"
+        }
+      ]
+    },
+    {
+      "phase": "install",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "make install"
+        }
+      ]
+    }
+  ],
+  "description": "CMake provides a platform-independent build-system generator used by IceWM and many BLFS packages.",
+  "dependencies": {
+    "build": [],
+    "runtime": [],
+    "test": [],
+    "before": [
+      "IceWM"
+    ],
+    "recommended": [
+      "cURL",
+      "libarchive",
+      "libuv",
+      "nghttp2"
+    ],
+    "optional": [
+      "GCC",
+      "git",
+      "mercurial",
+      "OpenJDK",
+      "Qt",
+      "sphinx",
+      "Subversion",
+      "cppdap",
+      "jsoncpp",
+      "rhash"
+    ]
+  },
+  "installed": {
+    "programs": [
+      "ccmake",
+      "cmake",
+      "cpack",
+      "ctest"
+    ],
+    "libraries": [],
+    "directories": [
+      "/usr/share/cmake-4.4",
+      "/usr/share/doc/cmake-{version}"
+    ]
+  }
+}

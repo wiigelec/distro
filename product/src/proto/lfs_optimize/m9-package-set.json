@@ -2,6 +2,11 @@
   "schema_version": 1,
   "name": "blfs-networkmanager-icewm-target-proof",
   "packages": [
+    "libndp",
+    {
+      "name": "cmake",
+      "build": "m9-minimal"
+    },
     "networkmanager",
     "icewm"
   ]
