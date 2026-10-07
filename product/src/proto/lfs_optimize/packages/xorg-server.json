@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "name": "xorg-server",
+  "reference": {
+    "blfs_section": "xorg-server",
+    "edition": "13.1-systemd"
+  },
+  "procedure": [
+    {
+      "phase": "prepare",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "patch -Np1 -i ../xorg-server-{version}-tearfree_backport-1.patch"
+        }
+      ]
+    },
+    {
+      "phase": "configure",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "mkdir build && cd build && meson setup .. --prefix=/usr --localstatedir=/var -D glamor=true -D xkb_output_dir=/var/lib/xkb"
+        }
+      ]
+    },
+    {
+      "phase": "build",
+      "working_directory": "build",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "ninja"
+        }
+      ]
+    },
+    {
+      "phase": "test",
+      "working_directory": "build",
+      "condition": "tests-enabled",
+      "commands": [
+        {
+          "user": "root",
+          "command": "/sbin/ldconfig && ninja test"
+        }
+      ]
+    },
+    {
+      "phase": "install",
+      "working_directory": "build",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "ninja install && mkdir -pv /etc/X11/xorg.conf.d"
+        }
+      ]
+    }
+  ],
+  "description": "Xorg Server is the core X Window System server.",
+  "dependencies": {
+    "build": [
+      "xorg-libraries",
+      "libxcvt",
+      "pixman",
+      "font-util"
+    ],
+    "runtime": [
+      "xkeyboard-config",
+      "systemd"
+    ],
+    "test": [],
+    "before": [],
+    "recommended": [
+      "libepoxy",
+      "libtirpc",
+      "xorg-libinput"
+    ],
+    "optional": [
+      "acpid",
+      "doxygen",
+      "fop",
+      "libunwind",
+      "nettle",
+      "libgcrypt",
+      "XCB Utilities",
+      "xmlto",
+      "rendercheck",
+      "xorg-sgml-doctools"
+    ]
+  },
+  "kernel_requirements": {
+    "graphics": [
+      "CONFIG_DRM",
+      "a usable DRM driver for graphical modesetting, or use Xvfb for the M9 headless proof"
+    ]
+  },
+  "installed": {
+    "programs": [
+      "gtf",
+      "X",
+      "Xnest",
+      "Xorg",
+      "Xvfb"
+    ],
+    "libraries": [
+      "modesetting_drv.so"
+    ],
+    "directories": [
+      "/etc/X11/xorg.conf.d",
+      "/usr/include/xorg",
+      "/usr/lib/xorg",
+      "/usr/share/X11/xorg.conf.d"
+    ]
+  }
+}

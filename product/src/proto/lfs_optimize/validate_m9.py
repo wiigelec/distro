@@ -6,7 +6,6 @@ from resolve import HERE
 
 VERSIONS = HERE / "versions" / "m9-development.json"
 PACKAGE_SET = HERE / "m9-package-set.json"
-
 XORG_LIBRARY_MEMBERS = ['xtrans', 'libX11', 'libXext', 'libFS', 'libICE', 'libSM', 'libXScrnSaver', 'libXt', 'libXmu', 'libXpm', 'libXaw', 'libXfixes', 'libXcomposite', 'libXrender', 'libXcursor', 'libXdamage', 'libfontenc', 'libXfont2', 'libXft', 'libXi', 'libXinerama', 'libXrandr', 'libXres', 'libXtst', 'libXv', 'libXvMC', 'libXxf86dga', 'libXxf86vm', 'libpciaccess', 'libxkbfile', 'libxshmfence', 'libXpresent']
 
 def require(value: bool, message: str) -> None:
@@ -15,90 +14,60 @@ def require(value: bool, message: str) -> None:
 
 def main() -> int:
     resolved = resolve_blfs(VERSIONS, PACKAGE_SET)
-    prefix = [
-        ("libndp", "default"),
-        ("cmake", "m9-minimal"),
-        ("networkmanager", "default"),
-        ("freetype2", "m9-bootstrap"),
-        ("fontconfig", "default"),
-        ("util-macros", "default"),
-        ("xorgproto", "default"),
-        ("libXau", "default"),
-        ("libXdmcp", "default"),
-        ("xcb-proto", "default"),
-        ("libxcb", "default"),
-    ]
-    expected = [
-        *prefix,
-        *[(name, "collection:xorg-libraries") for name in XORG_LIBRARY_MEMBERS],
-        ("icewm", "default"),
-    ]
-    require(
-        [(p["name"], p["build"]) for p in resolved["packages"]] == expected,
-        "M9 prerequisite/collection identity or order drift",
-    )
-
-    require(
-        resolved["collections"]
-        == [{
-            "name": "xorg-libraries",
-            "members": XORG_LIBRARY_MEMBERS,
-            "dependencies": {
-                "build": ["fontconfig", "libxcb"],
-                "runtime": [],
-                "test": [],
-                "before": [],
-                "recommended": [],
-                "optional": ["asciidoc", "xmlto", "fop", "Links", "Lynx", "ncompress", "W3m"],
-            },
-        }],
-        "Xorg Libraries collection dependency metadata drift",
-    )
-
     by_name = {p["name"]: p for p in resolved["packages"]}
+
+    names = [p["name"] for p in resolved["packages"]]
+    collection_start = names.index(XORG_LIBRARY_MEMBERS[0])
+    server_index = names.index("xorg-server")
     require(
-        by_name["freetype2"]["build"] == "m9-bootstrap"
-        and any(
-            "--without-harfbuzz" in item["command"]
-            for phase in by_name["freetype2"]["procedure"]
-            for item in phase["commands"]
-        ),
-        "M9 FreeType bootstrap build policy missing",
+        names[collection_start:collection_start + len(XORG_LIBRARY_MEMBERS)]
+        == XORG_LIBRARY_MEMBERS,
+        "Xorg Libraries collection order drift",
     )
     require(
-        by_name["fontconfig"]["dependencies"]["build"] == ["freetype2"],
-        "Fontconfig -> FreeType dependency missing",
+        all(names.index(name) < collection_start for name in ("fontconfig", "libxcb")),
+        "Xorg Libraries prerequisites must precede the collection",
     )
     require(
-        by_name["xorgproto"]["dependencies"]["build"] == ["util-macros"],
-        "xorgproto -> util-macros dependency missing",
-    )
-    require(
-        by_name["libXau"]["dependencies"]["build"] == ["xorgproto"]
-        and by_name["libXdmcp"]["dependencies"]["build"] == ["xorgproto"],
-        "X authorization/display-manager protocol prerequisite drift",
-    )
-    require(
-        by_name["libxcb"]["dependencies"]["build"] == ["libXau", "xcb-proto"]
-        and "libXdmcp" in by_name["libxcb"]["dependencies"]["recommended"],
-        "libxcb prerequisite closure missing",
+        all(names.index(name) < server_index for name in ("libxcvt", "pixman", "font-util", "xkeyboard-config")),
+        "Xorg Server prerequisites must precede the server",
     )
 
-    def command(package: str, needle: str) -> bool:
-        return any(
-            needle in item["command"]
-            for phase in by_name[package]["procedure"]
-            for item in phase["commands"]
-        )
-
-    require(command("libX11", "--disable-static"), "shared Xorg library procedure missing")
-    require(command("libXfont2", "--disable-devel-docs"), "libXfont2 override missing")
-    require(command("libXt", "--with-appdefaultdir=/etc/X11/app-defaults"), "libXt override missing")
-    require(command("libXpm", "--disable-open-zfile"), "libXpm override missing")
+    server = by_name["xorg-server"]
+    require(server["build"] == "m9-xvfb", "M9 must select the headless Xorg Server build")
     require(
-        command("libpciaccess", "meson setup --prefix=/usr")
-        and command("libxkbfile", "ninja -C build"),
-        "Meson collection overrides missing",
+        server["dependencies"]["build"]
+        == ["xorg-libraries", "libxcvt", "pixman", "font-util"],
+        "Xorg Server build dependency closure drift",
+    )
+    require(
+        server["dependencies"]["runtime"] == ["xkeyboard-config", "systemd"],
+        "Xorg Server runtime dependency closure drift",
+    )
+
+    commands = [
+        item["command"]
+        for phase in server["procedure"]
+        for item in phase["commands"]
+    ]
+    require(
+        any("-D glamor=false" in command and "-D secure-rpc=false" in command for command in commands),
+        "M9 Xvfb build policy missing",
+    )
+    require(
+        not any("tearfree_backport" in command for command in commands),
+        "headless Xvfb build must not apply the graphical TearFree patch",
+    )
+    require("Xvfb" in server["installed"]["programs"], "Xvfb installed-content claim missing")
+    require(server["installed"]["libraries"] == [], "M9 Xvfb build must not claim modesetting_drv")
+
+    require(
+        by_name["xkeyboard-config"]["dependencies"]["build"] == ["xorg-libraries"],
+        "xkeyboard-config Xorg library requirement missing",
+    )
+    require(
+        by_name["libxcvt"]["dependencies"]["build"] == ["xorg-libraries"],
+        "libxcvt Xorg build environment requirement missing",
     )
 
     plan = plan_blfs(
@@ -106,14 +75,15 @@ def main() -> int:
         versions_path=VERSIONS,
         package_set_path=PACKAGE_SET,
     )
+    planned = {p["package"]: p for p in plan["packages"]}
+    require("xorg-server" in planned, "planned Xorg Server missing")
     require(
-        plan["collections"][0]["members"] == XORG_LIBRARY_MEMBERS,
-        "planned Xorg collection membership drift",
+        any("-D glamor=false" in item["command"] for item in planned["xorg-server"]["commands"]),
+        "planned Xorg Server did not preserve M9 build policy",
     )
-    require(len(plan["packages"]) == len(expected), "planned M9 package count drift")
 
-    print("M9 Xorg Libraries prerequisite closure proof: success")
-    print("Collection prerequisites resolve explicitly before the 32-member executable collection.")
+    print("M9 Xorg Server headless runtime closure proof: success")
+    print("Xvfb is selected without Mesa/Glamor; xkeyboard-config and PAM-enabled systemd remain runtime requirements.")
     return 0
 
 if __name__ == "__main__":

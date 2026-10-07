@@ -22,6 +22,14 @@
     {
       "collection": "xorg-libraries"
     },
+    "libxcvt",
+    "pixman",
+    "font-util",
+    "xkeyboard-config",
+    {
+      "name": "xorg-server",
+      "build": "m9-xvfb"
+    },
     "icewm"
   ]
 }
