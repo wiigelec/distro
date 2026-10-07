@@ -30,6 +30,8 @@
       "name": "xorg-server",
       "build": "m9-xvfb"
     },
+    "xinit",
+    "imlib2",
     "icewm"
   ]
 }

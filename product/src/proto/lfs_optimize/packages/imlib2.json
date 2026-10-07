@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "name": "imlib2",
+  "reference": {
+    "blfs_section": "imlib2",
+    "edition": "13.1-systemd"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "./configure --prefix=/usr --disable-static"
+        }
+      ]
+    },
+    {
+      "phase": "build",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "make"
+        }
+      ]
+    },
+    {
+      "phase": "install",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "make install"
+        }
+      ]
+    }
+  ],
+  "description": "imlib2 is the graphics library required by IceWM.",
+  "dependencies": {
+    "build": [
+      "xorg-libraries"
+    ],
+    "runtime": [
+      "xorg-libraries"
+    ],
+    "test": [],
+    "before": [
+      "icewm"
+    ],
+    "recommended": [
+      "giflib",
+      "librsvg"
+    ],
+    "optional": [
+      "doxygen",
+      "highway",
+      "libheif",
+      "libjpeg-turbo",
+      "libjxl",
+      "libpng",
+      "tiff",
+      "libwebp",
+      "libid3tag",
+      "libspectre"
+    ]
+  },
+  "installed": {
+    "programs": [
+      "imlib2_bumpmap",
+      "imlib2_colorspace",
+      "imlib2_conv",
+      "imlib2_grab",
+      "imlib2_load",
+      "imlib2_poly",
+      "imlib2_show",
+      "imlib2_test",
+      "imlib2_view"
+    ],
+    "libraries": [
+      "libImlib2.so"
+    ],
+    "directories": [
+      "/usr/lib/imlib2",
+      "/usr/share/doc/imlib2-{version}",
+      "/usr/share/imlib2"
+    ]
+  }
+}

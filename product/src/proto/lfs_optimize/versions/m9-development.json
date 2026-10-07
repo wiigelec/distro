@@ -485,6 +485,34 @@
         "build_time": "0.3 SBU (using parallelism=4; with tests)",
         "disk_space": "199 MB (with tests)"
       }
+    },
+    "xinit": {
+      "version": "1.4.4",
+      "source": {
+        "url": "https://www.x.org/pub/individual/app/xinit-1.4.4.tar.xz",
+        "md5": "e7430a710261c9129b1280f26cb159a5",
+        "size": "160 KB",
+        "home": "https://www.x.org/",
+        "mirror": "direct"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "1.4 MB"
+      }
+    },
+    "imlib2": {
+      "version": "1.12.6",
+      "source": {
+        "url": "https://downloads.sourceforge.net/enlightenment/imlib2-1.12.6.tar.xz",
+        "md5": "8c66b4dabc52225562324be5a994accf",
+        "size": "828 KB",
+        "home": "https://sourceforge.net/projects/enlightenment/",
+        "mirror": "direct"
+      },
+      "reference_metrics": {
+        "build_time": "0.2 SBU (with docs)",
+        "disk_space": "20 MB (with docs)"
+      }
     }
   }
 }

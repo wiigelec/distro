@@ -47,21 +47,19 @@
   "description": "IceWM is a lightweight X11 window manager focused on speed and simplicity.",
   "dependencies": {
     "build": [
-      "CMake",
+      "cmake",
       "imlib2",
-      "graphical environment"
+      "xorg-libraries"
     ],
     "runtime": [
-      "graphical environment"
+      "xorg-server"
     ],
-    "test": [
-      "No working test suite"
-    ],
+    "test": [],
     "before": [],
     "recommended": [],
     "optional": [
       "asciidoc",
-      "FriBidi",
+      "fribidi",
       "librsvg",
       "libao",
       "libsndfile",
@@ -72,11 +70,13 @@
   "integration": {
     "session": {
       "command": "icewm-session",
-      "xinitrc": "echo icewm-session > ~/.xinitrc"
+      "xinitrc": "echo icewm-session > ~/.xinitrc",
+      "launcher": "xinit"
     },
     "graphical_environment": {
       "required": true,
-      "display_protocol": "X11"
+      "display_protocol": "X11",
+      "server": "xorg-server"
     }
   },
   "installed": {
