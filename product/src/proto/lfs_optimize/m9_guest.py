@@ -58,6 +58,10 @@ def guest_plan() -> dict[str, Any]:
         },
         "success_marker": GUEST_MARKER_OK,
         "failure_marker": GUEST_MARKER_FAILED,
+        "cache_policy": {
+            "host_guest_roundtrip": ["sources", "artifacts", "evidence"],
+            "salvage_existing_guest_before_replace": True,
+        },
         "superseded_proof_units": [
             "distro-boot-proof.service",
             "distro-blfs-proof.service",
@@ -102,12 +106,26 @@ def prefetch_sources(host_cache: Path) -> None:
             cached_download(resource, host_cache, mirror_required=False)
 
 
-def inject_sources(root: Path, host_cache: Path) -> None:
-    source = host_cache / "sources"
+def merge_cache_directory(source: Path, destination: Path) -> None:
     if not source.is_dir():
-        raise RuntimeError(f"host source cache missing after prefetch: {source}")
-    destination = root / "var/cache/distro-lfs-optimize/sources"
-    copy_tree(source, destination)
+        return
+    destination.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(source, destination, dirs_exist_ok=True)
+
+
+def inject_cache(root: Path, host_cache: Path) -> None:
+    sources = host_cache / "sources"
+    if not sources.is_dir():
+        raise RuntimeError(f"host source cache missing after prefetch: {sources}")
+    guest_cache = root / "var/cache/distro-lfs-optimize"
+    for name in ("sources", "artifacts", "evidence"):
+        merge_cache_directory(host_cache / name, guest_cache / name)
+
+
+def harvest_cache(root: Path, host_cache: Path) -> None:
+    guest_cache = root / "var/cache/distro-lfs-optimize"
+    for name in ("artifacts", "evidence"):
+        merge_cache_directory(guest_cache / name, host_cache / name)
 
 
 def inject_runner(root: Path) -> None:
@@ -207,13 +225,17 @@ def run_guest(boot_work: Path, m8_auth_work: Path, work: Path, cache: Path, time
     evidence_dir = guest_dir / "evidence"
     result_path = guest_dir / "result.json"
 
+    if image.is_file():
+        with mounted_image(image, mountpoint) as previous_root:
+            harvest_cache(previous_root, cache)
+
     image.unlink(missing_ok=True)
     run(["cp", "--reflink=auto", "--sparse=always", str(base_image), str(image)])
 
     prefetch_sources(cache)
     with mounted_image(image, mountpoint) as root:
         inject_prototype(root)
-        inject_sources(root, cache)
+        inject_cache(root, cache)
         inject_runner(root)
 
     definition = load_json(PLAN_PATH)
@@ -240,6 +262,7 @@ def run_guest(boot_work: Path, m8_auth_work: Path, work: Path, cache: Path, time
         shutil.rmtree(evidence_dir)
     guest_result = None
     with mounted_image(image, mountpoint) as root:
+        harvest_cache(root, cache)
         source = root / "var/lib/distro-m8/m9-runtime"
         if source.exists():
             copy_tree(source, evidence_dir)

@@ -54,6 +54,12 @@ def main() -> int:
         ],
         "M9 must disable all earlier proof units before boot",
     )
+    require(
+        plan["cache_policy"]["host_guest_roundtrip"]
+        == ["sources", "artifacts", "evidence"]
+        and plan["cache_policy"]["salvage_existing_guest_before_replace"],
+        "M9 guest cache persistence contract drift",
+    )
     require(GUEST_MARKER_OK == "DISTRO_DESKTOP_PROOF_OK", "M9 success marker drift")
 
     print("M9 guest acceptance contract: success")
