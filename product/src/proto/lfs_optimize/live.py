@@ -14,6 +14,7 @@ from artifact import (
     IGNORED_TOP_LEVEL,
     _record,
     create_tar_xz,
+    extract_tar_xz,
     delta,
     materialize_delta,
     sha256_file,
@@ -145,11 +146,125 @@ def build_package_live(
     before = live_snapshot(root)
     base_digest = snapshot_digest(before)
     definition_digest = canonical_sha256(package)
+    cache_key = canonical_sha256(
+        {
+            "cache_schema_version": CACHE_SCHEMA_VERSION,
+            "execution_mode": "live",
+            "resolved_package_sha256": definition_digest,
+            "baseline_root_sha256": base_digest,
+            "tests": False,
+            "jobs": jobs,
+        }
+    )
+    artifact = (
+        cache
+        / "artifacts"
+        / f"{package['name']}-{package['version']}-{cache_key}.tar.xz"
+    )
+    evidence_path = (
+        cache
+        / "evidence"
+        / f"{package['name']}-{package['version']}-{cache_key}.json"
+    )
     package_work = work / package["name"]
     stage = package_work / "stage"
     log_path = package_work / "build.log"
     result_path = package_work / "result.json"
     package_work.mkdir(parents=True, exist_ok=True)
+
+    if artifact.is_file() and evidence_path.is_file():
+        evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+        if (
+            evidence.get("status") == "success"
+            and evidence.get("execution_mode") == "live"
+            and evidence.get("cache_key") == cache_key
+            and evidence.get("artifact_sha256") == sha256_file(artifact)
+            and evidence.get("baseline_root_sha256") == base_digest
+            and evidence.get("resolved_package_sha256") == definition_digest
+        ):
+            extract_tar_xz(artifact, root)
+            transition_results: list[dict[str, Any]] = []
+            with log_path.open("w", encoding="utf-8") as log:
+                index = 0
+                for step in package["procedure"]:
+                    if step["condition"] == "tests-enabled":
+                        continue
+                    for command in step["commands"]:
+                        index += 1
+                        if command.get("kind") != "session-transition":
+                            continue
+                        item = live_command(command, "/", log, index, jobs)
+                        item["phase"] = step["phase"]
+                        item["disposition"] = (
+                            "executed-session-transition"
+                            if item["exit_code"] == 0
+                            else "fatal"
+                        )
+                        transition_results.append(item)
+                        if item["exit_code"] != 0:
+                            result = {
+                                "schema_version": 1,
+                                "status": "failure",
+                                "execution_mode": "live",
+                                "package": package["name"],
+                                "version": package["version"],
+                                "build": package.get("build", "default"),
+                                "cache": "hit",
+                                "cache_key": cache_key,
+                                "artifact": str(artifact),
+                                "artifact_sha256": sha256_file(artifact),
+                                "baseline_root_sha256": base_digest,
+                                "resolved_package_sha256": definition_digest,
+                                "failed_command": item,
+                                "jobs": jobs,
+                                "tests_enabled": False,
+                                "manual_checks": evidence.get("manual_checks", []),
+                                "review_required": bool(evidence.get("manual_checks", [])),
+                                "live_transitions": transition_results,
+                            }
+                            result_path.write_text(
+                                json.dumps(result, indent=2, sort_keys=True) + "\n",
+                                encoding="utf-8",
+                            )
+                            return result
+
+            after = live_snapshot(root)
+            final_digest = snapshot_digest(after)
+            expected_final = evidence.get("final_root_sha256")
+            if final_digest != expected_final:
+                raise RuntimeError(
+                    f"{package['name']}: cached live artifact realization mismatch: "
+                    f"{final_digest} != {expected_final}"
+                )
+            result = {
+                "schema_version": 1,
+                "status": "success",
+                "execution_mode": "live",
+                "package": package["name"],
+                "version": package["version"],
+                "build": package.get("build", "default"),
+                "cache": "hit",
+                "cache_key": cache_key,
+                "artifact": str(artifact),
+                "artifact_sha256": sha256_file(artifact),
+                "artifact_reused": True,
+                "realization_verified": True,
+                "baseline_root_sha256": base_digest,
+                "final_root_sha256": final_digest,
+                "resolved_package_sha256": definition_digest,
+                "cache_schema_version": CACHE_SCHEMA_VERSION,
+                "jobs": jobs,
+                "tests_enabled": False,
+                "test_status": evidence.get("test_status", "not-run"),
+                "manual_checks": evidence.get("manual_checks", []),
+                "review_required": bool(evidence.get("manual_checks", [])),
+                "live_transitions": transition_results,
+            }
+            result_path.write_text(
+                json.dumps(result, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            return result
 
     source_cwd = prepare_sources(package, root, cache)
     command_results: list[dict[str, Any]] = []
@@ -210,26 +325,6 @@ def build_package_live(
     changed, deleted = delta(before, after)
     materialize_delta(root, stage, changed, after)
 
-    cache_key = canonical_sha256(
-        {
-            "cache_schema_version": CACHE_SCHEMA_VERSION,
-            "execution_mode": "live",
-            "resolved_package_sha256": definition_digest,
-            "baseline_root_sha256": base_digest,
-            "tests": False,
-            "jobs": jobs,
-        }
-    )
-    artifact = (
-        cache
-        / "artifacts"
-        / f"{package['name']}-{package['version']}-{cache_key}.tar.xz"
-    )
-    evidence_path = (
-        cache
-        / "evidence"
-        / f"{package['name']}-{package['version']}-{cache_key}.json"
-    )
     create_tar_xz(stage, artifact, deleted)
     shutil.rmtree(stage, ignore_errors=True)
 
