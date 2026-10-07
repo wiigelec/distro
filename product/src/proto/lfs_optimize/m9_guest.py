@@ -5,6 +5,8 @@ import argparse
 import json
 import shutil
 import subprocess
+import sys
+import threading
 from pathlib import Path
 from typing import Any
 
@@ -241,22 +243,41 @@ def run_guest(boot_work: Path, m8_auth_work: Path, work: Path, cache: Path, time
     definition = load_json(PLAN_PATH)
     argv = qemu_argv(definition, kernel, image)
     timed_out = False
-    try:
-        completed = subprocess.run(
+    console_parts: list[str] = []
+    with console_path.open("w", encoding="utf-8") as console_file:
+        process = subprocess.Popen(
             argv,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
-            timeout=timeout,
+            bufsize=1,
         )
-        console = completed.stdout or ""
-        qemu_exit = completed.returncode
-    except subprocess.TimeoutExpired as exc:
-        timed_out = True
-        raw = exc.stdout or ""
-        console = raw.decode(errors="replace") if isinstance(raw, bytes) else raw
-        qemu_exit = None
-    console_path.write_text(console, encoding="utf-8")
+
+        def pump_console() -> None:
+            if process.stdout is None:
+                return
+            for line in process.stdout:
+                console_parts.append(line)
+                console_file.write(line)
+                console_file.flush()
+                sys.stdout.write(line)
+                sys.stdout.flush()
+
+        reader = threading.Thread(target=pump_console, daemon=True)
+        reader.start()
+        try:
+            qemu_exit = process.wait(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            timed_out = True
+            process.terminate()
+            try:
+                process.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
+            qemu_exit = None
+        reader.join(timeout=5)
+    console = "".join(console_parts)
 
     if evidence_dir.exists():
         shutil.rmtree(evidence_dir)

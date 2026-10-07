@@ -8,7 +8,7 @@ import shlex
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from artifact import (
     IGNORED_TOP_LEVEL,
@@ -129,6 +129,7 @@ def build_package_live(
     work: Path,
     cache: Path,
     run_tests: bool,
+    progress: Callable[[str], None] | None = None,
 ) -> dict[str, Any]:
     if os.geteuid() != 0:
         raise RuntimeError("live package execution requires root")
@@ -143,6 +144,9 @@ def build_package_live(
         raise RuntimeError("live package execution requires systemd as PID 1")
 
     jobs = effective_jobs()
+    notify = progress or (lambda message: None)
+    label = f"{package['name']} {package['version']}"
+    notify(f"{label}: snapshot-before")
     before = live_snapshot(root)
     base_digest = snapshot_digest(before)
     definition_digest = canonical_sha256(package)
@@ -182,6 +186,7 @@ def build_package_live(
             and evidence.get("baseline_root_sha256") == base_digest
             and evidence.get("resolved_package_sha256") == definition_digest
         ):
+            notify(f"{label}: cache-hit restore")
             extract_tar_xz(artifact, root)
             transition_results: list[dict[str, Any]] = []
             with log_path.open("w", encoding="utf-8") as log:
@@ -193,6 +198,7 @@ def build_package_live(
                         index += 1
                         if command.get("kind") != "session-transition":
                             continue
+                        notify(f"{label}: {step['phase']} session-transition")
                         item = live_command(command, "/", log, index, jobs)
                         item["phase"] = step["phase"]
                         item["disposition"] = (
@@ -228,6 +234,7 @@ def build_package_live(
                             )
                             return result
 
+            notify(f"{label}: cache-hit verify")
             after = live_snapshot(root)
             final_digest = snapshot_digest(after)
             expected_final = evidence.get("final_root_sha256")
@@ -264,8 +271,10 @@ def build_package_live(
                 json.dumps(result, indent=2, sort_keys=True) + "\n",
                 encoding="utf-8",
             )
+            notify(f"{label}: complete cache=hit")
             return result
 
+    notify(f"{label}: cache-miss")
     source_cwd = prepare_sources(package, root, cache)
     command_results: list[dict[str, Any]] = []
     manual_checks: list[dict[str, Any]] = []
@@ -281,6 +290,7 @@ def build_package_live(
             for command in step["commands"]:
                 index += 1
                 kind = command.get("kind", "command")
+                notify(f"{label}: {step['phase']} command={index}")
                 if kind == "manual-check":
                     item = {
                         "index": index,
@@ -319,12 +329,16 @@ def build_package_live(
                         json.dumps(result, indent=2, sort_keys=True) + "\n",
                         encoding="utf-8",
                     )
+                    notify(f"{label}: failed phase={step['phase']} exit={item['exit_code']}")
                     return result
 
+    notify(f"{label}: snapshot-after")
     after = live_snapshot(root)
+    notify(f"{label}: delta")
     changed, deleted = delta(before, after)
     materialize_delta(root, stage, changed, after)
 
+    notify(f"{label}: artifact")
     create_tar_xz(stage, artifact, deleted)
     shutil.rmtree(stage, ignore_errors=True)
 
@@ -362,4 +376,5 @@ def build_package_live(
     result_path.write_text(
         json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
+    notify(f"{label}: complete cache=miss")
     return result

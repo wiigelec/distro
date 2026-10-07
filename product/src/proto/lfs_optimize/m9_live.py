@@ -20,6 +20,16 @@ VERSIONS = HERE / "versions" / "m9-development.json"
 PACKAGE_SET = HERE / "m9-package-set.json"
 
 
+def serial_progress(message: str) -> None:
+    line = f"[M9] {message}\n"
+    try:
+        with Path("/dev/ttyS0").open("a", encoding="utf-8") as serial:
+            serial.write(line)
+            serial.flush()
+    except OSError:
+        print(line, end="", flush=True)
+
+
 def capture(argv: list[str], *, check: bool = True, env: dict[str, str] | None = None) -> subprocess.CompletedProcess:
     return subprocess.run(argv, check=check, capture_output=True, text=True, env=env)
 
@@ -203,7 +213,9 @@ def run_m9(work: Path, cache: Path, result_path: Path, run_tests: bool) -> dict[
     work.mkdir(parents=True, exist_ok=True)
     cache.mkdir(parents=True, exist_ok=True)
     result_path.parent.mkdir(parents=True, exist_ok=True)
+    serial_progress("initial snapshot")
     initial_digest = snapshot_digest(live_snapshot(Path("/")))
+    serial_progress("initial snapshot complete")
     package_results: list[dict[str, Any]] = []
 
     for package in resolved["packages"]:
@@ -213,6 +225,7 @@ def run_m9(work: Path, cache: Path, result_path: Path, run_tests: bool) -> dict[
             work / "packages",
             cache,
             run_tests=False,
+            progress=serial_progress,
         )
         package_results.append(result)
         cleanup_source(package)
@@ -232,13 +245,20 @@ def run_m9(work: Path, cache: Path, result_path: Path, run_tests: bool) -> dict[
                 "review_required": any(item.get("review_required") for item in package_results),
             }
             result_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+            serial_progress(f"{package['name']} failed")
             return payload
 
+    serial_progress("final build snapshot")
     build_digest = snapshot_digest(live_snapshot(Path("/")))
+    serial_progress("final build snapshot complete")
     evidence_dir = result_path.parent / "runtime"
     try:
+        serial_progress("runtime network acceptance")
         network = network_acceptance()
+        serial_progress("runtime network acceptance complete")
+        serial_progress("runtime desktop acceptance")
         desktop = desktop_acceptance(evidence_dir)
+        serial_progress("runtime desktop acceptance complete")
         payload = {
             "schema_version": 1,
             "status": "success",
@@ -275,6 +295,7 @@ def run_m9(work: Path, cache: Path, result_path: Path, run_tests: bool) -> dict[
         }
 
     result_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+    serial_progress(f"runtime proof {payload['status']}")
     return payload
 
 
