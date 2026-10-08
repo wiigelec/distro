@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "name": "hard-blfs-development",
+  "basis": "BLFS 13.1-systemd KDE Frameworks 6.29.0 representative collection proof",
+  "packages": {
+    "attica": {
+      "version": "6.29.0",
+      "source": {
+        "url": "https://download.kde.org/stable/frameworks/6.29/attica-6.29.0.tar.xz",
+        "md5": "04136d69a5f340514fad6352629adb28",
+        "home": "https://kde.org/"
+      }
+    },
+    "kapidox": {
+      "version": "6.29.0",
+      "source": {
+        "url": "https://download.kde.org/stable/frameworks/6.29/kapidox-6.29.0.tar.xz",
+        "md5": "c1888280d30447724d491e688e03cf45",
+        "home": "https://kde.org/"
+      }
+    },
+    "karchive": {
+      "version": "6.29.0",
+      "source": {
+        "url": "https://download.kde.org/stable/frameworks/6.29/karchive-6.29.0.tar.xz",
+        "md5": "e897f5323b32c6bdd477369a61972b2e",
+        "home": "https://kde.org/"
+      }
+    },
+    "kcodecs": {
+      "version": "6.29.0",
+      "source": {
+        "url": "https://download.kde.org/stable/frameworks/6.29/kcodecs-6.29.0.tar.xz",
+        "md5": "03a439a6c3d78eebd5484cf69c5c41a3",
+        "home": "https://kde.org/"
+      }
+    },
+    "kconfig": {
+      "version": "6.29.0",
+      "source": {
+        "url": "https://download.kde.org/stable/frameworks/6.29/kconfig-6.29.0.tar.xz",
+        "md5": "194b8c40c5c7e143b44ee2f8dadae775",
+        "home": "https://kde.org/"
+      }
+    },
+    "kcoreaddons": {
+      "version": "6.29.0",
+      "source": {
+        "url": "https://download.kde.org/stable/frameworks/6.29/kcoreaddons-6.29.0.tar.xz",
+        "md5": "9513021c1335227ec38b7cc7b92152f2",
+        "home": "https://kde.org/"
+      }
+    }
+  }
+}

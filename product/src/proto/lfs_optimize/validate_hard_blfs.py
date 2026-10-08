@@ -13,6 +13,9 @@ from resolve import HERE, load_json, resolve
 VERSIONS = HERE / "versions" / "m9-development.json"
 PACKAGE_SET = HERE / "m9-package-set.json"
 COLLECTION = "xorg-libraries"
+KDE_COLLECTION = "kde-frameworks"
+KDE_VERSIONS = HERE / "versions" / "hard-blfs-development.json"
+KDE_PACKAGE_SET = HERE / "hard-blfs-package-set.json"
 
 
 def require(value: bool, message: str) -> None:
@@ -139,6 +142,84 @@ def main() -> int:
         "Xorg collection members must resolve independently versioned package state",
     )
 
+
+
+    kde_definition = load_collection(KDE_COLLECTION)
+    kde_members = enabled_collection_members(kde_definition)
+    kde_member_names = [member["name"] for member in kde_members]
+    require(
+        kde_member_names
+        == ["attica", "kapidox", "karchive", "kcodecs", "kconfig", "kcoreaddons"],
+        "KDE Frameworks representative collection order drift",
+    )
+    require(
+        {
+            member["name"]
+            for member in kde_members
+            if "procedure" in member
+        }
+        == {"kapidox"},
+        "KDE Frameworks exception set drift",
+    )
+
+    kde_resolved = resolve_blfs(KDE_VERSIONS, KDE_PACKAGE_SET)
+    require(
+        kde_resolved["collections"]
+        == [
+            {
+                "name": KDE_COLLECTION,
+                "members": kde_member_names,
+                "dependencies": kde_definition["dependencies"],
+            }
+        ],
+        "KDE Frameworks collection metadata drift",
+    )
+    kde_packages = kde_resolved["packages"]
+    require(
+        [package["name"] for package in kde_packages] == kde_member_names
+        and [package["collection_member_index"] for package in kde_packages]
+        == list(range(len(kde_member_names))),
+        "KDE Frameworks collection expansion/order drift",
+    )
+    require(
+        all(
+            package["build"] == f"collection:{KDE_COLLECTION}"
+            and package["version"] == "6.29.0"
+            and package["source"]["url"].endswith(
+                f"/{package['name']}-6.29.0.tar.xz"
+            )
+            and len(package["source"]["md5"]) == 32
+            for package in kde_packages
+        ),
+        "KDE Frameworks independent source/version identity drift",
+    )
+
+    kde_by_name = {package["name"]: package for package in kde_packages}
+    for name in ("attica", "karchive", "kcodecs", "kconfig", "kcoreaddons"):
+        package_commands = commands(kde_by_name[name])
+        require(
+            any(
+                "CMAKE_INSTALL_PREFIX=/usr" in command
+                and "CMAKE_PREFIX_PATH=$QT6DIR" in command
+                and "BUILD_TESTING=OFF" in command
+                and "BUILD_PYTHON_BINDINGS=OFF" in command
+                for command in package_commands
+            )
+            and any("make -C build" == command for command in package_commands),
+            f"{name}: shared KDE Frameworks CMake procedure drift",
+        )
+
+    kapidox_commands = commands(kde_by_name["kapidox"])
+    require(
+        any("pip3 wheel" in command for command in kapidox_commands)
+        and any("pip3 install" in command for command in kapidox_commands)
+        and not any("cmake " in command for command in kapidox_commands)
+        and not any("make -C build" in command for command in kapidox_commands),
+        "kapidox must replace, not merge with, the shared KF6 CMake procedure",
+    )
+
+    print("Hard-BLFS KDE Frameworks collection contract: success")
+    print("KF6 order, shared CMake semantics, and kapidox procedure replacement are explicit.")
 
     catalogs = load_presentation(PRESENTATION / "catalogs.json")
     catalog = next(

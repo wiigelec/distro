@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "name": "kde-frameworks",
+  "description": "Ordered KDE Frameworks 6 executable collection with shared CMake build semantics and explicit non-CMake member overrides.",
+  "reference": {
+    "blfs_section": "frameworks6",
+    "edition": "13.1-systemd",
+    "framework_version": "6.29.0"
+  },
+  "dependencies": {
+    "build": [
+      "extra-cmake-modules",
+      "Qt6",
+      "Python"
+    ],
+    "runtime": [],
+    "test": [],
+    "before": [],
+    "recommended": [],
+    "optional": []
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "mkdir -v build && cd build && cmake -D CMAKE_INSTALL_PREFIX=/usr -D CMAKE_INSTALL_LIBEXECDIR=libexec -D CMAKE_PREFIX_PATH=$QT6DIR -D CMAKE_SKIP_INSTALL_RPATH=ON -D CMAKE_BUILD_TYPE=Release -D BUILD_TESTING=OFF -D BUILD_PYTHON_BINDINGS=OFF -W no-author .."
+        }
+      ]
+    },
+    {
+      "phase": "build",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "make -C build"
+        }
+      ]
+    },
+    {
+      "phase": "install",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "make -C build install && /sbin/ldconfig"
+        }
+      ]
+    }
+  ],
+  "members": [
+    {
+      "name": "attica",
+      "enabled": true
+    },
+    {
+      "name": "kapidox",
+      "enabled": true,
+      "procedure": [
+        {
+          "phase": "build",
+          "working_directory": "source",
+          "condition": "always",
+          "commands": [
+            {
+              "user": "root",
+              "command": "pip3 wheel -w dist --no-build-isolation --no-deps --no-cache-dir $PWD"
+            }
+          ]
+        },
+        {
+          "phase": "install",
+          "working_directory": "source",
+          "condition": "always",
+          "commands": [
+            {
+              "user": "root",
+              "command": "pip3 install --no-index --find-links dist --no-user kapidox"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "karchive",
+      "enabled": true
+    },
+    {
+      "name": "kcodecs",
+      "enabled": true
+    },
+    {
+      "name": "kconfig",
+      "enabled": true
+    },
+    {
+      "name": "kcoreaddons",
+      "enabled": true
+    }
+  ]
+}
