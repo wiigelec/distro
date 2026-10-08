@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "name": "binutils",
+  "phase": "cross-toolchain",
+  "status": "experiment",
+  "source_directory": "binutils-{version}",
+  "build_directory": "build",
+  "install_prefix": "/work/prefix",
+  "steps": [
+    {
+      "name": "configure",
+      "argv": [
+        "/work/src/binutils-{version}/configure",
+        "--target={target}",
+        "--prefix=/work/prefix",
+        "--disable-nls",
+        "--disable-werror",
+        "--disable-gdb",
+        "--disable-gprofng",
+        "--disable-sim"
+      ]
+    },
+    {
+      "name": "build",
+      "argv": [
+        "make",
+        "-j2"
+      ]
+    },
+    {
+      "name": "install",
+      "argv": [
+        "make",
+        "install"
+      ]
+    },
+    {
+      "name": "assembler-version",
+      "argv": [
+        "/work/prefix/bin/{target}-as",
+        "--version"
+      ]
+    },
+    {
+      "name": "linker-version",
+      "argv": [
+        "/work/prefix/bin/{target}-ld",
+        "--version"
+      ]
+    },
+    {
+      "name": "assemble-test-object",
+      "argv": [
+        "/work/prefix/bin/{target}-as",
+        "-o",
+        "/work/check.o",
+        "/work/check.s"
+      ]
+    },
+    {
+      "name": "link-relocatable",
+      "argv": [
+        "/work/prefix/bin/{target}-ld",
+        "-r",
+        "-o",
+        "/work/check-reloc.o",
+        "/work/check.o"
+      ]
+    }
+  ],
+  "validation": {
+    "tools": [
+      "/work/prefix/bin/{target}-as",
+      "/work/prefix/bin/{target}-ld"
+    ],
+    "assembly_source": ".globl distro_b1_symbol\\ndistro_b1_symbol: nop\\n",
+    "assembly_output": "/work/check.o",
+    "relocatable_output": "/work/check-reloc.o"
+  },
+  "description": "Parameterized recipe; no source version pins or URLs; dynamic host version supplied by runner."
+}
