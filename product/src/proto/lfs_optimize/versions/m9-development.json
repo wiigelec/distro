@@ -563,6 +563,20 @@
         "disk_space": "3.9 MB with tests"
       }
     },
+    "xterm": {
+      "version": "411",
+      "source": {
+        "url": "https://invisible-mirror.net/archives/xterm/xterm-411.tgz",
+        "md5": "08193f9b11db32c37aad00be4e386933",
+        "size": "1.6 MB",
+        "home": "https://invisible-island.net/xterm/",
+        "mirror": "direct"
+      },
+      "reference_metrics": {
+        "build_time": "0.2 SBU (using parallelism=4)",
+        "disk_space": "15 MB"
+      }
+    },
     "xinit": {
       "version": "1.4.4",
       "source": {

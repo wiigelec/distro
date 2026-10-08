@@ -43,6 +43,7 @@
       "build": "m9-desktop"
     },
     "xorg-libinput",
+    "xterm",
     "xinit",
     "imlib2",
     "dejavu-fonts",

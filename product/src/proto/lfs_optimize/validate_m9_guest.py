@@ -26,6 +26,7 @@ def main() -> int:
         ("xkbcomp", "default"),
         ("xorg-server", "m9-desktop"),
         ("xorg-libinput", "default"),
+        ("xterm", "default"),
         ("dejavu-fonts", "default"),
         ("icewm", "default"),
     ):
