@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "status": "prototype-hypothesis",
+  "stage": "B0",
+  "target": {
+    "architecture": "x86_64",
+    "kernel_abi": "linux",
+    "libc_strategy": "gnu-glibc-candidate",
+    "target_triple": "x86_64-unknown-linux-gnu",
+    "note": "Target triple is provisional and is not inferred from the host compiler."
+  },
+  "required_commands": [
+    "sh", "bash", "cc", "c++", "as", "ld", "ar", "ranlib", "make", "tar", "gzip", "sed", "awk", "grep", "find", "patch", "readelf", "sha256sum", "chroot", "mount", "umount"
+  ],
+  "observed_optional_commands": [
+    "bwrap", "unshare", "podman", "docker", "git", "curl", "wget", "python3", "pkg-config", "nproc"
+  ],
+  "minimum_versions": {},
+  "requirements_not_yet_fixed": [
+    "minimum-kernel-version", "minimum-tool-versions", "supported-host-distributions",
+    "toolchain-target-triple", "rootless-or-privileged-isolation", "host-source-acquisition-policy"
+  ],
+  "pass_rule": "B0 passes provisional command presence and executable compiler checks only; it does not prove hermeticity, kernel suitability, version compatibility or bootstrap success."
+}
