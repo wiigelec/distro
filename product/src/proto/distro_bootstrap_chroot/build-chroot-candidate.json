@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "name": "distro-build-chroot",
+  "status": "hypothesis-not-dependency-closed",
+  "architecture": "x86_64",
+  "target_toolchain": "gnu-glibc-candidate",
+  "selected_for_experiment_only": [
+    {"name":"binutils","reason":"Assembler and linker for native toolchain"},
+    {"name":"gcc","reason":"Initial C and C++ compilers"},
+    {"name":"glibc","reason":"Target C runtime, dynamic loader, headers"},
+    {"name":"bash","reason":"Build command shell"},
+    {"name":"coreutils","reason":"Initial filesystem and text utilities"},
+    {"name":"make","reason":"First representative source build driver"},
+    {"name":"tar","reason":"Source and payload archive handling"},
+    {"name":"gzip","reason":"Initial compressed source archive support"}
+  ],
+  "unresolved": ["transitive-build-dependencies","transitive-runtime-dependencies","source-version-lock","recipe-definitions","artifact-contract","build-executor-runtime","toolchain-bootstrap-order"],
+  "proven": false,
+  "source_of_selection": "independent capability hypothesis, not an LFS package list"
+}

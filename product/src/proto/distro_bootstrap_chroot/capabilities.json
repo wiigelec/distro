@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "status": "exploratory",
+  "baseline_capabilities": [
+    {"id":"native-c-toolchain","purpose":"Compile and link C sources","required":true},
+    {"id":"native-cxx-toolchain","purpose":"Compile and link C++ sources","required":true},
+    {"id":"target-c-runtime","purpose":"Run binaries without host shared libraries","required":true},
+    {"id":"command-shell","purpose":"Run scripted package build phases","required":true},
+    {"id":"filesystem-utilities","purpose":"Stage and inspect filesystem payloads","required":true},
+    {"id":"build-driver","purpose":"Execute an initial representative make-based build","required":true},
+    {"id":"archive-tools","purpose":"Extract source and create package payloads","required":true},
+    {"id":"checksum-verifier","purpose":"Verify source and artifact integrity","required":true},
+    {"id":"source-acquisition","purpose":"Obtain pinned source archives; may be done outside the chroot","required":true,"placement":"undecided"},
+    {"id":"build-executor-runtime","purpose":"Run Distro's Build code","required":true,"implementation":"undecided"}
+  ],
+  "workload_specific_not_baseline_by_default": ["autoconf","automake","cmake","meson","ninja","perl","python","git","pkg-config"],
+  "not_needed_merely_for_chroot": ["system-init","bootloader","kernel-package","desktop-environment"]
+}
