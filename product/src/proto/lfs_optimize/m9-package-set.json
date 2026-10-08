@@ -33,6 +33,7 @@
     "pixman",
     "font-util",
     "xkeyboard-config",
+    "xkbcomp",
     "libdrm",
     {
       "name": "xorg-server",

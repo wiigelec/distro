@@ -466,6 +466,19 @@
         "mirror": "direct"
       }
     },
+    "xkbcomp": {
+      "version": "1.5.0",
+      "source": {
+        "url": "https://www.x.org/pub/individual/app/xkbcomp-1.5.0.tar.xz",
+        "md5": "b8128ff6816897bd385ca437cd2886ee",
+        "home": "https://www.x.org/",
+        "mirror": "direct"
+      },
+      "reference_metrics": {
+        "build_time": "part of Xorg Applications; less than 0.1 SBU individually",
+        "disk_space": "small Xorg application"
+      }
+    },
     "libdrm": {
       "version": "2.4.134",
       "source": {

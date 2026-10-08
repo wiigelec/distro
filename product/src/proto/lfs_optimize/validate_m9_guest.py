@@ -20,6 +20,7 @@ def main() -> int:
         ("glib", "m9-minimal"),
         ("networkmanager", "m9-wired-minimal"),
         ("libdrm", "default"),
+        ("xkbcomp", "default"),
         ("xorg-server", "m9-desktop"),
         ("dejavu-fonts", "default"),
         ("icewm", "default"),
