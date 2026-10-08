@@ -31,8 +31,13 @@ from execute import (
 
 LIVE_EXCLUDED_PREFIXES = (
     "opt/distro-lfs-optimize",
+    "tmp/systemd-private-",
     "var/cache/distro-lfs-optimize",
     "var/lib/distro-m8",
+    "var/lib/systemd/random-seed",
+    "var/log/journal",
+    "var/log/wtmp",
+    "var/tmp/systemd-private-",
 )
 
 
@@ -45,7 +50,9 @@ def _excluded(relative: str) -> bool:
     if parts[:2] == ("tmp", "distro-lfs-optimize"):
         return True
     return any(
-        relative == prefix or relative.startswith(prefix + "/")
+        relative == prefix
+        or relative.startswith(prefix + "/")
+        or (prefix.endswith("-") and relative.startswith(prefix))
         for prefix in LIVE_EXCLUDED_PREFIXES
     )
 
