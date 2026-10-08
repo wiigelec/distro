@@ -37,6 +37,17 @@ def main() -> int:
         "M9 NetworkManager acceptance contract drift",
     )
 
+    interactive = plan["interactive_desktop"]
+    require(
+        interactive["mode"] == "--interactive"
+        and interactive["server"] == "Xorg"
+        and interactive["display"] == ":0"
+        and interactive["gpu"] == "virtio-vga"
+        and interactive["systemd_target"] == "graphical.target"
+        and interactive["automated_xvfb_proof_unchanged"],
+        "M9 interactive desktop contract drift",
+    )
+
     desktop = plan["runtime_acceptance"]["desktop"]
     require(
         desktop["server"] == "Xvfb"

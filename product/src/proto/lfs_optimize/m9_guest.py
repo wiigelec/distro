@@ -40,6 +40,15 @@ def guest_plan() -> dict[str, Any]:
             }
             for package in resolved["packages"]
         ],
+        "interactive_desktop": {
+            "mode": "--interactive",
+            "server": "Xorg",
+            "display": ":0",
+            "gpu": "virtio-vga",
+            "systemd_target": "graphical.target",
+            "source_image": "successful M9 guest image",
+            "automated_xvfb_proof_unchanged": True,
+        },
         "runtime_acceptance": {
             "network": {
                 "manager": "NetworkManager",
@@ -188,6 +197,117 @@ def inject_runner(root: Path) -> None:
     link.symlink_to("/etc/systemd/system/distro-m9-proof.service")
 
 
+def inject_interactive_desktop(root: Path) -> None:
+    unit_dir = root / "etc/systemd/system"
+    (unit_dir / "multi-user.target.wants/distro-m9-proof.service").unlink(missing_ok=True)
+
+    target = root / "opt/distro-lfs-optimize"
+    target.mkdir(parents=True, exist_ok=True)
+    runner = target / "m9-desktop-start.sh"
+    runner.write_text(
+        "#!/bin/bash\n"
+        "set -eu\n"
+        "systemctl mask --runtime systemd-networkd.service systemd-networkd.socket || true\n"
+        "systemctl stop systemd-networkd.socket systemd-networkd.service "
+        "systemd-networkd-persistent-storage.service || true\n"
+        "systemctl restart NetworkManager.service || true\n"
+        "install -d -m700 /run/user/0\n"
+        "rm -f /tmp/.X0-lock /tmp/.X11-unix/X0\n"
+        "/usr/bin/Xorg :0 -nolisten tcp > /var/log/m9-xorg.log 2>&1 &\n"
+        "xpid=$!\n"
+        "for _ in $(seq 1 100); do\n"
+        "  test -S /tmp/.X11-unix/X0 && break\n"
+        "  kill -0 \"$xpid\" 2>/dev/null || exit 1\n"
+        "  sleep 0.1\n"
+        "done\n"
+        "test -S /tmp/.X11-unix/X0\n"
+        "export DISPLAY=:0 HOME=/root XDG_RUNTIME_DIR=/run/user/0\n"
+        "exec /usr/bin/icewm-session\n",
+        encoding="utf-8",
+    )
+    runner.chmod(0o755)
+
+    unit = unit_dir / "distro-m9-desktop.service"
+    unit.write_text(
+        "[Unit]\n"
+        "Description=Interactive M9 Xorg + IceWM desktop\n"
+        "After=local-fs.target dbus.service systemd-user-sessions.service\n\n"
+        "[Service]\n"
+        "Type=simple\n"
+        "ExecStart=/opt/distro-lfs-optimize/m9-desktop-start.sh\n"
+        "Restart=on-failure\n"
+        "RestartSec=2\n\n"
+        "[Install]\n"
+        "WantedBy=graphical.target\n",
+        encoding="utf-8",
+    )
+    wants = unit_dir / "graphical.target.wants"
+    wants.mkdir(parents=True, exist_ok=True)
+    link = wants / "distro-m9-desktop.service"
+    link.unlink(missing_ok=True)
+    link.symlink_to("/etc/systemd/system/distro-m9-desktop.service")
+
+
+def interactive_qemu_argv(definition: dict[str, Any], kernel: Path, image: Path) -> list[str]:
+    argv = qemu_argv(definition, kernel, image)
+    argv.remove("-nographic")
+    append_index = argv.index("-append") + 1
+    argv[append_index] = argv[append_index].replace(
+        "systemd.unit=multi-user.target",
+        "systemd.unit=graphical.target",
+    )
+    argv.extend([
+        "-vga", "none",
+        "-device", "virtio-vga",
+        "-display", "gtk",
+        "-serial", "mon:stdio",
+    ])
+    return argv
+
+
+def run_interactive(boot_work: Path, work: Path) -> dict[str, Any]:
+    require_root()
+    for tool in ("qemu-system-x86_64", "losetup", "mount", "umount", "cp"):
+        require_tool(tool)
+
+    boot_result_path = boot_work.resolve() / "boot/result.json"
+    if not boot_result_path.is_file():
+        raise RuntimeError(f"missing boot result: {boot_result_path}")
+    boot_result = json.loads(boot_result_path.read_text(encoding="utf-8"))
+    kernel = Path(boot_result["kernel"])
+    if not kernel.is_file():
+        raise RuntimeError(f"boot result references missing kernel: {kernel}")
+
+    guest_dir = work.resolve() / "m9-guest"
+    source_image = guest_dir / "m9-root.ext4"
+    if not source_image.is_file():
+        raise RuntimeError(
+            f"interactive mode requires an existing successful M9 image: {source_image}"
+        )
+
+    image = guest_dir / "m9-desktop.ext4"
+    mountpoint = guest_dir / "desktop-mnt"
+    image.unlink(missing_ok=True)
+    run(["cp", "--reflink=auto", "--sparse=always", str(source_image), str(image)])
+    with mounted_image(image, mountpoint) as root:
+        inject_interactive_desktop(root)
+
+    definition = load_json(PLAN_PATH)
+    argv = interactive_qemu_argv(definition, kernel, image)
+    completed = subprocess.run(argv, check=False)
+    return {
+        "schema_version": 1,
+        "status": "success" if completed.returncode == 0 else "failure",
+        "kind": "interactive-m9-icewm-vm",
+        "guest_image": str(image),
+        "kernel": str(kernel),
+        "qemu_command": argv,
+        "qemu_exit_code": completed.returncode,
+        "display": ":0",
+        "gpu": "virtio-vga",
+    }
+
+
 def run_guest(boot_work: Path, m8_auth_work: Path, work: Path, cache: Path, timeout: int) -> dict[str, Any]:
     require_root()
     for tool in ("qemu-system-x86_64", "losetup", "mount", "umount", "cp"):
@@ -332,14 +452,19 @@ def main() -> int:
     parser.add_argument("--work", type=Path, default=Path("/tmp/lfs-optimize-m9-guest"))
     parser.add_argument("--cache", type=Path, default=Path("/tmp/lfs-optimize-cache"))
     parser.add_argument("--timeout", type=int, default=10800)
+    parser.add_argument("--interactive", action="store_true")
     parser.add_argument("--plan", action="store_true")
     args = parser.parse_args()
 
     if args.plan:
         result = guest_plan()
+    elif args.interactive:
+        if args.boot_work is None:
+            parser.error("--boot-work is required with --interactive")
+        result = run_interactive(args.boot_work, args.work)
     else:
         if args.boot_work is None or args.m8_auth_work is None:
-            parser.error("--boot-work and --m8-auth-work are required unless --plan is used")
+            parser.error("--boot-work and --m8-auth-work are required unless --plan or --interactive is used")
         result = run_guest(args.boot_work, args.m8_auth_work, args.work, args.cache, args.timeout)
 
     print(json.dumps(result, indent=2, sort_keys=True))

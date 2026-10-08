@@ -24,6 +24,8 @@
       "CGROUPS",
       "DEVTMPFS",
       "DEVTMPFS_MOUNT",
+      "DRM",
+      "DRM_VIRTIO_GPU",
       "EXT4_FS",
       "FHANDLE",
       "INOTIFY_USER",
