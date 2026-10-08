@@ -16,6 +16,7 @@ from resolve import HERE, load_json, resolve, substitute_string
 from system import plan_system
 from validate_boot import main as validate_boot_contract
 from validate_guest import main as validate_guest_contract
+from validate_hard_blfs import main as validate_hard_blfs_contract
 from validate_m8 import main as validate_m8_contract
 from validate_m9 import main as validate_m9_contract
 from validate_m9_guest import main as validate_m9_guest_contract
@@ -314,6 +315,7 @@ def main() -> int:
     validate_pam_auth_contract()
     validate_m9_contract()
     validate_m9_guest_contract()
+    validate_hard_blfs_contract()
 
     print(json.dumps({
         "status": "success",
