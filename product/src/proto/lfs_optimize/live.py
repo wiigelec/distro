@@ -175,6 +175,7 @@ def report_cache_miss(
         + "\n",
         encoding="utf-8",
     )
+    os.sync()
     if not candidates:
         notify(f"{label}: cache-debug candidates=0")
         return
