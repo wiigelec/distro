@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "status": "experimental-pinned-source",
+  "package": "binutils",
+  "version": "2.47",
+  "archive": "binutils-2.47.tar.xz",
+  "source_url": "https://gcc.gnu.org/ftp/binutils/releases/binutils-2.47.tar.xz",
+  "sha512": "3126a1064374d8da40d4d70630c204ed1e75d542c447d53fca9778c7ceff095c28e9b445e15a313fef9729082d7966471ee6b5b715d479aa6d568528743e1d98",
+  "checksum_reference": "https://gcc.gnu.org/ftp/binutils/releases/sha512.sum",
+  "target": "x86_64-unknown-linux-gnu",
+  "notes": "Independently selected B1 experiment. No LFS recipes, manifests, or versions used."
+}
