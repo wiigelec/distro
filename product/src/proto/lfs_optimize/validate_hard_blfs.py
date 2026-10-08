@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-from blfs import enabled_collection_members, load_collection, resolve_blfs
-from resolve import HERE
+from blfs import (
+    enabled_collection_members,
+    load_collection,
+    package_set_entry,
+    resolve_blfs,
+)
+from presentation import PRESENTATION, load_presentation
+from resolve import HERE, load_json, resolve
 
 VERSIONS = HERE / "versions" / "m9-development.json"
 PACKAGE_SET = HERE / "m9-package-set.json"
@@ -132,6 +138,83 @@ def main() -> int:
         ),
         "Xorg collection members must resolve independently versioned package state",
     )
+
+
+    catalogs = load_presentation(PRESENTATION / "catalogs.json")
+    catalog = next(
+        (
+            item
+            for item in catalogs.get("catalogs", [])
+            if item.get("name") == "python-modules"
+        ),
+        None,
+    )
+    require(isinstance(catalog, dict), "Python Modules presentation catalog missing")
+    require(
+        catalog.get("title") == "Python Modules"
+        and catalog.get("kind") == "presentation-catalog",
+        "Python Modules catalog identity drift",
+    )
+
+    catalog_members = catalog.get("members")
+    require(
+        catalog_members
+        == [
+            "jinja2",
+            "markupsafe",
+            "setuptools",
+            "wheel",
+            "packaging",
+            "flit-core",
+        ],
+        "Python Modules presentation membership/order drift",
+    )
+    require(
+        len(catalog_members) == len(set(catalog_members)),
+        "Python Modules catalog contains duplicate members",
+    )
+
+    forbidden_catalog_keys = {
+        "procedure",
+        "dependencies",
+        "build",
+        "enabled",
+        "collection",
+        "before",
+        "version",
+        "source",
+    }
+    require(
+        not forbidden_catalog_keys.intersection(catalog),
+        "presentation catalog acquired executable package semantics",
+    )
+
+    normal_package_set = load_json(HERE / "package-set.json")["packages"]
+    normal_positions = [normal_package_set.index(name) for name in catalog_members]
+    require(
+        normal_positions != sorted(normal_positions),
+        "catalog order accidentally duplicates authoritative package execution order",
+    )
+
+    resolved_catalog_members = [resolve([name])["packages"][0] for name in catalog_members]
+    require(
+        [package["name"] for package in resolved_catalog_members] == catalog_members
+        and all("collection" not in package for package in resolved_catalog_members)
+        and all("collection_member_index" not in package for package in resolved_catalog_members),
+        "presentation catalog changed independent package identity",
+    )
+
+    try:
+        package_set_entry({"catalog": "python-modules"})
+    except RuntimeError:
+        pass
+    else:
+        raise RuntimeError(
+            "BLFS package-set parser must reject presentation catalogs as executable input"
+        )
+
+    print("Hard-BLFS presentation-catalog contract: success")
+    print("Python Modules is presentation-only and does not own build order or procedure semantics.")
 
     print("Hard-BLFS executable-collection contract: success")
     print("Xorg collection order, shared semantics, per-member overrides, and independent versions are explicit.")

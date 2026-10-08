@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "catalogs": [
+    {
+      "name": "python-modules",
+      "kind": "presentation-catalog",
+      "title": "Python Modules",
+      "description": "Presentation grouping over independently defined packages. Membership and order are document composition only and carry no build semantics.",
+      "members": [
+        "jinja2",
+        "markupsafe",
+        "setuptools",
+        "wheel",
+        "packaging",
+        "flit-core"
+      ]
+    }
+  ]
+}
