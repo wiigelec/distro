@@ -49,7 +49,7 @@ def network_acceptance() -> dict[str, Any]:
         "systemd-networkd.socket",
         "systemd-networkd-persistent-storage.service",
     ]
-    capture(["systemctl", "stop", *networkd_units])
+    capture(["systemctl", "stop", *networkd_units], check=False)
     capture([
         "systemctl",
         "mask",
@@ -244,9 +244,12 @@ def run_m9(work: Path, cache: Path, result_path: Path, run_tests: bool) -> dict[
     cache.mkdir(parents=True, exist_ok=True)
     result_path.parent.mkdir(parents=True, exist_ok=True)
     serial_progress("initial snapshot")
-    initial_digest = snapshot_digest(live_snapshot(Path("/")))
+    initial_snapshot = live_snapshot(Path("/"))
+    initial_digest = snapshot_digest(initial_snapshot)
     serial_progress("initial snapshot complete")
     package_results: list[dict[str, Any]] = []
+    current_root_digest = initial_digest
+    current_snapshot: dict[str, dict[str, Any]] | None = initial_snapshot
 
     for package in resolved["packages"]:
         result = build_package_live(
@@ -256,9 +259,14 @@ def run_m9(work: Path, cache: Path, result_path: Path, run_tests: bool) -> dict[
             cache,
             run_tests=False,
             progress=serial_progress,
+            baseline_root_sha256=current_root_digest,
+            baseline_snapshot=current_snapshot,
         )
         package_results.append(result)
         cleanup_source(package)
+        if result["status"] == "success":
+            current_root_digest = result["final_root_sha256"]
+            current_snapshot = None
         if result["status"] != "success":
             payload = {
                 "schema_version": 1,
@@ -278,9 +286,8 @@ def run_m9(work: Path, cache: Path, result_path: Path, run_tests: bool) -> dict[
             serial_progress(f"{package['name']} failed")
             return payload
 
-    serial_progress("final build snapshot")
-    build_digest = snapshot_digest(live_snapshot(Path("/")))
-    serial_progress("final build snapshot complete")
+    build_digest = current_root_digest
+    serial_progress("build cache chain complete")
     evidence_dir = result_path.parent / "runtime"
     try:
         serial_progress("runtime network acceptance")

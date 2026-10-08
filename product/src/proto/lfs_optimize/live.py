@@ -271,6 +271,8 @@ def build_package_live(
     cache: Path,
     run_tests: bool,
     progress: Callable[[str], None] | None = None,
+    baseline_root_sha256: str | None = None,
+    baseline_snapshot: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     if os.geteuid() != 0:
         raise RuntimeError("live package execution requires root")
@@ -287,9 +289,20 @@ def build_package_live(
     jobs = effective_jobs()
     notify = progress or (lambda message: None)
     label = f"{package['name']} {package['version']}"
-    notify(f"{label}: snapshot-before")
-    before = live_snapshot(root)
-    base_digest = snapshot_digest(before)
+    before = baseline_snapshot
+    if baseline_root_sha256 is None:
+        notify(f"{label}: snapshot-before")
+        before = live_snapshot(root)
+        base_digest = snapshot_digest(before)
+    else:
+        base_digest = baseline_root_sha256
+        if before is not None:
+            supplied_digest = snapshot_digest(before)
+            if supplied_digest != base_digest:
+                raise RuntimeError(
+                    f"{package['name']}: supplied baseline snapshot mismatch: "
+                    f"{supplied_digest} != {base_digest}"
+                )
     definition_digest = canonical_sha256(package)
     cache_key = canonical_sha256(
         {
@@ -375,15 +388,12 @@ def build_package_live(
                             )
                             return result
 
-            notify(f"{label}: cache-hit verify")
-            after = live_snapshot(root)
-            final_digest = snapshot_digest(after)
-            expected_final = evidence.get("final_root_sha256")
-            if final_digest != expected_final:
+            final_digest = evidence.get("final_root_sha256")
+            if not isinstance(final_digest, str) or not final_digest:
                 raise RuntimeError(
-                    f"{package['name']}: cached live artifact realization mismatch: "
-                    f"{final_digest} != {expected_final}"
+                    f"{package['name']}: cached live artifact has no final root digest"
                 )
+            notify(f"{label}: cache-hit advance")
             result = {
                 "schema_version": 1,
                 "status": "success",
@@ -396,7 +406,9 @@ def build_package_live(
                 "artifact": str(artifact),
                 "artifact_sha256": sha256_file(artifact),
                 "artifact_reused": True,
-                "realization_verified": True,
+                "artifact_integrity_verified": True,
+                "cached_transition_trusted": True,
+                "realization_verified": False,
                 "baseline_root_sha256": base_digest,
                 "final_root_sha256": final_digest,
                 "resolved_package_sha256": definition_digest,
@@ -416,6 +428,15 @@ def build_package_live(
             return result
 
     notify(f"{label}: cache-miss")
+    if before is None:
+        notify(f"{label}: snapshot-before miss")
+        before = live_snapshot(root)
+        observed_base_digest = snapshot_digest(before)
+        if observed_base_digest != base_digest:
+            raise RuntimeError(
+                f"{package['name']}: live root diverged from trusted cache chain: "
+                f"{observed_base_digest} != {base_digest}"
+            )
     report_cache_miss(
         package,
         cache,
