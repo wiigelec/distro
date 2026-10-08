@@ -65,8 +65,20 @@ def main() -> int:
     )
 
     require(
-        names.index("xorg-server") < names.index("xinit") < names.index("icewm"),
-        "xinit must resolve after Xorg Server and before IceWM",
+        names.index("xkbcomp")
+        < names.index("xorg-server")
+        < names.index("xorg-libinput")
+        < names.index("xterm")
+        < names.index("xinit")
+        < names.index("icewm"),
+        "M9 XKB/Xorg/libinput/xterm/xinit/IceWM order drift",
+    )
+    require(
+        names.index("libevdev")
+        < names.index("libinput")
+        and names.index("mtdev") < names.index("libinput")
+        < names.index("xorg-libinput"),
+        "M9 libinput dependency order drift",
     )
     require(names.index("imlib2") < names.index("icewm"), "imlib2 must precede IceWM")
     require(
@@ -98,11 +110,47 @@ def main() -> int:
     )
 
     server = by_name["xorg-server"]
-    require(server["build"] == "m9-xvfb", "M9 Xvfb build selection drift")
-    require("Xvfb" in server["installed"]["programs"], "M9 Xvfb capability missing")
+    require(server["build"] == "m9-desktop", "M9 desktop Xorg build selection drift")
     require(
-        not server.get("resources"),
-        "M9 Xvfb build must not retain unused default-Xorg patch resources",
+        {"Xorg", "Xvfb"}.issubset(server["installed"]["programs"])
+        and "modesetting_drv.so" in server["installed"]["libraries"],
+        "M9 Xorg/Xvfb/modesetting capability drift",
+    )
+    require(
+        server["dependencies"]["build"]
+        == ["xorg-libraries", "libxcvt", "pixman", "font-util", "libdrm"]
+        and server["dependencies"]["runtime"]
+        == ["xkeyboard-config", "xkbcomp", "systemd", "libdrm", "xorg-libinput"],
+        "M9 desktop Xorg dependency closure drift",
+    )
+    require(
+        any(
+            "-D glamor=false" in c
+            and "-D glx=false" in c
+            and "-D secure-rpc=false" in c
+            for c in commands(server)
+        ),
+        "M9 desktop Xorg acceleration/security build policy missing",
+    )
+
+    libinput = by_name["libinput"]
+    require(
+        libinput["dependencies"]["runtime"] == ["libevdev", "mtdev", "systemd"],
+        "M9 libinput runtime closure drift",
+    )
+
+    xorg_libinput = by_name["xorg-libinput"]
+    require(
+        xorg_libinput["dependencies"]["runtime"] == ["libinput", "xorg-server"]
+        and "libinput_drv.so" in xorg_libinput["installed"]["libraries"],
+        "M9 Xorg libinput driver closure drift",
+    )
+
+    xterm = by_name["xterm"]
+    require(
+        "xterm" in xterm["installed"]["programs"]
+        and any("--enable-mini-luit" in c for c in commands(xterm)),
+        "M9 xterm terminal policy drift",
     )
 
     plan = plan_blfs(
@@ -126,10 +174,23 @@ def main() -> int:
             for item in planned["dejavu-fonts"]["commands"]),
         "planned DejaVu installation policy missing",
     )
+    require(
+        any(
+            "-D glamor=false" in item["command"]
+            and "-D glx=false" in item["command"]
+            for item in planned["xorg-server"]["commands"]
+        ),
+        "planned M9 desktop Xorg policy missing",
+    )
+    require(
+        any("--enable-mini-luit" in item["command"]
+            for item in planned["xterm"]["commands"]),
+        "planned xterm mini-luit policy missing",
+    )
 
     print("M9 buildable functional-system model proof: success")
-    print("NetworkManager wired closure, Xvfb/IceWM closure, and a scalable font payload are explicit.")
-    print("Booted runtime acceptance is the remaining M9 proof.")
+    print("NetworkManager, real Xorg + Xvfb, libinput, IceWM, fonts, and xterm are explicit.")
+    print("Automated and interactive booted runtime acceptance have both been proven.")
     return 0
 
 if __name__ == "__main__":
