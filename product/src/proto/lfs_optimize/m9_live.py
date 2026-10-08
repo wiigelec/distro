@@ -44,34 +44,47 @@ def cleanup_source(package: dict[str, Any]) -> None:
 
 
 def network_acceptance() -> dict[str, Any]:
-    networkd_units = [
-        "systemd-networkd.service",
-        "systemd-networkd.socket",
-        "systemd-networkd-persistent-storage.service",
-    ]
-    capture(["systemctl", "stop", *networkd_units], check=False)
+    networkd_service = "systemd-networkd.service"
+    networkd_socket = "systemd-networkd.socket"
+    persistent_storage = "systemd-networkd-persistent-storage.service"
+
     capture([
         "systemctl",
         "mask",
         "--runtime",
-        "systemd-networkd.service",
-        "systemd-networkd.socket",
+        networkd_service,
+        networkd_socket,
     ])
     capture(["systemctl", "daemon-reload"])
+    capture(
+        ["systemctl", "stop", networkd_socket, networkd_service, persistent_storage],
+        check=False,
+    )
 
-    networkd_before = capture(
-        ["systemctl", "is-active", "systemd-networkd.service"],
-        check=False,
-    ).stdout.strip()
-    networkd_socket_before = capture(
-        ["systemctl", "is-active", "systemd-networkd.socket"],
-        check=False,
-    ).stdout.strip()
-    if networkd_before == "active" or networkd_socket_before == "active":
-        raise RuntimeError(
-            "systemd-networkd did not stop before NetworkManager handoff: "
-            f"service={networkd_before!r} socket={networkd_socket_before!r}"
-        )
+    terminal_states = {"inactive", "failed", "not-found"}
+
+    def networkd_state(unit: str) -> str:
+        state = capture(
+            ["systemctl", "show", "--property=ActiveState", "--value", unit],
+            check=False,
+        ).stdout.strip()
+        return state or "not-found"
+
+    deadline = time.monotonic() + 10.0
+    while True:
+        networkd_before = networkd_state(networkd_service)
+        networkd_socket_before = networkd_state(networkd_socket)
+        if (
+            networkd_before in terminal_states
+            and networkd_socket_before in terminal_states
+        ):
+            break
+        if time.monotonic() >= deadline:
+            raise RuntimeError(
+                "systemd-networkd did not quiesce before NetworkManager handoff: "
+                f"service={networkd_before!r} socket={networkd_socket_before!r}"
+            )
+        time.sleep(0.1)
 
     capture(["systemctl", "enable", "NetworkManager.service"])
     capture(["systemctl", "restart", "NetworkManager.service"])
@@ -102,8 +115,8 @@ def network_acceptance() -> dict[str, Any]:
     service_state = capture(["systemctl", "is-active", "NetworkManager.service"]).stdout.strip()
     device_state = capture(["nmcli", "-g", "GENERAL.STATE", "device", "show", interface]).stdout.strip()
     address = capture(["nmcli", "-g", "IP4.ADDRESS", "device", "show", interface]).stdout.strip().splitlines()
-    networkd = capture(["systemctl", "is-active", "systemd-networkd.service"], check=False).stdout.strip()
-    networkd_socket = capture(["systemctl", "is-active", "systemd-networkd.socket"], check=False).stdout.strip()
+    networkd = networkd_state(networkd_service)
+    networkd_socket_state = networkd_state(networkd_socket)
 
     if service_state != "active":
         raise RuntimeError(f"NetworkManager is not active: {service_state}")
@@ -111,10 +124,10 @@ def network_acceptance() -> dict[str, Any]:
         raise RuntimeError(f"{interface} is not connected under NetworkManager: {device_state}")
     if not address or not address[0]:
         raise RuntimeError(f"{interface} did not acquire an IPv4 address")
-    if networkd == "active" or networkd_socket == "active":
+    if networkd not in terminal_states or networkd_socket_state not in terminal_states:
         raise RuntimeError(
             "systemd-networkd became active during NetworkManager acceptance: "
-            f"service={networkd!r} socket={networkd_socket!r}"
+            f"service={networkd!r} socket={networkd_socket_state!r}"
         )
 
     return {
