@@ -53,7 +53,7 @@
       "phase": "install",
       "commands": [
         {
-          "command": "make exec_prefix=/usr install\nmake -C man install-man",
+          "command": "make exec_prefix=/usr install\nmake -C man install-man\n/usr/sbin/pwconv\n/usr/sbin/grpconv",
           "user": "root"
         }
       ],
