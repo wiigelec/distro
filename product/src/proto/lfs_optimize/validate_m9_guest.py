@@ -43,6 +43,7 @@ def main() -> int:
         and interactive["server"] == "Xorg"
         and interactive["display"] == ":0"
         and interactive["gpu"] == "virtio-vga"
+        and interactive["usb_controller"] == "piix3-uhci via -usb"
         and interactive["pointer"] == "usb-tablet"
         and interactive["host_display"] == "gtk,grab-on-hover=off"
         and interactive["systemd_target"] == "graphical.target"
