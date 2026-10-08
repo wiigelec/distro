@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from blfs import plan_blfs, resolve_blfs
+from resolve import HERE, load_json
 
 
 def require(value: bool, message: str) -> None:
@@ -47,6 +48,18 @@ def main() -> int:
             for item in post_install
         ),
         "Linux-PAM -> systemd rebuild integration missing",
+    )
+
+    base_shadow = load_json(HERE / "packages/shadow.json")
+    base_shadow_commands = [
+        command["command"]
+        for step in base_shadow["procedure"]
+        for command in step["commands"]
+    ]
+    require(
+        any("/usr/sbin/pwconv" in command for command in base_shadow_commands)
+        and any("/usr/sbin/grpconv" in command for command in base_shadow_commands),
+        "base Shadow install must initialize /etc/shadow and /etc/gshadow",
     )
 
     require(

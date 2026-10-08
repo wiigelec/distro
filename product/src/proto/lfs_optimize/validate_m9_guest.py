@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from m9_guest import GUEST_MARKER_OK, guest_plan
+from resolve import HERE, load_json
 
 def require(value: bool, message: str) -> None:
     if not value:
@@ -80,6 +81,28 @@ def main() -> int:
         == ["sources", "artifacts", "evidence"]
         and plan["cache_policy"]["salvage_existing_guest_before_replace"],
         "M9 guest cache persistence contract drift",
+    )
+    xorg = load_json(HERE / "packages/xorg-server.json")
+    xorg_libinput = load_json(HERE / "packages/xorg-libinput.json")
+    xterm = load_json(HERE / "packages/xterm.json")
+    require(
+        "Xorg" in xorg["installed"]["programs"]
+        and "modesetting_drv.so" in xorg["installed"]["libraries"],
+        "M9 interactive Xorg modesetting installation contract drift",
+    )
+    require(
+        "libinput_drv.so" in xorg_libinput["installed"]["libraries"]
+        and "libinput" in xorg_libinput["dependencies"]["runtime"],
+        "M9 interactive libinput driver contract drift",
+    )
+    require(
+        "xterm" in xterm["installed"]["programs"]
+        and any(
+            "--enable-mini-luit" in command["command"]
+            for step in xterm["procedure"]
+            for command in step["commands"]
+        ),
+        "M9 interactive xterm contract drift",
     )
     require(GUEST_MARKER_OK == "DISTRO_DESKTOP_PROOF_OK", "M9 success marker drift")
 
