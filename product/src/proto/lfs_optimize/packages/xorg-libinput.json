@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "name": "xorg-libinput",
+  "reference": {
+    "blfs_section": "xorg-libinput",
+    "edition": "13.1-systemd"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-static"
+        }
+      ]
+    },
+    {
+      "phase": "build",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "make"
+        }
+      ]
+    },
+    {
+      "phase": "test",
+      "working_directory": "source",
+      "condition": "tests-enabled",
+      "commands": [
+        {
+          "user": "root",
+          "command": "make check"
+        }
+      ]
+    },
+    {
+      "phase": "install",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "make install"
+        }
+      ]
+    }
+  ],
+  "description": "The Xorg libinput driver connects Xorg Server to libinput for keyboard, mouse, touchscreen, and tablet input.",
+  "dependencies": {
+    "build": [
+      "libinput",
+      "xorg-server"
+    ],
+    "runtime": [
+      "libinput",
+      "xorg-server"
+    ],
+    "test": [],
+    "before": [
+      "xinit",
+      "icewm"
+    ],
+    "recommended": [],
+    "optional": []
+  },
+  "installed": {
+    "programs": [],
+    "libraries": [
+      "libinput_drv.so"
+    ],
+    "directories": []
+  }
+}

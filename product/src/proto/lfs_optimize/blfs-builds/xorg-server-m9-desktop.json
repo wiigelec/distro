@@ -15,13 +15,16 @@
       "xkeyboard-config",
       "xkbcomp",
       "systemd",
-      "libdrm"
+      "libdrm",
+      "xorg-libinput"
     ],
     "test": [],
     "before": [
       "icewm"
     ],
-    "recommended": [],
+    "recommended": [
+      "xorg-libinput"
+    ],
     "optional": [
       "libepoxy",
       "Mesa"

@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "name": "libevdev",
+  "reference": {
+    "blfs_section": "libevdev",
+    "edition": "13.1-systemd"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "mkdir build && cd build && meson setup .. --prefix=/usr --buildtype=release -D documentation=disabled -D tests=disabled"
+        }
+      ]
+    },
+    {
+      "phase": "build",
+      "working_directory": "build",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "ninja"
+        }
+      ]
+    },
+    {
+      "phase": "install",
+      "working_directory": "build",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "ninja install && /sbin/ldconfig"
+        }
+      ]
+    }
+  ],
+  "description": "libevdev provides the event-device helper library used by libinput and Xorg input drivers.",
+  "dependencies": {
+    "build": [],
+    "runtime": [],
+    "test": [],
+    "before": [],
+    "recommended": [],
+    "optional": []
+  },
+  "installed": {
+    "programs": [
+      "libevdev-tweak-device",
+      "mouse-dpi-tool",
+      "touchpad-edge-detector"
+    ],
+    "libraries": [
+      "libevdev.so"
+    ],
+    "directories": [
+      "/usr/include/libevdev-1.0"
+    ]
+  }
+}

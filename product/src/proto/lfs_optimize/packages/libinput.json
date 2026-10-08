@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "name": "libinput",
+  "reference": {
+    "blfs_section": "libinput",
+    "edition": "13.1-systemd"
+  },
+  "procedure": [
+    {
+      "phase": "configure",
+      "working_directory": "source",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "mkdir build && cd build && meson setup .. --prefix=/usr --buildtype=release -D debug-gui=false -D tests=false -D libwacom=false -D udev-dir=/usr/lib/udev"
+        }
+      ]
+    },
+    {
+      "phase": "build",
+      "working_directory": "build",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "ninja"
+        }
+      ]
+    },
+    {
+      "phase": "install",
+      "working_directory": "build",
+      "condition": "always",
+      "commands": [
+        {
+          "user": "root",
+          "command": "ninja install && /sbin/ldconfig"
+        }
+      ]
+    }
+  ],
+  "description": "libinput handles Linux input devices for display servers and provides the runtime used by the Xorg libinput driver.",
+  "dependencies": {
+    "build": [
+      "libevdev",
+      "mtdev",
+      "systemd"
+    ],
+    "runtime": [
+      "libevdev",
+      "mtdev",
+      "systemd"
+    ],
+    "test": [],
+    "before": [],
+    "recommended": [],
+    "optional": []
+  },
+  "installed": {
+    "programs": [
+      "libinput"
+    ],
+    "libraries": [
+      "libinput.so"
+    ],
+    "directories": [
+      "/etc/libinput",
+      "/usr/libexec/libinput",
+      "/usr/share/libinput"
+    ]
+  }
+}

@@ -493,6 +493,48 @@
         "disk_space": "7.8 MB (with tests)"
       }
     },
+    "libevdev": {
+      "version": "1.13.6",
+      "source": {
+        "url": "https://www.freedesktop.org/software/libevdev/libevdev-1.13.6.tar.xz",
+        "md5": "4202ff132e3efe95fe9ca2c4f8f119f7",
+        "size": "464 KB",
+        "home": "https://www.freedesktop.org/wiki/Software/libevdev/",
+        "mirror": "direct"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "5.0 MB without tests"
+      }
+    },
+    "mtdev": {
+      "version": "1.1.7",
+      "source": {
+        "url": "https://bitmath.org/code/mtdev/mtdev-1.1.7.tar.bz2",
+        "md5": "483ed7fdf7c1e7b7375c05a62848cce7",
+        "size": "296 KB",
+        "home": "https://bitmath.org/code/mtdev/",
+        "mirror": "direct"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "2.5 MB"
+      }
+    },
+    "libinput": {
+      "version": "1.31.3",
+      "source": {
+        "url": "https://gitlab.freedesktop.org/libinput/libinput/-/archive/1.31.3/libinput-1.31.3.tar.gz",
+        "md5": "022aa3838b0cf8b932c0e4a4dbeac150",
+        "size": "1.2 MB",
+        "home": "https://libinput.freedesktop.org/",
+        "mirror": "direct"
+      },
+      "reference_metrics": {
+        "build_time": "0.1 SBU",
+        "disk_space": "15 MB"
+      }
+    },
     "xorg-server": {
       "version": "21.1.24",
       "source": {
@@ -505,6 +547,20 @@
       "reference_metrics": {
         "build_time": "0.3 SBU (using parallelism=4; with tests)",
         "disk_space": "199 MB (with tests)"
+      }
+    },
+    "xorg-libinput": {
+      "version": "1.5.0",
+      "source": {
+        "url": "https://www.x.org/pub/individual/driver/xf86-input-libinput-1.5.0.tar.xz",
+        "md5": "f8d0fb6987d843e688d597c2b66ec824",
+        "size": "324 KB",
+        "home": "https://www.x.org/",
+        "mirror": "direct"
+      },
+      "reference_metrics": {
+        "build_time": "less than 0.1 SBU",
+        "disk_space": "3.9 MB with tests"
       }
     },
     "xinit": {

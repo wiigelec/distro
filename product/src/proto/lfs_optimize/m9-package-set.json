@@ -35,10 +35,14 @@
     "xkeyboard-config",
     "xkbcomp",
     "libdrm",
+    "libevdev",
+    "mtdev",
+    "libinput",
     {
       "name": "xorg-server",
       "build": "m9-desktop"
     },
+    "xorg-libinput",
     "xinit",
     "imlib2",
     "dejavu-fonts",
