@@ -43,6 +43,8 @@ def main() -> int:
         and interactive["server"] == "Xorg"
         and interactive["display"] == ":0"
         and interactive["gpu"] == "virtio-vga"
+        and interactive["pointer"] == "usb-tablet"
+        and interactive["host_display"] == "gtk,grab-on-hover=off"
         and interactive["systemd_target"] == "graphical.target"
         and interactive["automated_xvfb_proof_unchanged"],
         "M9 interactive desktop contract drift",

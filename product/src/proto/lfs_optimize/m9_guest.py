@@ -45,6 +45,8 @@ def guest_plan() -> dict[str, Any]:
             "server": "Xorg",
             "display": ":0",
             "gpu": "virtio-vga",
+            "pointer": "usb-tablet",
+            "host_display": "gtk,grab-on-hover=off",
             "systemd_target": "graphical.target",
             "source_image": "successful M9 guest image",
             "automated_xvfb_proof_unchanged": True,
@@ -259,7 +261,8 @@ def interactive_qemu_argv(definition: dict[str, Any], kernel: Path, image: Path)
     argv.extend([
         "-vga", "none",
         "-device", "virtio-vga",
-        "-display", "gtk",
+        "-device", "usb-tablet",
+        "-display", "gtk,grab-on-hover=off",
         "-serial", "mon:stdio",
     ])
     return argv
