@@ -21,6 +21,7 @@ from validate_m8 import main as validate_m8_contract
 from validate_m9 import main as validate_m9_contract
 from validate_m9_guest import main as validate_m9_guest_contract
 from validate_pam_auth import main as validate_pam_auth_contract
+from validate_profile import main as validate_profile_contract
 
 DEPENDENCY_CLASSES = ("build", "runtime", "test", "before", "optional")
 
@@ -316,6 +317,7 @@ def main() -> int:
     validate_m9_contract()
     validate_m9_guest_contract()
     validate_hard_blfs_contract()
+    validate_profile_contract()
 
     print(json.dumps({
         "status": "success",

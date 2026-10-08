@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "name": "xorg-icewm",
+  "description": "Interactive Xorg/IceWM system profile over validated M9 BLFS state.",
+  "resolver": "blfs",
+  "versions": "versions/m9-development.json",
+  "package_set": "m9-package-set.json",
+  "defaults": {
+    "run_tests": true
+  },
+  "runtime_policy": {
+    "network_manager": "NetworkManager",
+    "display_server": "Xorg",
+    "session": "icewm-session",
+    "terminal": "xterm"
+  }
+}
