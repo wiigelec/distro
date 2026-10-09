@@ -73,7 +73,7 @@
       "/work/prefix/bin/{target}-as",
       "/work/prefix/bin/{target}-ld"
     ],
-    "assembly_source": ".globl distro_b1_symbol\\ndistro_b1_symbol: nop\\n",
+    "assembly_source": ".globl distro_b1_symbol\ndistro_b1_symbol: nop\n",
     "assembly_output": "/work/check.o",
     "relocatable_output": "/work/check-reloc.o"
   },
