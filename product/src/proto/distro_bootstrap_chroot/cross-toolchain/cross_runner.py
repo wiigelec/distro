@@ -76,7 +76,11 @@ def main():
         if h.hexdigest()!=expected_digest:report['reason']='source checksum mismatch';return finish(report,args.out)
         with tarfile.open(archive,'r:*') as f:f.extractall(base/'src',filter='data')
     except Exception as e:report['reason']='fetch/extract failed: '+str(e)[:300];return finish(report,args.out)
-    vars={'version':version,'target':m['target']}
+    jobs_probe=subprocess.run(['nproc'],capture_output=True,text=True,timeout=20,check=True,env={'PATH':'/usr/bin:/bin','LC_ALL':'C'})
+    jobs=int(jobs_probe.stdout.strip())
+    if jobs<1 or jobs>4096:raise ValueError('invalid nproc result')
+    report['build_jobs']=jobs
+    vars={'version':version,'target':m['target'],'jobs':str(jobs)}
     try:
         fixtures=r['validation'].get('write_files',{})
         if 'assembly_source' in r['validation']:fixtures['check.s']=r['validation']['assembly_source']

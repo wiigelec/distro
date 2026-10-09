@@ -24,7 +24,7 @@
       "name": "build",
       "argv": [
         "make",
-        "-j2"
+        "-j{jobs}"
       ]
     },
     {

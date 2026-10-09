@@ -17,6 +17,7 @@
         "--with-as=/toolchain/bin/{target}-as",
         "--with-ld=/toolchain/bin/{target}-ld",
         "--without-headers",
+        "--disable-fixincludes",
         "--disable-bootstrap",
         "--disable-multilib",
         "--disable-nls",
@@ -32,7 +33,7 @@
       "name": "build-gcc",
       "argv": [
         "make",
-        "-j2",
+        "-j{jobs}",
         "all-gcc"
       ]
     },
