@@ -108,22 +108,31 @@ def main():
     args = ap.parse_args()
     if os.geteuid() == 0:
         ap.error('run as an ordinary user')
-    root = args.root.expanduser().resolve()
-    if root == Path('/') or root == Path.home().resolve():
-        ap.error('unsafe installation root')
+    project = args.root.expanduser().resolve()
+    if project == Path('/') or project == Path.home().resolve():
+        ap.error('unsafe bootstrap project directory')
+    # --root names the project directory, not the installed filesystem itself.
+    # Build state must never be placed inside the future chroot.
+    root = project / 'root'
+    state = project / '.distro-bootstrap'
+    if root.is_symlink() or state.is_symlink():
+        ap.error('root and .distro-bootstrap must be real directories, not symlinks')
+    if (root / '.distro-bootstrap').exists() or (root / '.distro-bootstrap').is_symlink():
+        ap.error('legacy build state detected inside root/; move it outside root before continuing')
     phase = PHASES[args.phase]
     manifest_path = phase / (args.phase + '-manifest.json')
     manifest = json.loads(manifest_path.read_text())
     if manifest.get('phase') != args.phase:
         ap.error('phase mismatch in manifest')
+    project.mkdir(parents=True, exist_ok=True)
     root.mkdir(parents=True, exist_ok=True)
-    state = root / '.distro-bootstrap'
+    state.mkdir(parents=True, exist_ok=True)
     work = state / 'work' / args.phase
     stamps = state / 'stamps' / args.phase
     work.mkdir(parents=True, exist_ok=True)
     stamps.mkdir(parents=True, exist_ok=True)
     packages = manifest['packages']
-    say(f'[build] phase={args.phase} root={root} packages={len(packages)}')
+    say(f'[build] phase={args.phase} project={project} root={root} state={state} packages={len(packages)}')
     t0 = time.monotonic()
     for n, pkg in enumerate(packages, 1):
         name = pkg['name']
