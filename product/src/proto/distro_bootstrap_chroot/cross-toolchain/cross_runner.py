@@ -34,19 +34,21 @@ def main():
         elif policy!='exact':raise ValueError('unsupported upstream version policy')
         report['resolved_version']=version
         source=p['source']
-        filename=source['archive_template'].format(version=version)
-        url=source['url_template'].format(version=version)
-        checksum_url=source['sha512_index'].format(version=version)
+        source_vars={'version':version,'major':version.split('.')[0]}
+        filename=source['archive_template'].format_map(source_vars)
+        url=source['url_template'].format_map(source_vars)
+        checksum_algorithm='sha256' if 'sha256_index' in source else 'sha512'
+        checksum_url=source[checksum_algorithm+'_index'].format_map(source_vars)
         with urllib.request.urlopen(checksum_url,timeout=45) as checksum_stream:
             checksum_text=checksum_stream.read(2_000_000).decode('utf-8')
         matches=[]
         for line in checksum_text.splitlines():
             bits=line.split()
-            if len(bits)==2 and bits[1].lstrip('*').removeprefix('./')==filename and re.fullmatch('[a-fA-F0-9]{128}',bits[0]):
+            if len(bits)==2 and bits[1].lstrip('*').removeprefix('./')==filename and re.fullmatch('[a-fA-F0-9]{'+str(64 if checksum_algorithm=='sha256' else 128)+'}',bits[0]):
                 matches.append(bits[0].lower())
         if len(matches)!=1:raise ValueError('exact archive checksum entry missing or ambiguous')
         expected_digest=matches[0]
-        report['source']={'url':url,'archive':filename,'sha512_index':checksum_url,'expected_sha512':expected_digest,'checksum_authentication':'HTTPS transport only; no signature verification'}
+        report['source']={'url':url,'archive':filename,'checksum_index':checksum_url,'checksum_algorithm':checksum_algorithm,'expected_checksum':expected_digest,'checksum_authentication':'HTTPS transport only; signed index signature not verified'}
     except Exception as e:
         report['reason']='host discovery/source resolution failed: '+str(e)[:260];return finish(report,args.out)
     if os.geteuid()==0 or not shutil.which('bwrap'):
@@ -65,14 +67,14 @@ def main():
     if r['name']!=p['name'] or r['phase']!=m['phase']:report['reason']='recipe identity mismatch';return finish(report,args.out)
     if not isinstance(r.get('steps'),list) or not r['steps']:report['reason']='missing recipe steps';return finish(report,args.out)
     base.mkdir(parents=True,exist_ok=True);(base/'logs').mkdir();(base/'build').mkdir();(base/'prefix').mkdir()
-    archive=base/'source.tar';h=hashlib.sha512()
+    archive=base/'source.tar';h=hashlib.new(checksum_algorithm)
     try:
         with urllib.request.urlopen(url,timeout=90) as src, archive.open('wb') as f:
             while True:
                 part=src.read(1024*1024)
                 if not part:break
                 h.update(part);f.write(part)
-        report['source_sha512']=h.hexdigest()
+        report['source_checksum']=h.hexdigest()
         if h.hexdigest()!=expected_digest:report['reason']='source checksum mismatch';return finish(report,args.out)
         with tarfile.open(archive,'r:*') as f:f.extractall(base/'src',filter='data')
     except Exception as e:report['reason']='fetch/extract failed: '+str(e)[:300];return finish(report,args.out)

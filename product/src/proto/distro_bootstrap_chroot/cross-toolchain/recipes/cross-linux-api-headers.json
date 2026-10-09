@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "name": "linux-api-headers",
+  "phase": "cross-toolchain",
+  "status": "experiment",
+  "source_directory": "linux-{version}",
+  "build_directory": "build",
+  "install_prefix": "/work/prefix/sysroot/usr",
+  "steps": [
+    {
+      "name": "install-headers",
+      "argv": [
+        "make",
+        "-j{jobs}",
+        "-C",
+        "/work/src/linux-{version}",
+        "ARCH=x86",
+        "INSTALL_HDR_PATH=/work/prefix/sysroot/usr",
+        "headers_install"
+      ]
+    }
+  ],
+  "validation": {
+    "tools": [
+      "/work/prefix/sysroot/usr/include/linux/version.h",
+      "/work/prefix/sysroot/usr/include/asm/unistd.h"
+    ],
+    "relocatable_output": null
+  },
+  "description": "Export kernel userspace UAPI headers to target sysroot/usr/include, independently of running kernel. Source version from installed Arch linux-api-headers package."
+}

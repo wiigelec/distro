@@ -44,10 +44,21 @@
     },
     {
       "name": "linux-api-headers",
-      "state": "unresolved-header-version-discovery",
-      "host_version": null,
-      "source": null,
-      "recipe": null
+      "state": "executable",
+      "host_version": {
+        "argv": [
+          "pacman",
+          "-Q",
+          "linux-api-headers"
+        ],
+        "regex": "^linux-api-headers\\s+([0-9]+\\.[0-9]+(?:\\.[0-9]+)?)(?:-[0-9]+)?$"
+      },
+      "source": {
+        "archive_template": "linux-{version}.tar.xz",
+        "url_template": "https://cdn.kernel.org/pub/linux/kernel/v{major}.x/linux-{version}.tar.xz",
+        "sha256_index": "https://cdn.kernel.org/pub/linux/kernel/v{major}.x/sha256sums.asc"
+      },
+      "recipe": "recipes/cross-linux-api-headers.json"
     },
     {
       "name": "glibc",
