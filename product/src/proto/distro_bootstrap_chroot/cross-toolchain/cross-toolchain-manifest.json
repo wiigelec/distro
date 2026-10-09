@@ -62,7 +62,7 @@
     },
     {
       "name": "glibc",
-      "state": "unresolved-upstream-mapping-and-recipe",
+      "state": "executable",
       "host_version": {
         "argv": [
           "getconf",
@@ -70,8 +70,14 @@
         ],
         "regex": "^glibc ([0-9]+\\.[0-9]+(?:\\.[0-9]+)?)$"
       },
-      "source": null,
-      "recipe": null
+      "source": {
+        "archive_template": "glibc-{version}.tar.xz",
+        "url_template": "https://ftp.gnu.org/gnu/glibc/glibc-{version}.tar.xz",
+        "signature_url_template": "https://ftp.gnu.org/gnu/glibc/glibc-{version}.tar.xz.sig"
+      },
+      "recipe": "recipes/cross-glibc.json",
+      "requires_toolchain_root": true,
+      "install_subdir": "sysroot"
     }
   ],
   "note": "Distro's independent package/recipe candidates; only stage progression is modeled after LFS. Host release strings need source mapping validation."

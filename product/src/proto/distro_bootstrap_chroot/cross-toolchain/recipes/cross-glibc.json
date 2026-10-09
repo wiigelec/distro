@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "name": "glibc",
+  "phase": "cross-toolchain",
+  "status": "experiment",
+  "source_directory": "glibc-{version}",
+  "build_directory": "build",
+  "install_prefix": "/usr",
+  "steps": [
+    {
+      "name": "configure",
+      "argv": [
+        "/work/src/glibc-{version}/configure",
+        "--prefix=/usr",
+        "--host={target}",
+        "--build=x86_64-pc-linux-gnu",
+        "--with-headers=/toolchain/sysroot/usr/include",
+        "--disable-werror",
+        "--disable-nscd",
+        "CC=/toolchain/bin/{target}-gcc",
+        "CXX=/toolchain/bin/{target}-g++",
+        "AR=/toolchain/bin/{target}-ar",
+        "RANLIB=/toolchain/bin/{target}-ranlib"
+      ]
+    },
+    {
+      "name": "build",
+      "argv": [
+        "make",
+        "-j{jobs}"
+      ]
+    },
+    {
+      "name": "install",
+      "argv": [
+        "make",
+        "-j{jobs}",
+        "install",
+        "install_root=/work/prefix/sysroot"
+      ]
+    }
+  ],
+  "validation": {
+    "tools": [
+      "/work/prefix/sysroot/usr/lib/libc.so.6"
+    ],
+    "relocatable_output": null
+  },
+  "description": "Cross-build glibc using installed GCC/Binutils and exported Linux UAPI headers. Configure/build not yet proven; source signature requires independently trusted GPG signer."
+}
