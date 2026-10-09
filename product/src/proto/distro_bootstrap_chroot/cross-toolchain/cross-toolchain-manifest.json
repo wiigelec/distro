@@ -24,7 +24,7 @@
     },
     {
       "name": "gcc",
-      "state": "unresolved-upstream-mapping-and-recipe",
+      "state": "executable",
       "host_version": {
         "argv": [
           "gcc",
@@ -32,8 +32,15 @@
         ],
         "regex": "^([0-9]+\\.[0-9]+(?:\\.[0-9]+)?)$"
       },
-      "source": null,
-      "recipe": null
+      "upstream_version_policy": "major-minor-zero-release",
+      "requires_toolchain_root": true,
+      "install_subdir": "toolchain",
+      "source": {
+        "archive_template": "gcc-{version}.tar.xz",
+        "url_template": "https://gcc.gnu.org/pub/gcc/releases/gcc-{version}/gcc-{version}.tar.xz",
+        "sha512_index": "https://gcc.gnu.org/pub/gcc/releases/gcc-{version}/sha512.sum"
+      },
+      "recipe": "recipes/cross-gcc.json"
     },
     {
       "name": "linux-api-headers",

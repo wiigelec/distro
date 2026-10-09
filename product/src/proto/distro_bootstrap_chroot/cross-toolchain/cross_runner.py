@@ -11,7 +11,7 @@ def finish(report,out):
     return 0 if report['status']=='provisional-pass' else 1
 
 def main():
-    ap=argparse.ArgumentParser();ap.add_argument('--package',required=True);ap.add_argument('--workspace',type=pathlib.Path,required=True);ap.add_argument('--out',type=pathlib.Path);args=ap.parse_args()
+    ap=argparse.ArgumentParser();ap.add_argument('--package',required=True);ap.add_argument('--workspace',type=pathlib.Path,required=True);ap.add_argument('--toolchain-root',type=pathlib.Path);ap.add_argument('--out',type=pathlib.Path);args=ap.parse_args()
     m=load(ROOT/'cross-toolchain-manifest.json'); matches=[p for p in m['packages'] if p['name']==args.package]
     report={'schema_version':1,'phase':'cross-toolchain','package':args.package,'status':'blocked'}
     if len(matches)!=1:report['reason']='package absent or duplicated';return finish(report,args.out)
@@ -28,11 +28,16 @@ def main():
         version=found.group(1)
         if not re.fullmatch(r'[0-9]+(?:\.[0-9]+){1,2}',version):raise ValueError('unsafe source version')
         report['host_version_banner']=banner.splitlines()[0]
+        report['host_version']=version
+        policy=p.get('upstream_version_policy','exact')
+        if policy=='major-minor-zero-release': version='.'.join(version.split('.')[:2])+'.0'
+        elif policy!='exact':raise ValueError('unsupported upstream version policy')
         report['resolved_version']=version
         source=p['source']
         filename=source['archive_template'].format(version=version)
         url=source['url_template'].format(version=version)
-        with urllib.request.urlopen(source['sha512_index'],timeout=45) as checksum_stream:
+        checksum_url=source['sha512_index'].format(version=version)
+        with urllib.request.urlopen(checksum_url,timeout=45) as checksum_stream:
             checksum_text=checksum_stream.read(2_000_000).decode('utf-8')
         matches=[]
         for line in checksum_text.splitlines():
@@ -41,11 +46,17 @@ def main():
                 matches.append(bits[0].lower())
         if len(matches)!=1:raise ValueError('exact archive checksum entry missing or ambiguous')
         expected_digest=matches[0]
-        report['source']={'url':url,'archive':filename,'sha512_index':source['sha512_index'],'expected_sha512':expected_digest,'checksum_authentication':'HTTPS transport only; no signature verification'}
+        report['source']={'url':url,'archive':filename,'sha512_index':checksum_url,'expected_sha512':expected_digest,'checksum_authentication':'HTTPS transport only; no signature verification'}
     except Exception as e:
         report['reason']='host discovery/source resolution failed: '+str(e)[:260];return finish(report,args.out)
     if os.geteuid()==0 or not shutil.which('bwrap'):
         report['reason']='requires non-root user and bubblewrap';return finish(report,args.out)
+    toolchain_root=None
+    if p.get('requires_toolchain_root'):
+        if not args.toolchain_root:report['reason']='requires --toolchain-root';return finish(report,args.out)
+        toolchain_root=args.toolchain_root.resolve()
+        if not (toolchain_root/'bin'/ (m['target']+'-as')).is_file() or not (toolchain_root/'bin'/(m['target']+'-ld')).is_file():
+            report['reason']='cross Binutils not found in toolchain root';return finish(report,args.out)
     base=args.workspace.resolve()
     if base.exists() and any(base.iterdir()):report['reason']='workspace must be empty';return finish(report,args.out)
     recipe_path=(ROOT/p['recipe']).resolve()
@@ -67,7 +78,11 @@ def main():
     except Exception as e:report['reason']='fetch/extract failed: '+str(e)[:300];return finish(report,args.out)
     vars={'version':version,'target':m['target']}
     try:
-        (base/'check.s').write_text(r['validation']['assembly_source'])
+        fixtures=r['validation'].get('write_files',{})
+        if 'assembly_source' in r['validation']:fixtures['check.s']=r['validation']['assembly_source']
+        for name,body in fixtures.items():
+            if pathlib.PurePath(name).name!=name or '/' in name or name in ('.','..'):raise ValueError('unsafe validation fixture')
+            (base/name).write_text(body)
         steps=[]
         for s in r['steps']:
             argv=[v.format_map(vars) for v in s['argv']]
@@ -84,6 +99,7 @@ with open("/work/logs/build.log","w") as log:
 """
         (base/'steps.json').write_text(json.dumps(steps));(base/'guest.py').write_text(guest)
         cmd=[shutil.which('bwrap'),'--die-with-parent','--new-session','--unshare-user','--unshare-pid','--unshare-net','--unshare-ipc','--unshare-uts','--proc','/proc','--dev','/dev','--tmpfs','/tmp','--dir','/run','--bind',str(base),'/work','--chdir','/work/build','--clearenv','--setenv','HOME','/work','--setenv','PATH','/work/prefix/bin:/usr/bin:/bin','--setenv','LC_ALL','C']
+        if toolchain_root:cmd+=['--ro-bind',str(toolchain_root),'/toolchain']
         for name in ('usr','bin','sbin','lib','lib64','etc'):
             if (pathlib.Path('/')/name).exists():cmd += ['--ro-bind','/'+name,'/'+name]
         cmd += ['--','/usr/bin/python3','/work/guest.py']
@@ -93,7 +109,8 @@ with open("/work/logs/build.log","w") as log:
         outputs=[pathlib.Path(x.format_map(vars)) for x in r['validation']['tools']]
         # Sandbox /work maps to base on host.
         report['tool_paths_exist']=all((base/path.relative_to('/work')).is_file() for path in outputs)
-        report['relocatable_object_exists']=(base/'check-reloc.o').is_file()
+        object_spec=r['validation'].get('relocatable_output','/work/check-reloc.o')
+        report['relocatable_object_exists']=True if object_spec is None else (base/pathlib.Path(object_spec).relative_to('/work')).is_file()
         if not (report['tool_paths_exist'] and report['relocatable_object_exists']):report['reason']='expected recipe outputs missing';return finish(report,args.out)
         report['status']='provisional-pass';report['limitations']=['runtime and target sysroot closure unproven','source checksum is not a signature']
     except Exception as e:report['reason']='execution failed: '+str(e)[:300]

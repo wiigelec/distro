@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "name": "gcc",
+  "phase": "cross-toolchain",
+  "status": "experiment",
+  "source_directory": "gcc-{version}",
+  "build_directory": "build",
+  "install_prefix": "/toolchain",
+  "steps": [
+    {
+      "name": "configure",
+      "argv": [
+        "/work/src/gcc-{version}/configure",
+        "--target={target}",
+        "--prefix=/toolchain",
+        "--with-sysroot=/toolchain/sysroot",
+        "--with-as=/toolchain/bin/{target}-as",
+        "--with-ld=/toolchain/bin/{target}-ld",
+        "--without-headers",
+        "--disable-bootstrap",
+        "--disable-multilib",
+        "--disable-nls",
+        "--disable-libsanitizer",
+        "--disable-libssp",
+        "--disable-libquadmath",
+        "--disable-libgomp",
+        "--disable-libstdcxx",
+        "--enable-languages=c,c++"
+      ]
+    },
+    {
+      "name": "build-gcc",
+      "argv": [
+        "make",
+        "-j2",
+        "all-gcc"
+      ]
+    },
+    {
+      "name": "install-gcc",
+      "argv": [
+        "make",
+        "install-gcc",
+        "DESTDIR=/work/prefix"
+      ]
+    },
+    {
+      "name": "compiler-version",
+      "argv": [
+        "/work/prefix/toolchain/bin/{target}-gcc",
+        "--version"
+      ]
+    }
+  ],
+  "validation": {
+    "write_files": {
+      "check.c": "int distro_cross_gcc_probe(void) { return 42; }\n"
+    },
+    "tools": [
+      "/work/prefix/toolchain/bin/{target}-gcc",
+      "/work/prefix/toolchain/bin/{target}-g++"
+    ],
+    "relocatable_output": null
+  },
+  "description": "Host-following compiler-only GCC cross stage, no target libc, target linker supplied from installed Binutils; GCC prefix /toolchain is only valid in isolated toolchain mount. Compiler-only validation checks binaries; target C object compilation after staged prefix installed remains unproven."
+}
