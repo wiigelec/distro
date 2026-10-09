@@ -1,0 +1,201 @@
+#!/usr/bin/env python3
+"""Distro bootstrap phase driver; per-package resumability and live progress."""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import time
+
+HERE = Path(__file__).resolve()
+REPO = HERE.parents[2]
+PHASES = {
+    'cross-toolchain': REPO / 'product/src/proto/distro_bootstrap_chroot/cross-toolchain',
+}
+
+
+def digest(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def filehash(path):
+    h = hashlib.sha256()
+    with path.open('rb') as f:
+        for buf in iter(lambda: f.read(1024 * 1024), b''):
+            h.update(buf)
+    return h.hexdigest()
+
+
+def say(message):
+    print(message, flush=True)
+
+
+def save(path, record):
+    temp = path.with_suffix('.tmp')
+    temp.write_text(json.dumps(record, indent=2, sort_keys=True) + '\n')
+    os.replace(temp, path)
+
+
+def probe(package):
+    spec = package['host_version']
+    run = subprocess.run(spec['argv'], capture_output=True, text=True,
+                         env={'PATH': '/usr/bin:/bin', 'LC_ALL': 'C'}, timeout=30, check=False)
+    if run.returncode:
+        raise RuntimeError('host version probe failed: ' + package['name'])
+    import re
+    match = re.search(spec['regex'], run.stdout)
+    if not match:
+        raise RuntimeError('cannot identify host version: ' + package['name'])
+    return match.group(1)
+
+
+def copy_prefix(src, root, previous):
+    """Publish files without following symlinks outside destination root.
+
+    The prototype requires a clean target: it refuses changed package versions once
+    files have been installed, rather than accumulating incompatible runtime files.
+    """
+    if previous:
+        raise RuntimeError('changed package inputs with installed files: clean the target root before rebuilding this package')
+    copied = []
+    for path in sorted(src.rglob('*')):
+        rel = path.relative_to(src)
+        dst = root / rel
+        if path.is_dir() and not path.is_symlink():
+            if dst.is_symlink():
+                raise RuntimeError('destination directory is symlink: ' + str(dst))
+            dst.mkdir(parents=True, exist_ok=True)
+        elif path.is_symlink():
+            link = os.readlink(path)
+            if link.startswith('/') or '..' in Path(link).parts:
+                raise RuntimeError('unsafe package symlink ' + str(rel))
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            if dst.exists() or dst.is_symlink():
+                raise RuntimeError('destination already exists: ' + str(dst))
+            dst.symlink_to(link)
+            copied.append({'path': str(rel), 'link': link})
+        elif path.is_file():
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            if dst.exists() or dst.is_symlink():
+                raise RuntimeError('destination already exists: ' + str(dst))
+            shutil.copy2(path, dst)
+            copied.append({'path': str(rel), 'sha256': filehash(dst)})
+    return copied
+
+
+def good_stamp(stamp, signature, root):
+    if not stamp or stamp.get('signature') != signature or stamp.get('status') != 'complete':
+        return False
+    entries = stamp.get('installed', [])
+    if not entries:
+        return False
+    for item in entries:
+        dest = root / item['path']
+        if 'sha256' in item and (not dest.is_file() or filehash(dest) != item['sha256']):
+            return False
+        if 'link' in item and (not dest.is_symlink() or os.readlink(dest) != item['link']):
+            return False
+    return True
+
+
+def main():
+    ap = argparse.ArgumentParser(description='Build a Distro bootstrap phase into a selected root')
+    ap.add_argument('phase', choices=PHASES)
+    ap.add_argument('--root', required=True, type=Path)
+    args = ap.parse_args()
+    if os.geteuid() == 0:
+        ap.error('run as an ordinary user')
+    root = args.root.expanduser().resolve()
+    if root == Path('/') or root == Path.home().resolve():
+        ap.error('unsafe installation root')
+    phase = PHASES[args.phase]
+    manifest_path = phase / (args.phase + '-manifest.json')
+    manifest = json.loads(manifest_path.read_text())
+    if manifest.get('phase') != args.phase:
+        ap.error('phase mismatch in manifest')
+    root.mkdir(parents=True, exist_ok=True)
+    state = root / '.distro-bootstrap'
+    work = state / 'work' / args.phase
+    stamps = state / 'stamps' / args.phase
+    work.mkdir(parents=True, exist_ok=True)
+    stamps.mkdir(parents=True, exist_ok=True)
+    packages = manifest['packages']
+    say(f'[build] phase={args.phase} root={root} packages={len(packages)}')
+    t0 = time.monotonic()
+    for n, pkg in enumerate(packages, 1):
+        name = pkg['name']
+        say(f'[{n}/{len(packages)}] {name}: inspecting manifest')
+        if pkg.get('state') != 'executable':
+            say(f'[{n}/{len(packages)}] {name}: BLOCKED (recipe or source mapping not ready)')
+            return 2
+        recipe_path = (phase / pkg['recipe']).resolve()
+        if not recipe_path.is_relative_to(phase.resolve()):
+            raise RuntimeError('recipe escapes phase directory')
+        version = probe(pkg)
+        signature = digest(json.dumps({'package': pkg, 'target': manifest['target'],
+            'recipe_sha256': filehash(recipe_path), 'version': version,
+            'runner_sha256': filehash(phase / 'cross_runner.py')}, sort_keys=True).encode())
+        stamp_path = stamps / (name + '.json')
+        old = json.loads(stamp_path.read_text()) if stamp_path.exists() else None
+        say(f'[{n}/{len(packages)}] {name}: host version {version}')
+        if good_stamp(old, signature, root):
+            say(f'[{n}/{len(packages)}] {name}: SKIP verified stamp')
+            continue
+        if old and old.get('installed'):
+            say(f'[{n}/{len(packages)}] {name}: BLOCKED changed inputs / installed files; use a clean root')
+            return 2
+        runid = 1
+        while (work / f'{name}-{runid:03d}').exists():
+            runid += 1
+        workspace = work / f'{name}-{runid:03d}'
+        result_path = work / f'{name}-{runid:03d}-result.json'
+        runner = phase / 'cross_runner.py'
+        argv = [sys.executable, str(runner), '--package', name, '--workspace', str(workspace), '--out', str(result_path)]
+        say(f'[{n}/{len(packages)}] {name}: BUILD started; workspace={workspace}')
+        start = time.monotonic()
+        p = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        last_step = None
+        last_announced = None
+        last_report = 0.0
+        while p.poll() is None:
+            logfile = workspace / 'logs/build.log'
+            if logfile.exists():
+                with logfile.open(errors='replace') as f:
+                    for line in f:
+                        if line.startswith('STEP '):
+                            last_step = line.strip()[5:]
+                if last_step is not None and last_step != last_announced:
+                    say(f'[{n}/{len(packages)}] {name}: step={last_step}')
+                    last_announced = last_step
+            if time.monotonic() - last_report >= 30:
+                say(f'[{n}/{len(packages)}] {name}: running ({int(time.monotonic()-start)}s)' + (f' step={last_step}' if last_step else ' acquiring/verifying source'))
+                last_report = time.monotonic()
+            time.sleep(2)
+        stdout, stderr = p.communicate()
+        if p.returncode or not result_path.exists():
+            say(f'[{n}/{len(packages)}] {name}: FAILED exit={p.returncode} log={workspace / "logs/build.log"} report={result_path}')
+            if stderr:
+                say(stderr[-1000:])
+            return 1
+        report = json.loads(result_path.read_text())
+        if report.get('status') != 'provisional-pass':
+            say(f'[{n}/{len(packages)}] {name}: BLOCKED {report.get("reason", "unknown")} log={workspace / "logs/build.log"}')
+            return 1
+        say(f'[{n}/{len(packages)}] {name}: BUILD passed ({int(time.monotonic()-start)}s); installing into root')
+        installed = copy_prefix(workspace / 'prefix', root, old and old.get('installed'))
+        save(stamp_path, {'schema_version': 1, 'status': 'complete', 'package': name,
+                          'host_version': version, 'signature': signature,
+                          'installed': installed, 'result': str(result_path)})
+        say(f'[{n}/{len(packages)}] {name}: COMPLETE ({len(installed)} installed entries)')
+    say(f'[build] COMPLETE phase={args.phase} elapsed={int(time.monotonic()-t0)}s')
+    return 0
+
+if __name__ == '__main__':
+    try:
+        raise SystemExit(main())
+    except (OSError, ValueError, RuntimeError, KeyError) as e:
+        say('[build] ERROR: ' + str(e))
+        raise SystemExit(1)
