@@ -53,34 +53,56 @@ def probe(package):
 
 
 def copy_prefix(src, root, previous):
-    """Publish files without following symlinks outside destination root.
+    """Preflight every destination before copying, then install without overwrites.
 
-    The prototype requires a clean target: it refuses changed package versions once
-    files have been installed, rather than accumulating incompatible runtime files.
+    share/info/dir is a generated GNU Texinfo index, not a package-owned payload.
+    A separate indexing step can regenerate it later.
     """
     if previous:
-        raise RuntimeError('changed package inputs with installed files: clean the target root before rebuilding this package')
-    copied = []
+        raise RuntimeError('changed package inputs with installed files: use a clean target root')
+    if not src.is_dir() or src.is_symlink():
+        raise RuntimeError('missing or invalid staging prefix: ' + str(src))
+    entries = []
     for path in sorted(src.rglob('*')):
         rel = path.relative_to(src)
+        if rel.as_posix() == 'share/info/dir':
+            continue
         dst = root / rel
         if path.is_dir() and not path.is_symlink():
-            if dst.is_symlink():
-                raise RuntimeError('destination directory is symlink: ' + str(dst))
-            dst.mkdir(parents=True, exist_ok=True)
+            kind = 'dir'
         elif path.is_symlink():
             link = os.readlink(path)
             if link.startswith('/') or '..' in Path(link).parts:
-                raise RuntimeError('unsafe package symlink ' + str(rel))
+                raise RuntimeError('unsafe package symlink: ' + str(rel))
+            kind = 'link'
+        elif path.is_file():
+            kind = 'file'
+        else:
+            raise RuntimeError('unsupported staged entry: ' + str(rel))
+        # Never follow a pre-existing symlink in any destination parent.
+        parent = dst.parent
+        while parent != root:
+            if parent.is_symlink():
+                raise RuntimeError('symlink in destination parent: ' + str(parent))
+            parent = parent.parent
+        if kind == 'dir':
+            if dst.is_symlink() or (dst.exists() and not dst.is_dir()):
+                raise RuntimeError('destination directory conflict: ' + str(dst))
+        elif dst.exists() or dst.is_symlink():
+            raise RuntimeError('destination already exists: ' + str(dst))
+        entries.append((path, rel, dst, kind))
+    # No filesystem mutation until the entire installation is conflict-free.
+    copied = []
+    for path, rel, dst, kind in entries:
+        if kind == 'dir':
+            dst.mkdir(parents=True, exist_ok=True)
+        elif kind == 'link':
             dst.parent.mkdir(parents=True, exist_ok=True)
-            if dst.exists() or dst.is_symlink():
-                raise RuntimeError('destination already exists: ' + str(dst))
+            link = os.readlink(path)
             dst.symlink_to(link)
             copied.append({'path': str(rel), 'link': link})
-        elif path.is_file():
+        else:
             dst.parent.mkdir(parents=True, exist_ok=True)
-            if dst.exists() or dst.is_symlink():
-                raise RuntimeError('destination already exists: ' + str(dst))
             shutil.copy2(path, dst)
             copied.append({'path': str(rel), 'sha256': filehash(dst)})
     return copied
