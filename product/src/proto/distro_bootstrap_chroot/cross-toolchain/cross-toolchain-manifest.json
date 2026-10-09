@@ -73,7 +73,10 @@
       "source": {
         "archive_template": "glibc-{version}.tar.xz",
         "url_template": "https://ftp.gnu.org/gnu/glibc/glibc-{version}.tar.xz",
-        "signature_url_template": "https://ftp.gnu.org/gnu/glibc/glibc-{version}.tar.xz.sig"
+        "signature_url_template": "https://ftp.gnu.org/gnu/glibc/glibc-{version}.tar.xz.sig",
+        "allowed_signer_fingerprints": [
+          "FD19E6D31B192EE4DC63EAD3DC2B16215ED5412A"
+        ]
       },
       "recipe": "recipes/cross-glibc.json",
       "requires_toolchain_root": true,

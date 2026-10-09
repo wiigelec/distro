@@ -41,7 +41,7 @@ def main():
         checksum_algorithm='sha256' if 'sha256_index' in source or signed_source else 'sha512'
         if signed_source:
             signature_url=source['signature_url_template'].format_map(source_vars)
-            report['source']={'url':url,'archive':filename,'signature_url':signature_url,'signature_authentication':'OpenPGP signature; signer trust requires local trusted GPG key'}
+            report['source']={'url':url,'archive':filename,'signature_url':signature_url,'signature_authentication':'OpenPGP signature verified against manifest-approved signing subkey; signer identity requires independent review'}
         else:
             checksum_url=source[checksum_algorithm+'_index'].format_map(source_vars)
             with urllib.request.urlopen(checksum_url,timeout=45) as checksum_stream:
@@ -89,14 +89,24 @@ def main():
                 report['reason']='signed glibc source requires gpg with an independently trusted release signing key';return finish(report,args.out)
             verify=subprocess.run(['gpg','--batch','--status-fd','1','--verify',str(signature),str(archive)],capture_output=True,text=True,timeout=90,check=False)
             status_lines=verify.stdout.splitlines()
-            valid=[line for line in status_lines if line.startswith('[GNUPG:] VALIDSIG ')]
-            trust=[line for line in status_lines if line in ('[GNUPG:] TRUST_FULLY 0 pgp','[GNUPG:] TRUST_ULTIMATE 0 pgp') or line.startswith('[GNUPG:] TRUST_FULLY') or line.startswith('[GNUPG:] TRUST_ULTIMATE')]
-            if verify.returncode or len(valid)!=1 or not trust:
-                report['reason']='glibc signature missing, unverified, or signer not locally trusted; import and validate official glibc release key first'
-                report['signature_diagnostics']=verify.stderr[-700:]
+            valid=[line.split() for line in status_lines if line.startswith('[GNUPG:] VALIDSIG ')]
+            good=[line for line in status_lines if line.startswith('[GNUPG:] GOODSIG ')]
+            invalid_markers=('BADSIG','ERRSIG','REVKEYSIG','EXPKEYSIG','KEYEXPIRED','SIGEXPIRED')
+            invalid=[line for line in status_lines if any(line.startswith('[GNUPG:] '+flag+' ') for flag in invalid_markers)]
+            approved=source.get('allowed_signer_fingerprints',[])
+            if (not isinstance(approved,list) or not approved or
+                any(not isinstance(fp,str) or not re.fullmatch('[A-F0-9]{40}',fp) for fp in approved)):
+                report['reason']='missing or invalid manifest signing subkey allowlist'
                 return finish(report,args.out)
-            report['source']['signer_fingerprint']=valid[0].split()[2]
+            signer=valid[0][2].upper() if len(valid)==1 and len(valid[0])>2 else None
+            if verify.returncode or len(valid)!=1 or len(good)!=1 or invalid or signer not in approved:
+                report['reason']='glibc detached signature failed cryptographic validation or signer not approved in manifest'
+                report['signature_diagnostics']=verify.stderr[-700:]
+                report['observed_signer_fingerprint']=signer
+                return finish(report,args.out)
+            report['source']['signer_fingerprint']=signer
             report['source']['signature_verified']=True
+            report['source']['signature_policy']='manifest-approved signing subkey (GPG ownertrust not consulted)'
         elif h.hexdigest()!=expected_digest:
             report['reason']='source checksum mismatch';return finish(report,args.out)
         with tarfile.open(archive,'r:*') as f:f.extractall(base/'src',filter='data')
