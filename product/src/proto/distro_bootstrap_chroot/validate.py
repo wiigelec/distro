@@ -4,8 +4,8 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-caps = json.loads((ROOT / "capabilities.json").read_text())
-manifest = json.loads((ROOT / "build-chroot-candidate.json").read_text())
+caps = json.loads((ROOT / "extra-tools/capabilities.json").read_text())
+manifest = json.loads((ROOT / "extra-tools/build-chroot-candidate.json").read_text())
 assert caps["status"] == "exploratory"
 assert manifest["proven"] is False
 assert manifest["status"] == "hypothesis-not-dependency-closed"

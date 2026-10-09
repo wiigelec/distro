@@ -3,6 +3,26 @@
 Status: **prototype hypothesis; not Product Design, Planning, or an accepted Functional Set**.
 Proposed branch: `proto/distro-bootstrap-chroot` (branched from `main`).
 
+## Directory layout
+
+The three working phases follow the conceptual progression of LFS Chapters 5–7 without importing its package lists, recipes, or version pins:
+
+- `cross-toolchain/`: active host-following manifest, runner and JSON recipes.
+  - `cross-toolchain/host/`: B0 host qualification and isolation probes.
+  - `cross-toolchain/experiments/`: retained historical B1 experiments (not the active version policy).
+- `temporary-tools/`: reserved for target-executable temporary userspace.
+- `extra-tools/`: reserved for native build tools and exploratory Build-chroot hypotheses.
+
+From the repository root, run the active Binutils experiment with a fresh workspace:
+
+```sh
+python3 product/src/proto/distro_bootstrap_chroot/cross-toolchain/cross_runner.py \
+  --package binutils --workspace /var/tmp/distro-cross-new \
+  --out /tmp/distro-cross-result.json
+```
+
+Host versions are discovered on every run; there are no persistent version locks. Earlier B1 experimental scripts are preserved as historical evidence only.
+
 ## Question
 
 What minimum independent bootstrap stages, tools, and package closure are needed to produce a Distro-native Build chroot and rebuild a representative package without an undeclared foreign-host dependency?
