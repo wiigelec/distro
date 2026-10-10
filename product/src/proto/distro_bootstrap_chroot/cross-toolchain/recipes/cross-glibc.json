@@ -42,7 +42,7 @@
   ],
   "validation": {
     "tools": [
-      "/work/prefix/sysroot/usr/lib64/libc.so.6",
+      "/work/prefix/sysroot/lib64/libc.so.6",
       "/work/prefix/sysroot/lib64/ld-linux-x86-64.so.2"
     ],
     "relocatable_output": null
