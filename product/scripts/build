@@ -238,6 +238,12 @@ def main():
                           'host_version': version, 'signature': signature,
                           'installed': installed, 'result': str(result_path)})
         say(f'[{n}/{len(packages)}] {name}: COMPLETE ({len(installed)} installed entries)')
+    say(f'[build] validating compiled toolchain and exporting clean root')
+    result = subprocess.run([sys.executable, str(phase / 'cross_validate_export.py'),
+                             '--root', str(root), '--project', str(project)],
+                            check=False)
+    if result.returncode:
+        raise RuntimeError('cross-toolchain validation/export failed')
     say(f'[build] COMPLETE phase={args.phase} elapsed={int(time.monotonic()-t0)}s')
     return 0
 
