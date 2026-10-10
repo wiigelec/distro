@@ -18,6 +18,8 @@
         "--with-ld=/toolchain/bin/{target}-ld",
         "--without-headers",
         "--disable-fixincludes",
+        "--disable-threads",
+        "--disable-shared",
         "--disable-bootstrap",
         "--disable-multilib",
         "--disable-nls",
@@ -38,10 +40,26 @@
       ]
     },
     {
+      "name": "build-libgcc",
+      "argv": [
+        "make",
+        "-j{jobs}",
+        "all-target-libgcc"
+      ]
+    },
+    {
       "name": "install-gcc",
       "argv": [
         "make",
         "install-gcc",
+        "DESTDIR=/work/prefix"
+      ]
+    },
+    {
+      "name": "install-libgcc",
+      "argv": [
+        "make",
+        "install-target-libgcc",
         "DESTDIR=/work/prefix"
       ]
     },
@@ -59,9 +77,10 @@
     },
     "tools": [
       "/work/prefix/toolchain/bin/{target}-gcc",
-      "/work/prefix/toolchain/bin/{target}-g++"
+      "/work/prefix/toolchain/bin/{target}-g++",
+      "/work/prefix/toolchain/lib/gcc/{target}/{version}/libgcc.a"
     ],
     "relocatable_output": null
   },
-  "description": "Host-following compiler-only GCC cross stage, no target libc, target linker supplied from installed Binutils; GCC prefix /toolchain is only valid in isolated toolchain mount. Compiler-only validation checks binaries; target C object compilation after staged prefix installed remains unproven."
+  "description": "Host-following bootstrap cross C/C++ compiler and static target libgcc; no target libc, shared runtime, or libstdc++. GCC and libgcc install into /toolchain, visible only inside the isolated toolchain mount. Compiler and libgcc artifact existence checked; end-to-end target linking remains unproven."
 }
