@@ -122,8 +122,12 @@ def main():
     check(sandbox + [compiler, "--sysroot=/toolchain", "-fno-link-libatomic",
                      "-c", "/work/smoke.c", "-o", "/work/smoke.o"])
     print("[validate] compile-only: PASS", flush=True)
+    # GCC was bootstrapped before glibc existed, so its compiled-in startfile
+    # search paths do not include the target's /usr/lib64 layout. Supply the
+    # target locations explicitly; do not fall back to host startup files.
     check(sandbox + [compiler, "--sysroot=/toolchain", "-fno-link-libatomic",
-                     "/work/smoke.c", "-o", "/work/smoke"])
+                     "-B/toolchain/usr/lib64/", "-L/toolchain/usr/lib64",
+                     "-L/toolchain/lib64", "/work/smoke.c", "-o", "/work/smoke"])
     print("[validate] executable link: PASS", flush=True)
     elf = elf_checks(obj, binary)
     print("[validate] ELF interpreter and NEEDED: PASS", flush=True)
