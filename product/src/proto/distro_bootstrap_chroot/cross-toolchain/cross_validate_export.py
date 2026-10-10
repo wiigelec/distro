@@ -103,10 +103,21 @@ def main():
     obj = work / "smoke.o"
     binary = work / "smoke"
     src.write_text('#include <stdio.h>\nint main(void) { puts("distro-cross-toolchain-ok"); return 0; }\n')
-    sandbox = ["bwrap", "--die-with-parent", "--unshare-net", "--ro-bind", "/", "/",
-               "--ro-bind", str(root), "/toolchain", "--bind", str(work), "/work",
+    # Mirror the working cross_runner sandbox. Binding host / read-only first
+    # prevents Bubblewrap from creating /toolchain as a mount point.
+    sandbox = ["bwrap", "--die-with-parent", "--new-session",
+               "--unshare-user", "--unshare-pid", "--unshare-net",
+               "--unshare-ipc", "--unshare-uts",
+               "--proc", "/proc", "--dev", "/dev", "--tmpfs", "/tmp",
+               "--dir", "/run", "--ro-bind", str(root), "/toolchain",
+               "--bind", str(work), "/work", "--clearenv",
+               "--setenv", "HOME", "/work",
                "--setenv", "PATH", "/toolchain/bin:/usr/bin:/bin",
-               "--setenv", "LC_ALL", "C", "--"]
+               "--setenv", "LC_ALL", "C"]
+    for name in ("usr", "bin", "sbin", "lib", "lib64", "etc"):
+        if (Path("/") / name).exists():
+            sandbox.extend(["--ro-bind", "/" + name, "/" + name])
+    sandbox.append("--")
     compiler = f"/toolchain/bin/{TARGET}-gcc"
     check(sandbox + [compiler, "--sysroot=/toolchain", "-fno-link-libatomic",
                      "-c", "/work/smoke.c", "-o", "/work/smoke.o"])
