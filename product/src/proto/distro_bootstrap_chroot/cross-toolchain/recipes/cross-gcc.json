@@ -17,6 +17,7 @@
         "--with-as=/toolchain/bin/{target}-as",
         "--with-ld=/toolchain/bin/{target}-ld",
         "--without-headers",
+        "--with-newlib",
         "--disable-fixincludes",
         "--disable-threads",
         "--disable-shared",
