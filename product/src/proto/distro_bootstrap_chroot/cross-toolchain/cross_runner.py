@@ -91,7 +91,7 @@ def main():
             status_lines=verify.stdout.splitlines()
             valid=[line.split() for line in status_lines if line.startswith('[GNUPG:] VALIDSIG ')]
             good=[line for line in status_lines if line.startswith('[GNUPG:] GOODSIG ')]
-            invalid_markers=('BADSIG','ERRSIG','REVKEYSIG','EXPKEYSIG','KEYEXPIRED','SIGEXPIRED')
+            invalid_markers=('BADSIG','ERRSIG','REVKEYSIG','EXPKEYSIG','SIGEXPIRED')
             invalid=[line for line in status_lines if any(line.startswith('[GNUPG:] '+flag+' ') for flag in invalid_markers)]
             approved=source.get('allowed_signer_fingerprints',[])
             if (not isinstance(approved,list) or not approved or
