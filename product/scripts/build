@@ -72,8 +72,23 @@ def copy_prefix(src, root, previous):
             kind = 'dir'
         elif path.is_symlink():
             link = os.readlink(path)
-            if link.startswith('/') or '..' in Path(link).parts:
+            if Path(link).is_absolute():
                 raise RuntimeError('unsafe package symlink: ' + str(rel))
+            # Walk the target lexically; do not resolve links on the host.
+            components = list(rel.parent.parts) if rel.parent != Path('.') else []
+            for component in Path(link).parts:
+                if component in ('', '.'):
+                    continue
+                if component == '..':
+                    if not components:
+                        raise RuntimeError('unsafe package symlink: ' + str(rel))
+                    components.pop()
+                else:
+                    components.append(component)
+            # Reject any pre-existing symlink chain leading outside the root.
+            target = root.joinpath(*components)
+            if not target.resolve(strict=False).is_relative_to(root.resolve()):
+                raise RuntimeError('unsafe package symlink target: ' + str(rel))
             kind = 'link'
         elif path.is_file():
             kind = 'file'
