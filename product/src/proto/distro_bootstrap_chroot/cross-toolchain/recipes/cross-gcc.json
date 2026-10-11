@@ -12,7 +12,7 @@
       "argv": [
         "/work/src/gcc-{version}/configure",
         "--target={target}",
-        "--prefix=/toolchain",
+        "--prefix=/toolchain/usr",
         "--with-sysroot=/toolchain",
         "--with-as=/toolchain/bin/{target}-as",
         "--with-ld=/toolchain/bin/{target}-ld",
@@ -67,7 +67,7 @@
     {
       "name": "compiler-version",
       "argv": [
-        "/work/prefix/toolchain/bin/{target}-gcc",
+        "/work/prefix/toolchain/usr/bin/{target}-gcc",
         "--version"
       ]
     }
@@ -77,9 +77,9 @@
       "check.c": "int distro_cross_gcc_probe(void) { return 42; }\n"
     },
     "tools": [
-      "/work/prefix/toolchain/bin/{target}-gcc",
-      "/work/prefix/toolchain/bin/{target}-g++",
-      "/work/prefix/toolchain/lib/gcc/{target}/{version}/libgcc.a"
+      "/work/prefix/toolchain/usr/bin/{target}-gcc",
+      "/work/prefix/toolchain/usr/bin/{target}-g++",
+      "/work/prefix/toolchain/usr/lib/gcc/{target}/{version}/libgcc.a"
     ],
     "relocatable_output": null
   },
