@@ -58,6 +58,7 @@
         "url_template": "https://cdn.kernel.org/pub/linux/kernel/v{major}.x/linux-{version}.tar.xz",
         "sha256_index": "https://cdn.kernel.org/pub/linux/kernel/v{major}.x/sha256sums.asc"
       },
+      "install_subdir": "sysroot",
       "recipe": "recipes/cross-linux-api-headers.json"
     },
     {
