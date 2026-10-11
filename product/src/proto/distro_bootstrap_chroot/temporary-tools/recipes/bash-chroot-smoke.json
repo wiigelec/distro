@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "name": "bash-chroot-smoke",
+  "version": "1",
+  "steps": [
+    {
+      "name": "builtins-check",
+      "cwd": "/build",
+      "argv": ["/bin/bash", "--noprofile", "--norc", "-c", "test -r /usr/include/linux/version.h && test -x /bin/bash && printf 'chroot-bash-builtins-ok\\n'"]
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+#!/usr/bin/env python3
+"""Generate and execute an auditable Bash package build in the Distro root.
+
+Bootstrap prototype: execution reports are not installation ownership stamps.
+"""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import shlex
+import shutil
+import subprocess
+import sys
+
+
+def digest(path):
+    h = hashlib.sha256()
+    with path.open('rb') as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b''):
+            h.update(block)
+    return h.hexdigest()
+
+
+def safe_name(value):
+    if not isinstance(value, str) or not re.fullmatch(r'[a-zA-Z0-9][a-zA-Z0-9_.+-]*', value):
+        raise ValueError('invalid package/version identifier')
+    return value
+
+
+def build_script(recipe, archive_name):
+    if recipe.get('schema_version') != 1:
+        raise ValueError('unsupported recipe schema')
+    name = safe_name(recipe['name'])
+    version = safe_name(recipe['version'])
+    steps = recipe['steps']
+    if not isinstance(steps, list) or not steps:
+        raise ValueError('recipe requires build steps')
+    lines = [
+        '#!/bin/bash', 'set -euo pipefail', 'umask 022',
+        'export PATH=/usr/bin:/bin', 'export LC_ALL=C',
+        'export HOME=/build', 'cd /build',
+        "printf '%s\\n' " + shlex.quote('DISTRO package ' + name + '-' + version),
+    ]
+    if archive_name:
+        # Archive is preverified by the host and exposed read-only at /sources.
+        lines += ['mkdir -p /build/source',
+                  'tar -xf ' + shlex.quote('/sources/' + archive_name) + ' -C /build/source']
+    for index, step in enumerate(steps, 1):
+        if not isinstance(step, dict) or set(step) != {'name', 'cwd', 'argv'}:
+            raise ValueError('step requires exactly name, cwd, argv')
+        step_name = safe_name(step['name'])
+        cwd = step['cwd']
+        if (not isinstance(cwd, str) or not cwd.startswith('/build') or
+                (cwd != '/build' and not cwd.startswith('/build/')) or
+                '..' in Path(cwd).parts):
+            raise ValueError('step cwd must stay beneath /build')
+        argv = step['argv']
+        if not isinstance(argv, list) or not argv or any(not isinstance(x, str) or not x or '\x00' in x or '\n' in x for x in argv):
+            raise ValueError('step argv must be nonempty strings')
+        lines += ["printf '%s\\n' " + shlex.quote('STEP ' + str(index) + ' ' + step_name),
+                  'cd ' + shlex.quote(cwd), shlex.join(argv)]
+    lines.append("printf '%s\\n' " + shlex.quote('DISTRO package script complete'))
+    return '\n'.join(lines) + '\n'
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument('--project', required=True, type=Path)
+    ap.add_argument('--recipe', required=True, type=Path)
+    ap.add_argument('--archive', type=Path)
+    ap.add_argument('--generate-only', action='store_true')
+    args = ap.parse_args()
+    if os.geteuid() == 0:
+        ap.error('run as a regular user')
+    project = args.project.expanduser().resolve()
+    root = project / 'root'
+    state = project / '.distro-bootstrap'
+    if project in (Path('/'), Path.home().resolve()) or root.is_symlink() or not root.is_dir():
+        raise RuntimeError('invalid project root')
+    if state.is_symlink() or not state.is_dir():
+        raise RuntimeError('missing or unsafe build state')
+    if not (root / 'bin/bash').is_file():
+        raise RuntimeError('the target root must contain Bash')
+    recipe_path = args.recipe.expanduser().resolve(strict=True)
+    recipe = json.loads(recipe_path.read_text())
+    name = safe_name(recipe['name'])
+    version = safe_name(recipe['version'])
+    archive = None
+    if args.archive:
+        archive = args.archive.expanduser().resolve(strict=True)
+        if not archive.is_file():
+            raise RuntimeError('source archive missing')
+        expected = recipe.get('source_sha256')
+        if not isinstance(expected, str) or not re.fullmatch(r'[0-9a-f]{64}', expected):
+            raise ValueError('source_sha256 required when providing archive')
+        if digest(archive) != expected:
+            raise RuntimeError('source archive checksum mismatch')
+    elif 'source_sha256' in recipe:
+        raise ValueError('recipe requires a source archive')
+    runs = state / 'work' / 'chroot-packages' / (name + '-' + version)
+    if runs.is_symlink():
+        raise RuntimeError('unsafe package work directory')
+    runs.mkdir(parents=True, exist_ok=True)
+    number = 1
+    while (runs / f'run-{number:03d}').exists():
+        number += 1
+    work = runs / f'run-{number:03d}'
+    work.mkdir()
+    text = build_script(recipe, archive.name if archive else None)
+    script = work / 'build.sh'
+    script.write_text(text)
+    script.chmod(0o644)  # invoked as /bin/bash /build/build.sh
+    report = {'schema_version': 1, 'package': name, 'version': version,
+              'recipe_sha256': digest(recipe_path), 'script_sha256': digest(script),
+              'status': 'generated', 'script': str(script)}
+    if args.generate_only:
+        (work / 'result.json').write_text(json.dumps(report, indent=2) + '\n')
+        print(f'[chroot-package] generated: {script}')
+        return
+    if shutil.which('bwrap') is None:
+        raise RuntimeError('bubblewrap required for isolated chroot execution')
+    # Do not bind the host /usr, toolchain, or executable paths into the guest.
+    command = ['bwrap', '--die-with-parent', '--new-session', '--unshare-user',
+               '--unshare-pid', '--unshare-net', '--unshare-ipc', '--unshare-uts',
+               '--bind', str(root), '/', '--bind', str(work), '/build']
+    if archive:
+        command += ['--dir', '/sources', '--ro-bind', str(archive), '/sources/' + archive.name]
+    command += ['--proc', '/proc', '--dev', '/dev', '--tmpfs', '/tmp',
+                '--chdir', '/build', '--clearenv', '--setenv', 'PATH', '/usr/bin:/bin',
+                '--setenv', 'HOME', '/build', '--setenv', 'LC_ALL', 'C',
+                '--', '/bin/bash', '--noprofile', '--norc', '/build/build.sh']
+    log = work / 'build.log'
+    try:
+        with log.open('w') as stream:
+            proc = subprocess.run(command, stdout=stream, stderr=subprocess.STDOUT,
+                                  timeout=7200, check=False)
+        report['status'] = 'executed' if proc.returncode == 0 else 'failed'
+        report['exit_code'] = proc.returncode
+        report['log'] = str(log)
+        (work / 'result.json').write_text(json.dumps(report, indent=2) + '\n')
+        if proc.returncode:
+            raise RuntimeError(f'package script failed ({proc.returncode}); inspect {log}')
+        print(f'[chroot-package] execution PASS; script={script} log={log}')
+        print('[chroot-package] NOTE: execution PASS does not certify package ownership or install correctness')
+    except subprocess.TimeoutExpired:
+        report['status'] = 'timeout'
+        (work / 'result.json').write_text(json.dumps(report, indent=2) + '\n')
+        raise
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except (OSError, RuntimeError, ValueError, KeyError, subprocess.TimeoutExpired) as exc:
+        print('[chroot-package] ERROR:', exc, file=sys.stderr)
+        sys.exit(1)
