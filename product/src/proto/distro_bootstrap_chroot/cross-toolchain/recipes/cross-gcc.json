@@ -13,7 +13,7 @@
         "/work/src/gcc-{version}/configure",
         "--target={target}",
         "--prefix=/toolchain",
-        "--with-sysroot=/toolchain/sysroot",
+        "--with-sysroot=/toolchain",
         "--with-as=/toolchain/bin/{target}-as",
         "--with-ld=/toolchain/bin/{target}-ld",
         "--without-headers",
