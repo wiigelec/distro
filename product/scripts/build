@@ -53,6 +53,33 @@ def probe(package):
     return match.group(1)
 
 
+def initialize_merged_usr(root):
+    """Create/check the canonical filesystem skeleton before installing packages."""
+    links = {'bin': 'usr/bin', 'sbin': 'usr/sbin',
+             'lib': 'usr/lib', 'lib64': 'usr/lib64'}
+    if not any(root.iterdir()):
+        for subdir in ('usr/bin', 'usr/sbin', 'usr/lib', 'usr/lib64', 'usr/include'):
+            (root / subdir).mkdir(parents=True, exist_ok=True)
+        for name, target in links.items():
+            (root / name).symlink_to(target)
+    for name, target in links.items():
+        link = root / name
+        if not link.is_symlink() or os.readlink(link) != target:
+            raise RuntimeError('incompatible bootstrap root layout: ' + str(link))
+    for name in ('usr/bin', 'usr/sbin', 'usr/lib', 'usr/lib64', 'usr/include'):
+        path = root / name
+        if not path.is_dir() or path.is_symlink():
+            raise RuntimeError('missing or unsafe merged-/usr directory: ' + str(path))
+
+
+def canonical_install_path(rel):
+    """Install legacy top-level paths into /usr, never over root symlinks."""
+    parts = rel.parts
+    if parts and parts[0] in ('bin', 'sbin', 'lib', 'lib64'):
+        return Path('usr', *parts)
+    return rel
+
+
 def copy_prefix(src, root, previous):
     """Preflight every destination before copying, then install without overwrites.
 
@@ -68,7 +95,7 @@ def copy_prefix(src, root, previous):
         rel = path.relative_to(src)
         if rel.as_posix() == 'share/info/dir':
             continue
-        dst = root / rel
+        dst = root / canonical_install_path(rel)
         if path.is_dir() and not path.is_symlink():
             kind = 'dir'
         elif path.is_symlink():
@@ -193,6 +220,7 @@ def main():
         ap.error('phase mismatch in manifest')
     project.mkdir(parents=True, exist_ok=True)
     root.mkdir(parents=True, exist_ok=True)
+    initialize_merged_usr(root)
     state.mkdir(parents=True, exist_ok=True)
     work = state / 'work' / args.phase
     stamps = state / 'stamps' / args.phase

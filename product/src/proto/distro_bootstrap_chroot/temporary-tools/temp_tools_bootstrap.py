@@ -11,7 +11,7 @@ import sys
 import tarfile
 import urllib.request
 
-TARGET = 'x86_64-unknown-linux-gnu'
+TARGET = 'x86_64-distro-linux-gnu'
 
 def sha(path):
     h = hashlib.sha256()
@@ -88,6 +88,10 @@ def sandbox(root, workspace):
     return cmd + ['--']
 
 def validate_bash(root, work):
+    for name, dest in (('bin', 'usr/bin'), ('sbin', 'usr/sbin'),
+                       ('lib', 'usr/lib'), ('lib64', 'usr/lib64')):
+        if not (root / name).is_symlink() or os.readlink(root / name) != dest:
+            raise RuntimeError('invalid imported merged-/usr symlink: ' + name)
     binary = root / 'bin/bash'
     if not binary.is_file() or binary.is_symlink():
         raise RuntimeError('Bash executable missing or not regular')

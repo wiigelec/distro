@@ -10,7 +10,7 @@ import subprocess
 import sys
 import tarfile
 
-TARGET = "x86_64-unknown-linux-gnu"
+TARGET = "x86_64-distro-linux-gnu"
 INTERPRETER = "/lib64/ld-linux-x86-64.so.2"
 
 def sha256(path):
@@ -88,6 +88,10 @@ def main():
     project = args.project.resolve()
     if root != project / "root" or root.is_symlink() or not root.is_dir():
         raise RuntimeError("invalid bootstrap root")
+    for name, dest in (("bin", "usr/bin"), ("sbin", "usr/sbin"),
+                       ("lib", "usr/lib"), ("lib64", "usr/lib64")):
+        if not (root / name).is_symlink() or os.readlink(root / name) != dest:
+            raise RuntimeError("invalid merged-/usr symlink: " + name)
     gcc = root / "bin" / (TARGET + "-gcc")
     for item in (gcc, root / "lib64/libc.so.6",
                  root / "lib64/ld-linux-x86-64.so.2",
