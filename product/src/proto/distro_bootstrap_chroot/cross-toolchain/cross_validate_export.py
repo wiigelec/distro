@@ -103,6 +103,9 @@ def main():
     obj = work / "smoke.o"
     binary = work / "smoke"
     src.write_text('#include <stdio.h>\nint main(void) { puts("distro-cross-toolchain-ok"); return 0; }\n')
+    cxx_src = work / "smoke.cc"
+    cxx_obj = work / "smoke-cxx.o"
+    cxx_src.write_text('int distro_cxx_probe() { return 42; }\n')
     # Mirror the working cross_runner sandbox. Binding host / read-only first
     # prevents Bubblewrap from creating /toolchain as a mount point.
     sandbox = ["bwrap", "--die-with-parent", "--new-session",
@@ -122,6 +125,12 @@ def main():
     check(sandbox + [compiler, "--sysroot=/toolchain", "-fno-link-libatomic",
                      "-c", "/work/smoke.c", "-o", "/work/smoke.o"])
     print("[validate] compile-only: PASS", flush=True)
+    check(sandbox + [f"/toolchain/bin/{TARGET}-g++", "--sysroot=/toolchain",
+                     "-c", "/work/smoke.cc", "-o", "/work/smoke-cxx.o"])
+    elf_cxx = check(["readelf", "-h", str(cxx_obj)]).stdout
+    if "ELF64" not in elf_cxx or "X86-64" not in elf_cxx or "REL (Relocatable file)" not in elf_cxx:
+        raise RuntimeError("C++ compile-only output is not a target relocatable object")
+    print("[validate] C++ compile-only: PASS", flush=True)
     # GCC was bootstrapped before glibc existed, so its compiled-in startfile
     # search paths do not include the target's /usr/lib64 layout. Supply the
     # target locations explicitly; do not fall back to host startup files.
@@ -141,6 +150,7 @@ def main():
     export(root, artifact)
     record = {"schema_version": 1, "phase": "cross-toolchain", "status": "passed",
               "target": TARGET, "elf": elf,
+              "cxx_compile_only": "passed (no libstdc++ linking asserted)",
               "archive": str(artifact), "archive_sha256": sha256(artifact),
               "archive_bytes": artifact.stat().st_size}
     report = artifact.with_suffix(artifact.suffix + ".json")

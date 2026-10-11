@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "status": "prototype-hypothesis",
-  "stage": "B0",
+  "stage": "cross-toolchain-host-qualification",
   "target": {
     "architecture": "x86_64",
     "kernel_abi": "linux",
@@ -10,15 +10,18 @@
     "note": "Target triple is provisional and is not inferred from the host compiler."
   },
   "required_commands": [
-    "sh", "bash", "cc", "c++", "as", "ld", "ar", "ranlib", "make", "tar", "gzip", "sed", "awk", "grep", "find", "patch", "readelf", "sha256sum", "chroot", "mount", "umount"
+    "sh", "bash", "cc", "c++", "gcc", "as", "ld", "ar", "ranlib",
+    "make", "tar", "gzip", "sed", "awk", "grep", "find", "patch",
+    "readelf", "sha256sum", "chroot", "mount", "umount",
+    "bwrap", "python3", "nproc", "getconf", "pacman", "gpg"
   ],
   "observed_optional_commands": [
-    "bwrap", "unshare", "podman", "docker", "git", "curl", "wget", "python3", "pkg-config", "nproc"
+    "unshare", "podman", "docker", "git", "curl", "wget", "pkg-config"
   ],
   "minimum_versions": {},
   "requirements_not_yet_fixed": [
     "minimum-kernel-version", "minimum-tool-versions", "supported-host-distributions",
     "toolchain-target-triple", "rootless-or-privileged-isolation", "host-source-acquisition-policy"
   ],
-  "pass_rule": "B0 passes provisional command presence and executable compiler checks only; it does not prove hermeticity, kernel suitability, version compatibility or bootstrap success."
+  "pass_rule": "Host qualification provisionally passes command presence and executable C/C++ checks only; source authentication, sandbox execution, compatibility and foreign-host closure require separate evidence. pacman is required by the active Arch-specific Linux API headers version probe, pending portability work."
 }
