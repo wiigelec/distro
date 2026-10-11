@@ -1,0 +1,196 @@
+#!/usr/bin/env python3
+"""Native chroot package experiment: verified host source, guest Bash build.
+
+Host extraction is transitional until native tar/gzip are available. The source
+is always mounted read-only; the package's configure/build/install run in chroot.
+"""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import shlex
+import shutil
+import subprocess
+import sys
+import tarfile
+import urllib.request
+
+
+def sha256(path):
+    h = hashlib.sha256()
+    with path.open('rb') as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b''):
+            h.update(block)
+    return h.hexdigest()
+
+
+def identifier(value):
+    if not isinstance(value, str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.+-]*', value):
+        raise ValueError('invalid name or version')
+    return value
+
+
+def save(path, data):
+    path.write_text(json.dumps(data, sort_keys=True, indent=2) + '\n')
+
+
+def get_archive(url, output, expected):
+    if output.exists():
+        if sha256(output) != expected:
+            raise RuntimeError('cached archive checksum mismatch: ' + str(output))
+        return
+    if not url.startswith('https://ftp.gnu.org/gnu/'):
+        raise ValueError('source URL is not an approved GNU HTTPS URL')
+    temp = output.with_suffix(output.suffix + '.partial')
+    try:
+        with urllib.request.urlopen(url, timeout=120) as response, temp.open('wb') as file:
+            shutil.copyfileobj(response, file)
+        if sha256(temp) != expected:
+            raise RuntimeError('downloaded source checksum mismatch')
+        temp.replace(output)
+    finally:
+        temp.unlink(missing_ok=True)
+
+
+def extract(archive, destination, topdir):
+    if destination.exists():
+        if not (destination / topdir / 'configure').is_file():
+            raise RuntimeError('incomplete source cache: ' + str(destination))
+        return
+    temporary = destination.with_name(destination.name + '.partial')
+    if temporary.exists():
+        raise RuntimeError('incomplete prior extraction: ' + str(temporary))
+    temporary.mkdir()
+    try:
+        with tarfile.open(archive, 'r:gz') as tf:
+            for member in tf.getmembers():
+                parts = Path(member.name).parts
+                if not parts or parts[0] != topdir or Path(member.name).is_absolute() or '..' in parts:
+                    raise RuntimeError('unsafe source archive path: ' + member.name)
+                if not (member.isfile() or member.isdir() or member.issym()):
+                    raise RuntimeError('unsupported source archive member: ' + member.name)
+            tf.extractall(temporary, filter='data')
+        if not (temporary / topdir / 'configure').is_file():
+            raise RuntimeError('source configure script missing')
+        temporary.rename(destination)
+    finally:
+        if temporary.exists():
+            shutil.rmtree(temporary)
+
+
+def render(recipe, topdir):
+    lines = ['#!/bin/bash', 'set -euo pipefail', 'umask 022',
+             'export PATH=/usr/bin:/bin', 'export LC_ALL=C', 'export HOME=/build',
+             'mkdir -p /build/build /build/stage',
+             "printf '%s\\n' 'DISTRO native build: '" + shlex.quote(recipe['name'] + '-' + recipe['version'])]
+    for number, step in enumerate(recipe['steps'], 1):
+        if set(step) != {'name', 'cwd', 'argv'}:
+            raise ValueError('invalid recipe step keys')
+        name = identifier(step['name'])
+        cwd = step['cwd']
+        if cwd not in ('/build', '/build/build'):
+            raise ValueError('working directory must be /build or /build/build')
+        argv = step['argv']
+        if not isinstance(argv, list) or not argv or any(not isinstance(x, str) or not x or '\n' in x or '\x00' in x for x in argv):
+            raise ValueError('invalid recipe argv')
+        argv = [x.replace('{source}', '/sources/' + topdir) for x in argv]
+        lines.extend(["printf '%s\\n' " + shlex.quote('STEP ' + str(number) + ' ' + name),
+                      'cd ' + shlex.quote(cwd), shlex.join(argv)])
+    lines.append("printf '%s\\n' 'DISTRO native package script complete'")
+    return '\n'.join(lines) + '\n'
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument('--project', required=True, type=Path)
+    ap.add_argument('--recipe', required=True, type=Path)
+    ap.add_argument('--generate-only', action='store_true')
+    args = ap.parse_args()
+    if os.geteuid() == 0:
+        ap.error('run as ordinary user')
+    project = args.project.expanduser().resolve()
+    if project in (Path('/'), Path.home().resolve()):
+        raise RuntimeError('unsafe project')
+    root = project / 'root'
+    state = project / '.distro-bootstrap'
+    if root.is_symlink() or state.is_symlink() or not (root / 'bin/bash').is_file() or not state.is_dir():
+        raise RuntimeError('missing or unsafe target root/state')
+    recipe_path = args.recipe.expanduser().resolve(strict=True)
+    recipe = json.loads(recipe_path.read_text())
+    if recipe.get('schema_version') != 1 or recipe.get('execution') != 'native-chroot':
+        raise ValueError('unsupported native package recipe')
+    name, version = identifier(recipe['name']), identifier(recipe['version'])
+    topdir = name + '-' + version
+    source = recipe['source']
+    archive_name = topdir + '.tar.gz'
+    url = source['url']
+    expected = source['sha256']
+    if not isinstance(expected, str) or not re.fullmatch('[0-9a-f]{64}', expected):
+        raise ValueError('source checksum must be pinned')
+    if url != 'https://ftp.gnu.org/gnu/' + name + '/' + archive_name:
+        raise ValueError('unexpected source URL')
+    cache = state / 'sources'
+    cache.mkdir(parents=True, exist_ok=True)
+    archive = cache / archive_name
+    print('[chroot-native] obtaining and verifying ' + url, flush=True)
+    get_archive(url, archive, expected)
+    extracted = cache / ('extracted-' + topdir)
+    extract(archive, extracted, topdir)
+    source_dir = extracted / topdir
+    runs = state / 'work/chroot-native' / topdir
+    runs.mkdir(parents=True, exist_ok=True)
+    number = 1
+    while (runs / f'run-{number:03d}').exists():
+        number += 1
+    work = runs / f'run-{number:03d}'
+    work.mkdir()
+    script = work / 'build.sh'
+    script.write_text(render(recipe, topdir))
+    report = {'schema_version': 1, 'name': name, 'version': version,
+              'recipe_sha256': sha256(recipe_path), 'source_sha256': sha256(archive),
+              'script_sha256': sha256(script), 'script': str(script), 'source_mount': '/sources/' + topdir,
+              'status': 'generated'}
+    save(work / 'result.json', report)
+    print('[chroot-native] script=' + str(script), flush=True)
+    if args.generate_only:
+        return
+    if shutil.which('bwrap') is None:
+        raise RuntimeError('bubblewrap required')
+    command = ['bwrap', '--die-with-parent', '--new-session', '--unshare-user',
+               '--unshare-pid', '--unshare-net', '--unshare-ipc', '--unshare-uts',
+               '--bind', str(root), '/', '--bind', str(work), '/build',
+               '--dir', '/sources', '--ro-bind', str(source_dir), '/sources/' + topdir,
+               '--proc', '/proc', '--dev', '/dev', '--tmpfs', '/tmp', '--chdir', '/build',
+               '--clearenv', '--setenv', 'PATH', '/usr/bin:/bin',
+               '--setenv', 'HOME', '/build', '--setenv', 'LC_ALL', 'C',
+               '--', '/bin/bash', '--noprofile', '--norc', '/build/build.sh']
+    log = work / 'build.log'
+    try:
+        with log.open('w') as stream:
+            proc = subprocess.run(command, stdout=stream, stderr=subprocess.STDOUT,
+                                  timeout=7200, check=False)
+        report['status'] = 'executed' if proc.returncode == 0 else 'failed'
+        report['exit_code'] = proc.returncode
+        report['log'] = str(log)
+        save(work / 'result.json', report)
+        if proc.returncode:
+            print('[chroot-native] FAILED exit=' + str(proc.returncode) + ' log=' + str(log), flush=True)
+            with log.open(errors='replace') as f:
+                print(''.join(f.readlines()[-25:]), file=sys.stderr)
+            return 1
+        print('[chroot-native] script execution PASS; installation is not yet certified', flush=True)
+        return 0
+    except subprocess.TimeoutExpired:
+        report['status'] = 'timeout'
+        save(work / 'result.json', report)
+        raise
+
+
+if __name__ == '__main__':
+    try:
+        sys.exit(main())
+    except (OSError, ValueError, RuntimeError, tarfile.TarError, subprocess.TimeoutExpired) as error:
+        print('[chroot-native] ERROR: ' + str(error), file=sys.stderr)
+        sys.exit(1)

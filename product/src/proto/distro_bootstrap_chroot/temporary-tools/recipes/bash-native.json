@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "name": "bash",
+  "version": "5.3",
+  "execution": "native-chroot",
+  "source": {
+    "url": "https://ftp.gnu.org/gnu/bash/bash-5.3.tar.gz",
+    "sha256": "62dd49c44c399ed1b3f7f731e87a782334d834f08e098a35f2c87547d5dbb269"
+  },
+  "steps": [
+    {
+      "name": "configure",
+      "cwd": "/build/build",
+      "argv": [
+        "{source}/configure",
+        "--prefix=/usr",
+        "--without-bash-malloc",
+        "--disable-nls"
+      ]
+    },
+    {
+      "name": "compile",
+      "cwd": "/build/build",
+      "argv": [
+        "make",
+        "-j2"
+      ]
+    },
+    {
+      "name": "stage-install",
+      "cwd": "/build/build",
+      "argv": [
+        "make",
+        "install",
+        "DESTDIR=/build/stage"
+      ]
+    },
+    {
+      "name": "verify-staged-bash",
+      "cwd": "/build",
+      "argv": [
+        "/bin/bash",
+        "-c",
+        "test -x /build/stage/usr/bin/bash"
+      ]
+    }
+  ]
+}
