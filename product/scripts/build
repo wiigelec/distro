@@ -93,7 +93,7 @@ def copy_prefix(src, root, previous):
     entries = []
     for path in sorted(src.rglob('*')):
         rel = path.relative_to(src)
-        if rel.as_posix() == 'share/info/dir':
+        if rel.as_posix() in ('share/info/dir', 'usr/share/info/dir'):
             continue
         dst = root / canonical_install_path(rel)
         if path.is_dir() and not path.is_symlink():
