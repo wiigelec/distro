@@ -14,6 +14,7 @@ HERE = Path(__file__).resolve()
 REPO = HERE.parents[2]
 PHASES = {
     'cross-toolchain': REPO / 'product/src/proto/distro_bootstrap_chroot/cross-toolchain',
+    'temp-tools': REPO / 'product/src/proto/distro_bootstrap_chroot/temporary-tools',
 }
 
 
@@ -162,9 +163,18 @@ def main():
     ap = argparse.ArgumentParser(description='Build a Distro bootstrap phase into a selected root')
     ap.add_argument('phase', choices=PHASES)
     ap.add_argument('--root', required=True, type=Path)
+    ap.add_argument('--cross-compiler', type=Path)
     args = ap.parse_args()
     if os.geteuid() == 0:
         ap.error('run as an ordinary user')
+    if args.phase == 'temp-tools':
+        if not args.cross_compiler:
+            ap.error('temp-tools requires --cross-compiler')
+        runner = PHASES['temp-tools'] / 'temp_tools_bootstrap.py'
+        return subprocess.call([sys.executable, str(runner),
+                                str(args.root), str(args.cross_compiler)])
+    if args.cross_compiler:
+        ap.error('--cross-compiler is only valid for temp-tools')
     project = args.root.expanduser().resolve()
     if project == Path('/') or project == Path.home().resolve():
         ap.error('unsafe bootstrap project directory')
