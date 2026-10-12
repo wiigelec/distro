@@ -289,7 +289,7 @@ def main(project_arg, name):
         'target': target, 'version': version,
         'jobs': str(min(os.cpu_count() or 2, 8)),
         'cc': '/toolchain/usr/bin/' + target + '-gcc --sysroot=/toolchain -fno-link-libatomic',
-        'cxx': '/toolchain/usr/bin/' + target + '-g++ --sysroot=/toolchain',
+        'cxx': '/toolchain/usr/bin/' + target + '-g++ --sysroot=/toolchain -fno-link-libatomic',
         'ldflags': '-B/toolchain/usr/lib64/ -L/toolchain/usr/lib64 -L/toolchain/lib64',
     }
     # Install source tree as a read-only nested mount rather than copying it.
