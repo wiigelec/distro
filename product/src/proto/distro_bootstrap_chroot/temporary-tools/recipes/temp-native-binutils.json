@@ -36,6 +36,14 @@
         "install",
         "DESTDIR=/work/stage"
       ]
+    },
+    {
+      "name": "omit-duplicate-libdep-plugin",
+      "argv": [
+        "/usr/bin/rm",
+        "-f",
+        "/work/stage/usr/lib/bfd-plugins/libdep.so"
+      ]
     }
   ],
   "validation": {
@@ -43,5 +51,6 @@
       "/usr/bin/as",
       "/usr/bin/ld"
     ]
-  }
+  },
+  "description": "The cross-toolchain root already contains usr/lib/bfd-plugins/libdep.so. Exclude the newly staged copy from native Binutils to avoid replacing the pre-existing plugin; native as/ld remain separate validated binaries. This is a package-scoped exclusion, not a relaxation of install collision checks."
 }
