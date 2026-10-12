@@ -352,6 +352,11 @@ def main():
                           'source_checksum': report.get('source_checksum'),
                           'source_checksum_algorithm': report.get('source_checksum_algorithm')})
         say(f'[{n}/{len(packages)}] {name}: COMPLETE ({len(installed)} installed entries)')
+    finalize = phase / 'cross_finalize_headers.py'
+    completed = subprocess.run([sys.executable, str(finalize), '--root', str(root),
+                                '--project', str(project)], check=False)
+    if completed.returncode:
+        raise RuntimeError('post-glibc GCC header finalization failed')
     say(f'[build] validating compiled toolchain and exporting clean root')
     result = subprocess.run([sys.executable, str(phase / 'cross_validate_export.py'),
                              '--root', str(root), '--project', str(project)],
