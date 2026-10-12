@@ -109,6 +109,78 @@ def recover_native_binutils(root, state, name, recipe, signature, source_hash, s
     return False
 
 
+
+def prepare_gcc_prerequisites(pkg, cache, work, source_dir):
+    """Pin GCC's supported in-tree prerequisite sources without mutating its cache."""
+    deps = pkg.get('build_prerequisites')
+    if not isinstance(deps, list) or [x.get('name') for x in deps] != ['gmp', 'mpfr', 'mpc']:
+        raise RuntimeError('GCC prerequisite source manifest missing or reordered')
+    deps_root = work / 'deps'
+    deps_root.mkdir()
+    overlay = work / 'gcc-overlay'
+    overlay.mkdir()
+    # Symlink farm, not a copy: GCC sources stay read-only, while the 3
+    # additional source trees are exposed under the conventional names.
+    for entry in source_dir.iterdir():
+        if entry.name in ('gmp', 'mpfr', 'mpc'):
+            raise RuntimeError('GCC source already contains a prerequisite directory')
+        (overlay / entry.name).symlink_to('/gcc-upstream/' + entry.name)
+    for item in deps:
+        name, version = item['name'], item['version']
+        filename = item['url'].rsplit('/',1)[-1]
+        if filename not in (f'{name}-{version}.tar.gz', f'{name}-{version}.tar.bz2'):
+            raise RuntimeError('unrecognized prerequisite archive name')
+        if item['url'] != f'https://gcc.gnu.org/pub/gcc/infrastructure/{filename}':
+            raise RuntimeError('unapproved GCC prerequisite origin')
+        expected = item['sha512']
+        if not re.fullmatch('[a-f0-9]{128}', expected):
+            raise RuntimeError('invalid prerequisite SHA512')
+        archive = cache / filename
+        if archive.exists():
+            if hashlib.sha512(archive.read_bytes()).hexdigest() != expected:
+                raise RuntimeError('cached GCC prerequisite checksum mismatch: ' + filename)
+        else:
+            import urllib.request, shutil
+            tmp = archive.with_name(archive.name + '.partial')
+            try:
+                with urllib.request.urlopen(item['url'], timeout=120) as response, tmp.open('wb') as output:
+                    shutil.copyfileobj(response, output)
+                if hashlib.sha512(tmp.read_bytes()).hexdigest() != expected:
+                    raise RuntimeError('downloaded GCC prerequisite checksum mismatch: ' + filename)
+                os.replace(tmp, archive)
+            finally:
+                tmp.unlink(missing_ok=True)
+        extracted = cache / ('gcc-prerequisite-' + name + '-' + version)
+        topdir = name + '-' + version
+        if not extracted.exists():
+            temp = extracted.with_name(extracted.name + '.partial')
+            if temp.exists():
+                raise RuntimeError('incomplete prior extraction: ' + str(temp))
+            temp.mkdir()
+            try:
+                with tarfile.open(archive, 'r:*') as tf:
+                    for member in tf.getmembers():
+                        p = Path(member.name)
+                        if p.is_absolute() or not p.parts or p.parts[0] != topdir or '..' in p.parts:
+                            raise RuntimeError('unsafe prerequisite member: ' + member.name)
+                        if not (member.isdir() or member.isfile() or member.issym()):
+                            raise RuntimeError('unsupported prerequisite archive entry: ' + member.name)
+                    tf.extractall(temp, filter='data')
+                if not (temp / topdir / 'configure').is_file():
+                    raise RuntimeError('prerequisite configure missing: ' + name)
+                temp.rename(extracted)
+            finally:
+                if temp.exists():
+                    import shutil
+                    shutil.rmtree(temp)
+        package_dir = extracted / topdir
+        if not (package_dir / 'configure').is_file():
+            raise RuntimeError('incomplete prerequisite cache: ' + name)
+        (deps_root / name).symlink_to('/gcc-prerequisites/' + name)
+        (overlay / name).symlink_to('/deps/' + name)
+        print(f'[temp-tools] native-gcc: {name} {version} SHA512 verified', flush=True)
+    return overlay, deps_root, {item['name']: cache / ('gcc-prerequisite-' + item['name'] + '-' + item['version']) / (item['name'] + '-' + item['version']) for item in deps}
+
 def main(project_arg, name):
     if os.geteuid() == 0:
         raise RuntimeError('run as regular user')
@@ -221,7 +293,20 @@ def main(project_arg, name):
         'ldflags': '-B/toolchain/usr/lib64/ -L/toolchain/usr/lib64 -L/toolchain/lib64',
     }
     # Install source tree as a read-only nested mount rather than copying it.
-    guest = common.sandbox(root, work, source_dir)
+    if name == 'native-gcc':
+        print('[temp-tools] native-gcc: verifying GMP/MPFR/MPC build prerequisites', flush=True)
+        overlay, deps_root, dep_dirs = prepare_gcc_prerequisites(pkg, cache, work, source_dir)
+        guest = common.sandbox(root, work, overlay)
+        # The overlay contains absolute symlinks; explicitly mount their
+        # read-only targets inside the sandbox before executing configure.
+        guest = guest[:-1] + ['--ro-bind', str(source_dir), '/gcc-upstream',
+                             '--ro-bind', str(deps_root), '/deps',
+                             '--dir', '/gcc-prerequisites']
+        for depname, deppath in dep_dirs.items():
+            guest += ['--ro-bind', str(deppath), '/gcc-prerequisites/' + depname]
+        guest += ['--']
+    else:
+        guest = common.sandbox(root, work, source_dir)
     for step in recipe['steps']:
         if set(step) != {'name','argv'}:
             raise RuntimeError('invalid recipe step')

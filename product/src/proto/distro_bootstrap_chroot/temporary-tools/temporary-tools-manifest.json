@@ -90,6 +90,26 @@
       "requires": [
         "native-binutils",
         "cross-toolchain"
+      ],
+      "build_prerequisites": [
+        {
+          "name": "gmp",
+          "version": "6.3.0",
+          "url": "https://gcc.gnu.org/pub/gcc/infrastructure/gmp-6.3.0.tar.bz2",
+          "sha512": "3b684c9bcb9ede2b7e54d0ba4c9764bfa17c20d4f3000017c553b6f1e135b536949580ff37341680c25dc236cfe0ba1db8cfdfe619ce013656189ef0871b89f8"
+        },
+        {
+          "name": "mpfr",
+          "version": "4.2.2",
+          "url": "https://gcc.gnu.org/pub/gcc/infrastructure/mpfr-4.2.2.tar.bz2",
+          "sha512": "0176e50808dcc07afbf5bc3e38bf9b7b21918e5f194aa0bfd860d99b00c470630aef149776c4be814a61c44269c3a5b9a4b0b1c0fcd4c9feb1459d8466452da8"
+        },
+        {
+          "name": "mpc",
+          "version": "1.3.1",
+          "url": "https://gcc.gnu.org/pub/gcc/infrastructure/mpc-1.3.1.tar.gz",
+          "sha512": "4bab4ef6076f8c5dfdc99d810b51108ced61ea2942ba0c1c932d624360a5473df20d32b300fc76f2ba4aa2a97e1f275c9fd494a1ba9f07c4cb2ad7ceaeb1ae97"
+        }
       ]
     },
     {
