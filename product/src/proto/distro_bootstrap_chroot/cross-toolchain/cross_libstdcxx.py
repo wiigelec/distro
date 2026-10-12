@@ -83,7 +83,34 @@ def main():
         run(mount+argv,log)
     stage=work/'stage/toolchain/usr'
     if not stage.is_dir():raise RuntimeError('missing staged /toolchain/usr')
+    # Some GCC install targets restage GCC-owned startup objects alongside
+    # libstdc++. Never replace these files: validate their existing package
+    # stamps and omit only previously owned, verified entries.
+    prior_owned={}
+    stamps_dir=project/'.distro-bootstrap/stamps/cross-toolchain'
+    for package in ('binutils','gcc','linux-api-headers','glibc'):
+        package_stamp=stamps_dir/(package+'.json')
+        if not package_stamp.is_file():
+            raise RuntimeError('missing completed cross package stamp: '+package)
+        prior=json.loads(package_stamp.read_text())
+        if prior.get('status')!='complete' or not prior.get('installed'):
+            raise RuntimeError('invalid cross package stamp: '+package)
+        for item in prior['installed']:
+            rel=item['path']
+            if rel in prior_owned:
+                raise RuntimeError('duplicate stamped path: '+rel)
+            dest=root/rel
+            if 'sha256' in item:
+                if not dest.is_file() or dest.is_symlink() or sha(dest)!=item['sha256']:
+                    raise RuntimeError('changed cross package file: '+rel)
+            elif 'link' in item:
+                if not dest.is_symlink() or os.readlink(dest)!=item['link']:
+                    raise RuntimeError('changed cross package symlink: '+rel)
+            else:
+                raise RuntimeError('invalid stamped entry: '+rel)
+            prior_owned[rel]=package
     entries=[]
+    reused=0
     for p in sorted(stage.rglob('*')):
         rel=pathlib.Path('usr')/p.relative_to(stage);dst=root/rel
         if rel.as_posix()=='usr/share/info/dir':continue
@@ -96,7 +123,14 @@ def main():
         else:raise RuntimeError('unsupported stage entry '+str(rel))
         if kind=='dir':
             if dst.is_symlink() or (dst.exists() and not dst.is_dir()):raise RuntimeError('directory collision '+str(rel))
-        elif dst.exists() or dst.is_symlink():raise RuntimeError('file collision '+str(rel))
+        elif dst.exists() or dst.is_symlink():
+            if rel.as_posix() in prior_owned:
+                # Skip restaged files which belong to an already verified
+                # cross-toolchain package. Never overwrite their stamp-owned
+                # paths even if this build produced different bytes.
+                reused+=1
+                continue
+            raise RuntimeError('unowned file collision '+str(rel))
         entries.append((p,dst,kind,rel))
     installed={};created=[]
     try:
@@ -114,6 +148,7 @@ def main():
         # refuse an unsafe blind retry on untracked files.
         raise
     if not installed:raise RuntimeError('empty libstdc++ stage')
+    print(f'[cross-libstdcxx] skipped {reused} verified prior-package files',flush=True)
     data={'schema_version':1,'status':'complete','signature':signature,'installed':installed}
     temp=stamp.with_suffix('.tmp');temp.write_text(json.dumps(data,sort_keys=True,indent=2)+'\n');os.replace(temp,stamp)
     print('[cross-libstdcxx] COMPLETE; C++ compile/link/execute PASS',flush=True)
