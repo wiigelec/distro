@@ -24,6 +24,38 @@
         "bash",
         "cross-toolchain"
       ]
+    },
+    {
+      "name": "sed",
+      "state": "executable",
+      "execution": "host-cross",
+      "version": "4.10",
+      "source": {
+        "url": "https://ftp.gnu.org/gnu/sed/sed-4.10.tar.xz",
+        "sha256": "b8e72182b2ec96a3574e2998c47b7aaa64cc20ce000d8e9ac313cc07cecf28c7"
+      },
+      "recipe": "recipes/temp-sed.json",
+      "requires": [
+        "bash",
+        "coreutils",
+        "cross-toolchain"
+      ]
+    },
+    {
+      "name": "grep",
+      "state": "executable",
+      "execution": "host-cross",
+      "version": "3.12",
+      "source": {
+        "url": "https://ftp.gnu.org/gnu/grep/grep-3.12.tar.xz",
+        "sha256": "2649b27c0e90e632eadcd757be06c6e9a4f48d941de51e7c0f83ff76408a07b9"
+      },
+      "recipe": "recipes/temp-grep.json",
+      "requires": [
+        "bash",
+        "coreutils",
+        "cross-toolchain"
+      ]
     }
   ]
 }
