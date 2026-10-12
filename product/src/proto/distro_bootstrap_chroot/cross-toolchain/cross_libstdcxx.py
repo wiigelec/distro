@@ -30,10 +30,10 @@ def target_test(root,work):
     src=work/'probe.cc';src.write_text('#include <string>\n#include <cstdio>\nint main(){std::string s="distro-cxx-ok";std::puts(s.c_str());}\n')
     log=work/'cxx-validation.log'
     cc=f'/toolchain/usr/bin/{TARGET}-g++'
-    command=sandbox(root,work)+[cc,'--sysroot=/toolchain','-fno-link-libatomic','-B/toolchain/usr/lib64/','-L/toolchain/usr/lib64','/work/probe.cc','-o','/work/probe']
+    command=sandbox(root,work)+[cc,'--sysroot=/toolchain','-fno-link-libatomic','-B/toolchain/usr/lib64/','-L/toolchain/usr/lib64','-Wl,-rpath-link,/toolchain/usr/lib/gcc/'+TARGET+'/16.2.0','/work/probe.cc','-o','/work/probe']
     run(command,log,120)
-    run(sandbox(root,work)+['/toolchain/lib64/ld-linux-x86-64.so.2','--library-path','/toolchain/usr/lib:/toolchain/usr/lib64:/toolchain/lib64','/work/probe'],log,120)
-    output=subprocess.run(sandbox(root,work)+['/toolchain/lib64/ld-linux-x86-64.so.2','--library-path','/toolchain/usr/lib:/toolchain/usr/lib64:/toolchain/lib64','/work/probe'],capture_output=True,text=True,timeout=120)
+    run(sandbox(root,work)+['/toolchain/lib64/ld-linux-x86-64.so.2','--library-path','/toolchain/usr/lib:/toolchain/usr/lib64:/toolchain/lib64:/toolchain/usr/lib/gcc/'+TARGET+'/16.2.0','/work/probe'],log,120)
+    output=subprocess.run(sandbox(root,work)+['/toolchain/lib64/ld-linux-x86-64.so.2','--library-path','/toolchain/usr/lib:/toolchain/usr/lib64:/toolchain/lib64:/toolchain/usr/lib/gcc/'+TARGET+'/16.2.0','/work/probe'],capture_output=True,text=True,timeout=120)
     if output.returncode or output.stdout.strip()!='distro-cxx-ok':raise RuntimeError('C++ runtime acceptance test failed: '+output.stderr[-900:])
 
 def main():
@@ -109,8 +109,21 @@ def main():
             else:
                 raise RuntimeError('invalid stamped entry: '+rel)
             prior_owned[rel]=package
+    # An earlier attempt may have installed this package's files before
+    # failing its C++ validation, leaving no completion stamp. Accept them
+    # only if byte-for-byte equal to the staging output of a prior attempt
+    # using this same recipe family; never treat arbitrary root contents as
+    # recoverable package files.
+    prior_stages=[]
+    for older in sorted(runroot.glob('run-*')):
+        if older==work or not older.is_dir():
+            continue
+        stage_previous=older/'stage/toolchain/usr'
+        if stage_previous.is_dir():
+            prior_stages.append(stage_previous)
     entries=[]
     reused=0
+    recovered={}
     for p in sorted(stage.rglob('*')):
         rel=pathlib.Path('usr')/p.relative_to(stage);dst=root/rel
         if rel.as_posix()=='usr/share/info/dir':continue
@@ -130,7 +143,20 @@ def main():
                 # paths even if this build produced different bytes.
                 reused+=1
                 continue
-            raise RuntimeError('unowned file collision '+str(rel))
+            # Recovery is allowed only for the exact same path and bytes
+            # previously staged by an interrupted libstdc++ build.
+            earlier=[stage_old/p.relative_to(stage) for stage_old in prior_stages]
+            if kind=='file' and dst.is_file() and not dst.is_symlink():
+                digest=sha(dst)
+                if any(q.is_file() and not q.is_symlink() and sha(q)==digest for q in earlier):
+                    recovered[str(rel)]={'sha256':digest}
+                    continue
+            if kind=='link' and dst.is_symlink():
+                link=os.readlink(dst)
+                if any(q.is_symlink() and os.readlink(q)==link for q in earlier):
+                    recovered[str(rel)]={'link':link}
+                    continue
+            raise RuntimeError('unowned file collision '+str(rel)+' (not a verified previous stage)')
         entries.append((p,dst,kind,rel))
     installed={};created=[]
     try:
@@ -147,8 +173,9 @@ def main():
         # Keep files intact after successful installation, allowing diagnosis;
         # refuse an unsafe blind retry on untracked files.
         raise
+    installed.update(recovered)
     if not installed:raise RuntimeError('empty libstdc++ stage')
-    print(f'[cross-libstdcxx] skipped {reused} verified prior-package files',flush=True)
+    print(f'[cross-libstdcxx] skipped {reused} verified prior-package files; recovered {len(recovered)} previous-stage files',flush=True)
     data={'schema_version':1,'status':'complete','signature':signature,'installed':installed}
     temp=stamp.with_suffix('.tmp');temp.write_text(json.dumps(data,sort_keys=True,indent=2)+'\n');os.replace(temp,stamp)
     print('[cross-libstdcxx] COMPLETE; C++ compile/link/execute PASS',flush=True)

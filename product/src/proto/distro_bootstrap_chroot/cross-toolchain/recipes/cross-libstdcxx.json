@@ -26,6 +26,22 @@
       ]
     },
     {
+      "name": "build-shared-libgcc",
+      "argv": [
+        "make",
+        "-j{jobs}",
+        "all-target-libgcc"
+      ]
+    },
+    {
+      "name": "stage-shared-libgcc",
+      "argv": [
+        "make",
+        "install-target-libgcc",
+        "DESTDIR=/work/stage"
+      ]
+    },
+    {
       "name": "build-libstdcxx",
       "argv": [
         "make",
@@ -44,6 +60,6 @@
   ],
   "validation": {
     "target_cxx_header": "string",
-    "runtime": "native target C++ string program"
+    "runtime": "native target C++ string program with target shared libgcc_s"
   }
 }
