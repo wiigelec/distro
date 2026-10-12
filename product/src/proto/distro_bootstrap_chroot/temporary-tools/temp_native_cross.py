@@ -25,7 +25,7 @@ def guest_run(root, work, argv, logfile, timeout=7200):
 def validate_in_root(root, work, binary):
     cmd = ['bwrap', '--die-with-parent', '--new-session', '--unshare-user',
            '--unshare-pid', '--unshare-net', '--unshare-ipc', '--unshare-uts',
-           '--ro-bind', str(root), '/', '--bind', str(work), '/work',
+           '--bind', str(root), '/', '--bind', str(work), '/work',
            '--proc', '/proc', '--dev', '/dev', '--tmpfs', '/tmp',
            '--clearenv', '--setenv', 'HOME', '/work',
            '--setenv', 'PATH', '/usr/bin:/bin', '--setenv', 'LC_ALL', 'C', '--']
@@ -39,7 +39,7 @@ def compiler_smoke(root, work):
     source.write_text('#include <stdio.h>\nint main(void){ puts("distro-native-gcc-ok");return 0;}\n')
     cmd = ['bwrap', '--die-with-parent', '--new-session', '--unshare-user',
            '--unshare-pid', '--unshare-net', '--unshare-ipc', '--unshare-uts',
-           '--ro-bind', str(root), '/', '--bind', str(work), '/work',
+           '--bind', str(root), '/', '--bind', str(work), '/work',
            '--proc', '/proc', '--dev', '/dev', '--tmpfs', '/tmp',
            '--clearenv', '--setenv', 'HOME', '/work',
            '--setenv', 'PATH', '/usr/bin:/bin', '--setenv', 'LC_ALL', 'C', '--']
@@ -48,6 +48,65 @@ def compiler_smoke(root, work):
     if test.returncode or test.stdout.strip() != 'distro-native-gcc-ok':
         raise RuntimeError('native GCC compiled program failed in isolated chroot: ' + test.stderr[-1000:])
     print('[temp-tools] native-gcc: in-chroot compile/link/execute PASS', flush=True)
+
+
+def recover_native_binutils(root, state, name, recipe, signature, source_hash, stamp):
+    """Complete a prior install whose validation failed after the files were copied.
+
+    Only accept a complete, byte-identical staged native Binutils payload. Never
+    overwrite a file or declare success from the mere presence of as/ld.
+    """
+    if name != 'native-binutils' or stamp.exists():
+        return False
+    runs = state / 'work' / name
+    if not runs.is_dir():
+        return False
+    for work in sorted(runs.glob('run-*'), reverse=True):
+        stage = work / 'stage/usr'
+        log = work / 'build.log'
+        if not stage.is_dir() or not log.is_file():
+            continue
+        recorded = log.read_text(errors='replace')
+        if recorded.count('STEP ') < len(recipe['steps']):
+            continue
+        proof = {}
+        all_match = True
+        for src in sorted(stage.rglob('*')):
+            relative = src.relative_to(work / 'stage')
+            if relative.as_posix() == 'usr/share/info/dir':
+                continue
+            dest = root / relative
+            if src.is_symlink():
+                target = os.readlink(src)
+                if not dest.is_symlink() or os.readlink(dest) != target:
+                    all_match = False
+                    break
+                proof[relative.as_posix()] = {'link': target}
+            elif src.is_dir():
+                if dest.is_symlink() or not dest.is_dir():
+                    all_match = False
+                    break
+            elif src.is_file():
+                if dest.is_symlink() or not dest.is_file() or common.sha(src) != common.sha(dest):
+                    all_match = False
+                    break
+                proof[relative.as_posix()] = {'sha256': common.sha(dest)}
+            else:
+                all_match = False
+                break
+        if not all_match or not proof:
+            continue
+        for binary in recipe['validation']['chroot_executables']:
+            if not (root / binary.lstrip('/')).is_file():
+                raise RuntimeError('recovery missing native-binutils executable: ' + binary)
+            validate_in_root(root, work, binary)
+        common.save(stamp, {'schema_version':1, 'phase':'temp-tools',
+                            'package':name, 'status':'complete',
+                            'manifest_sha256':signature,
+                            'source_sha256':source_hash, 'installed':proof})
+        print(f'[temp-tools] {name}: RECOVERED prior install; {len(proof)} files/links verified', flush=True)
+        return True
+    return False
 
 
 def main(project_arg, name):
@@ -90,6 +149,14 @@ def main(project_arg, name):
             compiler_smoke(root, check_work)
         print(f'[temp-tools] {name}: SKIP verified stamp', flush=True)
         return
+    # The previous version performed installation before isolated validation.
+    # Recover its byte-identical installed payload before refusing untracked binaries.
+    if name == 'native-binutils':
+        cached = state / 'sources' / (pkg['upstream_name'] + '-' + pkg['version'] + '.tar.xz')
+        if cached.is_file() and common.sha(cached) == pkg['source']['sha256']:
+            if recover_native_binutils(root, state, name, recipe, signature,
+                                       common.sha(cached), stamp):
+                return
     for binary in recipe['validation']['chroot_executables']:
         candidate = root / binary.lstrip('/')
         if candidate.exists() or candidate.is_symlink():
