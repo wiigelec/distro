@@ -377,6 +377,12 @@ def main():
                                 '--project', str(project)], check=False)
     if completed.returncode:
         raise RuntimeError('post-glibc GCC header finalization failed')
+    # Post-glibc target C++ runtime is a separate resumable package.
+    say('[build] finalizing post-glibc target libstdc++')
+    lib_result = subprocess.run([sys.executable, str(phase / 'cross_libstdcxx.py'),
+                                 '--project', str(project), '--root', str(root)], check=False)
+    if lib_result.returncode:
+        raise RuntimeError('cross-toolchain target libstdc++ build/validation failed')
     say(f'[build] validating compiled toolchain and exporting clean root')
     result = subprocess.run([sys.executable, str(phase / 'cross_validate_export.py'),
                              '--root', str(root), '--project', str(project)],

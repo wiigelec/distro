@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "name": "libstdc++",
+  "phase": "cross-toolchain",
+  "execution": "host-cross",
+  "source_package": "gcc",
+  "version": "16.2.0",
+  "steps": [
+    {
+      "name": "configure",
+      "argv": [
+        "/work/src/configure",
+        "--target={target}",
+        "--prefix=/toolchain/usr",
+        "--with-sysroot=/toolchain",
+        "--with-native-system-header-dir=/usr/include",
+        "--disable-bootstrap",
+        "--disable-multilib",
+        "--disable-nls",
+        "--disable-libsanitizer",
+        "--disable-libssp",
+        "--disable-libquadmath",
+        "--disable-libgomp",
+        "--disable-libatomic",
+        "--enable-languages=c,c++"
+      ]
+    },
+    {
+      "name": "build-libstdcxx",
+      "argv": [
+        "make",
+        "-j{jobs}",
+        "all-target-libstdc++-v3"
+      ]
+    },
+    {
+      "name": "stage-libstdcxx",
+      "argv": [
+        "make",
+        "install-target-libstdc++-v3",
+        "DESTDIR=/work/stage"
+      ]
+    }
+  ],
+  "validation": {
+    "target_cxx_header": "string",
+    "runtime": "native target C++ string program"
+  }
+}
