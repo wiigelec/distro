@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "name": "native-gcc",
+  "phase": "temp-tools",
+  "execution": "host-cross",
+  "steps": [
+    {
+      "name": "configure",
+      "argv": [
+        "/work/src/configure",
+        "--build=x86_64-pc-linux-gnu",
+        "--host={target}",
+        "--target={target}",
+        "--prefix=/usr",
+        "--with-sysroot=/",
+        "--with-native-system-header-dir=/usr/include",
+        "--disable-bootstrap",
+        "--disable-multilib",
+        "--disable-nls",
+        "--disable-libsanitizer",
+        "--disable-libssp",
+        "--disable-libquadmath",
+        "--disable-libgomp",
+        "--disable-libstdcxx",
+        "--disable-threads",
+        "--disable-libatomic",
+        "--enable-languages=c",
+        "CC={cc}",
+        "CXX={cxx}",
+        "CC_FOR_BUILD=/usr/bin/gcc",
+        "CXX_FOR_BUILD=/usr/bin/g++",
+        "CFLAGS=-O2",
+        "CXXFLAGS=-O2",
+        "LDFLAGS={ldflags}"
+      ]
+    },
+    {
+      "name": "build",
+      "argv": [
+        "make",
+        "-j{jobs}",
+        "all-gcc",
+        "all-target-libgcc"
+      ]
+    },
+    {
+      "name": "stage-install",
+      "argv": [
+        "make",
+        "install-gcc",
+        "install-target-libgcc",
+        "DESTDIR=/work/stage"
+      ]
+    }
+  ],
+  "validation": {
+    "chroot_executables": [
+      "/usr/bin/gcc"
+    ]
+  }
+}

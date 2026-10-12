@@ -260,6 +260,9 @@ def main():
             if package['name'] == 'coreutils':
                 helper = temp_phase / 'temp_coreutils_bootstrap.py'
                 command = [sys.executable, str(helper), str(args.root)]
+            elif package['name'] in ('native-binutils', 'native-gcc', 'make'):
+                helper = temp_phase / 'temp_native_cross.py'
+                command = [sys.executable, str(helper), str(args.root), package['name']]
             else:
                 helper = temp_phase / 'temp_cross_package.py'
                 command = [sys.executable, str(helper), str(args.root), package['name']]
