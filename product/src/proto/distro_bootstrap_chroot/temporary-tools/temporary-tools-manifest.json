@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "phase": "temp-tools",
+  "target": "x86_64-distro-linux-gnu",
+  "packages": [
+    {
+      "name": "bash",
+      "state": "existing-bootstrap",
+      "execution": "host-cross",
+      "stamp": "stamps/bash.json",
+      "description": "Existing Bash bootstrap; validated and resumed by temp_tools_bootstrap.py"
+    },
+    {
+      "name": "coreutils",
+      "state": "executable",
+      "execution": "host-cross",
+      "version": "9.10",
+      "source": {
+        "url": "https://ftp.gnu.org/gnu/coreutils/coreutils-9.10.tar.xz",
+        "sha256": "16535a9adf0b10037364e2d612aad3d9f4eca3a344949ced74d12faf4bd51d25"
+      },
+      "recipe": "recipes/temp-coreutils.json",
+      "requires": [
+        "bash",
+        "cross-toolchain"
+      ]
+    }
+  ]
+}

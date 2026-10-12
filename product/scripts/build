@@ -230,8 +230,26 @@ def main():
         if not args.cross_compiler:
             ap.error('temp-tools requires --cross-compiler')
         runner = PHASES['temp-tools'] / 'temp_tools_bootstrap.py'
-        return subprocess.call([sys.executable, str(runner),
-                                str(args.root), str(args.cross_compiler)])
+        status = subprocess.call([sys.executable, str(runner),
+                                  str(args.root), str(args.cross_compiler)])
+        if status:
+            return status
+        temp_phase = PHASES['temp-tools']
+        temp_manifest = json.loads((temp_phase / 'temporary-tools-manifest.json').read_text())
+        if temp_manifest.get('phase') != 'temp-tools' or temp_manifest.get('target') != 'x86_64-distro-linux-gnu':
+            raise RuntimeError('temporary-tools manifest identity mismatch')
+        for package in temp_manifest['packages']:
+            if package['name'] == 'bash' and package.get('state') == 'existing-bootstrap':
+                continue
+            if package.get('state') != 'executable' or package.get('execution') != 'host-cross':
+                raise RuntimeError('unsupported temp-tools package: ' + package['name'])
+            if package['name'] != 'coreutils':
+                raise RuntimeError('no generic temp-tools package dispatcher for: ' + package['name'])
+            helper = temp_phase / 'temp_coreutils_bootstrap.py'
+            status = subprocess.call([sys.executable, str(helper), str(args.root)])
+            if status:
+                return status
+        return 0
     if args.cross_compiler:
         ap.error('--cross-compiler is only valid for temp-tools')
     project = args.root.expanduser().resolve()
