@@ -281,14 +281,23 @@ def main():
     state = project / '.distro-bootstrap'
     if root.is_symlink() or state.is_symlink():
         ap.error('root and .distro-bootstrap must be real directories, not symlinks')
-    # A cross-toolchain build must start with a completely empty installed root.
-    # Check before mkdir, layout initialization, state creation, or any build step.
-    # This intentionally rejects a previously populated root, even when stamps exist.
+    # First invocation requires an empty root. Subsequent invocations may
+    # resume only when this project has already initialized cross-toolchain
+    # build state. Each stamped package is independently reverified below.
     if root.exists():
         if not root.is_dir():
             ap.error('cross-toolchain root exists and is not a directory: ' + str(root))
         if any(root.iterdir()):
-            ap.error('cross-toolchain requires an empty root directory: ' + str(root))
+            work_existing = state / 'work' / 'cross-toolchain'
+            stamps_existing = state / 'stamps' / 'cross-toolchain'
+            # The driver creates BOTH directories when starting a phase.
+            # A nonempty root without both is not a recognized resumable build.
+            if (not state.is_dir() or state.is_symlink()
+                    or not work_existing.is_dir() or work_existing.is_symlink()
+                    or not stamps_existing.is_dir() or stamps_existing.is_symlink()):
+                ap.error('cross-toolchain requires an empty root on first run; '
+                         'nonempty root has no resumable cross-toolchain state: ' + str(root))
+            say('[build] cross-toolchain: RESUME existing project; verifying installed package stamps')
     if (root / '.distro-bootstrap').exists() or (root / '.distro-bootstrap').is_symlink():
         ap.error('legacy build state detected inside root/; move it outside root before continuing')
     phase = PHASES[args.phase]
