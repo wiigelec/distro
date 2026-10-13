@@ -255,7 +255,8 @@ def main():
         for package in temp_manifest['packages']:
             if package['name'] == 'bash' and package.get('state') == 'existing-bootstrap':
                 continue
-            if package.get('state') != 'executable' or package.get('execution') != 'host-cross':
+            allowed_execution = ('native-root' if package['name'] == 'make' else 'host-cross')
+            if package.get('state') != 'executable' or package.get('execution') != allowed_execution:
                 raise RuntimeError('unsupported temp-tools package: ' + package['name'])
             if package['name'] == 'coreutils':
                 helper = temp_phase / 'temp_coreutils_bootstrap.py'
