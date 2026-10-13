@@ -398,7 +398,7 @@ def main(project_arg, name):
     if not recipe_path.is_relative_to(HERE) or not recipe_path.is_file():
         raise RuntimeError('unsafe recipe path')
     recipe = json.loads(recipe_path.read_text())
-    if recipe['name'] != name or recipe['execution'] != ('native-root' if name == 'make' else 'host-cross') or recipe['phase'] != 'temp-tools':
+    if recipe['name'] != name or recipe['execution'] != ('native-root' if name in ('make', 'gawk') else 'host-cross') or recipe['phase'] != 'temp-tools':
         raise RuntimeError('recipe identity mismatch')
     stamp = state / 'stamps' / (name + '.json')
     signature = hashlib.sha256((common.sha(recipe_path) + ':' + json.dumps(pkg, sort_keys=True)).encode()).hexdigest()
@@ -514,15 +514,45 @@ def main(project_arg, name):
         # Host /usr, headers, shared libraries and compiler are never mounted.
         # A temporary read-only host awk is permitted for Autoconf's probes;
         # this is explicitly transient and is never installed in the root.
+        # Bootstrap GNU Make once using a host gawk with only its explicit
+        # shared-library dependencies copied into the ephemeral workspace.
+        # Only the awk wrapper gets LD_LIBRARY_PATH; GCC/configure do not.
         awk = shutil.which('awk')
         if not awk:
-            raise RuntimeError('host awk required for native GNU Make configure')
+            raise RuntimeError('host awk required to bootstrap GNU Make')
         awk_real = Path(awk).resolve(strict=True)
+        deps = subprocess.run(['ldd', str(awk_real)], capture_output=True, text=True, check=True)
+        host_libs = work / 'awk-libs'
+        host_libs.mkdir()
+        allowed = {'libreadline.so.8', 'libmpfr.so.6', 'libgmp.so.10',
+                   'libncursesw.so.6', 'libtinfo.so.6'}
+        copied = set()
+        import shutil as _shutil
+        for line in deps.stdout.splitlines():
+            fields = line.strip().split()
+            if len(fields) >= 3 and fields[1] == '=>':
+                soname, location = fields[0], fields[2]
+                if location == 'not':
+                    raise RuntimeError('host awk has missing library: ' + soname)
+                if soname in ('libc.so.6', 'libm.so.6'):
+                    continue  # Always use Distro libc and libm
+                if soname not in allowed:
+                    raise RuntimeError('unexpected host awk dependency: ' + soname)
+                source = Path(location).resolve(strict=True)
+                if not source.is_file() or not source.is_relative_to(Path('/usr/lib')):
+                    raise RuntimeError('unsafe host awk dependency: ' + str(source))
+                _shutil.copy2(source, host_libs / soname)
+                copied.add(soname)
+        if not copied:
+            raise RuntimeError('host awk dependencies not resolved')
+        _shutil.copy2(awk_real, work / 'host-awk-real')
+        wrapper = work / 'host-awk'
+        wrapper.write_text('#!/bin/sh\nLD_LIBRARY_PATH=/work/awk-libs exec /work/host-awk-real "$@"\n')
+        wrapper.chmod(0o755)
         guest = ['bwrap', '--die-with-parent', '--new-session', '--unshare-user',
                  '--unshare-pid', '--unshare-net', '--unshare-ipc', '--unshare-uts',
                  '--bind', str(root), '/', '--bind', str(work), '/work',
                  '--ro-bind', str(source_dir), '/work/src',
-                 '--ro-bind', str(awk_real), '/work/host-awk',
                  '--proc', '/proc', '--dev', '/dev', '--tmpfs', '/tmp',
                  '--chdir', '/work/build', '--clearenv',
                  '--setenv', 'HOME', '/work', '--setenv', 'PATH', '/usr/bin:/bin',

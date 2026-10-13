@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "name": "gawk",
+  "phase": "temp-tools",
+  "execution": "native-root",
+  "steps": [
+    {
+      "name": "configure",
+      "argv": [
+        "/work/src/configure",
+        "--build={target}",
+        "--host={target}",
+        "--prefix=/usr",
+        "--disable-nls",
+        "--without-mpfr",
+        "CC=/usr/bin/gcc",
+        "CFLAGS=-O2"
+      ]
+    },
+    {
+      "name": "build",
+      "argv": [
+        "/usr/bin/make",
+        "-j{jobs}"
+      ]
+    },
+    {
+      "name": "stage-install",
+      "argv": [
+        "/usr/bin/make",
+        "install",
+        "DESTDIR=/work/stage"
+      ]
+    }
+  ],
+  "validation": {
+    "chroot_executables": [
+      "/usr/bin/gawk",
+      "/usr/bin/awk"
+    ]
+  }
+}

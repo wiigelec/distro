@@ -255,13 +255,13 @@ def main():
         for package in temp_manifest['packages']:
             if package['name'] == 'bash' and package.get('state') == 'existing-bootstrap':
                 continue
-            allowed_execution = ('native-root' if package['name'] == 'make' else 'host-cross')
+            allowed_execution = ('native-root' if package['name'] in ('make', 'gawk') else 'host-cross')
             if package.get('state') != 'executable' or package.get('execution') != allowed_execution:
                 raise RuntimeError('unsupported temp-tools package: ' + package['name'])
             if package['name'] == 'coreutils':
                 helper = temp_phase / 'temp_coreutils_bootstrap.py'
                 command = [sys.executable, str(helper), str(args.root)]
-            elif package['name'] in ('native-binutils', 'native-gcc', 'make'):
+            elif package['name'] in ('native-binutils', 'native-gcc', 'make', 'gawk'):
                 helper = temp_phase / 'temp_native_cross.py'
                 command = [sys.executable, str(helper), str(args.root), package['name']]
             else:
