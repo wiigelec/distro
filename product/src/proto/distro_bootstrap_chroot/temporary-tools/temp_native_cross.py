@@ -534,6 +534,12 @@ def main(project_arg, name):
                 soname, location = fields[0], fields[2]
                 if location == 'not':
                     raise RuntimeError('host awk has missing library: ' + soname)
+                # ldd may report the ELF interpreter with '=>', too.
+                # It is provided by the Distro root, not copied from the host.
+                if soname.startswith('/') and Path(soname).name == 'ld-linux-x86-64.so.2':
+                    if Path(location).name != 'ld-linux-x86-64.so.2':
+                        raise RuntimeError('unexpected host awk ELF interpreter: ' + location)
+                    continue
                 if soname in ('libc.so.6', 'libm.so.6'):
                     continue  # Always use Distro libc and libm
                 if soname not in allowed:
