@@ -31,7 +31,8 @@
         "CXX_FOR_BUILD=/usr/bin/g++",
         "CFLAGS=-O2",
         "CXXFLAGS=-O2",
-        "LDFLAGS={ldflags}"
+        "LDFLAGS={ldflags}",
+        "gcc_cv_sys_sdt_h=no"
       ]
     },
     {
