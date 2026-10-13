@@ -304,7 +304,10 @@ def main(project_arg, name):
                              '--dir', '/gcc-prerequisites']
         for depname, deppath in dep_dirs.items():
             guest += ['--ro-bind', str(deppath), '/gcc-prerequisites/' + depname]
-        guest += ['--']
+        # Export the target SystemTap probe override into every nested GCC
+        # configure process. A top-level configure argument alone is not
+        # inherited by the GCC subconfigure (which otherwise sees host headers).
+        guest += ['--setenv', 'gcc_cv_sys_sdt_h', 'no', '--']
     else:
         guest = common.sandbox(root, work, source_dir)
     for step in recipe['steps']:
