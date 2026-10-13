@@ -181,15 +181,75 @@ def prepare_gcc_prerequisites(pkg, cache, work, source_dir):
         print(f'[temp-tools] native-gcc: {name} {version} SHA512 verified', flush=True)
     return overlay, deps_root, {item['name']: cache / ('gcc-prerequisite-' + item['name'] + '-' + item['version']) / (item['name'] + '-' + item['version']) for item in deps}
 
-def install_native_gcc(stage, root, state):
-    """Preserve verified cross-toolchain ownership when installing native GCC.
+def installed_native_gcc_from_failed_run(root, state):
+    """Recover only byte-identical native files left by run-005.
 
-    The cross compiler and native GCC have the same target triple. Never
-    overwrite cross compiler executables, private GCC files or target runtime
-    libraries merely because the native install restaged those paths.
+    Imported archive entries do not belong to this recovery set. Verify the
+    entire old native payload before allowing any of it to be replaced.
     """
-    # Temp-tools imports a clean archive, not the cross build's stamp tree.
-    # Treat only byte-verified entries of that exact imported archive as owned.
+    work = state / 'work/native-gcc/run-005'
+    stage = work / 'stage/usr'
+    if not stage.is_dir() or not (work / 'native-smoke.log').is_file():
+        raise RuntimeError('missing failed native GCC run-005 stage/smoke evidence')
+    smoke = (work / 'native-smoke.log').read_text(errors='replace')
+    if 'libisl.so.23' not in smoke or 'error while loading shared libraries' not in smoke:
+        raise RuntimeError('run-005 is not the expected failed native GCC validation')
+    marker = json.loads((state / 'temp-tools-import.json').read_text())
+    archive = state.parent / 'artifacts/cross-toolchain-root.tar.xz'
+    if common.sha(archive) != marker.get('cross_archive_sha256'):
+        raise RuntimeError('import archive changed during native GCC recovery')
+    imported = set()
+    with tarfile.open(archive, 'r:xz') as tf:
+        for member in tf:
+            if member.isfile() or member.issym() or member.islnk():
+                imported.add(member.name.removeprefix('./'))
+    proof = {}
+    for source in sorted(stage.rglob('*')):
+        rel = source.relative_to(work / 'stage').as_posix()
+        if rel == 'usr/share/info/dir' or source.is_dir():
+            continue
+        if rel in imported:
+            continue
+        destination = root / rel
+        if source.is_symlink():
+            if not destination.is_symlink() or os.readlink(source) != os.readlink(destination):
+                raise RuntimeError('modified recovered native GCC symlink: ' + rel)
+            proof[rel] = {'link': os.readlink(source)}
+        elif source.is_file():
+            if destination.is_symlink() or not destination.is_file() or common.sha(source) != common.sha(destination):
+                raise RuntimeError('modified recovered native GCC file: ' + rel)
+            proof[rel] = {'sha256': common.sha(source)}
+        else:
+            raise RuntimeError('invalid recovered native GCC entry: ' + rel)
+    if not proof or 'usr/libexec/gcc/x86_64-distro-linux-gnu/16.2.0/cc1' not in proof:
+        raise RuntimeError('incomplete failed native GCC staged payload')
+    print(f'[temp-tools] native-gcc: verified {len(proof)} unstamped run-005 files for recovery', flush=True)
+    return proof
+
+
+def rollback_native_gcc(created, backup, root):
+    """Undo new native files and restore exactly the verified prior payload."""
+    for destination in reversed(created):
+        if destination.is_symlink() or destination.is_file():
+            destination.unlink()
+        elif destination.is_dir() and not any(destination.iterdir()):
+            destination.rmdir()
+    for relative, src in backup.items():
+        dst = root / relative
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        if src.is_symlink():
+            dst.symlink_to(os.readlink(src))
+        else:
+            import shutil
+            shutil.copy2(src, dst)
+
+
+def install_native_gcc(stage, root, state, work, prior_native):
+    """Transactionally install native GCC, protecting imported cross files.
+
+    Never overwrite imported files. Previous native files are only replaceable
+    after exact verification against the failed run-005 staged payload.
+    """
     marker = state / 'temp-tools-import.json'
     archive = state.parent / 'artifacts/cross-toolchain-root.tar.xz'
     if not marker.is_file() or not archive.is_file():
@@ -198,10 +258,11 @@ def install_native_gcc(stage, root, state):
     if (record.get('stage') != 'temp-tools' or record.get('status') != 'complete'
             or common.sha(archive) != record.get('cross_archive_sha256')):
         raise RuntimeError('cross-toolchain archive differs from verified import')
-    # Check only paths that the native package is attempting to replace.
-    # An unlisted path, or a path modified since import, remains a collision.
+    source_root = stage / 'usr'
+    if not source_root.is_dir() or source_root.is_symlink():
+        raise RuntimeError('missing native GCC staged /usr')
     collisions = set()
-    for path in (stage / 'usr').rglob('*'):
+    for path in source_root.rglob('*'):
         if (path.is_file() or path.is_symlink()) and ((root / path.relative_to(stage)).exists() or (root / path.relative_to(stage)).is_symlink()):
             collisions.add(path.relative_to(stage).as_posix())
     prior_owned = set()
@@ -226,35 +287,30 @@ def install_native_gcc(stage, root, state):
                 if not destination.is_symlink() or os.readlink(destination) != member.linkname:
                     raise RuntimeError('modified imported symlink: ' + relative)
             elif member.islnk():
-                # Hardlink archive entries need explicit resolution; never silently skip.
                 raise RuntimeError('unsupported imported hardlink collision: ' + relative)
             else:
                 raise RuntimeError('invalid imported archive member: ' + relative)
             prior_owned.add(relative)
-
-    source_root = stage / 'usr'
-    if not source_root.is_dir() or source_root.is_symlink():
-        raise RuntimeError('missing native GCC staged /usr')
+    if prior_owned.intersection(prior_native):
+        raise RuntimeError('recovered native GCC overlaps imported cross ownership')
     entries = []
     skipped = 0
     for source in sorted(source_root.rglob('*')):
-        rel = source.relative_to(stage)
-        if rel.as_posix() == 'usr/share/info/dir':
+        rel = source.relative_to(stage).as_posix()
+        if rel == 'usr/share/info/dir':
             continue
         destination = root / rel
         if source.is_symlink():
             link = os.readlink(source)
-            if os.path.isabs(link):
-                raise RuntimeError('absolute native GCC staged symlink: ' + str(rel))
-            if not (destination.parent / link).resolve(strict=False).is_relative_to(root.resolve()):
-                raise RuntimeError('unsafe native GCC symlink: ' + str(rel))
+            if os.path.isabs(link) or not (destination.parent / link).resolve(strict=False).is_relative_to(root.resolve()):
+                raise RuntimeError('unsafe staged native GCC symlink: ' + rel)
             kind = 'link'
         elif source.is_dir():
             kind = 'dir'
         elif source.is_file():
             kind = 'file'
         else:
-            raise RuntimeError('unsupported native GCC staged entry: ' + str(rel))
+            raise RuntimeError('unsupported native GCC staged entry: ' + rel)
         parent = destination.parent
         while parent != root:
             if parent.is_symlink():
@@ -262,16 +318,34 @@ def install_native_gcc(stage, root, state):
             parent = parent.parent
         if kind == 'dir':
             if destination.is_symlink() or (destination.exists() and not destination.is_dir()):
-                raise RuntimeError('native GCC directory collision: ' + str(rel))
+                raise RuntimeError('native GCC directory collision: ' + rel)
         elif destination.exists() or destination.is_symlink():
-            if str(rel) not in prior_owned:
-                raise RuntimeError('unowned native GCC file collision: ' + str(rel))
-            skipped += 1
-            continue
-        entries.append((source, destination, kind, str(rel)))
+            if rel in prior_owned:
+                skipped += 1
+                continue
+            if rel not in prior_native:
+                raise RuntimeError('unowned native GCC file collision: ' + rel)
+        entries.append((source, destination, kind, rel))
+    # Back up every old native file, including ones removed by the new recipe.
+    backup_dir = work / 'recovery-backup'
+    backup_dir.mkdir()
+    backup = {}
+    import shutil
+    for rel in prior_native:
+        src = root / rel
+        dst = backup_dir / rel
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        if src.is_symlink():
+            dst.symlink_to(os.readlink(src))
+        else:
+            shutil.copy2(src, dst)
+        backup[rel] = dst
     created = []
     installed = {}
     try:
+        # Once fully backed up, remove only verified prior-native paths.
+        for rel in prior_native:
+            (root / rel).unlink()
         for source, destination, kind, rel in entries:
             if kind == 'dir':
                 if not destination.exists():
@@ -284,19 +358,14 @@ def install_native_gcc(stage, root, state):
                     destination.symlink_to(link)
                     installed[rel] = {'link': link}
                 else:
-                    import shutil
                     shutil.copy2(source, destination)
                     installed[rel] = {'sha256': common.sha(destination)}
                 created.append(destination)
     except Exception:
-        for destination in reversed(created):
-            if destination.is_symlink() or destination.is_file():
-                destination.unlink()
-            elif destination.is_dir():
-                destination.rmdir()
+        rollback_native_gcc(created, backup, root)
         raise
     print(f'[temp-tools] native-gcc: preserved {skipped} verified cross-owned paths', flush=True)
-    return installed
+    return installed, created, backup
 
 
 def main(project_arg, name):
@@ -347,10 +416,14 @@ def main(project_arg, name):
             if recover_native_binutils(root, state, name, recipe, signature,
                                        common.sha(cached), stamp):
                 return
-    for binary in recipe['validation']['chroot_executables']:
-        candidate = root / binary.lstrip('/')
-        if candidate.exists() or candidate.is_symlink():
-            raise RuntimeError('untracked package binary: ' + binary)
+    if name == 'native-gcc':
+        # Its prior unstamped installation is independently verified before reuse.
+        recovery_owned = installed_native_gcc_from_failed_run(root, state)
+    else:
+        for binary in recipe['validation']['chroot_executables']:
+            candidate = root / binary.lstrip('/')
+            if candidate.exists() or candidate.is_symlink():
+                raise RuntimeError('untracked package binary: ' + binary)
     source = pkg['source']
     version = pkg['version']
     if not re.fullmatch(r'[a-f0-9]{64}', source['sha256']):
@@ -434,16 +507,24 @@ def main(project_arg, name):
         argv = [s.format_map(variables) for s in step['argv']]
         print(f'[temp-tools] {name}: step={step["name"]}', flush=True)
         common.run(guest + argv, log)
-    evidence = (install_native_gcc(work / 'stage', root, state) if name == 'native-gcc'
-                else common.install(work / 'stage', root))
-    if not evidence:
-        raise RuntimeError('empty installed package')
-    for binary in recipe['validation']['chroot_executables']:
-        if not (root / binary.lstrip('/')).is_file():
-            raise RuntimeError('missing installed executable: ' + binary)
-        validate_in_root(root, work, binary)
     if name == 'native-gcc':
-        compiler_smoke(root, work)
+        prior_native = recovery_owned
+        evidence, created, backup = install_native_gcc(work / 'stage', root, state, work, prior_native)
+    else:
+        evidence = common.install(work / 'stage', root)
+    try:
+        if not evidence:
+            raise RuntimeError('empty installed package')
+        for binary in recipe['validation']['chroot_executables']:
+            if not (root / binary.lstrip('/')).is_file():
+                raise RuntimeError('missing installed executable: ' + binary)
+            validate_in_root(root, work, binary)
+        if name == 'native-gcc':
+            compiler_smoke(root, work)
+    except Exception:
+        if name == 'native-gcc':
+            rollback_native_gcc(created, backup, root)
+        raise
     common.save(stamp, {'schema_version':1,'phase':'temp-tools','package':name,
                         'status':'complete','manifest_sha256':signature,
                         'source_sha256':common.sha(archive),'installed':evidence})
