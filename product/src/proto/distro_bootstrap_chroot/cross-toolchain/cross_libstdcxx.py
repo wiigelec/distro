@@ -30,10 +30,10 @@ def target_test(root,work):
     src=work/'probe.cc';src.write_text('#include <string>\n#include <cstdio>\nint main(){std::string s="distro-cxx-ok";std::puts(s.c_str());}\n')
     log=work/'cxx-validation.log'
     cc=f'/toolchain/usr/bin/{TARGET}-g++'
-    command=sandbox(root,work)+[cc,'--sysroot=/toolchain','-fno-link-libatomic','-B/toolchain/usr/lib64/','-L/toolchain/usr/lib64','-Wl,-rpath-link,/toolchain/usr/lib/gcc/'+TARGET+'/16.2.0','/work/probe.cc','-o','/work/probe']
+    command=sandbox(root,work)+[cc,'--sysroot=/toolchain','-fno-link-libatomic','-B/toolchain/usr/lib64/','-L/toolchain/usr/lib64','-Wl,-rpath-link,/toolchain/usr/'+TARGET+'/lib64','/work/probe.cc','-o','/work/probe']
     run(command,log,120)
-    run(sandbox(root,work)+['/toolchain/lib64/ld-linux-x86-64.so.2','--library-path','/toolchain/usr/lib:/toolchain/usr/lib64:/toolchain/lib64:/toolchain/usr/lib/gcc/'+TARGET+'/16.2.0','/work/probe'],log,120)
-    output=subprocess.run(sandbox(root,work)+['/toolchain/lib64/ld-linux-x86-64.so.2','--library-path','/toolchain/usr/lib:/toolchain/usr/lib64:/toolchain/lib64:/toolchain/usr/lib/gcc/'+TARGET+'/16.2.0','/work/probe'],capture_output=True,text=True,timeout=120)
+    run(sandbox(root,work)+['/toolchain/lib64/ld-linux-x86-64.so.2','--library-path','/toolchain/usr/lib:/toolchain/usr/lib64:/toolchain/lib64:/toolchain/usr/'+TARGET+'/lib64','/work/probe'],log,120)
+    output=subprocess.run(sandbox(root,work)+['/toolchain/lib64/ld-linux-x86-64.so.2','--library-path','/toolchain/usr/lib:/toolchain/usr/lib64:/toolchain/lib64:/toolchain/usr/'+TARGET+'/lib64','/work/probe'],capture_output=True,text=True,timeout=120)
     if output.returncode or output.stdout.strip()!='distro-cxx-ok':raise RuntimeError('C++ runtime acceptance test failed: '+output.stderr[-900:])
 
 def main():
