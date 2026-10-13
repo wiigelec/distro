@@ -470,7 +470,6 @@ def main(project_arg, name):
             tmp.rename(tree)
         finally:
             if tmp.exists():
-                import shutil
                 shutil.rmtree(tmp)
     source_dir = tree / (pkg['upstream_name'] + '-' + version)
     if not (source_dir / 'configure').is_file():
