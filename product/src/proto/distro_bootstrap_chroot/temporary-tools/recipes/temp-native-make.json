@@ -2,32 +2,31 @@
   "schema_version": 1,
   "name": "make",
   "phase": "temp-tools",
-  "execution": "host-cross",
+  "execution": "native-root",
   "steps": [
     {
       "name": "configure",
       "argv": [
         "/work/src/configure",
-        "--build=x86_64-pc-linux-gnu",
+        "--build={target}",
         "--host={target}",
         "--prefix=/usr",
         "--disable-nls",
-        "CC={cc}",
-        "CFLAGS=-O2",
-        "LDFLAGS={ldflags}"
+        "CC=/usr/bin/gcc",
+        "CFLAGS=-O2"
       ]
     },
     {
       "name": "build",
       "argv": [
-        "make",
-        "-j{jobs}"
+        "/bin/bash",
+        "/work/build/build.sh"
       ]
     },
     {
       "name": "stage-install",
       "argv": [
-        "make",
+        "/work/build/make",
         "install",
         "DESTDIR=/work/stage"
       ]

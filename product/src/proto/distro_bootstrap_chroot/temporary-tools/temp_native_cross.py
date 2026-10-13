@@ -9,6 +9,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import sys
 import tarfile
@@ -397,7 +398,7 @@ def main(project_arg, name):
     if not recipe_path.is_relative_to(HERE) or not recipe_path.is_file():
         raise RuntimeError('unsafe recipe path')
     recipe = json.loads(recipe_path.read_text())
-    if recipe['name'] != name or recipe['execution'] != 'host-cross' or recipe['phase'] != 'temp-tools':
+    if recipe['name'] != name or recipe['execution'] != ('native-root' if name == 'make' else 'host-cross') or recipe['phase'] != 'temp-tools':
         raise RuntimeError('recipe identity mismatch')
     stamp = state / 'stamps' / (name + '.json')
     signature = hashlib.sha256((common.sha(recipe_path) + ':' + json.dumps(pkg, sort_keys=True)).encode()).hexdigest()
@@ -508,6 +509,27 @@ def main(project_arg, name):
         # configure process. A top-level configure argument alone is not
         # inherited by the GCC subconfigure (which otherwise sees host headers).
         guest += ['--setenv', 'gcc_cv_sys_sdt_h', 'no', '--']
+    elif name == 'make':
+        # GNU Make can bootstrap itself without an existing make executable:
+        # configure generates build.sh/build.cfg, then build.sh uses native GCC.
+        # Host /usr, headers, shared libraries and compiler are never mounted.
+        # A temporary read-only host awk is permitted for Autoconf's probes;
+        # this is explicitly transient and is never installed in the root.
+        awk = shutil.which('awk')
+        if not awk:
+            raise RuntimeError('host awk required for native GNU Make configure')
+        awk_real = Path(awk).resolve(strict=True)
+        guest = ['bwrap', '--die-with-parent', '--new-session', '--unshare-user',
+                 '--unshare-pid', '--unshare-net', '--unshare-ipc', '--unshare-uts',
+                 '--bind', str(root), '/', '--bind', str(work), '/work',
+                 '--ro-bind', str(source_dir), '/work/src',
+                 '--ro-bind', str(awk_real), '/work/host-awk',
+                 '--proc', '/proc', '--dev', '/dev', '--tmpfs', '/tmp',
+                 '--chdir', '/work/build', '--clearenv',
+                 '--setenv', 'HOME', '/work', '--setenv', 'PATH', '/usr/bin:/bin',
+                 '--setenv', 'LC_ALL', 'C', '--setenv', 'AWK', '/work/host-awk',
+                 '--setenv', 'CONFIG_SHELL', '/bin/bash', '--']
+        print('[temp-tools] make: native-root compilation using /usr/bin/gcc and GNU Make build.sh', flush=True)
     else:
         guest = common.sandbox(root, work, source_dir)
     for step in recipe['steps']:
