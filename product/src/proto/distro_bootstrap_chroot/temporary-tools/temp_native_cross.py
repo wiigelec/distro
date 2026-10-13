@@ -181,6 +181,106 @@ def prepare_gcc_prerequisites(pkg, cache, work, source_dir):
         print(f'[temp-tools] native-gcc: {name} {version} SHA512 verified', flush=True)
     return overlay, deps_root, {item['name']: cache / ('gcc-prerequisite-' + item['name'] + '-' + item['version']) / (item['name'] + '-' + item['version']) for item in deps}
 
+def install_native_gcc(stage, root, state):
+    """Preserve verified cross-toolchain ownership when installing native GCC.
+
+    The cross compiler and native GCC have the same target triple. Never
+    overwrite cross compiler executables, private GCC files or target runtime
+    libraries merely because the native install restaged those paths.
+    """
+    prior_owned = {}
+    cross_stamps = state / 'stamps/cross-toolchain'
+    for package in ('binutils', 'gcc', 'linux-api-headers', 'glibc'):
+        stamp_path = cross_stamps / (package + '.json')
+        if not stamp_path.is_file():
+            raise RuntimeError('missing cross package ownership stamp: ' + package)
+        record = json.loads(stamp_path.read_text())
+        if record.get('status') != 'complete' or not record.get('installed'):
+            raise RuntimeError('invalid cross package ownership stamp: ' + package)
+        for entry in record['installed']:
+            relative = entry['path']
+            if relative in prior_owned:
+                raise RuntimeError('duplicate cross package ownership: ' + relative)
+            destination = root / relative
+            if 'sha256' in entry:
+                if (not destination.is_file() or destination.is_symlink()
+                        or common.sha(destination) != entry['sha256']):
+                    raise RuntimeError('modified cross-owned file: ' + relative)
+            elif 'link' in entry:
+                if (not destination.is_symlink()
+                        or os.readlink(destination) != entry['link']):
+                    raise RuntimeError('modified cross-owned link: ' + relative)
+            else:
+                raise RuntimeError('invalid cross package ownership: ' + relative)
+            prior_owned[relative] = package
+
+    source_root = stage / 'usr'
+    if not source_root.is_dir() or source_root.is_symlink():
+        raise RuntimeError('missing native GCC staged /usr')
+    entries = []
+    skipped = 0
+    for source in sorted(source_root.rglob('*')):
+        rel = source.relative_to(stage)
+        if rel.as_posix() == 'usr/share/info/dir':
+            continue
+        destination = root / rel
+        if source.is_symlink():
+            link = os.readlink(source)
+            if os.path.isabs(link):
+                raise RuntimeError('absolute native GCC staged symlink: ' + str(rel))
+            if not (destination.parent / link).resolve(strict=False).is_relative_to(root.resolve()):
+                raise RuntimeError('unsafe native GCC symlink: ' + str(rel))
+            kind = 'link'
+        elif source.is_dir():
+            kind = 'dir'
+        elif source.is_file():
+            kind = 'file'
+        else:
+            raise RuntimeError('unsupported native GCC staged entry: ' + str(rel))
+        parent = destination.parent
+        while parent != root:
+            if parent.is_symlink():
+                raise RuntimeError('symlink in native GCC install path: ' + str(parent))
+            parent = parent.parent
+        if kind == 'dir':
+            if destination.is_symlink() or (destination.exists() and not destination.is_dir()):
+                raise RuntimeError('native GCC directory collision: ' + str(rel))
+        elif destination.exists() or destination.is_symlink():
+            if str(rel) not in prior_owned:
+                raise RuntimeError('unowned native GCC file collision: ' + str(rel))
+            skipped += 1
+            continue
+        entries.append((source, destination, kind, str(rel)))
+    created = []
+    installed = {}
+    try:
+        for source, destination, kind, rel in entries:
+            if kind == 'dir':
+                if not destination.exists():
+                    destination.mkdir(parents=True)
+                    created.append(destination)
+            else:
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                if kind == 'link':
+                    link = os.readlink(source)
+                    destination.symlink_to(link)
+                    installed[rel] = {'link': link}
+                else:
+                    import shutil
+                    shutil.copy2(source, destination)
+                    installed[rel] = {'sha256': common.sha(destination)}
+                created.append(destination)
+    except Exception:
+        for destination in reversed(created):
+            if destination.is_symlink() or destination.is_file():
+                destination.unlink()
+            elif destination.is_dir():
+                destination.rmdir()
+        raise
+    print(f'[temp-tools] native-gcc: preserved {skipped} verified cross-owned paths', flush=True)
+    return installed
+
+
 def main(project_arg, name):
     if os.geteuid() == 0:
         raise RuntimeError('run as regular user')
@@ -316,7 +416,8 @@ def main(project_arg, name):
         argv = [s.format_map(variables) for s in step['argv']]
         print(f'[temp-tools] {name}: step={step["name"]}', flush=True)
         common.run(guest + argv, log)
-    evidence = common.install(work / 'stage', root)
+    evidence = (install_native_gcc(work / 'stage', root, state) if name == 'native-gcc'
+                else common.install(work / 'stage', root))
     if not evidence:
         raise RuntimeError('empty installed package')
     for binary in recipe['validation']['chroot_executables']:
