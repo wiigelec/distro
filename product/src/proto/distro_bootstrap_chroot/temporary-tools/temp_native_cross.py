@@ -221,7 +221,7 @@ def installed_native_gcc_from_failed_run(root, state):
             proof[rel] = {'sha256': common.sha(source)}
         else:
             raise RuntimeError('invalid recovered native GCC entry: ' + rel)
-    if not proof or 'usr/libexec/gcc/x86_64-distro-linux-gnu/16.2.0/cc1' not in proof:
+    if not proof or 'usr/bin/gcc' not in proof:
         raise RuntimeError('incomplete failed native GCC staged payload')
     print(f'[temp-tools] native-gcc: verified {len(proof)} unstamped run-005 files for recovery', flush=True)
     return proof
@@ -293,6 +293,13 @@ def install_native_gcc(stage, root, state, work, prior_native):
             prior_owned.add(relative)
     if prior_owned.intersection(prior_native):
         raise RuntimeError('recovered native GCC overlaps imported cross ownership')
+    # The native driver and cross compiler use the same private GCC backend
+    # directory. Only those compiler-internal paths may transition ownership.
+    # Other imported cross-toolchain files remain immutable.
+    private_prefix = 'usr/libexec/gcc/x86_64-distro-linux-gnu/16.2.0/'
+    handoff = {rel for rel in prior_owned if rel.startswith(private_prefix)}
+    if private_prefix + 'cc1' not in handoff:
+        raise RuntimeError('imported cross-GCC cc1 not available for guarded handoff')
     entries = []
     skipped = 0
     for source in sorted(source_root.rglob('*')):
@@ -320,10 +327,10 @@ def install_native_gcc(stage, root, state, work, prior_native):
             if destination.is_symlink() or (destination.exists() and not destination.is_dir()):
                 raise RuntimeError('native GCC directory collision: ' + rel)
         elif destination.exists() or destination.is_symlink():
-            if rel in prior_owned:
+            if rel in prior_owned and rel not in handoff:
                 skipped += 1
                 continue
-            if rel not in prior_native:
+            if rel not in prior_native and rel not in handoff:
                 raise RuntimeError('unowned native GCC file collision: ' + rel)
         entries.append((source, destination, kind, rel))
     # Back up every old native file, including ones removed by the new recipe.
@@ -331,7 +338,9 @@ def install_native_gcc(stage, root, state, work, prior_native):
     backup_dir.mkdir()
     backup = {}
     import shutil
-    for rel in prior_native:
+    replaceable = set(prior_native) | {rel for _, _, kind, rel in entries
+                                         if kind != 'dir' and rel in handoff}
+    for rel in sorted(replaceable):
         src = root / rel
         dst = backup_dir / rel
         dst.parent.mkdir(parents=True, exist_ok=True)
@@ -344,7 +353,7 @@ def install_native_gcc(stage, root, state, work, prior_native):
     installed = {}
     try:
         # Once fully backed up, remove only verified prior-native paths.
-        for rel in prior_native:
+        for rel in sorted(replaceable):
             (root / rel).unlink()
         for source, destination, kind, rel in entries:
             if kind == 'dir':
@@ -364,7 +373,7 @@ def install_native_gcc(stage, root, state, work, prior_native):
     except Exception:
         rollback_native_gcc(created, backup, root)
         raise
-    print(f'[temp-tools] native-gcc: preserved {skipped} verified cross-owned paths', flush=True)
+    print(f'[temp-tools] native-gcc: preserved {skipped} verified imported paths; transitioned {len(replaceable - set(prior_native))} private GCC backends', flush=True)
     return installed, created, backup
 
 
