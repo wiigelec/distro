@@ -188,31 +188,49 @@ def install_native_gcc(stage, root, state):
     overwrite cross compiler executables, private GCC files or target runtime
     libraries merely because the native install restaged those paths.
     """
-    prior_owned = {}
-    cross_stamps = state / 'stamps/cross-toolchain'
-    for package in ('binutils', 'gcc', 'linux-api-headers', 'glibc'):
-        stamp_path = cross_stamps / (package + '.json')
-        if not stamp_path.is_file():
-            raise RuntimeError('missing cross package ownership stamp: ' + package)
-        record = json.loads(stamp_path.read_text())
-        if record.get('status') != 'complete' or not record.get('installed'):
-            raise RuntimeError('invalid cross package ownership stamp: ' + package)
-        for entry in record['installed']:
-            relative = entry['path']
+    # Temp-tools imports a clean archive, not the cross build's stamp tree.
+    # Treat only byte-verified entries of that exact imported archive as owned.
+    marker = state / 'temp-tools-import.json'
+    archive = state.parent / 'artifacts/cross-toolchain-root.tar.xz'
+    if not marker.is_file() or not archive.is_file():
+        raise RuntimeError('missing verified cross-toolchain import/archive')
+    record = json.loads(marker.read_text())
+    if (record.get('stage') != 'temp-tools' or record.get('status') != 'complete'
+            or common.sha(archive) != record.get('cross_archive_sha256')):
+        raise RuntimeError('cross-toolchain archive differs from verified import')
+    # Check only paths that the native package is attempting to replace.
+    # An unlisted path, or a path modified since import, remains a collision.
+    collisions = set()
+    for path in (stage / 'usr').rglob('*'):
+        if (path.is_file() or path.is_symlink()) and ((root / path.relative_to(stage)).exists() or (root / path.relative_to(stage)).is_symlink()):
+            collisions.add(path.relative_to(stage).as_posix())
+    prior_owned = set()
+    with tarfile.open(archive, 'r:xz') as tf:
+        for member in tf:
+            relative = member.name.removeprefix('./')
+            if relative not in collisions:
+                continue
             if relative in prior_owned:
-                raise RuntimeError('duplicate cross package ownership: ' + relative)
+                raise RuntimeError('duplicate imported path: ' + relative)
             destination = root / relative
-            if 'sha256' in entry:
-                if (not destination.is_file() or destination.is_symlink()
-                        or common.sha(destination) != entry['sha256']):
-                    raise RuntimeError('modified cross-owned file: ' + relative)
-            elif 'link' in entry:
-                if (not destination.is_symlink()
-                        or os.readlink(destination) != entry['link']):
-                    raise RuntimeError('modified cross-owned link: ' + relative)
+            if member.isfile():
+                source = tf.extractfile(member)
+                if source is None or not destination.is_file() or destination.is_symlink():
+                    raise RuntimeError('modified imported file: ' + relative)
+                digest = hashlib.sha256()
+                for chunk in iter(lambda: source.read(1024 * 1024), b''):
+                    digest.update(chunk)
+                if common.sha(destination) != digest.hexdigest():
+                    raise RuntimeError('modified imported file: ' + relative)
+            elif member.issym():
+                if not destination.is_symlink() or os.readlink(destination) != member.linkname:
+                    raise RuntimeError('modified imported symlink: ' + relative)
+            elif member.islnk():
+                # Hardlink archive entries need explicit resolution; never silently skip.
+                raise RuntimeError('unsupported imported hardlink collision: ' + relative)
             else:
-                raise RuntimeError('invalid cross package ownership: ' + relative)
-            prior_owned[relative] = package
+                raise RuntimeError('invalid imported archive member: ' + relative)
+            prior_owned.add(relative)
 
     source_root = stage / 'usr'
     if not source_root.is_dir() or source_root.is_symlink():
