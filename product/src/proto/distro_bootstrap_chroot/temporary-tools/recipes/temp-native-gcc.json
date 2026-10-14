@@ -24,10 +24,8 @@
         "--disable-libssp",
         "--disable-libquadmath",
         "--disable-libgomp",
-        "--disable-libstdcxx",
-        "--disable-threads",
         "--disable-libatomic",
-        "--enable-languages=c",
+        "--enable-languages=c,c++",
         "CC={cc}",
         "CXX={cxx}",
         "CC_FOR_BUILD=/usr/bin/gcc",
@@ -43,7 +41,8 @@
         "make",
         "-j{jobs}",
         "all-gcc",
-        "all-target-libgcc"
+        "all-target-libgcc",
+        "all-target-libstdc++-v3"
       ]
     },
     {
@@ -52,13 +51,15 @@
         "make",
         "install-gcc",
         "install-target-libgcc",
+        "install-target-libstdc++-v3",
         "DESTDIR=/work/stage"
       ]
     }
   ],
   "validation": {
     "chroot_executables": [
-      "/usr/bin/gcc"
+      "/usr/bin/gcc",
+      "/usr/bin/g++"
     ]
   },
   "environment": {
