@@ -514,7 +514,7 @@ def native_build(project):
                   'jobs': str(min(os.cpu_count() or 2, 8))}
         lines = ['#!/usr/bin/bash', 'set -euo pipefail',
                  'cd ' + __import__('shlex').quote('/work/native/' + name + '/build')]
-        for step in recipe['steps']:
+        for step in recipe.get('native_steps', recipe['steps']):
             if not isinstance(step, dict) or set(step) != {'name', 'argv'}:
                 raise RuntimeError('unsupported native recipe step: ' + name)
             lines.append('echo ' + __import__('shlex').quote('native step=' + step['name']))

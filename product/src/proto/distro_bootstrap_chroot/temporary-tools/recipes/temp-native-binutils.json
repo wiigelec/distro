@@ -46,6 +46,20 @@
       ]
     }
   ],
+  "native_steps": [
+    {
+      "name": "configure",
+      "argv": ["/work/src/configure", "--prefix=/usr", "--disable-nls", "--disable-werror", "--disable-gdb", "--disable-gprofng", "--disable-sim"]
+    },
+    {
+      "name": "build",
+      "argv": ["make", "-j{jobs}", "all-binutils", "all-gas", "all-ld", "MAKEINFO=/usr/bin/true"]
+    },
+    {
+      "name": "stage-install",
+      "argv": ["make", "install-binutils", "install-gas", "install-ld", "MAKEINFO=/usr/bin/true", "DESTDIR=/work/stage"]
+    }
+  ],
   "validation": {
     "chroot_executables": [
       "/usr/bin/as",
