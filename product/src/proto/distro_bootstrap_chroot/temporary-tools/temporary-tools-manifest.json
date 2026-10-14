@@ -5,10 +5,18 @@
   "packages": [
     {
       "name": "bash",
-      "state": "existing-bootstrap",
+      "upstream_name": "bash",
+      "version": "5.3",
+      "state": "executable",
       "execution": "host-cross",
-      "stamp": "stamps/bash.json",
-      "description": "Existing Bash bootstrap; validated and resumed by temp_tools_bootstrap.py"
+      "source": {
+        "url": "https://ftp.gnu.org/gnu/bash/bash-5.3.tar.gz",
+        "sha256": "62dd49c44c399ed1b3f7f731e87a782334d834f08e098a35f2c87547d5dbb269"
+      },
+      "recipe": "recipes/temp-bash.json",
+      "requires": [
+        "cross-toolchain"
+      ]
     },
     {
       "name": "coreutils",
@@ -110,7 +118,11 @@
           "url": "https://gcc.gnu.org/pub/gcc/infrastructure/mpc-1.3.1.tar.gz",
           "sha512": "4bab4ef6076f8c5dfdc99d810b51108ced61ea2942ba0c1c932d624360a5473df20d32b300fc76f2ba4aa2a97e1f275c9fd494a1ba9f07c4cb2ad7ceaeb1ae97"
         }
-      ]
+      ],
+      "installation": {
+        "compiler_private_prefix": "manifest-target-and-version"
+      },
+      "compiler_smoke": true
     },
     {
       "name": "gawk",

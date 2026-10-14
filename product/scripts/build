@@ -229,48 +229,11 @@ def main():
     if args.phase == 'temp-tools':
         if not args.cross_compiler:
             ap.error('temp-tools requires --cross-compiler')
-        runner = PHASES['temp-tools'] / 'temp_tools_bootstrap.py'
-        status = subprocess.call([sys.executable, str(runner),
-                                  str(args.root), str(args.cross_compiler)])
-        if status:
-            return status
-        # POSIX configure scripts require /bin/sh; /bin already aliases /usr/bin.
-        # Validate a pre-existing user-created alias without replacing it.
-        project = args.root.expanduser().resolve()
-        shell = project / 'root/usr/bin/sh'
-        if shell.is_symlink():
-            if os.readlink(shell) != 'bash':
-                raise RuntimeError('unexpected /usr/bin/sh target; refusing overwrite')
-        elif shell.exists():
-            raise RuntimeError('untracked /usr/bin/sh entry; refusing overwrite')
-        else:
-            shell.symlink_to('bash')
-        if not (project / 'root/usr/bin/bash').is_file():
-            raise RuntimeError('POSIX sh target missing')
-        say('[temp-tools] /bin/sh -> bash: verified')
-        temp_phase = PHASES['temp-tools']
-        temp_manifest = json.loads((temp_phase / 'temporary-tools-manifest.json').read_text())
-        if temp_manifest.get('phase') != 'temp-tools' or temp_manifest.get('target') != 'x86_64-distro-linux-gnu':
-            raise RuntimeError('temporary-tools manifest identity mismatch')
-        for package in temp_manifest['packages']:
-            if package['name'] == 'bash' and package.get('state') == 'existing-bootstrap':
-                continue
-            allowed_execution = 'host-cross'
-            if package.get('state') != 'executable' or package.get('execution') != allowed_execution:
-                raise RuntimeError('unsupported temp-tools package: ' + package['name'])
-            if package['name'] == 'coreutils':
-                helper = temp_phase / 'temp_coreutils_bootstrap.py'
-                command = [sys.executable, str(helper), str(args.root)]
-            elif package['name'] in ('native-binutils', 'native-gcc', 'make', 'gawk'):
-                helper = temp_phase / 'temp_native_cross.py'
-                command = [sys.executable, str(helper), str(args.root), package['name']]
-            else:
-                helper = temp_phase / 'temp_cross_package.py'
-                command = [sys.executable, str(helper), str(args.root), package['name']]
-            status = subprocess.call(command)
-            if status:
-                return status
-        return 0
+        # A single recipe interpreter runs every temporary-tools package.
+        # It also verifies/imports the cross-toolchain before the first recipe.
+        runner = PHASES['temp-tools'] / 'package_runner.py'
+        return subprocess.call([sys.executable, str(runner),
+                                str(args.root), str(args.cross_compiler)])
     if args.cross_compiler:
         ap.error('--cross-compiler is only valid for temp-tools')
     project = args.root.expanduser().resolve()
