@@ -255,7 +255,7 @@ def main():
         for package in temp_manifest['packages']:
             if package['name'] == 'bash' and package.get('state') == 'existing-bootstrap':
                 continue
-            allowed_execution = ('native-root' if package['name'] in ('make', 'gawk') else 'host-cross')
+            allowed_execution = 'host-cross'
             if package.get('state') != 'executable' or package.get('execution') != allowed_execution:
                 raise RuntimeError('unsupported temp-tools package: ' + package['name'])
             if package['name'] == 'coreutils':

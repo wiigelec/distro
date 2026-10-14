@@ -398,7 +398,7 @@ def main(project_arg, name):
     if not recipe_path.is_relative_to(HERE) or not recipe_path.is_file():
         raise RuntimeError('unsafe recipe path')
     recipe = json.loads(recipe_path.read_text())
-    if recipe['name'] != name or recipe['execution'] != ('native-root' if name in ('make', 'gawk') else 'host-cross') or recipe['phase'] != 'temp-tools':
+    if recipe['name'] != name or recipe['execution'] != 'host-cross' or recipe['phase'] != 'temp-tools':
         raise RuntimeError('recipe identity mismatch')
     stamp = state / 'stamps' / (name + '.json')
     signature = hashlib.sha256((common.sha(recipe_path) + ':' + json.dumps(pkg, sort_keys=True)).encode()).hexdigest()
@@ -508,7 +508,7 @@ def main(project_arg, name):
         # configure process. A top-level configure argument alone is not
         # inherited by the GCC subconfigure (which otherwise sees host headers).
         guest += ['--setenv', 'gcc_cv_sys_sdt_h', 'no', '--']
-    elif name == 'make':
+    elif name == 'make' and recipe['execution'] == 'native-root':
         # GNU Make can bootstrap itself without an existing make executable:
         # configure generates build.sh/build.cfg, then build.sh uses native GCC.
         # Host /usr, headers, shared libraries and compiler are never mounted.
