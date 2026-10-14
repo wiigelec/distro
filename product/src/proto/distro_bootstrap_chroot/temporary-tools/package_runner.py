@@ -298,6 +298,20 @@ def package_run(project, manifest, pkg, cross_archive):
               'cxx': f'/toolchain/usr/bin/{target}-g++ --sysroot=/toolchain -fno-link-libatomic',
               'ldflags': '-B/toolchain/usr/lib64/ -L/toolchain/usr/lib64 -L/toolchain/lib64'}
     guest = sandbox_for(root, work, source_dir, pkg, state)
+    # Recipe environment is applied to every sandbox command, including
+    # recursive configure/build subprocesses. An argv assignment passed to
+    # the top-level configure does not reliably reach GCC sub-configures.
+    env = recipe.get('environment', {})
+    if not isinstance(env, dict):
+        raise RuntimeError('invalid recipe environment: ' + name)
+    env_args = []
+    for key, value in sorted(env.items()):
+        if (not isinstance(key, str) or not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', key)
+                or key in ('PATH', 'HOME', 'LC_ALL') or key.startswith(('LD_', 'BASH_FUNC_'))
+                or not isinstance(value, str) or '\x00' in value or '\n' in value):
+            raise RuntimeError('unsafe recipe environment declaration: ' + str(key))
+        env_args += ['--setenv', key, value.format_map(values)]
+    guest = guest[:-1] + env_args + ['--']
     for step in recipe['steps']:
         if not isinstance(step, dict) or set(step) != {'name', 'argv'}:
             raise RuntimeError('invalid recipe step: ' + name)
