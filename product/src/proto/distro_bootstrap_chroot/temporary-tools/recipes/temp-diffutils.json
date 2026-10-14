@@ -33,6 +33,9 @@
       ]
     }
   ],
+  "environment": {
+    "gl_cv_func_strcasecmp_works": "yes"
+  },
   "validation": {
     "chroot_executables": [
       "/usr/bin/diff",
