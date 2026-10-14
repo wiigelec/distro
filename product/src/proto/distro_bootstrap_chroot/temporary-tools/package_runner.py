@@ -435,8 +435,121 @@ def main(project, cross_archive):
         done.add(pkg['name'])
     return 0
 
+def native_recipe_argv(step, values):
+    """Translate a host-cross recipe step into its native counterpart."""
+    argv = []
+    for arg in step['argv']:
+        if (arg.startswith(('--build=', '--host=', '--target=')) or
+                arg.startswith(('CC=', 'CXX=', 'CC_FOR_BUILD=', 'CXX_FOR_BUILD=',
+                                'AR=', 'RANLIB=', 'LDFLAGS='))):
+            continue
+        if arg.startswith('/work/src/'):
+            arg = '/work/native/{name}/src/' + arg[len('/work/src/'):]
+        arg = arg.replace('/work/stage', '/work/native/{name}/stage')
+        argv.append(arg.format_map(values))
+    if not argv or any(not value for value in argv):
+        raise RuntimeError('invalid native recipe argv')
+    return argv
+
+
+def native_build(project):
+    """Host stages verified inputs; only Distro executes build steps.
+
+    Native outputs are staged and hashed; cross-built installed tools are NOT
+    overwritten. A separate ownership handoff is required for promotion.
+    """
+    if os.geteuid() == 0:
+        raise RuntimeError('invoke native build as ordinary user')
+    project = Path(project).expanduser().resolve()
+    root, state = project / 'root', project / '.distro-bootstrap'
+    if (root.is_symlink() or not root.is_dir() or
+            not (state / 'temp-tools-import.json').is_file()):
+        raise RuntimeError('native rebuild requires a verified temp-tools root')
+    manifest = json.loads(MANIFEST.read_text())
+    for binary in ('usr/bin/bash', 'usr/bin/env', 'usr/bin/make', 'usr/bin/gcc',
+                   'usr/bin/gawk', 'usr/bin/grep', 'usr/bin/sed'):
+        if not (root / binary).is_file():
+            raise RuntimeError('native build prerequisite absent: ' + binary)
+    if (root / 'work').is_symlink() or (root / 'work/native').is_symlink():
+        raise RuntimeError('unsafe native work directory')
+    for pkg in manifest['packages']:
+        name = pkg['name']
+        recipe_path = (HERE / pkg['recipe']).resolve()
+        if not recipe_path.is_relative_to(HERE):
+            raise RuntimeError('unsafe native recipe path')
+        recipe = json.loads(recipe_path.read_text())
+        if recipe.get('name') != name or recipe.get('execution') != 'host-cross':
+            raise RuntimeError('unexpected native source recipe: ' + name)
+        source_dir, archive = safe_source(pkg, state)
+        signature = hashlib.sha256((common.sha(recipe_path) + ':' +
+                                    json.dumps(pkg, sort_keys=True) + ':native-v1').encode()).hexdigest()
+        stamps = state / 'native-stamps'
+        stamps.mkdir(exist_ok=True)
+        stamp = stamps / (name + '.json')
+        if stamp.exists():
+            record = json.loads(stamp.read_text())
+            if record.get('signature') != signature or not record.get('artifacts'):
+                raise RuntimeError('stale native stamp: ' + name)
+            for rel, digest in record['artifacts'].items():
+                if common.sha(root / rel) != digest:
+                    raise RuntimeError('native staged artifact modified: ' + rel)
+            print('[native] ' + name + ': SKIP verified stage', flush=True)
+            continue
+        # Target-root /work is a private directory belonging to the native build.
+        work = root / 'work' / 'native' / name
+        if work.exists():
+            raise RuntimeError('existing uncommitted native workspace: ' + str(work))
+        work.mkdir(parents=True)
+        (work / 'build').mkdir()
+        (work / 'stage').mkdir()
+        shutil.copytree(source_dir, work / 'src', symlinks=True)
+        for prereq in pkg.get('build_prerequisites', []):
+            src = state / 'sources' / ('prerequisite-' + prereq['name'] + '-' + prereq['version']) / (prereq['name'] + '-' + prereq['version'])
+            archive_path = state / 'sources' / prereq['url'].rsplit('/', 1)[-1]
+            if (not src.is_dir() or not archive_path.is_file() or
+                    hashlib.sha512(archive_path.read_bytes()).hexdigest() != prereq['sha512']):
+                raise RuntimeError('verified GCC prerequisite cache unavailable: ' + prereq['name'])
+            shutil.copytree(src, work / 'src' / prereq['name'], symlinks=True)
+        values = {'name': name, 'target': manifest['target'], 'version': pkg['version'],
+                  'jobs': str(min(os.cpu_count() or 2, 8))}
+        lines = ['#!/usr/bin/bash', 'set -euo pipefail',
+                 'cd ' + __import__('shlex').quote('/work/native/' + name + '/build')]
+        for step in recipe['steps']:
+            if not isinstance(step, dict) or set(step) != {'name', 'argv'}:
+                raise RuntimeError('unsupported native recipe step: ' + name)
+            lines.append('echo ' + __import__('shlex').quote('native step=' + step['name']))
+            lines.append(' '.join(__import__('shlex').quote(a) for a in native_recipe_argv(step, values)))
+        script = work / 'build.sh'
+        script.write_text('\n'.join(lines) + '\n')
+        script.chmod(0o700)
+        # No host filesystems are bound. --clearenv plus env -i is intentional.
+        guest = ['bwrap', '--die-with-parent', '--new-session', '--unshare-user',
+                 '--unshare-pid', '--unshare-net', '--unshare-ipc', '--unshare-uts',
+                 '--bind', str(root), '/', '--proc', '/proc', '--dev', '/dev',
+                 '--tmpfs', '/tmp', '--clearenv', '--setenv', 'PATH', '/usr/bin:/bin',
+                 '--setenv', 'LC_ALL', 'C', '--', '/usr/bin/env', '-i',
+                 'HOME=/root', 'PATH=/usr/bin:/bin', 'LC_ALL=C',
+                 '/usr/bin/bash', '/work/native/' + name + '/build.sh']
+        print('[native] ' + name + ': isolated build', flush=True)
+        common.run(guest, state / 'work' / ('native-' + name + '.log'), timeout=7200)
+        stage_usr = work / 'stage' / 'usr'
+        if not stage_usr.is_dir():
+            raise RuntimeError('empty native stage: ' + name)
+        artifacts = {}
+        for path in sorted(stage_usr.rglob('*')):
+            if path.is_file() and not path.is_symlink():
+                artifacts[path.relative_to(root).as_posix()] = common.sha(path)
+        if not artifacts:
+            raise RuntimeError('no native staged files: ' + name)
+        common.save(stamp, {'schema_version': 1, 'package': name,
+                            'signature': signature, 'source_sha256': common.sha(archive),
+                            'artifacts': artifacts})
+        print(f'[native] {name}: COMPLETE; {len(artifacts)} staged files verified', flush=True)
+
 if __name__ == '__main__':
     try:
+        if len(sys.argv) == 3 and sys.argv[1] == '--native':
+            sys.exit(native_build(sys.argv[2]) or 0)
         parser = argparse.ArgumentParser()
         parser.add_argument('project')
         parser.add_argument('cross_archive')
