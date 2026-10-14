@@ -16,9 +16,15 @@ def main():
     report={'schema_version':1,'phase':'cross-toolchain','package':args.package,'status':'blocked'}
     if len(matches)!=1:report['reason']='package absent or duplicated';return finish(report,args.out)
     p=matches[0]
-    if p.get('state') != 'executable' or not p.get('source') or not p.get('recipe') or not p.get('host_version'):
+    source_owner=p
+    if p.get('source_package'):
+        owners=[x for x in m['packages'] if x['name']==p['source_package']]
+        if len(owners)!=1 or owners[0] is p or not owners[0].get('source'):
+            report['reason']='invalid source_package dependency';return finish(report,args.out)
+        source_owner=owners[0]
+    if p.get('state') != 'executable' or not source_owner.get('source') or not p.get('recipe') or not source_owner.get('host_version'):
         report['reason']='host version mapping/source or recipe unresolved for this package';return finish(report,args.out)
-    probe=p['host_version']
+    probe=source_owner['host_version']
     try:
         observed=subprocess.run(probe['argv'],capture_output=True,text=True,timeout=20,check=False,env={'PATH':'/usr/bin:/bin','LC_ALL':'C'})
         if observed.returncode:raise ValueError('host version probe failed')
@@ -29,11 +35,11 @@ def main():
         if not re.fullmatch(r'[0-9]+(?:\.[0-9]+){1,2}',version):raise ValueError('unsafe source version')
         report['host_version_banner']=banner.splitlines()[0]
         report['host_version']=version
-        policy=p.get('upstream_version_policy','exact')
+        policy=source_owner.get('upstream_version_policy','exact')
         if policy=='major-minor-zero-release': version='.'.join(version.split('.')[:2])+'.0'
         elif policy!='exact':raise ValueError('unsupported upstream version policy')
         report['resolved_version']=version
-        source=p['source']
+        source=source_owner['source']
         source_vars={'version':version,'major':version.split('.')[0]}
         filename=source['archive_template'].format_map(source_vars)
         url=source['url_template'].format_map(source_vars)
@@ -74,11 +80,30 @@ def main():
     base.mkdir(parents=True,exist_ok=True);(base/'logs').mkdir();(base/'build').mkdir();(base/'prefix').mkdir()
     archive=base/'source.tar';h=hashlib.new(checksum_algorithm)
     try:
-        with urllib.request.urlopen(url,timeout=90) as src, archive.open('wb') as f:
-            while True:
-                part=src.read(1024*1024)
-                if not part:break
-                h.update(part);f.write(part)
+        if p.get('source_package'):
+            if toolchain_root is None:raise ValueError('source reuse requires toolchain root')
+            project=toolchain_root.parent
+            stamp_path=project/'.distro-bootstrap/stamps/cross-toolchain'/(p['source_package']+'.json')
+            owner_stamp=load(stamp_path)
+            if owner_stamp.get('status')!='complete' or owner_stamp.get('resolved_version')!=version:
+                raise ValueError('verified source owner stamp missing or version mismatch')
+            prior_result=pathlib.Path(owner_stamp['result']).resolve()
+            workroot=(project/'.distro-bootstrap/work/cross-toolchain').resolve()
+            if not prior_result.is_relative_to(workroot):raise ValueError('source owner result escapes work directory')
+            prior_archive=prior_result.with_name(prior_result.name.removesuffix('-result.json'))/'source.tar'
+            if not prior_archive.is_file():raise ValueError('verified source owner archive missing')
+            owner_algorithm=owner_stamp['source_checksum_algorithm']
+            if owner_algorithm!=checksum_algorithm:raise ValueError('source checksum algorithm mismatch')
+            if hashlib.new(checksum_algorithm,prior_archive.read_bytes()).hexdigest()!=owner_stamp['source_checksum']:
+                raise ValueError('verified source archive hash mismatch')
+            shutil.copyfile(prior_archive,archive)
+            h.update(archive.read_bytes())
+        else:
+            with urllib.request.urlopen(url,timeout=90) as src, archive.open('wb') as f:
+                while True:
+                    part=src.read(1024*1024)
+                    if not part:break
+                    h.update(part);f.write(part)
         report['source_checksum']=h.hexdigest()
         report['source_checksum_algorithm']=checksum_algorithm
         if signed_source:
@@ -148,6 +173,12 @@ with open("/work/logs/build.log","w") as log:
         outputs=[pathlib.Path(x.format_map(vars)) for x in r['validation']['tools']]
         # Sandbox /work maps to base on host.
         report['tool_paths_exist']=all((base/path.relative_to('/work')).is_file() for path in outputs)
+        for pattern in r['validation'].get('glob_tools',[]):
+            rel=pathlib.PurePosixPath(pattern)
+            if not str(rel).startswith('/work/') or '..' in rel.parts:
+                raise ValueError('unsafe validation glob')
+            if not any(path.is_file() for path in base.glob(str(rel).removeprefix('/work/'))):
+                report['tool_paths_exist']=False
         object_spec=r['validation'].get('relocatable_output','/work/check-reloc.o')
         report['relocatable_object_exists']=True if object_spec is None else (base/pathlib.Path(object_spec).relative_to('/work')).is_file()
         if not (report['tool_paths_exist'] and report['relocatable_object_exists']):report['reason']='expected recipe outputs missing';return finish(report,args.out)

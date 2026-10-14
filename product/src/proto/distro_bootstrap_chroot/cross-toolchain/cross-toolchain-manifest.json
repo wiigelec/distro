@@ -82,6 +82,21 @@
       "recipe": "recipes/cross-glibc.json",
       "requires_toolchain_root": true,
       "install_subdir": "sysroot"
+    },
+    {
+      "name": "libstdc++",
+      "state": "executable",
+      "source_package": "gcc",
+      "requires": [
+        "gcc",
+        "glibc"
+      ],
+      "requires_toolchain_root": true,
+      "requires_finalized_headers": true,
+      "reuse_verified_paths": true,
+      "install_subdir": "toolchain",
+      "runtime_smoke": "cxx14",
+      "recipe": "recipes/cross-libstdcxx.json"
     }
   ],
   "note": "Distro's independent package/recipe candidates; only stage progression is modeled after LFS. Host release strings need source mapping validation."

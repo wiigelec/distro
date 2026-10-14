@@ -41,8 +41,7 @@
         "make",
         "-j{jobs}",
         "all-gcc",
-        "all-target-libgcc",
-        "all-target-libstdc++-v3"
+        "all-target-libgcc"
       ]
     },
     {
@@ -51,7 +50,6 @@
         "make",
         "install-gcc",
         "install-target-libgcc",
-        "install-target-libstdc++-v3",
         "DESTDIR=/work/stage"
       ]
     }

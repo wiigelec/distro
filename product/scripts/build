@@ -80,7 +80,7 @@ def canonical_install_path(rel):
     return rel
 
 
-def copy_prefix(src, root, previous):
+def copy_prefix(src, root, previous, verified_owned=None):
     """Preflight every destination before copying, then install without overwrites.
 
     share/info/dir is a generated GNU Texinfo index, not a package-owned payload.
@@ -91,6 +91,7 @@ def copy_prefix(src, root, previous):
     if not src.is_dir() or src.is_symlink():
         raise RuntimeError('missing or invalid staging prefix: ' + str(src))
     entries = []
+    verified_owned = verified_owned or set()
     for path in sorted(src.rglob('*')):
         rel = path.relative_to(src)
         if rel.as_posix() in ('share/info/dir', 'usr/share/info/dir'):
@@ -132,6 +133,8 @@ def copy_prefix(src, root, previous):
             if dst.is_symlink() or (dst.exists() and not dst.is_dir()):
                 raise RuntimeError('destination directory conflict: ' + str(dst))
         elif dst.exists() or dst.is_symlink():
+            if dst.relative_to(root).as_posix() in verified_owned:
+                continue  # Previously stamped file; do not replace or claim ownership
             raise RuntimeError('destination already exists: ' + str(dst))
         entries.append((path, rel, dst, kind))
     # No filesystem mutation until the entire installation is conflict-free.
@@ -283,13 +286,22 @@ def main():
     for n, pkg in enumerate(packages, 1):
         name = pkg['name']
         say(f'[{n}/{len(packages)}] {name}: inspecting manifest')
+        if pkg.get('requires_finalized_headers'):
+            finalized = subprocess.run([sys.executable, str(phase / 'cross_finalize_headers.py'),
+                                        '--root', str(root), '--project', str(project)],check=False)
+            if finalized.returncode:raise RuntimeError('post-glibc GCC header finalization failed')
         if pkg.get('state') != 'executable':
             say(f'[{n}/{len(packages)}] {name}: BLOCKED (recipe or source mapping not ready)')
             return 2
         recipe_path = (phase / pkg['recipe']).resolve()
         if not recipe_path.is_relative_to(phase.resolve()):
             raise RuntimeError('recipe escapes phase directory')
-        version = probe(pkg)
+        owner = pkg
+        if pkg.get('source_package'):
+            candidates=[p for p in packages if p['name']==pkg['source_package']]
+            if len(candidates)!=1:raise RuntimeError('missing source owner for '+name)
+            owner=candidates[0]
+        version = probe(owner)
         signature = digest(json.dumps({'package': pkg, 'target': manifest['target'],
             'recipe_sha256': filehash(recipe_path), 'version': version,
             'runner_sha256': filehash(phase / 'cross_runner.py')}, sort_keys=True).encode())
@@ -342,7 +354,26 @@ def main():
             say(f'[{n}/{len(packages)}] {name}: BLOCKED {report.get("reason", "unknown")} log={workspace / "logs/build.log"}')
             return 1
         say(f'[{n}/{len(packages)}] {name}: BUILD passed ({int(time.monotonic()-start)}s); installing into root')
-        installed = copy_prefix(workspace / 'prefix' / pkg.get('install_subdir',''), root, old and old.get('installed'))
+        verified_owned=set()
+        if pkg.get('reuse_verified_paths'):
+            for preceding in packages[:n-1]:
+                previous_stamp=stamps/(preceding['name']+'.json')
+                if not previous_stamp.is_file():raise RuntimeError('missing earlier ownership stamp')
+                previous=json.loads(previous_stamp.read_text())
+                if previous.get('status')!='complete' or not previous.get('installed'):
+                    raise RuntimeError('invalid previous ownership stamp: '+preceding['name'])
+                for entry in previous['installed']:
+                    dst=root/entry['path']
+                    if 'sha256' in entry:
+                        if not dst.is_file() or dst.is_symlink() or filehash(dst)!=entry['sha256']:
+                            raise RuntimeError('modified previously owned file: '+entry['path'])
+                    elif 'link' in entry:
+                        if not dst.is_symlink() or os.readlink(dst)!=entry['link']:
+                            raise RuntimeError('modified previously owned link: '+entry['path'])
+                    else:raise RuntimeError('malformed previously owned stamp')
+                    verified_owned.add(entry['path'])
+        installed = copy_prefix(workspace / 'prefix' / pkg.get('install_subdir',''), root,
+                                old and old.get('installed'), verified_owned)
         if name == 'gcc':
             test_installed_cross_compiler(root, state, manifest['target'])
         save(stamp_path, {'schema_version': 1, 'status': 'complete', 'package': name,
@@ -353,17 +384,6 @@ def main():
                           'source_checksum': report.get('source_checksum'),
                           'source_checksum_algorithm': report.get('source_checksum_algorithm')})
         say(f'[{n}/{len(packages)}] {name}: COMPLETE ({len(installed)} installed entries)')
-    finalize = phase / 'cross_finalize_headers.py'
-    completed = subprocess.run([sys.executable, str(finalize), '--root', str(root),
-                                '--project', str(project)], check=False)
-    if completed.returncode:
-        raise RuntimeError('post-glibc GCC header finalization failed')
-    # Post-glibc target C++ runtime is a separate resumable package.
-    say('[build] finalizing post-glibc target libstdc++')
-    lib_result = subprocess.run([sys.executable, str(phase / 'cross_libstdcxx.py'),
-                                 '--project', str(project), '--root', str(root)], check=False)
-    if lib_result.returncode:
-        raise RuntimeError('cross-toolchain target libstdc++ build/validation failed')
     say(f'[build] validating compiled toolchain and exporting clean root')
     result = subprocess.run([sys.executable, str(phase / 'cross_validate_export.py'),
                              '--root', str(root), '--project', str(project)],

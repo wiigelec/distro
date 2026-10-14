@@ -4,7 +4,6 @@
   "phase": "cross-toolchain",
   "execution": "host-cross",
   "source_package": "gcc",
-  "version": "16.2.0",
   "steps": [
     {
       "name": "configure",
@@ -22,7 +21,8 @@
         "--disable-libquadmath",
         "--disable-libgomp",
         "--disable-libatomic",
-        "--enable-languages=c,c++"
+        "--enable-languages=c,c++",
+        "--disable-fixincludes"
       ]
     },
     {
@@ -38,7 +38,7 @@
       "argv": [
         "make",
         "install-target-libgcc",
-        "DESTDIR=/work/stage"
+        "DESTDIR=/work/prefix"
       ]
     },
     {
@@ -54,12 +54,16 @@
       "argv": [
         "make",
         "install-target-libstdc++-v3",
-        "DESTDIR=/work/stage"
+        "DESTDIR=/work/prefix"
       ]
     }
   ],
   "validation": {
-    "target_cxx_header": "string",
-    "runtime": "native target C++ string program with target shared libgcc_s"
+    "tools": [],
+    "glob_tools": [
+      "/work/prefix/toolchain/usr/include/c++/*/string",
+      "/work/prefix/toolchain/usr/**/libstdc++.so*"
+    ],
+    "relocatable_output": null
   }
 }

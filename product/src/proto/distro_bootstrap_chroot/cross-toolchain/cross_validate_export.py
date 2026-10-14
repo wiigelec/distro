@@ -99,6 +99,19 @@ def main():
                  root / "usr/lib64/crtn.o"):
         if not item.is_file():
             raise RuntimeError(f"missing bootstrap prerequisite: {item}")
+    cxx_stamp=project/'.distro-bootstrap/stamps/cross-toolchain/libstdc++.json'
+    if not cxx_stamp.is_file():raise RuntimeError('missing manifest libstdc++ completion stamp')
+    cxx_record=json.loads(cxx_stamp.read_text())
+    if cxx_record.get('status')!='complete' or not cxx_record.get('installed'):
+        raise RuntimeError('invalid libstdc++ ownership stamp')
+    for entry in cxx_record['installed']:
+        item=root/entry['path']
+        if 'sha256' in entry and (not item.is_file() or sha256(item)!=entry['sha256']):
+            raise RuntimeError('libstdc++ stamped artifact modified')
+        if 'link' in entry and (not item.is_symlink() or os.readlink(item)!=entry['link']):
+            raise RuntimeError('libstdc++ stamped link modified')
+    if not any((root/'usr/include/c++').glob('*/string')):
+        raise RuntimeError('missing C++ standard library headers')
     if not shutil.which("bwrap") or not shutil.which("readelf"):
         raise RuntimeError("validation requires bubblewrap and readelf")
     work = project / ".distro-bootstrap/validation/cross-toolchain"
@@ -135,6 +148,19 @@ def main():
     if "ELF64" not in elf_cxx or "X86-64" not in elf_cxx or "REL (Relocatable file)" not in elf_cxx:
         raise RuntimeError("C++ compile-only output is not a target relocatable object")
     print("[validate] C++ compile-only: PASS", flush=True)
+    cxx_src.write_text('#include <string>\n#include <cstdio>\nint main(){std::string s="distro-cxx-ok";std::puts(s.c_str());}\n')
+    check(sandbox + [f'/toolchain/bin/{TARGET}-g++', '--sysroot=/toolchain',
+                     '-fno-link-libatomic', '-B/toolchain/usr/lib64/',
+                     '-L/toolchain/usr/lib64', '-L/toolchain/lib64',
+                     '-L/toolchain/usr/'+TARGET+'/lib64',
+                     '-Wl,-rpath-link,/toolchain/usr/'+TARGET+'/lib64',
+                     '/work/smoke.cc', '-o', '/work/smoke-cxx'])
+    cxx_runtime=check(sandbox + ['/toolchain/lib64/ld-linux-x86-64.so.2',
+                       '--library-path','/toolchain/usr/lib:/toolchain/usr/lib64:/toolchain/lib64:/toolchain/usr/'+TARGET+'/lib64',
+                       '/work/smoke-cxx'])
+    if cxx_runtime.stdout.strip()!='distro-cxx-ok':
+        raise RuntimeError('cross libstdc++ C++ runtime test failed')
+    print('[validate] C++ standard library compile/link/execute: PASS',flush=True)
     # GCC was bootstrapped before glibc existed, so its compiled-in startfile
     # search paths do not include the target's /usr/lib64 layout. Supply the
     # target locations explicitly; do not fall back to host startup files.
@@ -154,7 +180,7 @@ def main():
     export(root, artifact)
     record = {"schema_version": 1, "phase": "cross-toolchain", "status": "passed",
               "target": TARGET, "elf": elf,
-              "cxx_compile_only": "passed (no libstdc++ linking asserted)",
+              "cxx_compile_only": "passed", "cxx_compile_link_execute": "passed",
               "archive": str(artifact), "archive_sha256": sha256(artifact),
               "archive_bytes": artifact.stat().st_size}
     report = artifact.with_suffix(artifact.suffix + ".json")
