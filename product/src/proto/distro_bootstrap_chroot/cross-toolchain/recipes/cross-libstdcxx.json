@@ -61,8 +61,8 @@
   "validation": {
     "tools": [],
     "glob_tools": [
-      "/work/prefix/toolchain/usr/include/c++/*/string",
-      "/work/prefix/toolchain/usr/**/libstdc++.so*"
+      "/work/prefix/toolchain/usr/{target}/include/c++/{version}/string",
+      "/work/prefix/toolchain/usr/{target}/lib64/libstdc++.so.6.*"
     ],
     "relocatable_output": null
   }

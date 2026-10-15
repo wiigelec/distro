@@ -110,7 +110,7 @@ def main():
             raise RuntimeError('libstdc++ stamped artifact modified')
         if 'link' in entry and (not item.is_symlink() or os.readlink(item)!=entry['link']):
             raise RuntimeError('libstdc++ stamped link modified')
-    if not any((root/'usr/include/c++').glob('*/string')):
+    if not any((root/'usr'/TARGET/'include/c++').glob('*/string')):
         raise RuntimeError('missing C++ standard library headers')
     if not shutil.which("bwrap") or not shutil.which("readelf"):
         raise RuntimeError("validation requires bubblewrap and readelf")
