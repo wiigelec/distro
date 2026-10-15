@@ -8,7 +8,7 @@
     {
       "name": "configure",
       "argv": [
-        "/work/src/configure",
+        "/work/src/gcc-{version}/configure",
         "--target={target}",
         "--prefix=/toolchain/usr",
         "--with-sysroot=/toolchain",
