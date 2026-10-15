@@ -174,6 +174,7 @@ with open("/work/logs/build.log","w") as log:
         # Sandbox /work maps to base on host.
         report['tool_paths_exist']=all((base/path.relative_to('/work')).is_file() for path in outputs)
         for pattern in r['validation'].get('glob_tools',[]):
+            pattern=pattern.format_map(vars)
             rel=pathlib.PurePosixPath(pattern)
             if not str(rel).startswith('/work/') or '..' in rel.parts:
                 raise ValueError('unsafe validation glob')
