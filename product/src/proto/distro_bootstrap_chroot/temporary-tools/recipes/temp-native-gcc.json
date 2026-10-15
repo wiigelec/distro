@@ -61,6 +61,8 @@
     ]
   },
   "environment": {
-    "gcc_cv_sys_sdt_h": "no"
+    "gcc_cv_sys_sdt_h": "no",
+    "CFLAGS_FOR_TARGET": "-O2 -fno-link-libatomic",
+    "CXXFLAGS_FOR_TARGET": "-O2 -fno-link-libatomic"
   }
 }
