@@ -12,13 +12,13 @@
         "--host={target}",
         "--target={target}",
         "--prefix=/usr",
-        "--with-sysroot=/",
+        "--with-build-sysroot=/toolchain",
         "--with-native-system-header-dir=/usr/include",
-        "--disable-shared",
         "--without-isl",
         "--without-zstd",
         "--disable-bootstrap",
         "--disable-multilib",
+        "--disable-fixincludes",
         "--disable-nls",
         "--disable-libsanitizer",
         "--disable-libssp",
@@ -32,24 +32,24 @@
         "CXX_FOR_BUILD=/usr/bin/g++",
         "CFLAGS=-O2",
         "CXXFLAGS=-O2",
-        "LDFLAGS={ldflags}"
+        "LDFLAGS={ldflags}",
+        "CXX_FOR_TARGET=/toolchain/usr/bin/{target}-gcc --sysroot=/toolchain -nostdinc++ -fno-link-libatomic",
+        "LDFLAGS_FOR_TARGET=-L/work/build/{target}/libgcc",
+        "target_configargs=gcc_cv_target_thread_file=posix"
       ]
     },
     {
       "name": "build",
       "argv": [
         "make",
-        "-j{jobs}",
-        "all-gcc",
-        "all-target-libgcc"
+        "-j{jobs}"
       ]
     },
     {
       "name": "stage-install",
       "argv": [
         "make",
-        "install-gcc",
-        "install-target-libgcc",
+        "install",
         "DESTDIR=/work/stage"
       ]
     }
