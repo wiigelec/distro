@@ -33,6 +33,7 @@
         "CFLAGS=-O2",
         "CXXFLAGS=-O2",
         "LDFLAGS={ldflags}",
+        "CC_FOR_TARGET=/toolchain/usr/bin/{target}-gcc --sysroot=/toolchain -fno-link-libatomic",
         "CXX_FOR_TARGET=/toolchain/usr/bin/{target}-gcc --sysroot=/toolchain -nostdinc++ -fno-link-libatomic",
         "LDFLAGS_FOR_TARGET=-L/work/build/{target}/libgcc",
         "target_configargs=gcc_cv_target_thread_file=posix"
