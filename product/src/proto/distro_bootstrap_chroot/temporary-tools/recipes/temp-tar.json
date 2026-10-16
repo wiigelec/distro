@@ -14,7 +14,9 @@
         "--disable-nls",
         "CC={cc}",
         "CFLAGS=-O2",
-        "LDFLAGS={ldflags}"
+        "LDFLAGS={ldflags}",
+        "AR=/toolchain/usr/bin/{target}-ar",
+        "RANLIB=/toolchain/usr/bin/{target}-ranlib"
       ]
     },
     {
