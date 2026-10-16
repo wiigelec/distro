@@ -55,6 +55,57 @@
       ]
     }
   ],
+  "native_steps": [
+    {
+      "name": "configure",
+      "argv": [
+        "/work/src/configure",
+        "--build={target}",
+        "--host={target}",
+        "--target={target}",
+        "--prefix=/usr",
+        "--with-native-system-header-dir=/usr/include",
+        "--without-isl",
+        "--without-zstd",
+        "--disable-bootstrap",
+        "--disable-multilib",
+        "--disable-fixincludes",
+        "--disable-nls",
+        "--disable-libsanitizer",
+        "--disable-libssp",
+        "--disable-libquadmath",
+        "--disable-libgomp",
+        "--disable-libatomic",
+        "--enable-languages=c,c++",
+        "CC=/usr/bin/gcc",
+        "CXX=/usr/bin/g++",
+        "CC_FOR_BUILD=/usr/bin/gcc",
+        "CXX_FOR_BUILD=/usr/bin/g++",
+        "CC_FOR_TARGET=/usr/bin/gcc -fno-link-libatomic",
+        "CXX_FOR_TARGET=/usr/bin/gcc -nostdinc++ -fno-link-libatomic",
+        "CFLAGS=-O2",
+        "CXXFLAGS=-O2",
+        "CFLAGS_FOR_TARGET=-O2 -fno-link-libatomic",
+        "CXXFLAGS_FOR_TARGET=-O2 -fno-link-libatomic",
+        "target_configargs=gcc_cv_target_thread_file=posix"
+      ]
+    },
+    {
+      "name": "build",
+      "argv": [
+        "make",
+        "-j{jobs}"
+      ]
+    },
+    {
+      "name": "stage-install",
+      "argv": [
+        "make",
+        "install",
+        "DESTDIR=/work/stage"
+      ]
+    }
+  ],
   "validation": {
     "chroot_executables": [
       "/usr/bin/gcc",

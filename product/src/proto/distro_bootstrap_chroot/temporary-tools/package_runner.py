@@ -435,11 +435,11 @@ def main(project, cross_archive):
         done.add(pkg['name'])
     return 0
 
-def native_recipe_argv(step, values):
-    """Translate a host-cross recipe step into its native counterpart."""
+def native_recipe_argv(step, values, explicit_native=False):
+    """Translate host-cross steps, or preserve explicit native recipe arguments."""
     argv = []
     for arg in step['argv']:
-        if (arg.startswith(('--build=', '--host=', '--target=')) or
+        if not explicit_native and (arg.startswith(('--build=', '--host=', '--target=')) or
                 arg.startswith(('CC=', 'CXX=', 'CC_FOR_BUILD=', 'CXX_FOR_BUILD=',
                                 'AR=', 'RANLIB=', 'LDFLAGS='))):
             continue
@@ -514,11 +514,12 @@ def native_build(project):
                   'jobs': str(min(os.cpu_count() or 2, 8))}
         lines = ['#!/usr/bin/bash', 'set -euo pipefail',
                  'cd ' + __import__('shlex').quote('/work/native/' + name + '/build')]
+        explicit_native = 'native_steps' in recipe
         for step in recipe.get('native_steps', recipe['steps']):
             if not isinstance(step, dict) or set(step) != {'name', 'argv'}:
                 raise RuntimeError('unsupported native recipe step: ' + name)
             lines.append('echo ' + __import__('shlex').quote('native step=' + step['name']))
-            lines.append(' '.join(__import__('shlex').quote(a) for a in native_recipe_argv(step, values)))
+            lines.append(' '.join(__import__('shlex').quote(a) for a in native_recipe_argv(step, values, explicit_native)))
         script = work / 'build.sh'
         script.write_text('\n'.join(lines) + '\n')
         script.chmod(0o700)
