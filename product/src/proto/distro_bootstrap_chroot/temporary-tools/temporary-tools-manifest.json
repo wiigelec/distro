@@ -108,7 +108,10 @@
         "sha256": "7c8b7f9fc8609141fdea9cece85249d308624391ff61dedaf528fcb337727dfd"
       },
       "recipe": "recipes/temp-diffutils.json",
-      "requires": ["make", "cross-toolchain"]
+      "requires": [
+        "make",
+        "cross-toolchain"
+      ]
     },
     {
       "name": "native-binutils",
@@ -124,6 +127,22 @@
       "requires": [
         "make",
         "diffutils",
+        "cross-toolchain"
+      ]
+    },
+    {
+      "name": "tar",
+      "upstream_name": "tar",
+      "version": "1.35",
+      "state": "executable",
+      "execution": "host-cross",
+      "source": {
+        "url": "https://ftp.gnu.org/gnu/tar/tar-1.35.tar.xz",
+        "sha256": "4d62ff37342ec7aed748535323930c7cf94acf71c3591882b26a7ea50f3edc16"
+      },
+      "recipe": "recipes/temp-tar.json",
+      "requires": [
+        "native-binutils",
         "cross-toolchain"
       ]
     },
