@@ -10,7 +10,8 @@ components:
 - [Install](install.md) — creates a configured system by orchestrating package
   installation and system setup.
 
-See [Architecture](architecture.md) for the component boundaries,
+See [Bootstrap](bootstrap.md) for foreign-host initialization and the transition
+to native Distro operation. See [Architecture](architecture.md) for the component boundaries,
 [Interfaces](interfaces.md) for the contracts between them,
 [Package Model](package-model.md) for package identity and revision
 semantics, [Package Metadata](package-metadata.md) for the logical runtime package

@@ -10,7 +10,9 @@ Bootstrap is an infrequent initialization process, not an ongoing package-mainte
 
 Bootstrap initially operates on Arch Linux. The foreign host provides the existing compiler, toolchain, libraries, utilities, and execution substrate required to begin construction.
 
-Bootstrap discovers versions of relevant installed foreign-host packages and uses them as the basis for selecting corresponding upstream source releases. The foreign distribution's package version need not be identical to its upstream release version. For a required package without a corresponding installed host package, bootstrap must establish an appropriate source-selection method.
+Bootstrap checks the foreign host for the packages and capabilities required for construction. If a required package is missing or incompatible, bootstrap identifies the deficiency and reports the corrective action needed from the end user. The end user is responsible for installing or correcting host packages and rerunning qualification. Bootstrap does not install, upgrade, remove, or otherwise modify packages on the foreign host.
+
+Once the host satisfies its prerequisites, bootstrap discovers the installed versions of required host packages and uses them to select corresponding upstream source releases for Distro. Required bootstrap packages absent from the host must be installed by the end user before their versions are resolved. Distribution-specific package release identifiers may differ from upstream source versions and must be mapped accordingly.
 
 Bootstrap does not maintain a repository-pinned bootstrap package-version catalog. Each new bootstrap derives its initial choices from its qualified foreign host.
 
@@ -30,7 +32,7 @@ Declared foreign-host tools may participate in intermediate construction. The re
 
 ## Native Package Collections
 
-Bootstrap produces Distro-native package artifacts that can be consumed through the normal package interfaces.
+Bootstrap produces Distro-native package artifacts that can be consumed through the normal package interfaces. The final artifacts follow Distro's existing package identity, runtime metadata, integrity, ownership, and publication contracts; bootstrap does not define a competing permanent package format or package-management model.
 
 One package collection establishes the definitive Build chroot, supplying the compiler, libraries, utilities, and dependency closure required to build subsequent Distro packages without foreign-host userspace dependencies.
 
@@ -64,4 +66,4 @@ Successful bootstrap establishes that the temporary native build environment can
 
 Source provenance, environment inputs, package artifacts, dependencies, and validation evidence are retained sufficiently to inspect the bootstrap's result and distinguish temporary foreign-host assistance from native Distro output.
 
-The bootstrap-produced package baseline is the starting point for Distro, not a permanent version constraint. Following bootstrap, normal package lifecycle authority governs future upstream version selection, package changes, upgrades, and publication. Bootstrap does not continue tracking the foreign host.
+The bootstrap-produced package baseline is the starting point for Distro, not a permanent version constraint. Its adoption into normal operation preserves the separate authorities of the maintainer-declared Package Manifest, Build State, and published Package Database. Locally resolved bootstrap inputs and construction evidence do not themselves redefine package tracking policy or published package state. Following bootstrap, normal package lifecycle authority governs future upstream version selection, package changes, upgrades, and publication. Bootstrap does not continue tracking the foreign host.
