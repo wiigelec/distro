@@ -80,7 +80,7 @@ The definitive M3 Build chroot shall use Distro-native Build capabilities to reb
 
 **State: Inactive**
 
-M4 shall produce a Distro-native package collection providing the Linux kernel, GRUB, systemd, essential userspace, and required runtime dependencies for an independently bootable system.
+M4 shall use the M3 Distro-native Build environment to build or validly reuse and publish the complete declared bootable package manifest, including the Linux kernel, GRUB, systemd, essential userspace and all transitive runtime and build dependencies. Each newly built package shall use a fresh isolated Build root provisioned by Manage from verified published Distro packages with its declared build dependencies, and the authoritative repository shall serve as the integrity-checked artifact cache and durable resumption checkpoint.
 
 ### FS-001-NR-011 — M4 Build Capability
 
@@ -88,7 +88,7 @@ M4 shall produce a Distro-native package collection providing the Linux kernel, 
 
 **State: Inactive**
 
-The M4 bootable package collection shall include and make usable the Distro-native capabilities and package dependencies necessary to create a new managed definitive Build chroot and build Distro packages; merely containing a bootable userspace shall not satisfy M4.
+The complete M4 published collection shall include and make available the Distro-native Build and Manage capabilities and package dependency closure needed to create a new managed definitive Build chroot and build Distro packages after installation; mere bootability or a partial package manifest shall not satisfy M4. M4 shall validate complete coherent publication, cache reuse and failure resumption, while actual installed-VM boot and subsequent native Build-chroot creation are demonstrated in M5.
 
 ### FS-001-NR-012 — Install Delegation
 
