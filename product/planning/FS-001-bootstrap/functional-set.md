@@ -24,7 +24,7 @@ Milestones are internal acceptance checkpoints of **one** Functional Set, not se
 
 ## Included
 
-Host qualification without host package modification; source/version resolution and frozen execution-local provenance; isolated cross and temporary native construction; creation of interoperable Distro package artifacts and initial publication state; minimum Build/Manage/Install operations needed for bootstrap; definitive managed Build chroot; minimal bootable package set; installed bootable VM; native build and source/artifact validation evidence; reproducible rerun/resumption behavior to the extent required to validate the same resolved bootstrap inputs.
+Host qualification without host package modification; source/version resolution and frozen execution-local provenance; isolated cross and temporary native construction; creation of interoperable Distro package artifacts and initial publication state; minimum Build/Manage/Install operations needed for bootstrap; definitive managed Build chroot; minimal bootable package set; installed bootable VM capable of acting as its own new M1→M2 bootstrap host; native build and source/artifact validation evidence; reproducible rerun/resumption behavior to the extent required to validate the same resolved bootstrap inputs.
 
 ## Explicitly deferred
 
