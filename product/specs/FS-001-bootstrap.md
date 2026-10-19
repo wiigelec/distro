@@ -72,7 +72,7 @@ M3 shall assemble the definitive Build chroot as a fresh target using Manage and
 
 **State: Inactive**
 
-The definitive M3 Build chroot shall build and validate a representative Distro package without undeclared foreign-host userspace dependencies.
+The definitive M3 Build chroot shall use Distro-native Build capabilities to rebuild and validate every package in the complete declared package, runtime and build-dependency closure required to constitute and operate that Build chroot, without undeclared foreign-host userspace, host-side package-build orchestration or bootstrap-only construction dependencies. M3 acceptance shall not require assembly of a second Build chroot.
 
 ### FS-001-NR-010 — Bootable Native Collection
 
