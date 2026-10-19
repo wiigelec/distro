@@ -40,7 +40,7 @@ M1 validation shall establish compiler/linker target behavior and inspect genera
 
 **State: Inactive**
 
-M2 shall produce a distinct isolated temporary target root whose native-executable tools and runtime interfaces are sufficient for subsequent Distro-native package construction.
+M2 shall establish an isolated, native-capable temporary toolchain and userspace environment that can reproduce its complete required toolchain, runtime, utilities, and native build procedures into a fresh independent temporary root using build execution and orchestration available inside the producing environment. The reconstructed environment shall be functionally capable of repeating that replication, without requiring undeclared foreign-host userspace or a foreign-host Python runner to execute or orchestrate its package builds.
 
 ### FS-001-NR-006 — Temporary/Definitive Boundary
 
