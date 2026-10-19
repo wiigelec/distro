@@ -10,7 +10,7 @@ The revision binds the *entire accepted Design corpus* as of that commit; the se
 
 ## Purpose and result
 
-Bootstrap a Distro-native system from a qualified Arch Linux host, replacing foreign-host construction dependencies with native Distro capabilities. Complete a managed native Build chroot, a bootable package collection capable of constructing and operating that Build chroot, and an installed VM that independently boots, creates a Build chroot, builds Distro packages, and acts as a freshly qualified bootstrap host to repeat M1 and M2.
+Bootstrap a Distro-native system from a qualified Arch Linux host, replacing foreign-host construction dependencies with native Distro capabilities. Complete a managed native Build chroot, a bootable package collection capable of constructing and operating that Build chroot, and an installed VM that independently boots and acts as a freshly qualified host to repeat M1 and prove full M2 self-replication. M3/M4 establish the managed Build-chroot and native package-building capability.
 
 ## Milestones
 
@@ -18,7 +18,7 @@ Bootstrap a Distro-native system from a qualified Arch Linux host, replacing for
 2. **M2 — Temporary tools:** establish a Distro-native-capable temporary tools chroot for native construction.
 3. **M3 — Bootstrap-chroot Distro packages:** create Distro package artifacts through native construction and use Manage to assemble and exercise a definitive independent Build chroot.
 4. **M4 — Bootable package set:** produce a bootable Distro package collection that *also includes sufficient capabilities to create the managed Distro Build chroot and build Distro packages*.
-5. **M5 — Installed VM:** use Install and Manage to install M4 packages and boot through GRUB to systemd userspace; inside the installed Distro VM, clone the Distro repository and execute its normal bootstrap with Distro acting as the new foreign host, constructing and validating a fresh M1 cross-toolchain and M2 with full generation-A-to-generation-B self-replication. Separately demonstrate that Manage can create a definitive Build chroot and native Build can produce a representative Distro package.
+5. **M5 — Installed VM:** use Install and Manage to install M4 packages and boot through GRUB to systemd userspace; inside the installed VM, clone the Distro repository and execute a fresh M1→M2 bootstrap using Distro as the foreign host. M5 passes when the newly constructed M2 environment completely rebuilds itself (generation A→B). M3/M4, rather than M5, own managed Build-chroot and native package-building acceptance.
 
 Milestones are internal acceptance checkpoints of **one** Functional Set, not separate Functional Sets. M5 proves the integrated result; milestone checks alone do not establish Functional Set acceptance.
 

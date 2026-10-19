@@ -40,7 +40,7 @@ M1 validation shall establish compiler/linker target behavior and inspect genera
 
 **State: Inactive**
 
-M2 shall establish an isolated, native-capable temporary toolchain and userspace environment that can reproduce its complete required toolchain, runtime, utilities, and native build procedures into a fresh independent temporary root using build execution and orchestration available inside the producing environment. The reconstructed environment shall be functionally capable of repeating that replication, without requiring undeclared foreign-host userspace or a foreign-host Python runner to execute or orchestrate its package builds.
+M2 shall establish an isolated, native-capable temporary toolchain and userspace environment that can reproduce its complete required toolchain, runtime, utilities, and native build procedures into a fresh independent temporary root using build execution and orchestration available inside the producing environment. The reconstructed environment shall contain the complete native tools and procedures to repeat that replication (without requiring a generation-C build), without requiring undeclared foreign-host userspace or a foreign-host Python runner to execute or orchestrate its package builds.
 
 ### FS-001-NR-006 — Temporary/Definitive Boundary
 
@@ -64,7 +64,7 @@ M3 shall produce Distro-native package artifacts conforming to the accepted pack
 
 **State: Inactive**
 
-M3 shall assemble the definitive Build chroot as a fresh target using Manage and Distro-produced package artifacts, without copying the temporary bootstrap root wholesale.
+M3 shall materialize its temporary construction chroot solely from the verified standalone M2 `tar.xz` development artifact, then assemble the definitive Build chroot as a fresh target using Manage and Distro-produced permanent package artifacts, without copying the temporary bootstrap root wholesale.
 
 ### FS-001-NR-009 — Independent M3 Package Build
 
@@ -80,7 +80,7 @@ The definitive M3 Build chroot shall use Distro-native Build capabilities to reb
 
 **State: Inactive**
 
-M4 shall use the M3 Distro-native Build environment to build or validly reuse and publish the complete declared bootable package manifest, including the Linux kernel, GRUB, systemd, essential userspace and all transitive runtime and build dependencies. Each newly built package shall use a fresh isolated Build root provisioned by Manage from verified published Distro packages with its declared build dependencies, and the authoritative repository shall serve as the integrity-checked artifact cache and durable resumption checkpoint.
+M4 shall use the M3 Distro-native Build environment to build or validly reuse and publish the complete declared bootable package manifest, including the Linux kernel, GRUB, systemd, essential userspace and all transitive runtime and build dependencies. Each newly built package shall use a fresh isolated Build root provisioned by Manage from verified published Distro packages with its declared build dependencies, and the authoritative repository shall provide integrity-checked published packages for reuse through Manage installation and durable resumption checkpoints, without an independent build-cache mechanism.
 
 ### FS-001-NR-011 — M4 Build Capability
 
@@ -112,7 +112,7 @@ M5 shall install a virtual machine that boots through GRUB into the Distro Linux
 
 **State: Inactive**
 
-From within the independently booted M5 VM, Distro shall clone the `wiigelec/distro` repository and run its normal bootstrap workflow with the installed Distro system serving as the foreign host: qualify that host, freshly construct and validate the M1 cross-toolchain using its native host prerequisites, construct M2 from the new M1 handoff, and pass M2's complete generation-A-to-generation-B self-replication validation. The Distro-hosted bootstrap shall not require Arch-only package-management tools, the original Arch-hosted bootstrap outputs or workspaces, or undeclared external userspace or build orchestration. During pre-chroot construction it shall protect the installed host filesystem against accidental modification; after the temporary chroot is functional, normal controlled chroot execution suffices without mandatory additional sandboxing. The installed VM shall separately use Manage and published Distro packages to construct a fresh definitive Build chroot and use native Build to produce and validate a representative Distro package.
+From within the independently booted M5 VM, Distro shall clone the `wiigelec/distro` repository and run its normal bootstrap workflow with the installed Distro system serving as the foreign host: qualify that host, freshly construct and validate the M1 cross-toolchain using its native host prerequisites, construct M2 from the new M1 handoff, and pass M2's complete generation-A-to-generation-B self-replication validation. The Distro-hosted bootstrap shall not require Arch-only package-management tools, the original Arch-hosted bootstrap outputs or workspaces, or undeclared external userspace or build orchestration. During construction through M2 self-replication, it shall use Bubblewrap to protect the installed host filesystem against accidental modification; after M2 has fully rebuilt itself, controlled native chroot execution requires no additional isolation mechanism. M5 acceptance completes when the independently booted VM has freshly rebuilt and validated M1 and its M2 generation A has completely constructed generation B; a separate installed-VM Build-chroot/package-build acceptance test is not required because native Build-chroot and package-closure capabilities are proven in M3/M4.
 
 ### FS-001-NR-015 — Publication Consistency
 
