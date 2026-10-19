@@ -112,7 +112,7 @@ M5 shall install a virtual machine that boots through GRUB into the Distro Linux
 
 **State: Inactive**
 
-From within the independently booted M5 VM, Distro shall use Manage to construct a new definitive Build chroot from Distro packages and shall use that chroot to build and validate a representative Distro package without access to foreign-host userspace or bootstrap-only files.
+From within the independently booted M5 VM, Distro shall clone the `wiigelec/distro` repository and execute its own bootstrap build scripts using Distro-native prerequisites to construct a fresh M2 temporary environment and pass M2's complete generation-A-to-generation-B self-replication validation, without reusing the original bootstrap outputs, invoking the Arch-specific M1 construction path, or depending on foreign-host userspace or host-side package-build orchestration. The installed VM shall also use Manage and published Distro packages to construct a separate fresh definitive Build chroot and use native Build to produce and validate a representative Distro package.
 
 ### FS-001-NR-015 — Publication Consistency
 
