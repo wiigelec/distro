@@ -8,7 +8,7 @@ All requirements are **inactive** during Planning and carry no current implement
 
 **State: Inactive**
 
-Before M1 construction, bootstrap shall qualify its initial Arch Linux host as the known-working package/version reference configuration for the complete selected M1–M5 bootstrap manifest and recursive build/runtime dependency closure, requiring installed host counterparts and unambiguous upstream-release mappings for every selected source-providing component. Missing, incompatible, or ambiguous prerequisites shall prevent construction, with actionable reporting and no installation, removal, or modification of foreign-host packages by bootstrap.
+Bootstrap shall qualify its initial Arch Linux host for the required construction capabilities and report missing or incompatible prerequisites without installing, removing, or modifying foreign-host packages.
 
 ### FS-001-NR-002 — Source Identity and Consistency
 
@@ -16,7 +16,7 @@ Before M1 construction, bootstrap shall qualify its initial Arch Linux host as t
 
 **State: Inactive**
 
-Bootstrap shall freeze one execution-local qualified host package/version and upstream-release mapping snapshot before M1, select and verify corresponding upstream source identities incrementally from that snapshot, explicitly resolve distribution-specific naming/version differences, and preserve consistency throughout the execution and resumption without imposing a permanent repository-pinned bootstrap version catalog. The known-working foreign-host configuration is a selection reference, not proof of compatibility of Distro-built outputs.
+Bootstrap shall select upstream source identities and versions from qualified host package versions, resolve distribution-specific version differences as necessary, and retain consistent verified source identities across one execution and its resumption without imposing a permanent repository-pinned bootstrap version catalog.
 
 ### FS-001-NR-003 — Cross-toolchain Result
 
@@ -145,3 +145,19 @@ Bootstrap shall establish the initial Distro package baseline without making hos
 **State: Inactive**
 
 FS-001 shall implement only the Build, Manage, Install, and bootstrap capabilities necessary to establish and verify the required independent package-building and bootable environments, without prematurely treating prototype shortcuts or deferred product functionality as normative policy.
+
+### FS-001-NR-019 — Known-Good Bootstrap Reference Configuration
+
+**Classification: B**
+
+**State: Inactive**
+
+Before any M1 construction, bootstrap shall qualify one complete, execution-local known-working foreign-host package/version reference for the selected M1–M5 bootstrap manifest and recursive build/runtime dependency closure. Every selected source-providing component shall have an installed, identified host counterpart; missing or ambiguous counterparts shall block construction until the host configuration or reviewed mapping is corrected, without bootstrap modifying host packages. This qualification is the initial version-selection reference, not proof that resulting Distro-built components are compatible.
+
+### FS-001-NR-020 — Frozen Reference-to-Upstream Correspondence
+
+**Classification: B**
+
+**State: Inactive**
+
+For the qualified whole-manifest configuration governed by NR-019, bootstrap shall record full installed foreign-host package versions and explicit, unambiguous correspondences to resolvable upstream source releases before M1. Bootstrap shall freeze that mapping for the execution, verify and lock source artifacts incrementally at first use, and reject unreviewed additions or changed version mappings during resumption. The snapshot shall remain execution-local rather than creating a repository-pinned version catalog or ongoing update authority.
