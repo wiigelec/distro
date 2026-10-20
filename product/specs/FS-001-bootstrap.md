@@ -88,7 +88,7 @@ M4 shall use the M3 Distro-native Build environment to build or validly reuse an
 
 **State: Inactive**
 
-The complete M4 published collection shall include and make available the Distro-native Build and Manage capabilities and package dependency closure needed to create a new managed definitive Build chroot and build Distro packages after installation; mere bootability or a partial package manifest shall not satisfy M4. M4 shall validate complete coherent publication, cache reuse and failure resumption, while actual installed-VM boot and subsequent native Build-chroot creation are demonstrated in M5.
+The complete M4 published collection shall include and make available the Distro-native Build and Manage capabilities and package dependency closure needed to create a new managed definitive Build chroot and build Distro packages after installation; mere bootability or a partial package manifest shall not satisfy M4. M4 shall validate complete coherent publication, Manage-mediated reuse of published artifacts, and failure resumption. The installed-VM boot and fresh M1→M2 self-replication are demonstrated in M5; M5 does not repeat M3/M4 Build-chroot acceptance.
 
 ### FS-001-NR-012 — Install Delegation
 
