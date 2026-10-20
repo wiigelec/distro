@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "name": "linux-api-headers",
+  "status": "experimental",
+  "source_package": "linux-api-headers",
+  "steps": [
+    {
+      "name": "install-headers",
+      "argv": [
+        "make",
+        "-j{jobs}",
+        "-C",
+        "{source}",
+        "ARCH=x86",
+        "INSTALL_HDR_PATH=/toolchain/usr",
+        "headers_install"
+      ]
+    }
+  ],
+  "required_outputs": [
+    "/toolchain/usr/include/linux/version.h"
+  ]
+}

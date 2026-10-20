@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "name": "glibc",
+  "status": "experimental",
+  "source_package": "glibc",
+  "steps": [
+    {
+      "name": "configure",
+      "argv": [
+        "{source}/configure",
+        "--prefix=/usr",
+        "--host={target}",
+        "--build=x86_64-pc-linux-gnu",
+        "--with-headers=/toolchain/usr/include",
+        "--disable-werror",
+        "--disable-nscd",
+        "CC=/toolchain/usr/bin/{target}-gcc",
+        "CXX=/toolchain/usr/bin/{target}-g++",
+        "AR=/toolchain/bin/{target}-ar",
+        "RANLIB=/toolchain/bin/{target}-ranlib"
+      ]
+    },
+    {
+      "name": "build",
+      "argv": [
+        "make",
+        "-j{jobs}"
+      ]
+    },
+    {
+      "name": "install",
+      "argv": [
+        "make",
+        "-j{jobs}",
+        "install",
+        "install_root=/toolchain"
+      ]
+    }
+  ],
+  "required_outputs": [
+    "/toolchain/usr/lib/libc.so",
+    "/toolchain/lib64/ld-linux-x86-64.so.2"
+  ]
+}

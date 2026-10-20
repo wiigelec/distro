@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "name": "gcc",
+  "status": "experimental",
+  "source_package": "gcc",
+  "steps": [
+    {
+      "name": "configure",
+      "argv": [
+        "{source}/configure",
+        "--target={target}",
+        "--prefix=/toolchain/usr",
+        "--with-sysroot=/toolchain",
+        "--with-as=/toolchain/bin/{target}-as",
+        "--with-ld=/toolchain/bin/{target}-ld",
+        "--without-headers",
+        "--with-newlib",
+        "--disable-fixincludes",
+        "--disable-threads",
+        "--disable-shared",
+        "--disable-bootstrap",
+        "--disable-multilib",
+        "--disable-nls",
+        "--disable-libsanitizer",
+        "--disable-libssp",
+        "--disable-libquadmath",
+        "--disable-libgomp",
+        "--disable-libstdcxx",
+        "--enable-languages=c,c++"
+      ]
+    },
+    {
+      "name": "build-gcc",
+      "argv": [
+        "make",
+        "-j{jobs}",
+        "all-gcc"
+      ]
+    },
+    {
+      "name": "build-libgcc",
+      "argv": [
+        "make",
+        "-j{jobs}",
+        "all-target-libgcc"
+      ]
+    },
+    {
+      "name": "install-gcc",
+      "argv": [
+        "make",
+        "install-gcc"
+      ]
+    },
+    {
+      "name": "install-libgcc",
+      "argv": [
+        "make",
+        "install-target-libgcc"
+      ]
+    }
+  ],
+  "required_outputs": [
+    "/toolchain/usr/bin/{target}-gcc",
+    "/toolchain/usr/bin/{target}-g++"
+  ]
+}
