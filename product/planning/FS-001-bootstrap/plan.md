@@ -110,6 +110,38 @@ The following choices implement the accepted Design without changing its logical
 
 Physical serialization and transaction particulars not specified above (e.g., tar identity-entry schema, JSON layout and SQLite tables) remain to be documented as implementation detail without changing these selections or accepted Design semantics.
 
+## Prototype-evidence decisions for FS-001
+
+The eight `proto/*` branches provide non-normative construction evidence, not Design authority, accepted package state, or completed FS-001 acceptance. The decisions below refine implementation intent while preserving the five milestones, current normative requirements and their inactive state. Where a prototype conflicts with accepted Design or this Plan, the accepted contracts control.
+
+### PE-1 — M1 construction sequence
+
+Select the investigated progression of target Binutils, bootstrap GCC, Linux API headers, glibc, and compiler/C++ runtime finalization as the initial M1 construction baseline. Keep the `x86_64-distro-linux-gnu` toolchain-prefix and sysroot roles distinct. Qualify compiler target and search paths, ELF interpreter and library dependencies, and C/C++ compile/link/execute behavior before exporting the independently checked M1 root. `proto/distro-bootstrap-chroot` and `proto/bootstrap-staging` provide example procedures and failure cases, not approved source versions or a complete host equivalence policy. Resolve and lock verified source identities incrementally as EC-1 requires; neither prototype hardcoded versions nor completion stamps are source authority.
+
+### PE-2 — Native execution and staged-result equivalence
+
+Select the investigated `proto/lfs-optimize` pattern of disposable native construction roots, explicit build/test/install phases, staged payload capture, and verification that an artifact-realized filesystem matches the intended direct-install result. Check file types and bytes, numeric UID/GID, modes, symlink and hardlink semantics, and intended deletions; reject unsupported filesystem transitions. Declare temporary mounts and keep them outside payloads. M2 generation A must itself supply and execute the complete native build procedures and orchestration to reconstruct B; host Python package dispatch from the prototype is not admissible. In M3/M4 replace the prototype's `tar.xz` cache and direct-extraction reuse path with identity-bearing `tar.zst`, external SHA-256, published Package Database metadata and Manage-provisioned package roots. Do not introduce a second cache-fingerprint authority.
+
+### PE-3 — Dependency-closure discovery fixtures
+
+Seed candidate package inventories from `proto/lfs-optimize/package-set.json` (its 80-package normal LFS proof), `proto/g1-bootable` and its build-tools list. These are not accepted Distro manifests or source/version selections. Distinguish M2 self-replicating temporary tools and procedures, M3 definitive Build-chroot runtime/build closure, M4 complete bootable collection with ongoing native Build/Manage capability, and M5 fresh Distro-hosted bootstrap prerequisites. For each selected component, record host/upstream mapping, source verification, build/runtime edges, provider resolution, order, and explicitly reviewed cycle breaks. Freeze a finite authoritative inventory before the relevant complete-closure milestone proof. Discovery may expand it, but cannot silently weaken acceptance. Continue to apply EC-1 qualification instead of importing pinned LFS versions.
+
+### PE-4 — Artifact application and filesystem integrity
+
+Use `proto/lfs-optimize/artifact.py` snapshot/equivalence checks and `proto/g1-chroot/manage.py` artifact identity, checksum, archive-member and path-conflict preflight as candidate mechanisms and negative-test fixtures. Before target mutation, verify selected whole-artifact checksum, embedded canonical identity, target-root-relative paths and link containment, ownership and all dependency/conflict constraints. After application verify applied-file fidelity and installed-state consistency. The permanent interchange and authority remain those in EC-3 and EC-4. These prototype checks do **not** establish crash-consistent SQLite/filesystem transaction semantics. Before dependent Build work, settle externally observable identity encoding, shared directory and mutable configuration semantics, and a durable interrupted-operation protocol.
+
+### PE-5 — Initial VM installation implementation
+
+Use `proto/g2-installer` as a candidate Install-to-Manage orchestration: confirm a disposable target block device, partition and format it, delegate every package payload and installed-state change to Manage, write filesystem/boot configuration, and install GRUB. Retain destructive-operation confirmation, controlled mounts and failure cleanup. Adapt the prototype's MBR layout to FS-001's selected BIOS-GRUB-on-GPT configuration with a BIOS boot partition and ext4 root. Use boot/systemd runtime evidence approaches from `proto/lfs-optimize`. Neither prototype replaces M5's independent VM boot followed by a fresh Distro-hosted M1 and complete M2 A-to-B replication.
+
+### Still unresolved: explicit Planning and proof obligations
+
+- **Host/source mapping (Planning):** The observed executable and `pacman` probes plus builder-discovery capability evidence do not resolve all host-to-upstream equivalences. Specify treatment of split packages, virtual capabilities, absent counterparts, and Distro-host mappings; if strict installed-host equivalence itself must change, return that semantic question to Design.
+- **M2 A-to-B independence (Build proof after Plan resolution):** Neither investigated prototype proves a complete A-to-B native reconstruction under the current acceptance contract. Retain independent inventories, procedures, ELF/host contamination checks, negative and restart evidence. Any consequential unselected construction contract returns to Planning before Build proceeds.
+- **Manage interrupted-operation recovery (Planning):** No prototype proves SQLite-plus-filesystem crash safety. Define durable journal states, mutation order, permitted recovery outcomes, and how ambiguous partial state fails closed before implementing native package transactions.
+
+These evidence selections do not activate normative requirements, create validation task bindings, change Design meaning, or establish a new acceptance or cache authority.
+
 ## Execution contracts for Build handoff
 
 These contracts define the minimum interfaces and stage gates needed to realize the selected Planning decisions. Physical schemas, command names and precise package lists may be implemented in Build, but may not weaken the accepted Design, source-verification decisions or milestone acceptance. The FS remains in Planning; all normative requirements remain Inactive until separately activated through governance.
