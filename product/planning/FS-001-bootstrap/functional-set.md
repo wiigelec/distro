@@ -10,6 +10,8 @@ The revision binds the *entire accepted Design corpus* as of that commit; the se
 
 ## Purpose and result
 
+**Known-good reference configuration.** The initial Arch host is the known-working reference for the complete M1–M5 bootstrap package/version configuration, not merely a supplier of tools for M1. Before construction, preflight identifies and freezes one execution-local snapshot of the installed host counterparts and full versions for the entire selected bootstrap manifest and its recursive build/runtime dependency closure. Every required counterpart must be installed and unambiguously mapped to an available upstream source release; missing or ambiguous entries stop the bootstrap for user correction or reviewed mapping changes. This deliberate whole-manifest gate prevents construction from starting with an unqualified or internally inconsistent version selection. The snapshot supplies a reference for source selection, not a claim that unpatched upstream sources or future Distro packages have already been proven compatible; M1–M5 must independently establish their correctness. It is neither a repository-pinned version catalog nor ongoing package-version authority.
+
 Bootstrap a Distro-native system from a qualified Arch Linux host, replacing foreign-host construction dependencies with native Distro capabilities. Complete a managed native Build chroot, a bootable package collection capable of constructing and operating that Build chroot, and an installed VM that independently boots and acts as a freshly qualified host to repeat M1 and prove full M2 self-replication. M3/M4 establish the managed Build-chroot and native package-building capability.
 
 ## Milestones
