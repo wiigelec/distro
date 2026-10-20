@@ -2,7 +2,7 @@
 
 ## Design binding
 
-- **design_revision:** `12e71d53fde329b16b14ed8103136443696efa70`
+- **design_revision:** `1a70607f80ee6014f261dceb5476e482b6ec0767`
 - **selected controlling design:** `product/design/bootstrap.md`
 - **related applicable design:** `product/design/architecture.md`, `product/design/build.md`, `product/design/manage.md`, `product/design/install.md`, `product/design/interfaces.md`, `product/design/package-model.md`, `product/design/package-metadata.md`, `product/design/package-database.md`, `product/design/autonomous-build.md`.
 

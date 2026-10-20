@@ -2,7 +2,7 @@
 
 ## Intent and governing boundaries
 
-This Plan realizes `functional-set.md` at Design revision `12e71d53fde329b16b14ed8103136443696efa70`. Build, Manage, and Install remain distinct authorities. Bootstrap construction roots are temporary and must not become an alternative permanent package format or package-management authority. A definitive Build chroot is created by Manage from Distro-produced packages, not by copying the temporary chroot. M3 proves native production and complete rebuilding of the definitive managed Build-chroot package closure; M4 publishes the bootable collection and preserves native Build/Manage capability. M5 independently boots that collection and proves Distro can act as the foreign host for fresh M1→M2 self-replication.
+This Plan realizes `functional-set.md` at Design revision `1a70607f80ee6014f261dceb5476e482b6ec0767`. Build, Manage, and Install remain distinct authorities. Bootstrap construction roots are temporary and must not become an alternative permanent package format or package-management authority. A definitive Build chroot is created by Manage from Distro-produced packages, not by copying the temporary chroot. M3 proves native production and complete rebuilding of the definitive managed Build-chroot package closure; M4 publishes the bootable collection and preserves native Build/Manage capability. M5 independently boots that collection and proves Distro can act as the foreign host for fresh M1→M2 self-replication.
 
 ### Known-good configuration snapshot — purpose of preflight
 

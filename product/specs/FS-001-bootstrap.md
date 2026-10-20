@@ -8,7 +8,7 @@ All requirements are **inactive** during Planning and carry no current implement
 
 **State: Inactive**
 
-Bootstrap shall qualify its initial Arch Linux host for the required construction capabilities and report missing or incompatible prerequisites without installing, removing, or modifying foreign-host packages.
+Before M1 construction, bootstrap shall qualify its initial Arch Linux host as the known-working package/version reference configuration for the complete selected M1–M5 bootstrap manifest and recursive build/runtime dependency closure, requiring installed host counterparts and unambiguous upstream-release mappings for every selected source-providing component. Missing, incompatible, or ambiguous prerequisites shall prevent construction, with actionable reporting and no installation, removal, or modification of foreign-host packages by bootstrap.
 
 ### FS-001-NR-002 — Source Identity and Consistency
 
@@ -16,7 +16,7 @@ Bootstrap shall qualify its initial Arch Linux host for the required constructio
 
 **State: Inactive**
 
-Bootstrap shall select upstream source identities and versions from qualified host package versions, resolve distribution-specific version differences as necessary, and retain consistent verified source identities across one execution and its resumption without imposing a permanent repository-pinned bootstrap version catalog.
+Bootstrap shall freeze one execution-local qualified host package/version and upstream-release mapping snapshot before M1, select and verify corresponding upstream source identities incrementally from that snapshot, explicitly resolve distribution-specific naming/version differences, and preserve consistency throughout the execution and resumption without imposing a permanent repository-pinned bootstrap version catalog. The known-working foreign-host configuration is a selection reference, not proof of compatibility of Distro-built outputs.
 
 ### FS-001-NR-003 — Cross-toolchain Result
 
