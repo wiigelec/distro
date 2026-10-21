@@ -6,6 +6,7 @@ No implicit package-version discovery, mirror substitution, or lock rewriting.
 from __future__ import annotations
 
 import argparse
+import subprocess
 import hashlib
 import json
 import os
@@ -87,24 +88,62 @@ def source_spec(upstream: dict) -> dict:
     Signature-bearing sources are deliberately rejected until trusted-key
     verification is implemented; an unsigned checksum is not a downgrade path.
     """
-    if 'signature_url' in upstream or 'signing_fingerprints' in upstream:
-        raise SourceError('detached-signature verification not yet available; refusing checksum downgrade')
     artifact = upstream.get('artifact')
     if not isinstance(artifact, dict):
         raise SourceError('reviewed upstream artifact specification missing')
     url = https_url(artifact.get('url'))
-    listing = https_url(artifact.get('checksum_url'))
+    signed = 'signature_url' in artifact or 'signing_fingerprints' in artifact
+    listing = None if signed else https_url(artifact.get('checksum_url'))
     filename = artifact.get('filename')
     algorithm = artifact.get('checksum_algorithm')
     if not isinstance(filename, str) or not filename or '/' in filename or '\\' in filename:
         raise SourceError('invalid reviewed source filename')
-    if algorithm not in ('sha256', 'sha512'):
+    if not signed and algorithm not in ('sha256', 'sha512'):
         raise SourceError('unsupported official source checksum algorithm')
+    if signed:
+        signature = https_url(artifact.get('signature_url'))
+        fingerprints = artifact.get('signing_fingerprints')
+        if not isinstance(fingerprints, list) or not fingerprints or any(
+                not isinstance(fp, str) or not re.fullmatch('[A-F0-9]{40}', fp) for fp in fingerprints):
+            raise SourceError('approved full signing fingerprints required')
+        if len(set(fingerprints)) != len(fingerprints):
+            raise SourceError('duplicate approved signing fingerprints')
     if urlparse(url).path.rsplit('/', 1)[-1] != filename:
         raise SourceError('reviewed source filename and URL disagree')
+    if signed:
+        return {'url': url, 'signature_url': signature, 'signing_fingerprints': fingerprints,
+                'filename': filename, 'verification_method': 'detached-openpgp'}
     return {'url': url, 'checksum_url': listing, 'filename': filename,
-            'checksum_algorithm': algorithm}
+            'checksum_algorithm': algorithm, 'verification_method': 'official-https-checksum'}
 
+
+
+def verify_detached_signature(data: bytes, signature: bytes, fingerprints: list[str],
+                              *, keyring: Path, runner=subprocess.run) -> str:
+    """Verify with an operator-provisioned keyring; never discover keys by ID."""
+    if not keyring.is_file() or keyring.is_symlink():
+        raise SourceError('approved local signing keyring required')
+    with tempfile.TemporaryDirectory(prefix='distro-sign-') as temp:
+        work = Path(temp)
+        archive = work / 'source'
+        detached = work / 'source.sig'
+        archive.write_bytes(data)
+        detached.write_bytes(signature)
+        try:
+            result = runner(['gpgv', '--keyring', str(keyring.resolve()), '--status-fd', '1',
+                             str(detached), str(archive)], capture_output=True, text=True,
+                            timeout=90, check=False)
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            raise SourceError('detached signature verification unavailable') from exc
+    statuses = [line.split() for line in result.stdout.splitlines()
+                if line.startswith('[GNUPG:] ')]
+    valid = [tokens[2].upper() for tokens in statuses
+             if len(tokens) >= 3 and tokens[1] == 'VALIDSIG']
+    invalid = {'BADSIG', 'ERRSIG', 'REVKEYSIG', 'EXPKEYSIG', 'SIGEXPIRED', 'KEYEXPIRED'}
+    if (result.returncode != 0 or len(valid) != 1 or valid[0] not in fingerprints
+            or any(tokens[1] in invalid for tokens in statuses if len(tokens) > 1)):
+        raise SourceError('detached signature invalid or signer fingerprint not approved')
+    return valid[0]
 
 def write_once(path: Path, content: bytes) -> None:
     """Durably publish complete bytes without ever replacing another file."""
@@ -132,7 +171,7 @@ def write_once(path: Path, content: bytes) -> None:
 
 def verify_and_lock(baseline: dict, name: str, cache: Path, lock_dir: Path,
                     *, recipe_sha256: str, offline: bool = False,
-                    fetch=read_https) -> dict:
+                    fetch=read_https, keyring: Path | None = None) -> dict:
     """Verify cached or fetched source and create immutable first-use lock.
 
     Existing locks are rechecked against the unchanged baseline and exact
@@ -165,15 +204,27 @@ def verify_and_lock(baseline: dict, name: str, cache: Path, lock_dir: Path,
         return locked
     if offline:
         raise SourceError('offline source consumption requires existing verified lock')
-    index = fetch(spec['checksum_url'], limit=2_000_000)
-    expected = expected_checksum(index, spec['filename'], spec['checksum_algorithm'])
     data = fetch(spec['url'], limit=2_000_000_000)
-    actual = hashlib.new(spec['checksum_algorithm'], data).hexdigest()
-    if actual != expected:
-        raise SourceError('source archive does not match official checksum')
+    if spec['verification_method'] == 'detached-openpgp':
+        if keyring is None:
+            raise SourceError('explicit approved signer keyring required')
+        signature = fetch(spec['signature_url'], limit=2_000_000)
+        signer = verify_detached_signature(data, signature, spec['signing_fingerprints'], keyring=keyring)
+        algorithm = 'sha256'
+        actual = hashlib.sha256(data).hexdigest()
+        verification = {'method': 'detached-openpgp', 'signer_fingerprint': signer,
+                        'signature_url': spec['signature_url']}
+    else:
+        index = fetch(spec['checksum_url'], limit=2_000_000)
+        expected = expected_checksum(index, spec['filename'], spec['checksum_algorithm'])
+        algorithm = spec['checksum_algorithm']
+        actual = hashlib.new(algorithm, data).hexdigest()
+        if actual != expected:
+            raise SourceError('source archive does not match official checksum')
+        verification = {'method': 'official-https-checksum'}
     write_once(archive_path, data)
     locked = {'schema_version': 1, 'identity': identity, 'digest': actual,
-              'checksum_algorithm': spec['checksum_algorithm'], 'verification': 'official-https-checksum'}
+              'checksum_algorithm': algorithm, 'verification': verification}
     write_once(lock_path, (json.dumps(locked, indent=2, sort_keys=True) + '\n').encode())
     return locked
 
@@ -196,13 +247,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument('--locks', type=Path, required=True)
     parser.add_argument('--recipe-sha256', required=True)
     parser.add_argument('--offline', action='store_true')
+    parser.add_argument('--signer-keyring', type=Path)
     args = parser.parse_args(argv)
     try:
         if os.geteuid() == 0:
             raise SourceError('run as an unprivileged user')
         baseline = json.loads(args.baseline.read_text(encoding='utf-8'))
         lock = verify_and_lock(baseline, args.package, args.cache, args.locks,
-                               recipe_sha256=args.recipe_sha256, offline=args.offline)
+                               recipe_sha256=args.recipe_sha256, offline=args.offline, keyring=args.signer_keyring)
         print(json.dumps(lock, sort_keys=True))
         return 0
     except (SourceError, OSError, KeyError, TypeError, ValueError) as exc:

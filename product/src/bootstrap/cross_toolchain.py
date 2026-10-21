@@ -121,7 +121,7 @@ def check_outputs(root: Path, recipe: dict, values: dict[str, str]) -> None:
 
 def run_stage(stage: str, baseline: dict, cache: Path, locks: Path, root: Path,
               work_base: Path, *, jobs: int, offline: bool = False,
-              runner=subprocess.run) -> dict:
+              runner=subprocess.run, keyring: Path | None = None) -> dict:
     recipe_path = ROOT / 'recipes' / (stage + '.json')
     recipe = read_json(recipe_path)
     validate_recipe(recipe, stage)
@@ -134,7 +134,7 @@ def run_stage(stage: str, baseline: dict, cache: Path, locks: Path, root: Path,
     source_recipe_path = ROOT / 'recipes' / (source_owner + '.json')
     source_hash = digest(source_recipe_path)
     lock = verify_and_lock(baseline, source_owner, cache, locks,
-                           recipe_sha256=source_hash, offline=offline)
+                           recipe_sha256=source_hash, offline=offline, keyring=keyring)
     if lock.get('identity', {}).get('baseline_sha256') != baseline['baseline_sha256']:
         raise ToolchainError('source lock does not match execution baseline')
     filename = lock['identity']['source']['filename']
@@ -248,6 +248,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument('--workspace', type=Path, required=True)
     parser.add_argument('--jobs', type=int, default=1)
     parser.add_argument('--offline', action='store_true')
+    parser.add_argument('--signer-keyring', type=Path)
     args = parser.parse_args(argv)
     try:
         if args.jobs < 1 or args.jobs > 256:
@@ -272,7 +273,7 @@ def main(argv: list[str] | None = None) -> int:
         evidence = []
         for stage in STAGES:
             evidence.append(run_stage(stage, baseline, cache, locks, root, work,
-                                      jobs=args.jobs, offline=args.offline))
+                                      jobs=args.jobs, offline=args.offline, keyring=args.signer_keyring))
         probe = inspect_target(root, work)
         handoff = archive_root(root, workspace / 'cross-toolchain-root.tar.xz')
         (workspace / 'evidence.json').write_text(json.dumps({'builds': evidence, 'probe': probe,
