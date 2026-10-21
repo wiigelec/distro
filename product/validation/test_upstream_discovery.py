@@ -58,6 +58,24 @@ class UpstreamDiscoveryTests(unittest.TestCase):
             api=lambda _: {'sha': 'd564253eb6c8' + 'a'*28})
         self.assertEqual(result['upstream']['revision'], 'd564253eb6c8' + 'a'*28)
 
+    def test_grub_upstream_gitlab_tag(self):
+        def lookup(url):
+            self.assertEqual(url, 'https://gitlab.freedesktop.org/api/v4/projects/gnu-grub%2Fgrub/repository/tags/grub-2.16')
+            return {'name': 'grub-2.16', 'commit': {'id': 'b'*40}}
+        result = discovery.resolve_package({'distro_name': 'grub',
+            'host_version_observed': '2:2.16-1'}, api=lookup)
+        self.assertEqual(result['status'], 'candidate-exact-match')
+        self.assertEqual(result['upstream']['version'], '2.16')
+        self.assertEqual(result['upstream']['revision'], 'b'*40)
+        self.assertEqual(result['upstream']['artifact_url'],
+            'https://gitlab.freedesktop.org/gnu-grub/grub/-/archive/grub-2.16/grub-grub-2.16.tar.gz')
+
+    def test_grub_missing_tag_unresolved(self):
+        result = discovery.resolve_package({'distro_name': 'grub',
+            'host_version_observed': '2:2.16-1'},
+            lambda _: [], lambda _: {'name': 'other', 'commit': {'id': 'c'*40}})
+        self.assertEqual(result['status'], 'unresolved')
+
     def test_systemd_git_tag(self):
         result = discovery.resolve_package({'distro_name': 'systemd',
             'host_version_observed': '262.1-1'},

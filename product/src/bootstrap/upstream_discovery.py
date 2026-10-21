@@ -155,9 +155,25 @@ def resolve_special(name, candidate, listing, api):
                                 f'https://github.com/gcc-mirror/gcc/archive/{sha}.tar.gz',
                                 'arch-vcs-revision-to-gcc-mirror-commit',
                                 revision=sha, reference='gcc-mirror/gcc')
-    if name in ('systemd', 'grub'):
-        repo = 'systemd/systemd' if name == 'systemd' else 'rhboot/grub2'
-        tag = ('v' if name == 'systemd' else 'grub-') + candidate
+    if name == 'grub':
+        if not VERSION.fullmatch(candidate):
+            return None
+        tag = 'grub-' + candidate
+        project = 'gnu-grub%2Fgrub'
+        data = api(f'https://gitlab.freedesktop.org/api/v4/projects/{project}/repository/tags/{tag}')
+        commit = data.get('commit', {})
+        revision = commit.get('id')
+        if data.get('name') != tag or not isinstance(revision, str) or not re.fullmatch('[a-f0-9]{40}', revision):
+            return None
+        filename = f'grub-{tag}.tar.gz'
+        return source_candidate(name, candidate,
+                                f'https://gitlab.freedesktop.org/gnu-grub/grub/-/archive/{tag}/{filename}',
+                                'upstream-gitlab-release-tag', tag=tag,
+                                revision=revision, filename=filename,
+                                reference='gnu-grub/grub')
+    if name == 'systemd':
+        repo = 'systemd/systemd'
+        tag = 'v' + candidate
         data = api(f'https://api.github.com/repos/{repo}/git/ref/tags/{tag}')
         obj = data.get('object', {})
         if obj.get('type') not in ('tag', 'commit') or not re.fullmatch('[a-f0-9]{40}', obj.get('sha', '')):
