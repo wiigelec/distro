@@ -60,30 +60,25 @@ def main(argv: list[str] | None = None) -> int:
     audit = commands.add_parser('host-audit', help='Audit only packages selected by a manifest')
     audit.add_argument('--manifest', type=Path, required=True)
     audit.add_argument('--out', type=Path, required=True)
-    discover = commands.add_parser('source-discover', help='Discover host-corresponding upstream source releases')
-    discover.add_argument('--audit', type=Path, required=True)
-    discover.add_argument('--out', type=Path, required=True)
     args = parser.parse_args(argv)
     try:
-        if args.command == 'source-discover':
-            raw = args.audit.read_bytes()
-            result = discover_from_audit(json.loads(raw))
-            result['audit_sha256'] = hashlib.sha256(raw).hexdigest()
-            args.out.parent.mkdir(parents=True, exist_ok=True)
-            with args.out.open('x', encoding='utf-8') as stream:
-                json.dump(result, stream, indent=2, sort_keys=True)
-                stream.write('\n')
-            print(f"Discovered {result['summary']['matched']} exact upstream releases; {result['summary']['unresolved']} unresolved: {args.out}")
-            return 0
         raw = args.manifest.read_bytes()
         manifest = json.loads(raw)
         result = audit_manifest(manifest, installed_arch_packages())
         result['manifest_sha256'] = hashlib.sha256(raw).hexdigest()
+        discovery = discover_from_audit(result)
+        by_name = {item['distro_name']: item for item in discovery['packages']}
+        for item in result['packages']:
+            item['upstream_discovery'] = by_name[item['distro_name']]
+        result['source_summary'] = discovery['summary']
+        result['source_discovery_note'] = discovery['note']
         args.out.parent.mkdir(parents=True, exist_ok=True)
         with args.out.open('x', encoding='utf-8') as stream:
             json.dump(result, stream, indent=2, sort_keys=True)
             stream.write('\n')
-        print(f"Audited {len(result['packages'])} selected packages: {args.out}")
+        print(f"Audited {len(result['packages'])} packages; "
+              f"{result['source_summary']['matched']} upstream sources matched, "
+              f"{result['source_summary']['unresolved']} unresolved: {args.out}")
         return 0
     except (QualificationError, OSError, ValueError, TypeError, subprocess.TimeoutExpired) as exc:
         print(f'Host audit failed: {exc}', file=sys.stderr)
