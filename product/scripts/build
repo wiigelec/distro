@@ -72,6 +72,8 @@ def main(argv: list[str] | None = None) -> int:
             item['upstream_discovery'] = by_name[item['distro_name']]
         result['source_summary'] = discovery['summary']
         result['source_discovery_note'] = discovery['note']
+        from m1_inputs import evaluate_inputs
+        result['cross_toolchain_inputs'] = evaluate_inputs(result)
         args.out.parent.mkdir(parents=True, exist_ok=True)
         with args.out.open('x', encoding='utf-8') as stream:
             json.dump(result, stream, indent=2, sort_keys=True)
