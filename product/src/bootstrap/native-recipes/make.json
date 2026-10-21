@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "name": "make",
+  "source_package": "make",
+  "review_status": "unreviewed",
+  "execution": "native-chroot",
+  "build_dependencies": [
+    "gcc",
+    "binutils",
+    "glibc",
+    "bash"
+  ],
+  "runtime_dependencies": [
+    "glibc"
+  ],
+  "steps": [
+    {
+      "name": "configure",
+      "argv": [
+        "{source}/configure",
+        "--prefix=/usr",
+        "--without-guile"
+      ]
+    },
+    {
+      "name": "build",
+      "argv": [
+        "make",
+        "-j{jobs}"
+      ]
+    },
+    {
+      "name": "install",
+      "argv": [
+        "make",
+        "DESTDIR={destdir}",
+        "install"
+      ]
+    }
+  ],
+  "required_outputs": [
+    "/usr/bin/make"
+  ]
+}

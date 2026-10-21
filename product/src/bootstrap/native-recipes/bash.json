@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "name": "bash",
+  "source_package": "bash",
+  "review_status": "unreviewed",
+  "execution": "native-chroot",
+  "build_dependencies": [
+    "make",
+    "gcc",
+    "binutils",
+    "glibc",
+    "readline",
+    "ncurses",
+    "bison"
+  ],
+  "runtime_dependencies": [
+    "glibc",
+    "readline",
+    "ncurses"
+  ],
+  "steps": [
+    {
+      "name": "configure",
+      "argv": [
+        "{source}/configure",
+        "--prefix=/usr",
+        "--without-bash-malloc"
+      ]
+    },
+    {
+      "name": "build",
+      "argv": [
+        "make",
+        "-j{jobs}"
+      ]
+    },
+    {
+      "name": "install",
+      "argv": [
+        "make",
+        "DESTDIR={destdir}",
+        "install"
+      ]
+    }
+  ],
+  "required_outputs": [
+    "/usr/bin/bash"
+  ]
+}
