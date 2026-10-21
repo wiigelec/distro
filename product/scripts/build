@@ -12,6 +12,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'product' / 'src' / 'bootstrap'))
 from host_qualification import QualificationError, installed_arch_packages
+from upstream_discovery import discover_from_audit
 
 
 def audit_manifest(manifest: dict, installed: dict[str, str]) -> dict:
@@ -59,8 +60,21 @@ def main(argv: list[str] | None = None) -> int:
     audit = commands.add_parser('host-audit', help='Audit only packages selected by a manifest')
     audit.add_argument('--manifest', type=Path, required=True)
     audit.add_argument('--out', type=Path, required=True)
+    discover = commands.add_parser('source-discover', help='Discover host-corresponding upstream source releases')
+    discover.add_argument('--audit', type=Path, required=True)
+    discover.add_argument('--out', type=Path, required=True)
     args = parser.parse_args(argv)
     try:
+        if args.command == 'source-discover':
+            raw = args.audit.read_bytes()
+            result = discover_from_audit(json.loads(raw))
+            result['audit_sha256'] = hashlib.sha256(raw).hexdigest()
+            args.out.parent.mkdir(parents=True, exist_ok=True)
+            with args.out.open('x', encoding='utf-8') as stream:
+                json.dump(result, stream, indent=2, sort_keys=True)
+                stream.write('\n')
+            print(f"Discovered {result['summary']['matched']} exact upstream releases; {result['summary']['unresolved']} unresolved: {args.out}")
+            return 0
         raw = args.manifest.read_bytes()
         manifest = json.loads(raw)
         result = audit_manifest(manifest, installed_arch_packages())
