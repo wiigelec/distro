@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Run a read-only Arch host package audit for source mapping candidates."""
+"""Inspect selected bootstrap packages on an Arch host without changing it."""
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import subprocess
@@ -13,37 +14,66 @@ sys.path.insert(0, str(ROOT / 'product' / 'src' / 'bootstrap'))
 from host_qualification import QualificationError, installed_arch_packages
 
 
+def audit_manifest(manifest: dict, installed: dict[str, str]) -> dict:
+    if manifest.get('schema_version') != 1 or not isinstance(manifest.get('packages'), list):
+        raise ValueError('expected a bootstrap package manifest with a packages list')
+    names = set()
+    records = []
+    for package in manifest['packages']:
+        if not isinstance(package, dict):
+            raise ValueError('invalid manifest package entry')
+        name = package.get('distro_name')
+        if not isinstance(name, str) or not name or name in names:
+            raise ValueError('missing or duplicated Distro package name')
+        names.add(name)
+        host = package.get('host_package')
+        if host is not None and (not isinstance(host, str) or not host):
+            raise ValueError(f'{name}: invalid host package mapping')
+        candidate = host if host is not None else name
+        version = installed.get(candidate)
+        status = 'present' if version is not None and host is not None else (
+            'mapping-unreviewed' if version is not None else 'missing')
+        records.append({'distro_name': name, 'host_package_candidate': candidate,
+                        'host_package_mapping_reviewed': host is not None,
+                        'host_version_observed': version, 'status': status})
+    return {
+        'schema_version': 1,
+        'status': 'observed',
+        'host_kind': 'arch',
+        'manifest_status': manifest.get('status'),
+        'packages': sorted(records, key=lambda x: x['distro_name']),
+        'summary': {key: sum(p['status'] == key for p in records)
+                    for key in ('present', 'mapping-unreviewed', 'missing')},
+        'commands': {'installed_packages': {
+            'argv': ['pacman', '-Q'], 'exit_code': 0,
+            'stdout': ''.join(f"{p['host_package_candidate']} {p['host_version_observed']}\n"
+                            for p in sorted(records, key=lambda x: x['host_package_candidate'])
+                            if p['host_version_observed'] is not None),
+        }},
+    }
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest='command', required=True)
-    audit = commands.add_parser('host-audit', help='Inspect installed Arch packages without modifying the host')
+    audit = commands.add_parser('host-audit', help='Audit only packages selected by a manifest')
+    audit.add_argument('--manifest', type=Path, required=True)
     audit.add_argument('--out', type=Path, required=True)
     args = parser.parse_args(argv)
-    if args.command == 'host-audit':
-        try:
-            packages = installed_arch_packages()
-            output = {
-                'schema_version': 1,
-                'status': 'observed',
-                'host_kind': 'arch',
-                'commands': {
-                    'installed_packages': {
-                        'argv': ['pacman', '-Q'],
-                        'exit_code': 0,
-                        'stdout': ''.join(f'{name} {version}\n' for name, version in sorted(packages.items())),
-                    }
-                },
-            }
-            args.out.parent.mkdir(parents=True, exist_ok=True)
-            with args.out.open('x', encoding='utf-8') as stream:
-                json.dump(output, stream, indent=2, sort_keys=True)
-                stream.write('\n')
-            print(f'Audited {len(packages)} installed Arch packages: {args.out}')
-            return 0
-        except (QualificationError, OSError, ValueError, subprocess.TimeoutExpired) as exc:
-            print(f'Host audit failed: {exc}', file=sys.stderr)
-            return 1
-    return 2
+    try:
+        raw = args.manifest.read_bytes()
+        manifest = json.loads(raw)
+        result = audit_manifest(manifest, installed_arch_packages())
+        result['manifest_sha256'] = hashlib.sha256(raw).hexdigest()
+        args.out.parent.mkdir(parents=True, exist_ok=True)
+        with args.out.open('x', encoding='utf-8') as stream:
+            json.dump(result, stream, indent=2, sort_keys=True)
+            stream.write('\n')
+        print(f"Audited {len(result['packages'])} selected packages: {args.out}")
+        return 0
+    except (QualificationError, OSError, ValueError, TypeError, subprocess.TimeoutExpired) as exc:
+        print(f'Host audit failed: {exc}', file=sys.stderr)
+        return 1
 
 
 if __name__ == '__main__':
