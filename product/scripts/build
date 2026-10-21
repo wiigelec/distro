@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+"""Run a read-only Arch host package audit for source mapping candidates."""
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'product' / 'src' / 'bootstrap'))
+from host_qualification import QualificationError, installed_arch_packages
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    commands = parser.add_subparsers(dest='command', required=True)
+    audit = commands.add_parser('host-audit', help='Inspect installed Arch packages without modifying the host')
+    audit.add_argument('--out', type=Path, required=True)
+    args = parser.parse_args(argv)
+    if args.command == 'host-audit':
+        try:
+            packages = installed_arch_packages()
+            output = {
+                'schema_version': 1,
+                'status': 'observed',
+                'host_kind': 'arch',
+                'commands': {
+                    'installed_packages': {
+                        'argv': ['pacman', '-Q'],
+                        'exit_code': 0,
+                        'stdout': ''.join(f'{name} {version}\n' for name, version in sorted(packages.items())),
+                    }
+                },
+            }
+            args.out.parent.mkdir(parents=True, exist_ok=True)
+            with args.out.open('x', encoding='utf-8') as stream:
+                json.dump(output, stream, indent=2, sort_keys=True)
+                stream.write('\n')
+            print(f'Audited {len(packages)} installed Arch packages: {args.out}')
+            return 0
+        except (QualificationError, OSError, ValueError, subprocess.TimeoutExpired) as exc:
+            print(f'Host audit failed: {exc}', file=sys.stderr)
+            return 1
+    return 2
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())
