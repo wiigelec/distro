@@ -20,7 +20,8 @@ class UpstreamDiscoveryTests(unittest.TestCase):
 
     def test_arch_vcs_revision_unresolved(self):
         result = discovery.resolve_package({'distro_name': 'gcc',
-            'host_version_observed': '16.2.1+r23+gd564253eb6c8-1'})
+            'host_version_observed': '16.2.1+r23+gd564253eb6c8-1'},
+            api=lambda _: {})
         self.assertEqual(result['status'], 'unresolved')
         self.assertEqual(result['reason'], 'host-version-needs-package-specific-mapping')
 
@@ -33,6 +34,35 @@ class UpstreamDiscoveryTests(unittest.TestCase):
         self.assertEqual(discovery.arch_pkgver('2:2.16-1'), '2.16')
         result = discovery.resolve_package({'distro_name':'tar','host_version_observed':None})
         self.assertEqual(result['reason'], 'host-counterpart-missing')
+
+
+    def test_bash_patches_complete(self):
+        def listing(url):
+            if url.endswith('patches/'):
+                return ['bash53-001', 'bash53-002']
+            return ['bash-5.3.tar.xz']
+        result = discovery.resolve_package({'distro_name': 'bash',
+            'host_version_observed': '5.3.2-1'}, listing)
+        self.assertEqual(len(result['upstream']['patches']), 2)
+        self.assertEqual(result['upstream']['base_version'], '5.3')
+
+    def test_linux_arch_suffix(self):
+        result = discovery.resolve_package({'distro_name': 'linux',
+            'host_version_observed': '7.2.11.arch1-1'},
+            lambda _: ['linux-7.2.11.tar.xz'])
+        self.assertEqual(result['upstream']['version'], '7.2.11')
+
+    def test_gcc_commit_identity(self):
+        result = discovery.resolve_package({'distro_name': 'gcc',
+            'host_version_observed': '16.2.1+r23+gd564253eb6c8-1'},
+            api=lambda _: {'sha': 'd564253eb6c8' + 'a'*28})
+        self.assertEqual(result['upstream']['revision'], 'd564253eb6c8' + 'a'*28)
+
+    def test_systemd_git_tag(self):
+        result = discovery.resolve_package({'distro_name': 'systemd',
+            'host_version_observed': '262.1-1'},
+            api=lambda _: {'object': {'type': 'commit', 'sha': 'a'*40}})
+        self.assertEqual(result['upstream']['tag'], 'v262.1')
 
     def test_scope_is_audit(self):
         report={'schema_version':1,'host_kind':'arch','manifest_sha256':'abc',
