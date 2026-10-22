@@ -14,8 +14,8 @@
         "--with-headers=/toolchain/usr/include",
         "--disable-werror",
         "--disable-nscd",
-        "CC=/toolchain/usr/bin/{target}-gcc",
-        "CXX=/toolchain/usr/bin/{target}-g++",
+        "CC=/toolchain/usr/bin/{target}-gcc -fno-link-libatomic",
+        "CXX=/toolchain/usr/bin/{target}-g++ -fno-link-libatomic",
         "AR=/toolchain/bin/{target}-ar",
         "RANLIB=/toolchain/bin/{target}-ranlib"
       ]
