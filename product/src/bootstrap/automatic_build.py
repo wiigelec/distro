@@ -12,6 +12,7 @@ from source_artifacts import (SourceError, canonical_digest, expected_checksum,
 from upstream_discovery import archive_candidates, fetch_listing
 
 SOURCE_OWNERS = ('binutils', 'gcc', 'linux-api-headers', 'glibc')
+GLIBC_RELEASE_SIGNERS = ('FD19E6D31B192EE4DC63EAD3DC2B16215ED5412A',)
 
 
 def locate_checksum(url: str, filename: str, fetch=read_https) -> tuple[str, str]:
@@ -64,16 +65,22 @@ def make_baseline(audit: dict, manifest: dict, fetch=read_https) -> dict:
         filename = upstream.get('filename') or url.rsplit('/', 1)[-1]
         if upstream.get('patches'):
             raise SourceError(alias + ': patch-bearing source needs verified patch acquisition')
-        checksum_url, algorithm = locate_checksum(url, filename, fetch)
+        if owner == 'glibc':
+            # The release is authenticated against the signing subkey approved
+            # by the source definition, not an identity supplied by a signature.
+            verification = {'signature_url': url + '.sig',
+                            'signing_fingerprints': list(GLIBC_RELEASE_SIGNERS)}
+        else:
+            checksum_url, algorithm = locate_checksum(url, filename, fetch)
+            verification = {'checksum_url': checksum_url,
+                            'checksum_algorithm': algorithm}
         host_name = record['host_package_candidate']
         version = record['host_version_observed']
         result.append({'distro_name': owner, 'host_package': host_name,
                        'host_version': parse_arch_version(version),
                        'upstream': {'name': upstream['name'], 'version': upstream['version'],
                                     'official_url': url, 'mapping_basis': candidate['mapping_basis'],
-                                    'artifact': {'url': url, 'filename': filename,
-                                                 'checksum_url': checksum_url,
-                                                 'checksum_algorithm': algorithm}}})
+                                    'artifact': {'url': url, 'filename': filename, **verification}}})
     output = {'schema_version': 1, 'host_kind': 'arch',
               'status': 'qualified-mapping-baseline',
               'manifest_sha256': audit['manifest_sha256'],
@@ -142,7 +149,7 @@ def prepare(project: Path, manifest_path: Path, audit_function) -> dict:
                 'upstream': {'name': 'glibc', 'version': upstream_version,
                              'artifact_url': selected['url'],
                              'filename': selected['filename']}}})
-    print('[build] locating official source checksums', flush=True)
+    print('[build] resolving upstream source authentication', flush=True)
     baseline = make_baseline(audit, manifest)
     state.mkdir(parents=True, exist_ok=True)
     save_once(state / 'host-audit.json', audit)

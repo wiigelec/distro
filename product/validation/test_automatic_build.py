@@ -38,7 +38,14 @@ class ConstructionInputTests(unittest.TestCase):
         self.assertEqual(len(output['packages']), 4)
         self.assertEqual(output['baseline_sha256'], subject.canonical_digest(
             {k: v for k, v in output.items() if k != 'baseline_sha256'}))
-        self.assertEqual(locator.call_count, 4)
+        self.assertEqual(locator.call_count, 3)
+        glibc = next(record for record in output['packages']
+                     if record['distro_name'] == 'glibc')
+        artifact = glibc['upstream']['artifact']
+        self.assertEqual(artifact['signature_url'], 'https://example.org/glibc.tar.xz.sig')
+        self.assertEqual(artifact['signing_fingerprints'],
+                         ['FD19E6D31B192EE4DC63EAD3DC2B16215ED5412A'])
+        self.assertNotIn('checksum_url', artifact)
 
     def test_missing_official_checksum_blocks(self):
         with patch.object(subject, 'locate_checksum', side_effect=subject.SourceError('missing')):

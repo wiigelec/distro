@@ -83,11 +83,7 @@ def select_component(baseline: dict, package_name: str) -> tuple[dict, dict]:
 
 
 def source_spec(upstream: dict) -> dict:
-    """Resolve the reviewed artifact location and official checksum method.
-
-    Signature-bearing sources are deliberately rejected until trusted-key
-    verification is implemented; an unsigned checksum is not a downgrade path.
-    """
+    """Resolve official checksum or approved detached signature verification."""
     artifact = upstream.get('artifact')
     if not isinstance(artifact, dict):
         raise SourceError('reviewed upstream artifact specification missing')
@@ -119,10 +115,10 @@ def source_spec(upstream: dict) -> dict:
 
 
 def verify_detached_signature(data: bytes, signature: bytes, fingerprints: list[str],
-                              *, keyring: Path, runner=subprocess.run) -> str:
-    """Verify with an operator-provisioned keyring; never discover keys by ID."""
-    if not keyring.is_file() or keyring.is_symlink():
-        raise SourceError('approved local signing keyring required')
+                              *, keyring: Path | None = None, runner=subprocess.run) -> str:
+    """Verify with GPG and require the source's approved signing subkey."""
+    if keyring is not None and (not keyring.is_file() or keyring.is_symlink()):
+        raise SourceError('invalid explicitly selected signing keyring')
     with tempfile.TemporaryDirectory(prefix='distro-sign-') as temp:
         work = Path(temp)
         archive = work / 'source'
@@ -130,8 +126,11 @@ def verify_detached_signature(data: bytes, signature: bytes, fingerprints: list[
         archive.write_bytes(data)
         detached.write_bytes(signature)
         try:
-            result = runner(['gpgv', '--keyring', str(keyring.resolve()), '--status-fd', '1',
-                             str(detached), str(archive)], capture_output=True, text=True,
+            command = (['gpgv', '--keyring', str(keyring.resolve()), '--status-fd', '1',
+                        str(detached), str(archive)] if keyring else
+                       ['gpg', '--batch', '--status-fd', '1', '--verify',
+                        str(detached), str(archive)])
+            result = runner(command, capture_output=True, text=True,
                             timeout=90, check=False)
         except (OSError, subprocess.TimeoutExpired) as exc:
             raise SourceError('detached signature verification unavailable') from exc
@@ -206,8 +205,6 @@ def verify_and_lock(baseline: dict, name: str, cache: Path, lock_dir: Path,
         raise SourceError('offline source consumption requires existing verified lock')
     data = fetch(spec['url'], limit=2_000_000_000)
     if spec['verification_method'] == 'detached-openpgp':
-        if keyring is None:
-            raise SourceError('explicit approved signer keyring required')
         signature = fetch(spec['signature_url'], limit=2_000_000)
         signer = verify_detached_signature(data, signature, spec['signing_fingerprints'], keyring=keyring)
         algorithm = 'sha256'
