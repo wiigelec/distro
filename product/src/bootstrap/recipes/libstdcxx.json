@@ -56,6 +56,6 @@
     }
   ],
   "required_outputs": [
-    "/toolchain/usr/lib/libstdc++.so"
+    "/toolchain/usr/x86_64-distro-linux-gnu/lib64/libstdc++.so"
   ]
 }
