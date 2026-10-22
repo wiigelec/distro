@@ -138,7 +138,7 @@ def verify_detached_signature(data: bytes, signature: bytes, fingerprints: list[
                 if line.startswith('[GNUPG:] ')]
     valid = [tokens[2].upper() for tokens in statuses
              if len(tokens) >= 3 and tokens[1] == 'VALIDSIG']
-    invalid = {'BADSIG', 'ERRSIG', 'REVKEYSIG', 'EXPKEYSIG', 'SIGEXPIRED', 'KEYEXPIRED'}
+    invalid = {'BADSIG', 'ERRSIG', 'REVKEYSIG', 'EXPKEYSIG', 'SIGEXPIRED'}
     if (result.returncode != 0 or len(valid) != 1 or valid[0] not in fingerprints
             or any(tokens[1] in invalid for tokens in statuses if len(tokens) > 1)):
         raise SourceError('detached signature invalid or signer fingerprint not approved')
