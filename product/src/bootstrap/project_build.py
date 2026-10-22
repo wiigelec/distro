@@ -145,11 +145,14 @@ def build(project: Path, baseline: dict, *, jobs: int = 1,
     probe_work = state / 'validation'
     probe_work.mkdir(exist_ok=True)
     probe = inspect_target(root, probe_work)
-    handoff_path = project / 'cross-toolchain-root.tar.xz'
+    handoff_path = project / 'artifacts' / 'cross-toolchain-root.tar.xz'
     if handoff_path.exists():
+        print(f'[export] Reusing archive: {handoff_path}', flush=True)
         handoff = {'archive': str(handoff_path), 'sha256': file_hash(handoff_path, 'sha256')}
     else:
+        print(f'[export] Building archive: {handoff_path}', flush=True)
         handoff = archive_root(root, handoff_path)
+        print(f'[export] Archive complete: {handoff_path}', flush=True)
     result = {'schema_version': 1, 'status': 'verified', 'target': TARGET,
               'packages': records, 'probe': probe, 'handoff': handoff}
     report = state / 'cross-toolchain-evidence.json'
