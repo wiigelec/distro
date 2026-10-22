@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "closure_complete": true,
+  "target": "x86_64-distro-linux-gnu",
+  "roots": ["gcc", "glibc"],
+  "packages": [
+    {"distro_name": "binutils", "host_package": "binutils", "build_dependencies": [], "runtime_dependencies": []},
+    {"distro_name": "gcc", "host_package": "gcc", "build_dependencies": ["binutils"], "runtime_dependencies": []},
+    {"distro_name": "linux-api-headers", "host_package": "linux", "build_dependencies": [], "runtime_dependencies": []},
+    {"distro_name": "glibc", "host_package": "glibc", "build_dependencies": ["linux-api-headers"], "runtime_dependencies": []}
+  ]
+}

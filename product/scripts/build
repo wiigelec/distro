@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
-"""Audit a foreign build host and construct a cross-toolchain project."""
+"""Audit a build host or construct and verify a Distro cross-toolchain."""
 from __future__ import annotations
 
 import argparse
-import os
 import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'product' / 'src' / 'bootstrap'))
-from host_qualification import QualificationError, installed_arch_packages
-from upstream_discovery import discover_from_audit
+from bootstrap_inputs import prepare
 from cross_toolchain import ToolchainError
+from host_qualification import QualificationError, installed_arch_packages
 from project_build import build
-from automatic_build import prepare
 from source_artifacts import SourceError
+from upstream_discovery import discover_from_audit
 
-DEFAULT_MANIFEST = ROOT / 'product/planning/FS-001-bootstrap/m5-initial-manifest-candidate.json'
+DEFAULT_MANIFEST = ROOT / 'product/src/bootstrap/manifest.json'
 
 
 def audit_manifest(manifest: dict, installed: dict[str, str]) -> dict:
@@ -44,21 +44,16 @@ def audit_manifest(manifest: dict, installed: dict[str, str]) -> dict:
         records.append({'distro_name': name, 'host_package_candidate': candidate,
                         'host_package_mapping_reviewed': host is not None,
                         'host_version_observed': version, 'status': status})
-    return {
-        'schema_version': 1,
-        'status': 'observed',
-        'host_kind': 'arch',
-        'manifest_status': manifest.get('status'),
-        'packages': sorted(records, key=lambda x: x['distro_name']),
-        'summary': {key: sum(p['status'] == key for p in records)
-                    for key in ('present', 'mapping-unreviewed', 'missing')},
-        'commands': {'installed_packages': {
-            'argv': ['pacman', '-Q'], 'exit_code': 0,
-            'stdout': ''.join(f"{p['host_package_candidate']} {p['host_version_observed']}\n"
-                            for p in sorted(records, key=lambda x: x['host_package_candidate'])
-                            if p['host_version_observed'] is not None),
-        }},
-    }
+    return {'schema_version': 1, 'status': 'observed', 'host_kind': 'arch',
+            'manifest_status': manifest.get('status'),
+            'packages': sorted(records, key=lambda x: x['distro_name']),
+            'summary': {key: sum(p['status'] == key for p in records)
+                        for key in ('present', 'mapping-unreviewed', 'missing')},
+            'commands': {'installed_packages': {
+                'argv': ['pacman', '-Q'], 'exit_code': 0,
+                'stdout': ''.join(f"{p['host_package_candidate']} {p['host_version_observed']}\n"
+                                for p in sorted(records, key=lambda x: x['host_package_candidate'])
+                                if p['host_version_observed'] is not None)}}}
 
 
 def host_audit(manifest_path: Path) -> dict:
@@ -84,12 +79,11 @@ def save_new(path: Path, report: dict) -> None:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest='command', required=True)
-    audit = commands.add_parser('host-audit', help='Inspect selected installed packages and upstream sources')
+    audit = commands.add_parser('host-audit', help='Inspect installed packages and upstream source candidates')
     audit.add_argument('--manifest', type=Path, default=DEFAULT_MANIFEST)
     audit.add_argument('--out', type=Path, required=True)
     compiler = commands.add_parser('cross-toolchain', help='Construct and verify the cross-toolchain')
-    compiler.add_argument('--root', type=Path, required=True,
-                          help='Bootstrap project directory containing root/ and .distro-bootstrap/')
+    compiler.add_argument('--root', type=Path, required=True, help='Bootstrap project directory')
     available_jobs = (len(os.sched_getaffinity(0)) if hasattr(os, 'sched_getaffinity')
                       else (os.cpu_count() or 1))
     compiler.add_argument('--jobs', type=int, default=available_jobs)
@@ -110,7 +104,7 @@ def main(argv: list[str] | None = None) -> int:
             raise ToolchainError('run as an ordinary user')
         project = args.root.expanduser().resolve()
         print('[build] project=' + str(project), flush=True)
-        baseline = prepare(project, DEFAULT_MANIFEST, host_audit)
+        baseline = prepare(project, DEFAULT_MANIFEST)
         result = build(project, baseline, jobs=args.jobs,
                        keyring=args.signer_keyring, offline=args.offline)
         print('Cross-toolchain verified: ' + result['handoff']['archive'])
