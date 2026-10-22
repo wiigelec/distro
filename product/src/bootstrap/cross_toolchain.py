@@ -179,8 +179,8 @@ def inspect_target(root: Path, work: Path, *, runner=subprocess.run) -> dict:
         if not path.is_file():
             raise ToolchainError('target tool or loader missing: ' + str(path))
     probe_work = work / 'target-probes'
-    probe_work.mkdir()
-    (probe_work / 'build').mkdir()
+    probe_work.mkdir(exist_ok=True)
+    (probe_work / 'build').mkdir(exist_ok=True)
     fixtures = {'c': ('int main(void) {return 0;}\n', '{target}-gcc', 'probe.c'),
                 'cxx': ('#include <string>\nint main() {std::string s="ok"; return s.size()!=2;}\n',
                         '{target}-g++', 'probe.cxx')}
@@ -190,6 +190,11 @@ def inspect_target(root: Path, work: Path, *, runner=subprocess.run) -> dict:
         executable = '/work/build/' + kind + '-probe'
         compile_cmd = sandbox_command(probe_work, root,
                       ['/toolchain/usr/bin/' + compiler.format(target=TARGET),
+                       '--sysroot=/toolchain', '-fno-link-libatomic',
+                       '-B/toolchain/usr/lib64/', '-L/toolchain/usr/lib64',
+                       '-L/toolchain/lib64',
+                       '-L/toolchain/usr/' + TARGET + '/lib64',
+                       '-Wl,-rpath-link,/toolchain/usr/' + TARGET + '/lib64',
                        '/work/build/' + name, '-o', executable])
         result = runner(compile_cmd, capture_output=True, text=True, timeout=180, check=False)
         if result.returncode:
@@ -206,11 +211,11 @@ def inspect_target(root: Path, work: Path, *, runner=subprocess.run) -> dict:
         for library in needed:
             if '/' in library or library in ('.', '..'):
                 raise ToolchainError('invalid runtime dependency')
-            if not any((root / sub / library).is_file() for sub in ('lib64','lib','usr/lib','usr/lib64')):
+            if not any((root / sub / library).is_file() for sub in ('lib64','lib','usr/lib','usr/lib64','usr/' + TARGET + '/lib64')):
                 raise ToolchainError('target runtime dependency missing: ' + library)
         invoke = sandbox_command(probe_work, root,
                  [loader_guest, '--library-path',
-                  '/toolchain/lib64:/toolchain/lib:/toolchain/usr/lib64:/toolchain/usr/lib', executable])
+                  '/toolchain/lib64:/toolchain/lib:/toolchain/usr/lib64:/toolchain/usr/lib:/toolchain/usr/' + TARGET + '/lib64', executable])
         executed = runner(invoke, capture_output=True, text=True, timeout=60, check=False)
         if executed.returncode:
             raise ToolchainError(kind + ' target runtime execution failed: ' + executed.stderr[-500:])
