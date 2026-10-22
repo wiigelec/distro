@@ -188,14 +188,16 @@ def inspect_target(root: Path, work: Path, *, runner=subprocess.run) -> dict:
     for kind, (content, compiler, name) in fixtures.items():
         (probe_work / 'build' / name).write_text(content, encoding='utf-8')
         executable = '/work/build/' + kind + '-probe'
-        compile_cmd = sandbox_command(probe_work, root,
-                      ['/toolchain/usr/bin/' + compiler.format(target=TARGET),
-                       '--sysroot=/toolchain', '-fno-link-libatomic',
-                       '-B/toolchain/usr/lib64/', '-L/toolchain/usr/lib64',
-                       '-L/toolchain/lib64',
-                       '-L/toolchain/usr/' + TARGET + '/lib64',
-                       '-Wl,-rpath-link,/toolchain/usr/' + TARGET + '/lib64',
-                       '/work/build/' + name, '-o', executable])
+        compile_args = ['/toolchain/usr/bin/' + compiler.format(target=TARGET),
+                        '--sysroot=/toolchain', '-fno-link-libatomic',
+                        '-B/toolchain/usr/lib64/', '-L/toolchain/usr/lib64',
+                        '-L/toolchain/lib64',
+                        '-L/toolchain/usr/' + TARGET + '/lib64',
+                        '-Wl,-rpath-link,/toolchain/usr/' + TARGET + '/lib64',
+                        '/work/build/' + name, '-o', executable]
+        if kind == 'cxx':
+            compile_args.append('-lgcc_s')
+        compile_cmd = sandbox_command(probe_work, root, compile_args)
         result = runner(compile_cmd, capture_output=True, text=True, timeout=180, check=False)
         if result.returncode:
             raise ToolchainError(kind + ' cross-compile/link failed: ' + result.stderr[-500:])
