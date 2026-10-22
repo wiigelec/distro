@@ -5,7 +5,6 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import shutil
 import subprocess
 import sys
 
@@ -125,13 +124,11 @@ def build(project: Path, baseline: dict, *, jobs: int = 1,
             records.append(prior)
             continue
         print(f'[{index}/{len(STAGES)}] {stage}: constructing', flush=True)
-        # Preserve logs from a failed attempt; a retry must start with fresh work.
-        stale = work / stage
-        if stale.exists():
-            attempt = 1
-            while (work / f'{stage}.failed-{attempt}').exists():
-                attempt += 1
-            stale.rename(work / f'{stage}.failed-{attempt}')
+        # A failed stage may have partially installed files into the shared root.
+        # Preserve its log and refuse to trust that root on restart.
+        if (work / stage).exists():
+            raise ToolchainError('incomplete stage ' + stage +
+                                 '; preserve this project and use a fresh build directory')
         outcome = run_stage(stage, baseline, sources, locks, root, work,
                             jobs=jobs, offline=offline, keyring=keyring, runner=stream_command)
         details = read_json(recipe)
@@ -183,8 +180,18 @@ def build(project: Path, baseline: dict, *, jobs: int = 1,
     result = {'schema_version': 1, 'status': 'verified', 'target': TARGET,
               'packages': records, 'probe': probe, 'handoff': handoff}
     report = state / 'cross-toolchain-evidence.json'
-    if not report.exists():
-        with report.open('x', encoding='utf-8') as stream:
-            json.dump(result, stream, indent=2, sort_keys=True)
-            stream.write('\n')
+    # Publish evidence for the same verification that produced this result.
+    import tempfile
+    with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', dir=state,
+                                     prefix='.cross-toolchain-evidence-',
+                                     delete=False) as stream:
+        temporary_report = Path(stream.name)
+        json.dump(result, stream, indent=2, sort_keys=True)
+        stream.write('\n')
+        stream.flush()
+        os.fsync(stream.fileno())
+    try:
+        os.replace(temporary_report, report)
+    finally:
+        temporary_report.unlink(missing_ok=True)
     return result

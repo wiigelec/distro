@@ -187,6 +187,15 @@ def inspect_target(root: Path, work: Path, *, runner=subprocess.run) -> dict:
     reports = {}
     for kind, (content, compiler, name) in fixtures.items():
         (probe_work / 'build' / name).write_text(content, encoding='utf-8')
+        driver = '/toolchain/usr/bin/' + compiler.format(target=TARGET)
+        identity = runner(sandbox_command(probe_work, root, [driver, '-dumpmachine']),
+                          capture_output=True, text=True, timeout=30, check=False)
+        if identity.returncode or identity.stdout.strip() != TARGET:
+            raise ToolchainError(kind + ' compiler does not target ' + TARGET)
+        search = runner(sandbox_command(probe_work, root, [driver, '-print-search-dirs']),
+                        capture_output=True, text=True, timeout=30, check=False)
+        if search.returncode or not search.stdout.strip():
+            raise ToolchainError(kind + ' compiler search paths unavailable')
         executable = '/work/build/' + kind + '-probe'
         compile_args = ['/toolchain/usr/bin/' + compiler.format(target=TARGET),
                         '--sysroot=/toolchain', '-fno-link-libatomic',
@@ -236,7 +245,9 @@ def inspect_target(root: Path, work: Path, *, runner=subprocess.run) -> dict:
         if executed.returncode:
             raise ToolchainError(kind + ' target runtime execution failed: ' + executed.stderr[-500:])
         reports[kind] = {'needed': needed, 'interpreter': '/lib64/ld-linux-x86-64.so.2',
-                         'execution': 'target-loader-success', 'resolved': resolved}
+                         'execution': 'target-loader-success', 'resolved': resolved,
+                         'compiler_target': identity.stdout.strip(),
+                         'compiler_search_paths': search.stdout.strip()}
     return {'target': TARGET, 'probes': reports, 'runtime_linkage': 'verified'}
 
 
