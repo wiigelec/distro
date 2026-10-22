@@ -13,6 +13,7 @@ import sys
 
 from dependency_closure import ClosureError, resolve_closure
 from host_qualification import QualificationError, installed_arch_packages, qualify, save_new
+from host_checks import HostCheckError, qualify_execution_host, qualify_source_availability
 
 
 class PreflightError(ValueError):
@@ -76,10 +77,16 @@ def main(argv: list[str] | None = None) -> int:
             raise PreflightError('run as an unprivileged user')
         manifest = json.loads(options.manifest.read_text(encoding='utf-8'))
         qualified = qualified_baseline(manifest, installed_arch_packages())
+        host_report = qualify_execution_host()
+        source_report = qualify_source_availability(qualified['packages'])
+        qualified.pop('baseline_sha256')
+        qualified['host_execution'] = host_report
+        qualified['source_availability'] = source_report
+        qualified['baseline_sha256'] = canonical_digest(qualified)
         save_new(options.output, qualified)
         print(f"qualified {len(qualified['packages'])} packages: {qualified['baseline_sha256']}")
         return 0
-    except (PreflightError, QualificationError, OSError, ValueError) as exc:
+    except (PreflightError, QualificationError, HostCheckError, OSError, ValueError) as exc:
         print(f'Host qualification blocked: {exc}', file=sys.stderr)
         return 1
 
