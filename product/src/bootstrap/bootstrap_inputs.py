@@ -20,7 +20,7 @@ ARCHIVE_EXTENSIONS = ('.tar.xz', '.tar.gz', '.tar.bz2')
 def checksum_listing(url: str, filename: str, fetch=read_https) -> tuple[str, str]:
     base = url.rsplit('/', 1)[0] + '/'
     for listing in ('sha256.sum', 'sha512.sum', 'SHA256SUMS', 'SHA512SUMS',
-                    'sha256sums', 'sha512sums'):
+                    'sha256sums', 'sha512sums', 'sha256sums.asc', 'sha512sums.asc'):
         algorithm = 'sha512' if '512' in listing else 'sha256'
         try:
             expected_checksum(fetch(base + listing, limit=2_000_000), filename, algorithm)

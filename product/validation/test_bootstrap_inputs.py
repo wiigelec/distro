@@ -8,7 +8,7 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src' / 'bootstrap'))
-from bootstrap_inputs import prepare, resolve_sources
+from bootstrap_inputs import prepare, resolve_sources, checksum_listing
 from source_artifacts import SourceError
 
 
@@ -33,6 +33,22 @@ class BootstrapInputsTests(unittest.TestCase):
                 patch('bootstrap_inputs.checksum_listing', return_value=('https://example.org/SHA256SUMS', 'sha256')):
             result = resolve_sources(manifest(), versions)
         self.assertEqual([p['distro_name'] for p in result['packages']], ['binutils', 'gcc'])
+
+    def test_kernel_signed_checksum_listing(self):
+        digest = 'a' * 64
+        armored = ('-----BEGIN PGP SIGNED MESSAGE-----\n'
+                   'Hash: SHA256\n\n'
+                   + digest + '  linux-7.2.11.tar.gz\n'
+                   '-----BEGIN PGP SIGNATURE-----\n'
+                   'signature\n-----END PGP SIGNATURE-----\n').encode()
+        def fetch(url, *, limit):
+            if url.endswith('/sha256sums.asc'):
+                return armored
+            raise OSError('not published')
+        self.assertEqual(
+            checksum_listing('https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-7.2.11.tar.gz',
+                             'linux-7.2.11.tar.gz', fetch),
+            ('https://cdn.kernel.org/pub/linux/kernel/v7.x/sha256sums.asc', 'sha256'))
 
     def test_missing_declared_host_blocks(self):
         with self.assertRaisesRegex(SourceError, 'unavailable'):
