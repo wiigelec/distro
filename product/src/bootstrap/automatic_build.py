@@ -125,7 +125,7 @@ def prepare(project: Path, manifest_path: Path, audit_function) -> dict:
         if not release:
             raise SourceError('unsupported installed glibc source version: ' + pkgver)
         upstream_version = release.group(1)
-        base = 'https://sourceware.org/pub/glibc/releases/'
+        base = 'https://ftp.gnu.org/gnu/glibc/'
         matches = [candidate for candidate in archive_candidates(
             base, 'glibc', fetch_listing(base)) if candidate['version'] == upstream_version]
         if not matches:
