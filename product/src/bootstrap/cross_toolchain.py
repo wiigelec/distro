@@ -215,14 +215,28 @@ def inspect_target(root: Path, work: Path, *, runner=subprocess.run) -> dict:
                 raise ToolchainError('invalid runtime dependency')
             if not any((root / sub / library).is_file() for sub in ('lib64','lib','usr/lib','usr/lib64','usr/' + TARGET + '/lib64')):
                 raise ToolchainError('target runtime dependency missing: ' + library)
+        library_path = ('/toolchain/lib64:/toolchain/lib:/toolchain/usr/lib64:'
+                        '/toolchain/usr/lib:/toolchain/usr/' + TARGET + '/lib64')
+        listing = runner(sandbox_command(probe_work, root,
+                 [loader_guest, '--library-path', library_path, '--list', executable]),
+                 capture_output=True, text=True, timeout=60, check=False)
+        if listing.returncode:
+            raise ToolchainError(kind + ' dependency resolution failed: ' + listing.stderr[-500:])
+        resolved = {}
+        for line in listing.stdout.splitlines():
+            match = re.match(r'\s*(\S+)\s+=>\s+(\S+)', line)
+            if match and match.group(1) in needed:
+                resolved[match.group(1)] = match.group(2)
+        if any(name not in resolved or not resolved[name].startswith('/toolchain/')
+               for name in needed):
+            raise ToolchainError(kind + ' dependency resolved outside toolchain')
         invoke = sandbox_command(probe_work, root,
-                 [loader_guest, '--library-path',
-                  '/toolchain/lib64:/toolchain/lib:/toolchain/usr/lib64:/toolchain/usr/lib:/toolchain/usr/' + TARGET + '/lib64', executable])
+                 [loader_guest, '--library-path', library_path, executable])
         executed = runner(invoke, capture_output=True, text=True, timeout=60, check=False)
         if executed.returncode:
             raise ToolchainError(kind + ' target runtime execution failed: ' + executed.stderr[-500:])
         reports[kind] = {'needed': needed, 'interpreter': '/lib64/ld-linux-x86-64.so.2',
-                         'execution': 'target-loader-success'}
+                         'execution': 'target-loader-success', 'resolved': resolved}
     return {'target': TARGET, 'probes': reports, 'runtime_linkage': 'verified'}
 
 
