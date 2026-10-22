@@ -121,17 +121,25 @@ def prepare(project: Path, manifest_path: Path, audit_function) -> dict:
         if not version:
             raise SourceError('installed glibc is required for the C runtime')
         pkgver = parse_arch_version(version)['pkgver']
+        release = re.fullmatch(r'(\d+\.\d+)(?:\+r\d+\+g[a-f0-9]{7,40})?', pkgver)
+        if not release:
+            raise SourceError('unsupported installed glibc source version: ' + pkgver)
+        upstream_version = release.group(1)
         base = 'https://sourceware.org/pub/glibc/releases/'
         matches = [candidate for candidate in archive_candidates(
-            base, 'glibc', fetch_listing(base)) if candidate['version'] == pkgver]
+            base, 'glibc', fetch_listing(base)) if candidate['version'] == upstream_version]
         if not matches:
-            raise SourceError('upstream glibc archive missing for ' + pkgver)
+            raise SourceError('upstream glibc archive missing for ' + upstream_version)
+        matches.sort(key=lambda x: (('.tar.xz', '.tar.gz', '.tar.bz2').index(
+            next(ext for ext in ('.tar.xz', '.tar.gz', '.tar.bz2')
+                 if x['filename'].endswith(ext))), x['url']))
         selected = matches[0]
         audit['packages'].append({'distro_name': 'glibc',
             'host_package_candidate': 'glibc', 'host_version_observed': version,
             'upstream_discovery': {'status': 'candidate-exact-match',
-                'mapping_basis': 'exact-host-pkgver-and-upstream-archive',
-                'upstream': {'name': 'glibc', 'version': pkgver,
+                'mapping_basis': ('glibc-release-train-base' if pkgver != upstream_version
+                                  else 'exact-host-pkgver-and-upstream-archive'),
+                'upstream': {'name': 'glibc', 'version': upstream_version,
                              'artifact_url': selected['url'],
                              'filename': selected['filename']}}})
     print('[build] locating official source checksums', flush=True)
