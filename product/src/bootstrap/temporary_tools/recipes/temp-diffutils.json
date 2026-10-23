@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "name": "diffutils",
+  "phase": "temp-tools",
+  "execution": "host-cross",
+  "steps": [
+    {
+      "name": "configure",
+      "argv": [
+        "/work/src/configure",
+        "--host={target}",
+        "--build=x86_64-pc-linux-gnu",
+        "--prefix=/usr",
+        "--disable-nls",
+        "CC={cc}",
+        "CFLAGS=-O2",
+        "LDFLAGS={ldflags}"
+      ]
+    },
+    {
+      "name": "build",
+      "argv": [
+        "make",
+        "-j{jobs}"
+      ]
+    },
+    {
+      "name": "stage-install",
+      "argv": [
+        "make",
+        "install",
+        "DESTDIR=/work/stage"
+      ]
+    }
+  ],
+  "environment": {
+    "gl_cv_func_strcasecmp_works": "yes"
+  },
+  "validation": {
+    "chroot_executables": [
+      "/usr/bin/diff",
+      "/usr/bin/cmp"
+    ]
+  }
+}

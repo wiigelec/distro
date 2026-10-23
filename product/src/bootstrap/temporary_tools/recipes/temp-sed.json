@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "name": "sed",
+  "phase": "temp-tools",
+  "execution": "host-cross",
+  "steps": [
+    {
+      "name": "configure",
+      "argv": [
+        "/work/src/configure",
+        "--host={target}",
+        "--build=x86_64-pc-linux-gnu",
+        "--prefix=/usr",
+        "--disable-nls",
+        "CC={cc}",
+        "CFLAGS=-O2",
+        "LDFLAGS={ldflags}",
+        "AR=/toolchain/usr/bin/{target}-ar",
+        "RANLIB=/toolchain/usr/bin/{target}-ranlib"
+      ]
+    },
+    {
+      "name": "build",
+      "argv": [
+        "make",
+        "-j{jobs}"
+      ]
+    },
+    {
+      "name": "stage-install",
+      "argv": [
+        "make",
+        "install",
+        "DESTDIR=/work/stage"
+      ]
+    }
+  ],
+  "validation": {
+    "chroot_executables": [
+      "/usr/bin/sed"
+    ]
+  }
+}
