@@ -11,11 +11,11 @@ def main(argv=None):
     parser.add_argument('--cross-toolchain', required=True, type=Path)
     args = parser.parse_args(argv)
     root = args.root.expanduser().absolute()
-    if root.name != 'root' or root.is_symlink():
-        parser.error('--root must identify the /root target directory, not the project')
+    if root.is_symlink():
+        parser.error('--root workspace must not be a symlink')
     if os.geteuid() == 0:
         parser.error('host cross-build must run unprivileged')
-    return build_temporary_tools(root.parent, args.cross_toolchain)
+    return build_temporary_tools(root, args.cross_toolchain)
 
 
 if __name__ == '__main__':
