@@ -229,6 +229,24 @@ def inspect_target(root: Path, work: Path, *, runner=subprocess.run) -> dict:
         if include_result.returncode:
             raise ToolchainError(kind + ' compiler include inspection failed')
         include_paths = require_target_paths(include_result.stderr, kind='includes')
+        # Deliberately expose a foreign-host include directory to the same
+        # compiler inspector. Acceptance requires the contamination to be seen
+        # and rejected, not merely successful clean compilation.
+        poisoned_command = [driver, '--sysroot=/toolchain', '-I/usr/include',
+                            '-E', '-Wp,-v', '-x',
+                            'c++' if kind == 'cxx' else 'c',
+                            '/dev/null', '-o', '/dev/null']
+        poisoned = runner(sandbox_command(probe_work, root, poisoned_command),
+                          capture_output=True, text=True, timeout=30, check=False)
+        if poisoned.returncode:
+            raise ToolchainError(kind + ' negative contamination probe could not run')
+        try:
+            require_target_paths(poisoned.stderr, kind='includes')
+        except ToolchainError as exc:
+            if 'host or unsafe compiler includes path:' not in str(exc):
+                raise
+        else:
+            raise ToolchainError(kind + ' negative contamination probe was not rejected')
         startup = runner(sandbox_command(probe_work, root,
                          [driver, '--sysroot=/toolchain', '-print-file-name=crt1.o']),
                          capture_output=True, text=True, timeout=30, check=False)
@@ -289,7 +307,8 @@ def inspect_target(root: Path, work: Path, *, runner=subprocess.run) -> dict:
                          'execution': 'target-loader-success', 'resolved': resolved,
                          'compiler_target': identity.stdout.strip(),
                          'compiler_search_paths': search.stdout.strip(),
-                         'include_paths': include_paths, 'startup_objects': startup_paths}
+                         'include_paths': include_paths, 'startup_objects': startup_paths,
+                         'negative_contamination': 'host-include-rejected'}
     return {'target': TARGET, 'probes': reports, 'runtime_linkage': 'verified'}
 
 
