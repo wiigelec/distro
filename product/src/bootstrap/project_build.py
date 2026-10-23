@@ -90,7 +90,11 @@ def verify_archive(root: Path, handoff_path: Path) -> None:
         expected = {item.relative_to(root).as_posix(): item for item in root.rglob('*')}
         if len(members) != len(expected) or {m.name for m in members} != set(expected):
             raise ToolchainError('existing handoff inventory differs from current root')
-        for member in members:
+        total = len(members)
+        print(f'[export] Checking {total} archive members against installed root', flush=True)
+        for index, member in enumerate(members, 1):
+            if index == 1 or index % 250 == 0 or index == total:
+                print(f'[export] Verified {index}/{total} members', flush=True)
             current = expected[member.name]
             if member.isfile():
                 content = archive.extractfile(member)
@@ -182,9 +186,14 @@ def build(project: Path, baseline: dict, *, jobs: int = 1,
     # Run validation even after a complete resume, before publishing a handoff.
     probe_work = state / 'validation'
     probe_work.mkdir(exist_ok=True)
+    print('[verify] Checking target compilers, include paths, startup files, and C/C++ execution', flush=True)
     probe = inspect_target(root, probe_work)
+    for kind, record in probe['probes'].items():
+        print(f'[verify] {kind}: target={record["compiler_target"]}, '
+              f'runtime={record["execution"]}, libraries={len(record["needed"])}', flush=True)
     handoff_path = project / 'artifacts' / 'cross-toolchain-root.tar.xz'
     if handoff_path.exists():
+        print(f'[export] Checking existing archive: {handoff_path}', flush=True)
         verify_archive(root, handoff_path)
         print(f'[export] Verified existing archive: {handoff_path}', flush=True)
         handoff = {'archive': str(handoff_path), 'sha256': file_hash(handoff_path, 'sha256')}
@@ -196,6 +205,7 @@ def build(project: Path, baseline: dict, *, jobs: int = 1,
     result = {'schema_version': 1, 'status': 'verified', 'target': TARGET,
               'packages': records, 'probe': probe, 'handoff': handoff}
     report = state / 'cross-toolchain-evidence.json'
+    print(f'[evidence] Writing verification report: {report}', flush=True)
     # Publish evidence for the same verification that produced this result.
     import tempfile
     with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', dir=state,
