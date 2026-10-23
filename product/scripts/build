@@ -1,0 +1,119 @@
+#!/usr/bin/env python3
+"""Audit a build host or construct and verify a Distro cross-toolchain."""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'product' / 'src' / 'bootstrap'))
+from bootstrap_inputs import prepare
+from cross_toolchain import ToolchainError
+from host_qualification import QualificationError, installed_arch_packages
+from project_build import build
+from source_artifacts import SourceError
+from upstream_discovery import discover_from_audit
+
+DEFAULT_MANIFEST = ROOT / 'product/src/bootstrap/manifest.json'
+
+
+def audit_manifest(manifest: dict, installed: dict[str, str]) -> dict:
+    if manifest.get('schema_version') != 1 or not isinstance(manifest.get('packages'), list):
+        raise ValueError('expected a bootstrap package manifest with a packages list')
+    names = set()
+    records = []
+    for package in manifest['packages']:
+        if not isinstance(package, dict):
+            raise ValueError('invalid manifest package entry')
+        name = package.get('distro_name')
+        if not isinstance(name, str) or not name or name in names:
+            raise ValueError('missing or duplicated Distro package name')
+        names.add(name)
+        host = package.get('host_package')
+        if host is not None and (not isinstance(host, str) or not host):
+            raise ValueError(f'{name}: invalid host package mapping')
+        candidate = host if host is not None else name
+        version = installed.get(candidate)
+        status = 'present' if version is not None and host is not None else (
+            'mapping-unreviewed' if version is not None else 'missing')
+        records.append({'distro_name': name, 'host_package_candidate': candidate,
+                        'host_package_mapping_reviewed': host is not None,
+                        'host_version_observed': version, 'status': status})
+    return {'schema_version': 1, 'status': 'observed', 'host_kind': 'arch',
+            'manifest_status': manifest.get('status'),
+            'packages': sorted(records, key=lambda x: x['distro_name']),
+            'summary': {key: sum(p['status'] == key for p in records)
+                        for key in ('present', 'mapping-unreviewed', 'missing')},
+            'commands': {'installed_packages': {
+                'argv': ['pacman', '-Q'], 'exit_code': 0,
+                'stdout': ''.join(f"{p['host_package_candidate']} {p['host_version_observed']}\n"
+                                for p in sorted(records, key=lambda x: x['host_package_candidate'])
+                                if p['host_version_observed'] is not None)}}}
+
+
+def host_audit(manifest_path: Path) -> dict:
+    raw = manifest_path.read_bytes()
+    report = audit_manifest(json.loads(raw), installed_arch_packages())
+    report['manifest_sha256'] = hashlib.sha256(raw).hexdigest()
+    discovery = discover_from_audit(report)
+    by_name = {item['distro_name']: item for item in discovery['packages']}
+    for item in report['packages']:
+        item['upstream_discovery'] = by_name[item['distro_name']]
+    report['source_summary'] = discovery['summary']
+    report['source_discovery_note'] = discovery['note']
+    return report
+
+
+def save_new(path: Path, report: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('x', encoding='utf-8') as stream:
+        json.dump(report, stream, indent=2, sort_keys=True)
+        stream.write('\n')
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    commands = parser.add_subparsers(dest='command', required=True)
+    audit = commands.add_parser('host-audit', help='Inspect installed packages and upstream source candidates')
+    audit.add_argument('--manifest', type=Path, default=DEFAULT_MANIFEST)
+    audit.add_argument('--out', type=Path, required=True)
+    compiler = commands.add_parser('cross-toolchain', help='Construct and verify the cross-toolchain')
+    compiler.add_argument('--root', type=Path, required=True, help='Bootstrap project directory')
+    available_jobs = (len(os.sched_getaffinity(0)) if hasattr(os, 'sched_getaffinity')
+                      else (os.cpu_count() or 1))
+    compiler.add_argument('--jobs', type=int, default=available_jobs)
+    compiler.add_argument('--offline', action='store_true')
+    compiler.add_argument('--signer-keyring', type=Path)
+    args = parser.parse_args(argv)
+    try:
+        if args.command == 'host-audit':
+            report = host_audit(args.manifest)
+            save_new(args.out, report)
+            print(f"Audited {len(report['packages'])} packages; "
+                  f"{report['source_summary']['matched']} upstream sources matched, "
+                  f"{report['source_summary']['unresolved']} unresolved: {args.out}")
+            return 0
+        if args.jobs < 1:
+            raise ValueError('invalid parallel build count')
+        if os.geteuid() == 0:
+            raise ToolchainError('run as an ordinary user')
+        project = args.root.expanduser().resolve()
+        print('[build] project=' + str(project), flush=True)
+        baseline = prepare(project, DEFAULT_MANIFEST)
+        result = build(project, baseline, jobs=args.jobs,
+                       keyring=args.signer_keyring, offline=args.offline)
+        print('Cross-toolchain verified: ' + result['handoff']['archive'])
+        return 0
+    except (QualificationError, ToolchainError, SourceError, OSError, ValueError, TypeError,
+            KeyError, subprocess.TimeoutExpired) as exc:
+        print('Build blocked: ' + str(exc), file=sys.stderr)
+        return 1
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

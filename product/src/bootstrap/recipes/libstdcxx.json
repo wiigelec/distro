@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "name": "libstdcxx",
+  "status": "experimental",
+  "source_package": "gcc",
+  "steps": [
+    {
+      "name": "configure",
+      "argv": [
+        "{source}/configure",
+        "--target={target}",
+        "--prefix=/toolchain/usr",
+        "--with-sysroot=/toolchain",
+        "--with-native-system-header-dir=/usr/include",
+        "--disable-bootstrap",
+        "--disable-multilib",
+        "--disable-nls",
+        "--disable-libsanitizer",
+        "--disable-libssp",
+        "--disable-libquadmath",
+        "--disable-libgomp",
+        "--disable-libatomic",
+        "--enable-languages=c,c++",
+        "--disable-fixincludes"
+      ]
+    },
+    {
+      "name": "build-shared-libgcc",
+      "argv": [
+        "make",
+        "-j{jobs}",
+        "all-target-libgcc"
+      ]
+    },
+    {
+      "name": "install-shared-libgcc",
+      "argv": [
+        "make",
+        "install-target-libgcc"
+      ]
+    },
+    {
+      "name": "build-libstdcxx",
+      "argv": [
+        "make",
+        "-j{jobs}",
+        "all-target-libstdc++-v3"
+      ]
+    },
+    {
+      "name": "install-libstdcxx",
+      "argv": [
+        "make",
+        "install-target-libstdc++-v3"
+      ]
+    }
+  ],
+  "required_outputs": [
+    "/toolchain/usr/x86_64-distro-linux-gnu/lib64/libstdc++.so"
+  ]
+}

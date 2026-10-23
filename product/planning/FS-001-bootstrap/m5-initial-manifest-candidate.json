@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "name": "m5-initial-package-candidate",
+  "status": "incomplete-candidate",
+  "closure_complete": false,
+  "target": "x86_64-distro-linux-gnu",
+  "source_prototype": "proto/distro-bootstrap-chroot/product/src/proto/distro_bootstrap_chroot/temporary-tools/temporary-tools-manifest.json",
+  "notes": [
+    "Initial package names derived from the ten temporary-tools entries with native-binutils and native-gcc normalized to binutils and gcc.",
+    "Prototype versions, source hashes, procedures and dependencies must be reconciled from the source prototype; this is not a qualified preflight manifest.",
+    "The cross-toolchain pseudo-dependency is a construction-stage input, not a native package.",
+    "GMP, MPFR and MPC are known GCC build prerequisites but not yet promoted to a package decision.",
+    "Additional dependencies are discovered and reviewed incrementally.",
+    "prototype_requires records prototype sequencing only, not verified Distro build/runtime dependencies; cross-toolchain is an external construction input.",
+    "Version and source resolution deferred to host-audit and upstream reconciliation; no fixed prototype versions transferred into authority."
+  ],
+  "packages": [
+    {
+      "distro_name": "bash",
+      "origin": "prototype-temporary-tools",
+      "review_status": "candidate",
+      "host_package": null,
+      "upstream": null,
+      "prototype_requires": [
+        "cross-toolchain"
+      ]
+    },
+    {
+      "distro_name": "coreutils",
+      "origin": "prototype-temporary-tools",
+      "review_status": "candidate",
+      "host_package": null,
+      "upstream": null,
+      "prototype_requires": [
+        "bash",
+        "cross-toolchain"
+      ]
+    },
+    {
+      "distro_name": "sed",
+      "origin": "prototype-temporary-tools",
+      "review_status": "candidate",
+      "host_package": null,
+      "upstream": null,
+      "prototype_requires": [
+        "bash",
+        "coreutils",
+        "cross-toolchain"
+      ]
+    },
+    {
+      "distro_name": "grep",
+      "origin": "prototype-temporary-tools",
+      "review_status": "candidate",
+      "host_package": null,
+      "upstream": null,
+      "prototype_requires": [
+        "bash",
+        "coreutils",
+        "cross-toolchain"
+      ]
+    },
+    {
+      "distro_name": "gawk",
+      "origin": "prototype-temporary-tools",
+      "review_status": "candidate",
+      "host_package": null,
+      "upstream": null,
+      "prototype_requires": [
+        "grep",
+        "cross-toolchain"
+      ]
+    },
+    {
+      "distro_name": "make",
+      "origin": "prototype-temporary-tools",
+      "review_status": "candidate",
+      "host_package": null,
+      "upstream": null,
+      "prototype_requires": [
+        "gawk",
+        "cross-toolchain"
+      ]
+    },
+    {
+      "distro_name": "diffutils",
+      "origin": "prototype-temporary-tools",
+      "review_status": "candidate",
+      "host_package": null,
+      "upstream": null,
+      "prototype_requires": [
+        "make",
+        "cross-toolchain"
+      ]
+    },
+    {
+      "distro_name": "tar",
+      "origin": "prototype-temporary-tools",
+      "review_status": "candidate",
+      "host_package": null,
+      "upstream": null,
+      "prototype_requires": [
+        "make",
+        "diffutils",
+        "cross-toolchain"
+      ]
+    },
+    {
+      "distro_name": "binutils",
+      "origin": "prototype-temporary-tools",
+      "review_status": "candidate",
+      "host_package": null,
+      "upstream": null,
+      "prototype_requires": [
+        "make",
+        "diffutils",
+        "tar",
+        "cross-toolchain"
+      ]
+    },
+    {
+      "distro_name": "gcc",
+      "origin": "prototype-temporary-tools",
+      "review_status": "candidate",
+      "host_package": null,
+      "upstream": null,
+      "prototype_requires": [
+        "binutils",
+        "cross-toolchain"
+      ],
+      "prototype_build_prerequisites": [
+        "gmp",
+        "mpfr",
+        "mpc"
+      ]
+    },
+    {
+      "distro_name": "systemd",
+      "origin": "initial-M5-addition",
+      "review_status": "candidate",
+      "host_package": null,
+      "upstream": null
+    },
+    {
+      "distro_name": "grub",
+      "origin": "initial-M5-addition",
+      "review_status": "candidate",
+      "host_package": null,
+      "upstream": null
+    },
+    {
+      "distro_name": "linux",
+      "origin": "initial-M5-addition",
+      "review_status": "candidate",
+      "host_package": null,
+      "upstream": null
+    }
+  ]
+}

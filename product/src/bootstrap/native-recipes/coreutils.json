@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "name": "coreutils",
+  "source_package": "coreutils",
+  "review_status": "unreviewed",
+  "execution": "native-chroot",
+  "build_dependencies": [
+    "make",
+    "gcc",
+    "binutils",
+    "glibc",
+    "gettext"
+  ],
+  "runtime_dependencies": [
+    "glibc"
+  ],
+  "steps": [
+    {
+      "name": "configure",
+      "argv": [
+        "{source}/configure",
+        "--prefix=/usr",
+        "--enable-install-program=hostname"
+      ]
+    },
+    {
+      "name": "build",
+      "argv": [
+        "make",
+        "-j{jobs}"
+      ]
+    },
+    {
+      "name": "install",
+      "argv": [
+        "make",
+        "DESTDIR={destdir}",
+        "install"
+      ]
+    }
+  ],
+  "required_outputs": [
+    "/usr/bin/ls",
+    "/usr/bin/cp"
+  ]
+}

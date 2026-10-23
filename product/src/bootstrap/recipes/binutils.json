@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "name": "binutils",
+  "status": "experimental",
+  "source_package": "binutils",
+  "steps": [
+    {
+      "name": "configure",
+      "argv": [
+        "{source}/configure",
+        "--target={target}",
+        "--prefix=/toolchain",
+        "--disable-nls",
+        "--disable-werror",
+        "--disable-gdb",
+        "--disable-gprofng",
+        "--disable-sim"
+      ]
+    },
+    {
+      "name": "build",
+      "argv": [
+        "make",
+        "-j{jobs}"
+      ]
+    },
+    {
+      "name": "install",
+      "argv": [
+        "make",
+        "install"
+      ]
+    }
+  ],
+  "required_outputs": [
+    "/toolchain/bin/{target}-as",
+    "/toolchain/bin/{target}-ld"
+  ]
+}
