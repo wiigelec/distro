@@ -368,42 +368,46 @@ def package_run(project, manifest, pkg, cross_archive):
     print(f'[temp-tools] {name}: COMPLETE; {len(evidence)} files/links verified', flush=True)
 
 
-def resolve_m1_archive(source):
-    """Require an archive and current FS-001 M1 evidence before use."""
+def resolve_cross_toolchain_archive(source):
+    """Locate and verify the cross-toolchain handoff archive."""
     candidate = Path(source).expanduser().resolve(strict=True)
     if candidate.is_dir():
         options = [candidate / 'artifacts/cross-toolchain-root.tar.xz',
                    candidate / 'cross-toolchain-root.tar.xz']
         matches = [p for p in options if p.is_file()]
         if len(matches) != 1:
-            raise RuntimeError('expected exactly one M1 handoff archive')
+            raise RuntimeError('expected exactly one cross-toolchain handoff archive')
         candidate = matches[0]
     if not candidate.is_file() or candidate.name != 'cross-toolchain-root.tar.xz':
-        raise RuntimeError('M1 cross-toolchain-root.tar.xz required')
+        raise RuntimeError('cross-toolchain cross-toolchain-root.tar.xz required')
     reports = [candidate.parent.parent / '.distro-bootstrap/cross-toolchain-evidence.json',
                candidate.parent / 'cross-toolchain-evidence.json']
     report = next((p for p in reports if p.is_file()), None)
     if report is None:
-        raise RuntimeError('M1 verification evidence missing')
+        raise RuntimeError('cross-toolchain verification evidence missing')
     record = json.loads(report.read_text())
     if record.get('status') != 'verified' or record.get('target') != 'x86_64-distro-linux-gnu':
-        raise RuntimeError('M1 verification evidence invalid')
+        raise RuntimeError('cross-toolchain verification evidence invalid')
     handoff = record.get('handoff', {})
+    print(f'[cross-toolchain] Verifying archive SHA-256: {candidate}', flush=True)
     if handoff.get('sha256') != common.sha(candidate):
-        raise RuntimeError('M1 handoff checksum mismatch')
+        raise RuntimeError('cross-toolchain archive checksum mismatch')
+    print('[cross-toolchain] Archive checksum verified', flush=True)
     if Path(handoff.get('archive', '')).name != candidate.name:
-        raise RuntimeError('M1 handoff archive identity mismatch')
+        raise RuntimeError('cross-toolchain handoff archive identity mismatch')
     return candidate
 
 
 def import_cross_toolchain(project, cross_archive, target):
-    """Verify, import and stamp current FS-001 M1 handoff."""
+    """Verify and import the cross-toolchain into a clean target root."""
     if project in (Path('/'), Path.home().resolve()):
         raise RuntimeError('unsafe project path')
-    archive = resolve_m1_archive(cross_archive)
+    archive = resolve_cross_toolchain_archive(cross_archive)
     root, state = project / 'root', project / '.distro-bootstrap'
+    print(f'[import] Checking target root: {root}', flush=True)
     bootstrap.check_directory(root)
     bootstrap.check_directory(state)
+    print('[import] Checking cross-toolchain archive digest', flush=True)
     digest = common.sha(archive)
     marker = state / 'temp-tools-import.json'
     if marker.exists():
@@ -411,19 +415,27 @@ def import_cross_toolchain(project, cross_archive, target):
         if (previous.get('stage') != 'temp-tools' or previous.get('status') != 'complete'
                 or previous.get('cross_archive_sha256') != digest
                 or not root.is_dir() or bootstrap.empty(root)):
-            raise RuntimeError('inconsistent prior M1 import')
+            raise RuntimeError('inconsistent prior cross-toolchain import')
         for rel, expected in previous.get('files', {}).items():
             if common.sha(root / rel) != expected:
-                raise RuntimeError('imported M1 file changed: ' + rel)
+                raise RuntimeError('imported cross-toolchain file changed: ' + rel)
+        print('[import] Existing cross-toolchain import verified', flush=True)
         return
     if not bootstrap.empty(root) or not bootstrap.empty(state):
-        raise RuntimeError('initial M1 import requires empty root and state')
+        raise RuntimeError('initial cross-toolchain import requires empty root and state')
+    print('[import] Inspecting cross-toolchain archive members', flush=True)
     with tarfile.open(archive, 'r:xz') as tf:
         members = bootstrap.archive_members(tf)
         project.mkdir(parents=True, exist_ok=True)
         root.mkdir(exist_ok=True)
         state.mkdir(exist_ok=True)
-        tf.extractall(root, members=members, filter='data')
+        total = len(members)
+        print(f'[import] Extracting {total} verified archive members', flush=True)
+        for index, member in enumerate(members, 1):
+            tf.extract(member, root, filter='data')
+            if index % 250 == 0 or index == total:
+                print(f'[import] Extracted {index}/{total} members', flush=True)
+    print('[import] Validating compiler and runtime files', flush=True)
     required = (f'usr/bin/{target}-gcc', f'usr/bin/{target}-g++',
                 'lib64/libc.so.6', 'lib64/ld-linux-x86-64.so.2',
                 'usr/include/linux/version.h')
@@ -435,19 +447,25 @@ def import_cross_toolchain(project, cross_archive, target):
     common.save(marker, {'schema_version': 1, 'stage': 'temp-tools',
                          'status': 'complete', 'cross_archive_sha256': digest,
                          'files': checks})
+    print('[import] Cross-toolchain import complete', flush=True)
 
 
 def main(project, cross_archive):
     if os.geteuid() == 0:
         raise RuntimeError('run as ordinary user')
     project = Path(project).expanduser().resolve()
+    print('[bootstrap] Temporary-tools cross-build starting', flush=True)
+    print(f'[workspace] {project}', flush=True)
     manifest = json.loads(MANIFEST.read_text())
     if manifest.get('phase') != 'temp-tools' or not re.fullmatch(r'[a-zA-Z0-9_]+(?:-[a-zA-Z0-9_]+)+', manifest['target']):
         raise RuntimeError('invalid temp-tools manifest')
-    cross_archive = resolve_m1_archive(cross_archive)
+    print(f'[cross-toolchain] Locating verified archive: {cross_archive}', flush=True)
+    cross_archive = resolve_cross_toolchain_archive(cross_archive)
     import_cross_toolchain(project, cross_archive, manifest['target'])
     done = set()
-    for pkg in manifest['packages']:
+    total = len(manifest['packages'])
+    for index, pkg in enumerate(manifest['packages'], 1):
+        print(f'[{index}/{total}] {pkg["name"]}: constructing', flush=True)
         if pkg.get('state') != 'executable' or pkg.get('execution') != 'host-cross':
             raise RuntimeError('unsupported package entry: ' + pkg['name'])
         for dependency in pkg.get('requires', []):
@@ -455,6 +473,7 @@ def main(project, cross_archive):
                 raise RuntimeError('package dependency out of order: ' + pkg['name'] + ' -> ' + dependency)
         package_run(project, manifest, pkg, cross_archive)
         done.add(pkg['name'])
+    print(f'[bootstrap] Temporary-tools cross-build complete: {len(done)} packages', flush=True)
     return 0
 
 def native_recipe_argv(step, values, explicit_native=False):
