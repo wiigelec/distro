@@ -168,6 +168,32 @@ def run_stage(stage: str, baseline: dict, cache: Path, locks: Path, root: Path,
             'log': str(log_path), 'status': 'built-unverified-runtime'}
 
 
+
+def require_target_paths(output: str, *, kind: str) -> list[str]:
+    """Reject host include directories and startup objects in compiler evidence."""
+    paths = []
+    if kind == 'includes':
+        started = False
+        for line in output.splitlines():
+            if line.strip() == '#include <...> search starts here:':
+                started = True
+                continue
+            if started and line.strip() == 'End of search list.':
+                break
+            if started:
+                path = line.strip().removesuffix(' (framework directory)')
+                if path:
+                    paths.append(path)
+        if not started or not paths:
+            raise ToolchainError('target compiler include search list unavailable')
+    else:
+        paths = [output.strip()]
+    for path in paths:
+        if not path.startswith('/toolchain/') or __import__('posixpath').normpath(path).startswith('/toolchain/') is False:
+            raise ToolchainError('host or unsafe compiler ' + kind + ' path: ' + path)
+    return paths
+
+
 def inspect_target(root: Path, work: Path, *, runner=subprocess.run) -> dict:
     """Compile, inspect ELF linkage and execute C/C++ via the target loader."""
     gcc = root / 'usr/bin' / (TARGET + '-gcc')
@@ -196,6 +222,21 @@ def inspect_target(root: Path, work: Path, *, runner=subprocess.run) -> dict:
                         capture_output=True, text=True, timeout=30, check=False)
         if search.returncode or not search.stdout.strip():
             raise ToolchainError(kind + ' compiler search paths unavailable')
+        include_command = [driver, '--sysroot=/toolchain', '-E', '-Wp,-v',
+                           '-x', 'c++' if kind == 'cxx' else 'c', '/dev/null', '-o', '/dev/null']
+        include_result = runner(sandbox_command(probe_work, root, include_command),
+                                capture_output=True, text=True, timeout=30, check=False)
+        if include_result.returncode:
+            raise ToolchainError(kind + ' compiler include inspection failed')
+        include_paths = require_target_paths(include_result.stderr, kind='includes')
+        startup = runner(sandbox_command(probe_work, root,
+                         [driver, '--sysroot=/toolchain', '-print-file-name=crt1.o']),
+                         capture_output=True, text=True, timeout=30, check=False)
+        if startup.returncode:
+            raise ToolchainError(kind + ' target startup object unresolved')
+        startup_paths = require_target_paths(startup.stdout, kind='startup')
+        if not (root / startup_paths[0].removeprefix('/toolchain/')).is_file():
+            raise ToolchainError(kind + ' target startup object missing from installed root')
         executable = '/work/build/' + kind + '-probe'
         compile_args = ['/toolchain/usr/bin/' + compiler.format(target=TARGET),
                         '--sysroot=/toolchain', '-fno-link-libatomic',
@@ -247,7 +288,8 @@ def inspect_target(root: Path, work: Path, *, runner=subprocess.run) -> dict:
         reports[kind] = {'needed': needed, 'interpreter': '/lib64/ld-linux-x86-64.so.2',
                          'execution': 'target-loader-success', 'resolved': resolved,
                          'compiler_target': identity.stdout.strip(),
-                         'compiler_search_paths': search.stdout.strip()}
+                         'compiler_search_paths': search.stdout.strip(),
+                         'include_paths': include_paths, 'startup_objects': startup_paths}
     return {'target': TARGET, 'probes': reports, 'runtime_linkage': 'verified'}
 
 

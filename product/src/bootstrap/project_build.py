@@ -81,6 +81,29 @@ def load_stamp(path: Path, expected: str, root: Path, stage: str) -> dict | None
     return record
 
 
+
+def verify_archive(root: Path, handoff_path: Path) -> None:
+    # The archive is an output of this root, not a reusable name alone.
+    import tarfile
+    with tarfile.open(handoff_path, 'r:xz') as archive:
+        members = archive.getmembers()
+        expected = {item.relative_to(root).as_posix(): item for item in root.rglob('*')}
+        if len(members) != len(expected) or {m.name for m in members} != set(expected):
+            raise ToolchainError('existing handoff inventory differs from current root')
+        for member in members:
+            current = expected[member.name]
+            if member.isfile():
+                content = archive.extractfile(member)
+                if not current.is_file() or content is None or (
+                        hashlib.sha256(content.read()).hexdigest()
+                        != file_hash(current, 'sha256')):
+                    raise ToolchainError('existing handoff file differs: ' + member.name)
+            elif member.issym():
+                if not current.is_symlink() or member.linkname != os.readlink(current):
+                    raise ToolchainError('existing handoff link differs: ' + member.name)
+            elif not member.isdir() or not current.is_dir() or current.is_symlink():
+                raise ToolchainError('existing handoff member type differs: ' + member.name)
+
 def build(project: Path, baseline: dict, *, jobs: int = 1,
           keyring: Path | None = None, offline: bool = False) -> dict:
     project = project.expanduser().resolve()
@@ -151,31 +174,13 @@ def build(project: Path, baseline: dict, *, jobs: int = 1,
     probe = inspect_target(root, probe_work)
     handoff_path = project / 'artifacts' / 'cross-toolchain-root.tar.xz'
     if handoff_path.exists():
-        # The archive is an output of this root, not a reusable name alone.
-        import tarfile
-        with tarfile.open(handoff_path, 'r:xz') as archive:
-            members = archive.getmembers()
-            expected = {item.relative_to(root).as_posix(): item for item in root.rglob('*')}
-            if len(members) != len(expected) or {m.name for m in members} != set(expected):
-                raise ToolchainError('existing handoff inventory differs from current root')
-            for member in members:
-                current = expected[member.name]
-                if member.isfile():
-                    content = archive.extractfile(member)
-                    if not current.is_file() or content is None or (
-                            hashlib.sha256(content.read()).hexdigest()
-                            != file_hash(current, 'sha256')):
-                        raise ToolchainError('existing handoff file differs: ' + member.name)
-                elif member.issym():
-                    if not current.is_symlink() or member.linkname != os.readlink(current):
-                        raise ToolchainError('existing handoff link differs: ' + member.name)
-                elif not member.isdir() or not current.is_dir() or current.is_symlink():
-                    raise ToolchainError('existing handoff member type differs: ' + member.name)
+        verify_archive(root, handoff_path)
         print(f'[export] Verified existing archive: {handoff_path}', flush=True)
         handoff = {'archive': str(handoff_path), 'sha256': file_hash(handoff_path, 'sha256')}
     else:
         print(f'[export] Building archive: {handoff_path}', flush=True)
         handoff = archive_root(root, handoff_path)
+        verify_archive(root, handoff_path)
         print(f'[export] Archive complete: {handoff_path}', flush=True)
     result = {'schema_version': 1, 'status': 'verified', 'target': TARGET,
               'packages': records, 'probe': probe, 'handoff': handoff}
