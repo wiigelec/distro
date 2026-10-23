@@ -14,7 +14,7 @@ import subprocess
 import sys
 import tarfile
 
-import temp_cross_package as common
+from . import temp_cross_package as common
 
 HERE = Path(__file__).resolve().parent
 

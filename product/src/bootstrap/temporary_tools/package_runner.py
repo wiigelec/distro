@@ -15,8 +15,8 @@ import subprocess
 import sys
 import tarfile
 
-import temp_cross_package as common
-import temp_tools_bootstrap as bootstrap
+from . import temp_cross_package as common
+from . import temp_tools_bootstrap as bootstrap
 
 HERE = Path(__file__).resolve().parent
 MANIFEST = HERE / 'temporary-tools-manifest.json'

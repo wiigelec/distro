@@ -1,10 +1,8 @@
 """FS-001 M2 Part 1 host cross-build: construct Generation A."""
 import argparse
-import urllib.request
-import urllib.error
 import os
 from pathlib import Path
-from package_runner import main as build_temporary_tools
+from .package_runner import main as build_temporary_tools
 
 
 def main(argv=None):
