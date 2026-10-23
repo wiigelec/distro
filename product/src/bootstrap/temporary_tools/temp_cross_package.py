@@ -12,6 +12,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 import tarfile
 import urllib.request
 
@@ -32,12 +33,44 @@ def save(path, obj):
     os.replace(tmp, path)
 
 def run(cmd, log, timeout=7200):
-    with log.open('a') as f:
-        f.write('STEP ' + ' '.join(cmd) + '\n')
-        f.flush()
-        p = subprocess.run(cmd, stdout=f, stderr=subprocess.STDOUT, timeout=timeout, check=False)
-    if p.returncode:
-        raise RuntimeError(f'command failed ({p.returncode}); inspect {log}')
+    """Stream merged build output live and retain a complete package log.
+
+    Use binary chunks rather than line iteration so progress without newline
+    is visible immediately, and preserve the byte stream in the log.
+    """
+    with log.open('ab') as record:
+        record.write(('STEP ' + ' '.join(cmd) + '\n').encode())
+        record.flush()
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+                                   stderr=subprocess.STDOUT, bufsize=0)
+        started = time.monotonic()
+        try:
+            while True:
+                remaining = timeout - (time.monotonic() - started)
+                if remaining <= 0:
+                    raise subprocess.TimeoutExpired(cmd, timeout)
+                # Select keeps the timeout effective even if a build emits no output.
+                import select
+                ready, _, _ = select.select([process.stdout], [], [], remaining)
+                if not ready:
+                    raise subprocess.TimeoutExpired(cmd, timeout)
+                chunk = os.read(process.stdout.fileno(), 65536)
+                if not chunk:
+                    break
+                record.write(chunk)
+                record.flush()
+                sys.stdout.buffer.write(chunk)
+                sys.stdout.buffer.flush()
+            remaining = max(0, timeout - (time.monotonic() - started))
+            code = process.wait(timeout=remaining)
+        except BaseException:
+            process.kill()
+            process.wait()
+            raise
+        finally:
+            process.stdout.close()
+    if code:
+        raise RuntimeError(f'command failed ({code}); inspect {log}')
 
 def obtain(url, output, expected):
     if output.is_file():
