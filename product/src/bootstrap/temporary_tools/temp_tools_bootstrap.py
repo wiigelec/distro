@@ -36,6 +36,7 @@ def empty(path):
 def archive_members(tf):
     members = tf.getmembers()
     names = set()
+    verified_files = set()
     for member in members:
         name = member.name
         p = Path(name)
@@ -44,8 +45,20 @@ def archive_members(tf):
         if name in names:
             raise RuntimeError(f'duplicate archive member: {name}')
         names.add(name)
-        if not (member.isfile() or member.isdir() or member.issym()):
+        if not (member.isfile() or member.isdir() or member.issym() or member.islnk()):
             raise RuntimeError(f'unsupported archive member: {name}')
+        if member.islnk():
+            # Tar hard links are archive-root-relative; require an earlier
+            # regular file (or verified hard link), never a symlink or a path
+            # outside the imported filesystem.
+            link = Path(member.linkname)
+            if (link.is_absolute() or not link.parts or
+                    any(part in ('..', '.') for part in link.parts) or
+                    member.linkname not in verified_files):
+                raise RuntimeError(f'unsafe archive hard link: {name}')
+            verified_files.add(name)
+        elif member.isfile():
+            verified_files.add(name)
         if member.issym():
             link = Path(member.linkname)
             if link.is_absolute():
