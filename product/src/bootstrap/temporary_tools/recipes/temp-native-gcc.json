@@ -9,7 +9,7 @@
       "argv": [
         "/usr/bin/bash",
         "-c",
-        "set -eu\ncat > /work/unwind-link-check.cc <<'EOF'\nint main() { try { throw 42; } catch (int n) { return n == 42 ? 0 : 1; } }\nEOF\n/toolchain/usr/bin/{target}-g++ --sysroot=/toolchain -fno-link-libatomic -static-libstdc++ -static-libgcc -B/toolchain/usr/lib64/ -L/toolchain/usr/lib64 -L/toolchain/lib64 /work/unwind-link-check.cc -lgcc_eh -o /work/unwind-link-check\n"
+        "set -eu\ncat > /work/unwind-link-check.cc <<'EOF'\nint main() {{ try {{ throw 42; }} catch (int n) {{ return n == 42 ? 0 : 1; }} }}\nEOF\n/toolchain/usr/bin/{target}-g++ --sysroot=/toolchain -fno-link-libatomic -static-libstdc++ -static-libgcc -B/toolchain/usr/lib64/ -L/toolchain/usr/lib64 -L/toolchain/lib64 /work/unwind-link-check.cc -lgcc_eh -o /work/unwind-link-check\n"
       ]
     },
     {
