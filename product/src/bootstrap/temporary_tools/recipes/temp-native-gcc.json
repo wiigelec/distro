@@ -5,6 +5,14 @@
   "execution": "host-cross",
   "steps": [
     {
+      "name": "verify-static-unwinder",
+      "argv": [
+        "/usr/bin/bash",
+        "-c",
+        "set -eu\ncat > /work/unwind-link-check.cc <<'EOF'\nint main() { try { throw 42; } catch (int n) { return n == 42 ? 0 : 1; } }\nEOF\n/toolchain/usr/bin/{target}-g++ --sysroot=/toolchain -fno-link-libatomic -static-libstdc++ -static-libgcc -B/toolchain/usr/lib64/ -L/toolchain/usr/lib64 -L/toolchain/lib64 /work/unwind-link-check.cc -lgcc_eh -o /work/unwind-link-check\n"
+      ]
+    },
+    {
       "name": "configure",
       "argv": [
         "/work/src/configure",
@@ -33,6 +41,7 @@
         "CFLAGS=-O2",
         "CXXFLAGS=-O2",
         "LDFLAGS={ldflags}",
+        "LIBS=-lgcc_eh",
         "CC_FOR_TARGET=/toolchain/usr/bin/{target}-gcc --sysroot=/toolchain -fno-link-libatomic",
         "CXX_FOR_TARGET=/toolchain/usr/bin/{target}-gcc --sysroot=/toolchain -nostdinc++ -fno-link-libatomic",
         "LDFLAGS_FOR_TARGET=-L/work/build/{target}/libgcc",
