@@ -11,6 +11,7 @@ import sys
 from cross_toolchain import (STAGES, ToolchainError, archive_root, digest,
                              inspect_target, read_json, run_stage, TARGET)
 from source_artifacts import select_component, file_hash
+from header_finalization import finalize_limits
 
 
 def stream_command(argv, *, stdout=None, stderr=None, check=False, timeout=None):
@@ -183,6 +184,24 @@ def build(project: Path, baseline: dict, *, jobs: int = 1,
             json.dump(record, stream, indent=2, sort_keys=True)
             stream.write('\n')
         records.append(record)
+    # Reconcile target GCC headers with installed libc before export.
+    gcc_path = stamps / 'gcc.json'
+    gcc_record = next(record for record in records if record['stage'] == 'gcc')
+    print('[headers] Reconciling GCC and libc target headers', flush=True)
+    header_evidence = finalize_limits(project, baseline, gcc_record)
+    # Persist the updated output digest for verified restarts.
+    import tempfile
+    with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', dir=stamps,
+                                     prefix='.gcc-', delete=False) as stream:
+        updated_stamp = Path(stream.name)
+        json.dump(gcc_record, stream, indent=2, sort_keys=True)
+        stream.write('\n')
+        stream.flush()
+        os.fsync(stream.fileno())
+    try:
+        os.replace(updated_stamp, gcc_path)
+    finally:
+        updated_stamp.unlink(missing_ok=True)
     # Run validation even after a complete resume, before publishing a handoff.
     probe_work = state / 'validation'
     probe_work.mkdir(exist_ok=True)
@@ -203,12 +222,21 @@ def build(project: Path, baseline: dict, *, jobs: int = 1,
         verify_archive(root, handoff_path)
         print(f'[export] Archive complete: {handoff_path}', flush=True)
     result = {'schema_version': 1, 'status': 'verified', 'target': TARGET,
-              'packages': records, 'probe': probe, 'handoff': handoff}
-    report = state / 'cross-toolchain-evidence.json'
+              'packages': records, 'probe': probe, 'headers': header_evidence,
+              'handoff': handoff}
+    report = project / 'artifacts' / 'cross-toolchain-evidence.json'
+    if report.exists() or report.is_symlink():
+        if report.is_symlink() or not report.is_file():
+            raise ToolchainError('unsafe existing cross-toolchain evidence')
+        existing = json.loads(report.read_text())
+        if existing != result:
+            raise ToolchainError('existing cross-toolchain evidence differs; do not overwrite')
+        print(f'[evidence] Verified existing evidence: {report}', flush=True)
+        return result
     print(f'[evidence] Writing verification report: {report}', flush=True)
     # Publish evidence for the same verification that produced this result.
     import tempfile
-    with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', dir=state,
+    with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', dir=report.parent,
                                      prefix='.cross-toolchain-evidence-',
                                      delete=False) as stream:
         temporary_report = Path(stream.name)
@@ -217,7 +245,7 @@ def build(project: Path, baseline: dict, *, jobs: int = 1,
         stream.flush()
         os.fsync(stream.fileno())
     try:
-        os.replace(temporary_report, report)
+        os.link(temporary_report, report)
     finally:
         temporary_report.unlink(missing_ok=True)
     return result
