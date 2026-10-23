@@ -98,6 +98,17 @@ def verify_archive(root: Path, handoff_path: Path) -> None:
                         hashlib.sha256(content.read()).hexdigest()
                         != file_hash(current, 'sha256')):
                     raise ToolchainError('existing handoff file differs: ' + member.name)
+            elif member.islnk():
+                # tarfile emits subsequent hard-linked files as link entries.
+                # Check both the recorded hard-link relationship and file bytes.
+                linked = expected.get(member.linkname)
+                content = archive.extractfile(member)
+                if (linked is None or current.is_symlink() or linked.is_symlink()
+                        or not current.is_file() or not linked.is_file()
+                        or not os.path.samefile(current, linked) or content is None
+                        or hashlib.sha256(content.read()).hexdigest()
+                        != file_hash(current, 'sha256')):
+                    raise ToolchainError('handoff hard link differs: ' + member.name)
             elif member.issym():
                 if not current.is_symlink() or member.linkname != os.readlink(current):
                     raise ToolchainError('existing handoff link differs: ' + member.name)

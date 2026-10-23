@@ -21,6 +21,33 @@ class AcceptanceTests(unittest.TestCase):
         with self.assertRaises(ToolchainError):
             require_target_paths('/usr/lib/crt1.o\n', kind='startup')
 
+    def test_archive_hard_link_matches_installed_root(self):
+        import os
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)
+            root = folder / 'root'
+            root.mkdir()
+            (root / 'gcc').write_bytes(b'compiler')
+            os.link(root / 'gcc', root / 'g++')
+            archive = folder / 'root.tar.xz'
+            archive_root(root, archive)
+            verify_archive(root, archive)
+
+    def test_archive_hard_link_replacement_rejected(self):
+        import os
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)
+            root = folder / 'root'
+            root.mkdir()
+            (root / 'gcc').write_bytes(b'compiler')
+            os.link(root / 'gcc', root / 'g++')
+            archive = folder / 'root.tar.xz'
+            archive_root(root, archive)
+            (root / 'g++').unlink()
+            (root / 'g++').write_bytes(b'compiler')
+            with self.assertRaisesRegex(ToolchainError, 'hard link differs'):
+                verify_archive(root, archive)
+
     def test_archive_member_change_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             folder=Path(tmp)
