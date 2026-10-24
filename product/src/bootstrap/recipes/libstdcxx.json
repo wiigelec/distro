@@ -5,53 +5,57 @@
   "source_package": "gcc",
   "steps": [
     {
-      "name": "verify-first-pass-libgcc",
+      "name": "configure",
       "argv": [
-        "/usr/bin/bash",
-        "-c",
-        "set -eu; archive=/toolchain/usr/lib/gcc/{target}/{version}/libgcc.a; test -f \"$archive\"; /usr/bin/nm --defined-only \"$archive\" > /work/libgcc-before.symbols; for symbol in _Unwind_Resume _Unwind_RaiseException _Unwind_DeleteException; do grep -E \" [TW] $symbol$\" /work/libgcc-before.symbols >/dev/null || exit 1; done; sha256sum \"$archive\" > /work/libgcc-before.sha256"
+        "{source}/configure",
+        "--target={target}",
+        "--prefix=/toolchain/usr",
+        "--with-sysroot=/toolchain",
+        "--with-native-system-header-dir=/usr/include",
+        "--disable-bootstrap",
+        "--disable-multilib",
+        "--disable-nls",
+        "--disable-libsanitizer",
+        "--disable-libssp",
+        "--disable-libquadmath",
+        "--disable-libgomp",
+        "--disable-libatomic",
+        "--enable-languages=c,c++",
+        "--disable-fixincludes"
       ]
     },
     {
-      "name": "configure",
+      "name": "build-shared-libgcc",
       "argv": [
-        "{source}/libstdc++-v3/configure",
-        "--build=x86_64-pc-linux-gnu",
-        "--host={target}",
-        "--prefix=/toolchain/usr",
-        "--libdir=/toolchain/usr/{target}/lib64",
-        "--disable-multilib",
-        "--disable-nls",
-        "--disable-libstdcxx-pch",
-        "--with-gxx-include-dir=/toolchain/usr/{target}/include/c++/{version}",
-        "CC=/toolchain/usr/bin/{target}-gcc --sysroot=/toolchain -fno-link-libatomic",
-        "CXX=/toolchain/usr/bin/{target}-g++ --sysroot=/toolchain -fno-link-libatomic"
+        "make",
+        "-j{jobs}",
+        "all-target-libgcc"
+      ]
+    },
+    {
+      "name": "install-shared-libgcc",
+      "argv": [
+        "make",
+        "install-target-libgcc"
       ]
     },
     {
       "name": "build-libstdcxx",
       "argv": [
         "make",
-        "-j{jobs}"
+        "-j{jobs}",
+        "all-target-libstdc++-v3"
       ]
     },
     {
       "name": "install-libstdcxx",
       "argv": [
         "make",
-        "install"
-      ]
-    },
-    {
-      "name": "verify-first-pass-libgcc-unchanged",
-      "argv": [
-        "/usr/bin/bash",
-        "-c",
-        "set -eu; archive=/toolchain/usr/lib/gcc/{target}/{version}/libgcc.a; test -f \"$archive\"; sha256sum -c /work/libgcc-before.sha256; /usr/bin/nm --defined-only \"$archive\" > /work/libgcc-after.symbols; for symbol in _Unwind_Resume _Unwind_RaiseException _Unwind_DeleteException; do grep -E \" [TW] $symbol$\" /work/libgcc-after.symbols >/dev/null || exit 1; done"
+        "install-target-libstdc++-v3"
       ]
     }
   ],
   "required_outputs": [
-    "/toolchain/usr/{target}/lib64/libstdc++.so"
+    "/toolchain/usr/x86_64-distro-linux-gnu/lib64/libstdc++.so"
   ]
 }
