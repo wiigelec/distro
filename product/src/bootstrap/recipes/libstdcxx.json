@@ -33,12 +33,11 @@
       ]
     },
     {
-      "name": "install-shared-libgcc",
+      "name": "stage-shared-libgcc",
       "argv": [
         "make",
-        "-C",
-        "{target}/libgcc",
-        "install-shared"
+        "install-target-libgcc",
+        "DESTDIR=/work/stage"
       ]
     },
     {
@@ -53,7 +52,9 @@
       "name": "install-libstdcxx",
       "argv": [
         "make",
-        "install-target-libstdc++-v3"
+        "-C",
+        "{target}/libstdc++-v3",
+        "install"
       ]
     }
   ],

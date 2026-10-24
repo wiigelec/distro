@@ -10,11 +10,37 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src/bootstrap'))
 from cross_toolchain import (ToolchainError, validate_recipe, checked_source_extract,
-                             sandbox_command, archive_root, STAGES, ROOT)
+                             sandbox_command, archive_root, integrate_shared_libgcc,
+                             STAGES, ROOT)
 import json
 
 
 class ToolchainTests(unittest.TestCase):
+    def test_staged_libgcc_integration_preserves_first_pass(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            root, work = base / 'root', base / 'work'
+            target, version = 'x86_64-distro-linux-gnu', '16.2.0'
+            private = Path('usr/lib/gcc') / target / version
+            shared = Path('usr') / target / 'lib64'
+            original = root / private / 'libgcc.a'
+            original.parent.mkdir(parents=True)
+            original.write_bytes(b'first-pass-unwind-runtime')
+            import hashlib
+            before = hashlib.sha256(original.read_bytes()).hexdigest()
+            staged = work / 'stage/toolchain'
+            for rel in (private / 'libgcc_eh.a', shared / 'libgcc_s.so.1',
+                        shared / 'libgcc_s.so', shared / 'libgcc_s_asneeded.so'):
+                path = staged / rel
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(b'new-shared-runtime')
+            (staged / private / 'libgcc.a').write_bytes(b'incorrect-replacement')
+            integrate_shared_libgcc(work, root, target, version, before)
+            self.assertEqual(original.read_bytes(), b'first-pass-unwind-runtime')
+            self.assertEqual((root / shared / 'libgcc_s.so.1').read_bytes(), b'new-shared-runtime')
+            with self.assertRaises(ToolchainError):
+                integrate_shared_libgcc(work, root, target, version, 'wrong-digest')
+
     def test_all_recipe_structures(self):
         for stage in STAGES:
             with self.subTest(stage=stage):

@@ -119,6 +119,33 @@ def check_outputs(root: Path, recipe: dict, values: dict[str, str]) -> None:
             raise ToolchainError('required toolchain output missing: ' + guest)
 
 
+def integrate_shared_libgcc(work: Path, root: Path, target: str, version: str,
+                            preserved_digest: str) -> None:
+    """Integrate only second-pass shared runtime; preserve the first-pass libgcc.a."""
+    private = Path('usr/lib/gcc') / target / version
+    shared = Path('usr') / target / 'lib64'
+    staged = work / 'stage' / 'toolchain'
+    files = (private / 'libgcc_eh.a', shared / 'libgcc_s.so.1',
+             shared / 'libgcc_s.so', shared / 'libgcc_s_asneeded.so')
+    first_pass = root / private / 'libgcc.a'
+    if not first_pass.is_file() or first_pass.is_symlink() or digest(first_pass) != preserved_digest:
+        raise ToolchainError('first-pass libgcc.a changed before shared runtime integration')
+    for relative in files:
+        source = staged / relative
+        destination = root / relative
+        if not source.is_file() or source.is_symlink():
+            raise ToolchainError('staged shared runtime missing or unsafe: ' + str(relative))
+        if destination.is_symlink() or (destination.exists() and not destination.is_file()):
+            raise ToolchainError('shared runtime destination unsafe: ' + str(relative))
+    for relative in files:
+        source = staged / relative
+        destination = root / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, destination)
+    if digest(first_pass) != preserved_digest:
+        raise ToolchainError('shared runtime integration overwrote first-pass libgcc.a')
+
+
 def run_stage(stage: str, baseline: dict, cache: Path, locks: Path, root: Path,
               work_base: Path, *, jobs: int, offline: bool = False,
               runner=subprocess.run, keyring: Path | None = None) -> dict:
@@ -148,6 +175,12 @@ def run_stage(stage: str, baseline: dict, cache: Path, locks: Path, root: Path,
     (work / 'build').mkdir()
     source_dir = checked_source_extract(archive, work / 'src')
     values = {'target': TARGET, 'version': version, 'jobs': str(jobs), 'source': '/work/src/' + source_dir.name}
+    first_pass = root / 'usr/lib/gcc' / TARGET / version / 'libgcc.a'
+    first_pass_digest = None
+    if stage == 'libstdcxx':
+        if not first_pass.is_file() or first_pass.is_symlink():
+            raise ToolchainError('first-pass libgcc.a missing before libstdc++')
+        first_pass_digest = digest(first_pass)
     log_path = work / 'build.log'
     with log_path.open('w', encoding='utf-8') as log:
         for step in recipe['steps']:
@@ -163,6 +196,10 @@ def run_stage(stage: str, baseline: dict, cache: Path, locks: Path, root: Path,
             completed = runner(cmd, stdout=log, stderr=subprocess.STDOUT, check=False, timeout=14400)
             if completed.returncode:
                 raise ToolchainError('isolated recipe step failed: ' + stage + '/' + step['name'])
+            if stage == 'libstdcxx' and step['name'] == 'stage-shared-libgcc':
+                integrate_shared_libgcc(work, root, TARGET, version, first_pass_digest)
+        if stage == 'libstdcxx' and digest(first_pass) != first_pass_digest:
+            raise ToolchainError('libstdc++ stage replaced first-pass libgcc.a')
     check_outputs(root, recipe, values)
     return {'stage': stage, 'recipe_sha256': recipe_hash, 'source_lock': lock,
             'log': str(log_path), 'status': 'built-unverified-runtime'}
