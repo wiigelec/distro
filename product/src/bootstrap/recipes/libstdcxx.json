@@ -33,10 +33,26 @@
       ]
     },
     {
+      "name": "preserve-first-pass-libgcc",
+      "argv": [
+        "/usr/bin/bash",
+        "-c",
+        "set -eu\nset -- /toolchain/usr/lib/gcc/{target}/*/libgcc.a\n[ \"$#\" -eq 1 ] && [ -f \"$1\" ] || exit 1\n/usr/bin/nm --defined-only \"$1\" > /work/first-pass-libgcc.symbols\nfor symbol in _Unwind_Resume _Unwind_RaiseException _Unwind_DeleteException; do\n  grep -E \" [TW] $symbol$\" /work/first-pass-libgcc.symbols >/dev/null || exit 1\ndone\ncp -p \"$1\" /work/first-pass-libgcc.a\nsha256sum /work/first-pass-libgcc.a | cut -d' ' -f1 > /work/first-pass-libgcc.sha256\n"
+      ]
+    },
+    {
       "name": "install-shared-libgcc",
       "argv": [
         "make",
         "install-target-libgcc"
+      ]
+    },
+    {
+      "name": "restore-first-pass-libgcc",
+      "argv": [
+        "/usr/bin/bash",
+        "-c",
+        "set -eu\nset -- /toolchain/usr/lib/gcc/{target}/*/libgcc.a\n[ \"$#\" -eq 1 ] && [ -f \"$1\" ] || exit 1\ncp -p /work/first-pass-libgcc.a \"$1\"\nexpected=$(cat /work/first-pass-libgcc.sha256)\nactual=$(sha256sum \"$1\" | cut -d' ' -f1)\n[ \"$actual\" = \"$expected\" ] || exit 1\n/usr/bin/nm --defined-only \"$1\" > /work/installed-libgcc.symbols\nfor symbol in _Unwind_Resume _Unwind_RaiseException _Unwind_DeleteException; do\n  grep -E \" [TW] $symbol$\" /work/installed-libgcc.symbols >/dev/null || exit 1\ndone\n"
       ]
     },
     {
