@@ -37,7 +37,7 @@
       "argv": [
         "/usr/bin/bash",
         "-c",
-        "set -eu\nset -- /toolchain/usr/lib/gcc/{target}/*/libgcc.a\n[ \"$#\" -eq 1 ] && [ -f \"$1\" ] || exit 1\n/usr/bin/nm --defined-only \"$1\" > /work/first-pass-libgcc.symbols\nfor symbol in _Unwind_Resume _Unwind_RaiseException _Unwind_DeleteException; do\n  grep -E \" [TW] $symbol$\" /work/first-pass-libgcc.symbols >/dev/null || exit 1\ndone\ncp -p \"$1\" /work/first-pass-libgcc.a\nsha256sum /work/first-pass-libgcc.a | cut -d' ' -f1 > /work/first-pass-libgcc.sha256\n"
+        "set -eu; set -- /toolchain/usr/lib/gcc/{target}/*/libgcc.a; [ \"$#\" -eq 1 ] && [ -f \"$1\" ] || exit 1; /usr/bin/nm --defined-only \"$1\" > /work/first-pass-libgcc.symbols; for symbol in _Unwind_Resume _Unwind_RaiseException _Unwind_DeleteException; do grep -E \" [TW] $symbol$\" /work/first-pass-libgcc.symbols >/dev/null || exit 1; done; cp -p \"$1\" /work/first-pass-libgcc.a; sha256sum /work/first-pass-libgcc.a | cut -d' ' -f1 > /work/first-pass-libgcc.sha256"
       ]
     },
     {
@@ -52,7 +52,7 @@
       "argv": [
         "/usr/bin/bash",
         "-c",
-        "set -eu\nset -- /toolchain/usr/lib/gcc/{target}/*/libgcc.a\n[ \"$#\" -eq 1 ] && [ -f \"$1\" ] || exit 1\ncp -p /work/first-pass-libgcc.a \"$1\"\nexpected=$(cat /work/first-pass-libgcc.sha256)\nactual=$(sha256sum \"$1\" | cut -d' ' -f1)\n[ \"$actual\" = \"$expected\" ] || exit 1\n/usr/bin/nm --defined-only \"$1\" > /work/installed-libgcc.symbols\nfor symbol in _Unwind_Resume _Unwind_RaiseException _Unwind_DeleteException; do\n  grep -E \" [TW] $symbol$\" /work/installed-libgcc.symbols >/dev/null || exit 1\ndone\n"
+        "set -eu; set -- /toolchain/usr/lib/gcc/{target}/*/libgcc.a; [ \"$#\" -eq 1 ] && [ -f \"$1\" ] || exit 1; cp -p /work/first-pass-libgcc.a \"$1\"; expected=$(cat /work/first-pass-libgcc.sha256); actual=$(sha256sum \"$1\" | cut -d' ' -f1); [ \"$actual\" = \"$expected\" ] || exit 1; /usr/bin/nm --defined-only \"$1\" > /work/installed-libgcc.symbols; for symbol in _Unwind_Resume _Unwind_RaiseException _Unwind_DeleteException; do grep -E \" [TW] $symbol$\" /work/installed-libgcc.symbols >/dev/null || exit 1; done"
       ]
     },
     {
