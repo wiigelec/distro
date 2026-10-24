@@ -5,73 +5,53 @@
   "source_package": "gcc",
   "steps": [
     {
+      "name": "verify-first-pass-libgcc",
+      "argv": [
+        "/usr/bin/bash",
+        "-c",
+        "set -eu; archive=/toolchain/usr/lib/gcc/{target}/{version}/libgcc.a; test -f \"$archive\"; /usr/bin/nm --defined-only \"$archive\" > /work/libgcc-before.symbols; for symbol in _Unwind_Resume _Unwind_RaiseException _Unwind_DeleteException; do grep -E \" [TW] $symbol$\" /work/libgcc-before.symbols >/dev/null || exit 1; done; sha256sum \"$archive\" > /work/libgcc-before.sha256"
+      ]
+    },
+    {
       "name": "configure",
       "argv": [
-        "{source}/configure",
-        "--target={target}",
+        "{source}/libstdc++-v3/configure",
+        "--build=x86_64-pc-linux-gnu",
+        "--host={target}",
         "--prefix=/toolchain/usr",
-        "--with-sysroot=/toolchain",
-        "--with-native-system-header-dir=/usr/include",
-        "--disable-bootstrap",
+        "--libdir=/toolchain/usr/{target}/lib64",
         "--disable-multilib",
         "--disable-nls",
-        "--disable-libsanitizer",
-        "--disable-libssp",
-        "--disable-libquadmath",
-        "--disable-libgomp",
-        "--disable-libatomic",
-        "--enable-languages=c,c++",
-        "--disable-fixincludes"
-      ]
-    },
-    {
-      "name": "build-shared-libgcc",
-      "argv": [
-        "make",
-        "-j{jobs}",
-        "all-target-libgcc"
-      ]
-    },
-    {
-      "name": "preserve-first-pass-libgcc",
-      "argv": [
-        "/usr/bin/bash",
-        "-c",
-        "set -eu; set -- /toolchain/usr/lib/gcc/{target}/*/libgcc.a; [ \"$#\" -eq 1 ] && [ -f \"$1\" ] || exit 1; /usr/bin/nm --defined-only \"$1\" > /work/first-pass-libgcc.symbols; for symbol in _Unwind_Resume _Unwind_RaiseException _Unwind_DeleteException; do grep -E \" [TW] $symbol$\" /work/first-pass-libgcc.symbols >/dev/null || exit 1; done; cp -p \"$1\" /work/first-pass-libgcc.a; sha256sum /work/first-pass-libgcc.a | cut -d' ' -f1 > /work/first-pass-libgcc.sha256"
-      ]
-    },
-    {
-      "name": "install-shared-libgcc",
-      "argv": [
-        "make",
-        "install-target-libgcc"
-      ]
-    },
-    {
-      "name": "restore-first-pass-libgcc",
-      "argv": [
-        "/usr/bin/bash",
-        "-c",
-        "set -eu; set -- /toolchain/usr/lib/gcc/{target}/*/libgcc.a; [ \"$#\" -eq 1 ] && [ -f \"$1\" ] || exit 1; cp -p /work/first-pass-libgcc.a \"$1\"; expected=$(cat /work/first-pass-libgcc.sha256); actual=$(sha256sum \"$1\" | cut -d' ' -f1); [ \"$actual\" = \"$expected\" ] || exit 1; /usr/bin/nm --defined-only \"$1\" > /work/installed-libgcc.symbols; for symbol in _Unwind_Resume _Unwind_RaiseException _Unwind_DeleteException; do grep -E \" [TW] $symbol$\" /work/installed-libgcc.symbols >/dev/null || exit 1; done"
+        "--disable-libstdcxx-pch",
+        "--with-gxx-include-dir=/toolchain/usr/{target}/include/c++/{version}",
+        "CC=/toolchain/usr/bin/{target}-gcc --sysroot=/toolchain -fno-link-libatomic",
+        "CXX=/toolchain/usr/bin/{target}-g++ --sysroot=/toolchain -fno-link-libatomic"
       ]
     },
     {
       "name": "build-libstdcxx",
       "argv": [
         "make",
-        "-j{jobs}",
-        "all-target-libstdc++-v3"
+        "-j{jobs}"
       ]
     },
     {
       "name": "install-libstdcxx",
       "argv": [
         "make",
-        "install-target-libstdc++-v3"
+        "install"
+      ]
+    },
+    {
+      "name": "verify-first-pass-libgcc-unchanged",
+      "argv": [
+        "/usr/bin/bash",
+        "-c",
+        "set -eu; archive=/toolchain/usr/lib/gcc/{target}/{version}/libgcc.a; test -f \"$archive\"; sha256sum -c /work/libgcc-before.sha256; /usr/bin/nm --defined-only \"$archive\" > /work/libgcc-after.symbols; for symbol in _Unwind_Resume _Unwind_RaiseException _Unwind_DeleteException; do grep -E \" [TW] $symbol$\" /work/libgcc-after.symbols >/dev/null || exit 1; done"
       ]
     }
   ],
   "required_outputs": [
-    "/toolchain/usr/x86_64-distro-linux-gnu/lib64/libstdc++.so"
+    "/toolchain/usr/{target}/lib64/libstdc++.so"
   ]
 }
