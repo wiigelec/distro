@@ -36,7 +36,9 @@
       "name": "install-shared-libgcc",
       "argv": [
         "make",
-        "install-target-libgcc"
+        "-C",
+        "{target}/libgcc",
+        "install-shared"
       ]
     },
     {
