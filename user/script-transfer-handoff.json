@@ -1,0 +1,130 @@
+{
+  "schema_version": "1",
+  "record_type": "script-transfer-handoff",
+  "surface": "user/script-transfer-handoff.json",
+  "authority_state": "none",
+  "management": "user-owned",
+  "purpose": "Initialize the operational handoff used to transfer bounded repository tasks from a web client to a local checkout and return verified results after remote publication.",
+  "transport": {
+    "web_to_local": {
+      "artifact": "standalone Python transfer script",
+      "suggested_local_path": "~/Downloads/<script>.py",
+      "invocation": "python3 ~/Downloads/<script>.py",
+      "working_directory": "repository root",
+      "terminal_output": {
+        "standard": "fs0-script-transfer-terminal-v2",
+        "status_line": "FS0 Script Transfer: <START|PASS|FAILED>",
+        "step_line": "[<NN>/<TOTAL>] <PHASE> <description>",
+        "step_result_line": "PASS|FAIL followed by a concise machine-relevant detail",
+        "command_line": "$ <exact command>",
+        "captured_output_line": "OUT|ERR | <captured command output line>",
+        "phases": [
+          "PRECHECK",
+          "MUTATE",
+          "GENERATE",
+          "VALIDATE",
+          "COMMIT",
+          "PUBLISH",
+          "VERIFY"
+        ],
+        "required_summary_fields": [
+          "Operation",
+          "Repository",
+          "Branch",
+          "Expected HEAD",
+          "Observed HEAD",
+          "Files Changed",
+          "Validation",
+          "Commit",
+          "Remote HEAD",
+          "Result JSON"
+        ],
+        "behavior": [
+          "emit START and operation identity before any repository mutation",
+          "visually separate phases with the standard stage header and clean blank-line spacing",
+          "announce every material precondition, mutation, generation, validation, commit, publication, and verification step before execution",
+          "show exact external commands before execution",
+          "show captured stdout and stderr beneath the command using OUT and ERR prefixes when output is non-empty",
+          "emit an explicit PASS or FAIL result for every announced step",
+          "do not leave long-running validation, commit, push, or remote verification activity silent",
+          "emit PASS only after commit, normal non-force push, and exact remote-head verification",
+          "emit FAILED immediately after the failing step and include the failure in the result JSON",
+          "write the machine-readable result JSON on both PASS and FAILED when possible",
+          "preserve a concise final summary after the step transcript"
+        ],
+        "stage_header_line": "===== <PHASE> =====",
+        "stage_spacing": "emit one blank line before each phase header and one blank line after each completed phase"
+      }
+    },
+    "local_to_web": {
+      "artifact": "machine-readable JSON result",
+      "suggested_local_path": "~/Downloads/<result>.json",
+      "action": "upload the result JSON to the web client before the next mutation"
+    }
+  },
+  "execution_contract": {
+    "preconditions": [
+      "verify repository identity",
+      "verify expected branch",
+      "verify exact expected local HEAD or base",
+      "verify acceptable worktree state",
+      "verify exact expected remote head before mutation",
+      "verify governing issue or predecessor state when applicable"
+    ],
+    "mutation_rules": [
+      "mutate only explicitly authorized paths",
+      "preserve unrelated user work",
+      "do not force-push or rewrite history unless separately and explicitly authorized",
+      "do not embed or persist secrets",
+      "when parsing git status --porcelain output, preserve its leading fixed-width status columns; never call .strip() on the complete porcelain output before slicing status/path fields; split lines and remove only line terminators"
+    ],
+    "validation_rules": [
+      "run task-specific regression checks",
+      "run canonical repository validation when applicable",
+      "run deterministic generation correspondence checks when applicable",
+      "run git diff --check before commit"
+    ],
+    "publication_rules": [
+      "commit only the authorized mutation",
+      "re-check the remote head before push",
+      "use a normal non-force push",
+      "verify the remote resolves to the exact pushed commit"
+    ],
+    "handoff_rules": [
+      "write a machine-readable JSON result even on failure when possible",
+      "stop on validation failure, conflicting dirty state, authority conflict, or remote race",
+      "inspect the uploaded result JSON before authorizing the next mutation",
+      "emit standardized verbose terminal output conforming to fs0-script-transfer-terminal-v2"
+    ]
+  },
+  "result_record": {
+    "recommended_fields": [
+      "schema_version",
+      "status",
+      "operation",
+      "repository",
+      "branch",
+      "governing_issue",
+      "expected_base_or_head",
+      "observed_base_or_head",
+      "files_changed",
+      "validation_performed",
+      "validation_results",
+      "diff_summary",
+      "commit_sha",
+      "commit_count",
+      "push_mode",
+      "remote_head",
+      "errors",
+      "conflicts",
+      "history_rewrite_or_force_push_occurred",
+      "merge_occurred"
+    ]
+  },
+  "lifecycle": {
+    "initialization_behavior": "seed-if-absent-on-initial-repository-setup",
+    "ongoing_behavior": "unmanaged",
+    "handoff_validation_behavior": "ignored-by-repository-framework-validation",
+    "maintenance_behavior": "preserve-existing-user-copy"
+  }
+}

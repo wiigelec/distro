@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "root": {
+    "files": [
+      ".gitignore",
+      "AGENTS.md",
+      "LICENSE",
+      "README.md"
+    ],
+    "directories": [
+      ".github",
+      "product",
+      "repo",
+      "scripts",
+      "user"
+    ]
+  },
+  "repo": {
+    "directories": [
+      "design",
+      "planning",
+      "scripts",
+      "specs",
+      "src",
+      "validation"
+    ]
+  },
+  "product": {
+    "directories": [
+      "design",
+      "planning",
+      "scripts",
+      "specs",
+      "src",
+      "validation"
+    ],
+    "required_when_present": [
+      "design",
+      "scripts",
+      "specs",
+      "validation"
+    ]
+  }
+}
