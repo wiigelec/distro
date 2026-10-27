@@ -9,54 +9,60 @@ depends_on:
 
 ## Purpose
 
-Bootstrap is the one-time process that creates the minimal Distro package set needed to construct a bootable Distro system capable of replicating itself.
+Bootstrap is the one-time process that establishes Distro's native package-production capability and a minimal bootable Distro system capable of reproducing its foundational build environment.
 
-Self-replication means that the booted Distro system can download, extract, build from source, and package all packages that comprise the bootstrap package set. The final proof is to repeat Stage 1 on the booted Distro host without dependence on the original foreign distribution's build tools and libraries. This describes functional replication; it does not yet require byte-for-byte identical artifacts.
+The final self-replication proof runs the Stage 1 construction sequence on the booted Distro host, generates replacement `distro-buildroot` packages without publishing them, and compares their packaged file lists with those of the published foreign-host-built packages. If the file lists are equivalent, the Distro-host-built packages replace the foreign-host-built packages on the package server. File-list equivalence is the specified proof criterion; byte-for-byte artifact identity is not required.
 
-Bootstrap is not a fourth permanent Distro component. Once Bootstrap has established the initial package collections and demonstrated self-replication, ongoing package production belongs to Build, installed package state belongs to Manage, and system installation belongs to Install.
+Bootstrap is not a fourth permanent Distro component. Build owns ongoing package production, Manage owns installed package state, and Install owns system installation and configuration, as established by DP-001.
 
 ## Stage 1 — `distro-chroot`
 
-Stage 1 initially runs under a foreign Linux host kernel and creates the production package set named `distro-buildroot`. Its three substages have distinct artifact handoffs.
+Stage 1 is initially performed on a foreign Linux host and produces the initial published package collection needed to establish Distro's isolated production Build environment. Its three substages have explicit artifact handoffs.
 
 ### 1A — Host (Cross) Build
 
-Using the foreign host, construct a cross-toolchain artifact for Stage 1B. The principal technical reference is Linux From Scratch (LFS) Chapter 5, *Compiling a Cross-Toolchain*. The exact toolchain contents and construction procedures remain open for further Design.
+On the foreign host, construct the cross-toolchain artifact required by Stage 1B. Linux From Scratch (LFS) Chapter 5, *Compiling a Cross-Toolchain*, is the principal technical reference.
 
 **Output:** cross-toolchain artifact.
 
-### 1B — Native Chroot Build
+### 1B — Temporary Chroot Construction
 
-Use the cross-toolchain artifact to construct a temporary Distro chroot artifact for Stage 1C. LFS Chapter 6, *Cross Compiling Temporary Tools*, is the principal reference for construction of this temporary environment.
+On the foreign host, use the Stage 1A cross-toolchain to construct the temporary Distro chroot. All Stage 1B construction takes place from the foreign host; Stage 1B does not execute native builds inside the chroot it is constructing. The temporary chroot becomes functional only upon completion of Stage 1B. LFS Chapter 6, *Cross Compiling Temporary Tools*, is the principal technical reference.
 
-In the native chroot, Distro tools perform the `configure`, `make`, and `make install` work. At this stage the foreign host supplies the kernel and remains responsible for source download, extraction, and packaging of build output. The temporary chroot is a construction environment, not the definitive production Build chroot.
+**Output:** temp-chroot artifact, available for use by Stage 1C.
 
-**Output:** temp-chroot artifact.
+### 1C — Bootstrap Build Environment and Publish Packages
 
-### 1C — Production Package Build and Publication
+Use the Stage 1B temp-chroot artifact to bootstrap the initial production package collection, including the `distro-buildroot` metapackage and its required packages. Publish the initial collection to the package server so Manage can install it and establish a production Build environment. This initial bootstrapping is the exception required before `distro-buildroot` can itself be used to build published packages.
 
-Use the temp-chroot artifact to build and package the closed production Distro package set `distro-buildroot`, then publish it to the package server.
+`distro-buildroot` is a metapackage defining the package requirements for Build's isolated build environment. It is not itself a preassembled chroot image. Manage installs its required package set to create that environment; the resulting environment is not a copy of the temporary Stage 1B chroot.
 
-`distro-buildroot` contains the packages needed to establish the native production Build chroot, including the package closure needed to build its own constituent software from source. Manage must be able to consume the published packages to create that Build chroot. The Build chroot is assembled from the production packages, not copied wholesale from the temporary chroot.
-
-**Output:** published `distro-buildroot` package set.
+**Output:** published initial `distro-buildroot` package collection, installable by Manage.
 
 ## Stage 2 — `distro-base`
 
-Stage 2 begins on the foreign host using the published `distro-buildroot` packages. Manage creates the production Build chroot from those packages. The Build environment builds and publishes the `distro-base` package set required for a minimal bootable Distro system.
+Stage 2 begins on the foreign host. Manage installs the published `distro-buildroot` package collection to establish the isolated production Build environment. Build uses that environment to build and publish the `distro-base` packages required for a minimal bootable Distro system. All published packages built after the initial `distro-buildroot` bootstrap are built within an environment established from `distro-buildroot`.
 
-Manage and Install then use the published packages to construct that system. Booting it transfers execution from the foreign host kernel to Distro's own kernel.
+Manage and Install use the published packages to construct the minimal system. Booting that system transfers execution to Distro's own kernel and userland.
 
-The final Stage 2 proof is to repeat Stage 1 on the booted Distro host. In this repetition, Distro performs its own source download, extraction, building, and packaging instead of relying on the original foreign distribution. Successfully reproducing the bootstrap package set establishes the intended self-replication capability.
+### Self-Replication Proof and Package Replacement
 
-## Package Sets and Environment Boundaries
+On the booted Distro host, repeat the logical Stage 1 sequence using Distro as the host rather than the original foreign distribution. The repeated process must acquire and extract its own sources, build from source, and package the packages comprising the `distro-buildroot` collection, without relying on the foreign distribution's build tools or libraries.
 
-`distro-buildroot` is the closed production package set for the native Build chroot. `distro-base` is the package set for the minimal bootable Distro system. Their exact package inventories, dependency relationships, and any overlap remain for later Design.
+The resulting Distro-host-built packages are **not** published immediately. Compare each generated package's packaged file list with that of its corresponding published foreign-host-built package. If the lists are equivalent for the complete `distro-buildroot` collection, replace the published foreign-host-built packages with the Distro-host-built equivalents. The replacement completes the Bootstrap self-replication proof. If the file lists are not equivalent, do not replace the published packages; Bootstrap's proof remains incomplete.
 
-The cross-toolchain, temporary chroot, production Build chroot, and bootable Distro system are distinct artifacts or environments with different roles. Stage 1 produces published packages; the definitive Build chroot is installed from those packages through Manage.
+The comparison concerns the package file inventories, not byte-for-byte identity of archive contents. The exact comparison mechanism and publication transaction are left to further Design.
+
+## Package Set and Capability Boundaries
+
+`distro-buildroot` names the metapackage that defines Build's isolated environment. The corresponding package collection includes the dependency closure required to construct that environment and build source packages and their build dependencies as required by Build. The self-replication proof uses reconstruction of this foundational environment to demonstrate that Distro has bootstrapped its native package-production capability; it is not a claim that every possible package has been individually tested.
+
+`distro-base` names the package set required for the minimal bootable Distro system. The exact inventories, dependency relationships, and overlap of these sets remain open.
+
+The cross-toolchain artifact, temp-chroot artifact, production isolated Build environment, published package collections, and bootable Distro system are distinct outputs or environments. Bootstrap establishes the first production Build environment; Build owns subsequent package production through that environment.
 
 ## Progressive Decomposition
 
-This document establishes the intended stages, responsibilities, outputs, and final proof. Later Design may elaborate stage construction, package membership and closure, artifact formats, source selection, package publication, installation details, and validation criteria as the selected Functional Set requires. No single Functional Set is implied to cover an entire Bootstrap stage.
+This document establishes the stage sequence, artifact handoffs, ownership boundaries, initial-package exception, and final proof. Package inventories, dependency resolution, chroot composition, artifact formats, source-selection policies, comparison mechanics, and publication procedures may be refined when needed for bounded Functional Sets. No Functional Set is implied to cover an entire Bootstrap stage.
 
-The prior `distro-proto` work and LFS chapters are technical references, not independent authority over Distro Product Design.
+The earlier `distro-proto` repository and LFS chapters are technical references, not independent authority over Distro Product Design.
