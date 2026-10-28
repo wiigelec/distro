@@ -2,48 +2,71 @@
 
 ## Goal and Shape
 
-Implement Stage 1A on the existing Build surface, not as a separate bootstrap builder. The command `product/scripts/build cross-toolchain --root <rootdir>` selects host execution and the `cross-toolchain` list. Build uses the shared manifest/list/Bash-recipe pipeline; the stage adapter supplies only stage selection, execution context and artifact production.
+Implement Stage 1A via `product/scripts/build cross-toolchain --root <rootdir>` through the shared Build engine and host execution. No independent Bootstrap engine or package-specific commands in Build application source. The initial reference is the **released LFS 13.1-systemd Chapter 5** (`https://www.linuxfromscratch.org/lfs/view/13.1-systemd/chapter05/chapter05.html`), used as a technical recipe reference rather than a second Design authority.
 
-## Workspace and Data Flow
+## Target and Host Baseline
 
-The selected `--root` is a workspace directory, not the install prefix:
+FS-001 initially supports an **x86_64 Linux host producing an x86_64 GNU/Linux toolchain**. Determine the host machine triplet via the host GCC (`gcc -dumpmachine`); normalize its CPU portion to `x86_64` and use the **cross target triplet `x86_64-distro-linux-gnu`**, passing it consistently to Binutils, GCC, and glibc configure steps. Distinct host and target triplets provide the cross-compiler namespace even on matching architectures. The target triplet's vendor token is a Planning convention, not a claim of existing toolchain compatibility; recipes must confirm that the selected upstream releases accept it. Any necessary canonicalization adjustment returns to Planning rather than silently replacing the target identity.
 
-```text
-rootdir/
-  build/       source extraction and compilation work
-  root/        installed target / filesystem hierarchy
-  artifacts/   archived contents of root/
-```
+Require the essential host capabilities from LFS 13.1 Chapter 2 host requirements (compiler, C++ compiler, binutils, make, shell, tar, decompression, patch, bison, gawk, etc.) and an accessible writable workspace with enough free space. Build performs preflight checks before modifying `root/` or publishing artifacts. Host packages remain host-provided capabilities, not Distro manifest dependencies. Exact minimal host tool versions can follow the pinned LFS 13.1 host requirements, with a diagnostic on mismatch; Build does not implement a host package manager.
 
-The workflow resolves package selections, verifies inputs, extracts sources into build work, prepares package-specific build directories, runs selected Bash recipes directly on the host with an explicit context, installs their resulting files into the `root/` hierarchy, validates the result and archives the installed filesystem only. The archive is the handoff contract for Stage 1B; it must not depend on `build/` being retained.
+## Workspace and Stage Data Flow
 
-## Package Model
+`--root` is the workspace, not an installation prefix. The workspace contains `build/` for downloaded/extracted sources and compilation, `root/` for the installed target `/` hierarchy, and `artifacts/` for archives of `root/`. Resolve selected packages; fetch and verify all required sources; extract into isolated package source directories; prepare out-of-tree build directories when needed; run recipes on the host in prerequisite order; verify toolchain; then archive `root/` only. Build workspace paths are never included in the handoff archive.
 
-- Under `product/src/build/packages/`, each package has one authoritative YAML manifest defining identity, upstream archive location/name template, source verification information and package dependencies. Manifests do not select versions or contain construction commands.
-- Under `product/src/build/lists/`, the Stage 1A list selects each package's exact version and Stage 1A Bash recipe. A list does not redefine dependencies or embed build instructions.
-- Under `product/src/build/recipes/`, ordinary executable Bash scripts perform package-specific configure/build/install operations. A recipe can be run independently when given the documented context. No generated recipe translation, JSON command interpreter or package-specific command table is introduced.
-- Use a minimal Stage 1A package selection sufficient for an initial target assembler/linker, compiler, Linux API headers and C library interface. The prototype's Binutils/GCC/Linux headers/glibc exploration and LFS Chapter 5 are references for selecting and verifying that closure, not automatic authority for versions, commands or acceptance criteria. Exact version strings and the reproducible tested list are committed as project data before a completed FS-001 build is claimed.
+## Initial Package Versions and Construction Sequence
 
-## Dependencies and Order
+Pin the initial package selection to the released LFS 13.1-systemd Chapter 5 reference set and commit these literal versions to `product/src/build/lists/cross-toolchain.yaml`:
 
-The Stage 1A list provides complete explicit version selections for every selected package and applicable dependencies. Build checks that manifest-declared requirements needed in Stage 1A resolve to these selections or to a documented host-provided tool capability. It executes packages in a deterministic order satisfying relevant prerequisites, rejects missing or cyclic requirements when relevant, and does not move dependency declarations into recipes or lists. The precise minimal YAML representation of context-sensitive dependency rules is chosen only as required by the selected set; do not implement a general condition engine absent a demonstrated need.
+| Ordered recipe selection | Manifest identity | Version |
+| --- | --- | --- |
+| Binutils pass 1 | `binutils` | `2.47` |
+| GCC pass 1 | `gcc` | `16.2.0` |
+| Linux API headers | `linux` | `7.1.8` |
+| glibc | `glibc` | `2.44` |
+| libstdc++ from GCC sources | `gcc` | `16.2.0` |
 
-## Execution Contract
+The two GCC selections reference the **same authoritative GCC manifest and exact source version** but select distinct Bash recipes. An ordered list may therefore contain repeated package identity for separate construction steps; treat each selected step as a distinct execution node while retaining a single source and dependency authority. GCC supporting source components (such as GMP, MPFR, and MPC if used by the pinned GCC recipe) must have verified upstream source identities; any in-tree prerequisites downloaded by the recipe require a documented verified-source handoff from Build, not unverified recipe downloads. Host-provided development libraries may instead be used where compatible with LFS 13.1 and documented by preflight.
 
-Build supplies a small, documented environment to each Bash recipe: source directory, separate package build directory, installed filesystem root, target triplet and selected package identity/version. Stage 1A executes package construction on the foreign host; target toolchain binaries and files are installed beneath the selected filesystem root rather than into the host OS. Recipes own compiler flags, configure options, patches and package-specific steps. Build must not parse or generate recipe instructions. Host assumptions needed for the selected toolchain are explicit and checked before irreversible construction.
+This sequence is a *planning baseline*, not a claim that these versions have been experimentally built in Distro yet. The precise LFS configure flags and compatibility patches reside in the corresponding Bash recipes; no instruction text is embedded in lists or manifests. The Stage 1A package set stops after libstdc++ construction; Stage 1B begins the temporary-tools sequence.
 
-## Source and Failure Semantics
+## Manifest, List, and Ordering Contract
 
-Resolve exact source URLs from the authoritative manifest and list version, download archives, verify against manifest-defined integrity information before extraction, and fail closed on missing or failed verification. Build does not silently discover newer versions. A failed package operation fails the Stage 1A command; a partial root or archive must not be reported as a successful handoff. Whether a workspace is reusable and the precise safe cleanup/retry algorithm are Build-level choices, provided stale output cannot be mistaken for success and unrelated files are preserved.
+Each YAML manifest under `product/src/build/packages/` is uniquely identified by package name and owns upstream source locations/name templates, SHA-256 source digests, and all dependency declarations. Manifest source templates may substitute only the selected `{version}`. The `cross-toolchain` YAML list contains ordered entries with `name`, quoted `version`, and repository-relative `recipe`, plus an optional explicit step identifier for repeated GCC selection. No list entry may declare dependencies or embed build commands. Every manifest dependency needed to execute a selected step must be resolved to an explicitly selected list version or a preflight-checked host capability defined by the manifest's build-tool category. Manifest dependency relationships control prerequisite validity; the prescribed step ordering resolves sequence among same-package phases. Reject unresolved or cyclic prerequisites. Avoid a general conditional-expression system unless this selected sequence demonstrates its need.
 
-## Artifact and Functional Verification
+## Bash Recipe Execution Interface
 
-The produced archive represents the installed root filesystem, with filesystem structure and symlinks preserved as required for Stage 1B consumption. Construction completion requires more than successful recipe exit codes: exercise the cross compiler/toolchain to create target objects, check relevant target/ELF properties, and test linking against the constructed target interface as far as is feasible in Stage 1A. Native execution of target programs or complete Stage 1B is not required here. Keep host-tool reliance explicit rather than claiming foreign-host independence in Stage 1A, which by Design is host-executed.
+Execute each recipe with `bash <absolute-recipe-path>` as a separate subprocess, no generated intermediary script and no command-language translation. Set working directory to the per-step build directory. Supply the following exported environment contract:
+
+| Variable | Meaning |
+| --- | --- |
+| `DISTRO_SOURCE_DIR` | Absolute verified/extracted source tree for this step |
+| `DISTRO_BUILD_DIR` | Absolute writable construction directory for this step |
+| `DISTRO_ROOT_DIR` | Absolute `rootdir/root` installation filesystem root |
+| `DISTRO_TARGET` | Exact `x86_64-distro-linux-gnu` toolchain target triplet |
+| `DISTRO_PACKAGE_NAME` | Authoritative manifest identity |
+| `DISTRO_PACKAGE_VERSION` | Exact list-selected version |
+| `DISTRO_STEP_ID` | Unique step identity, including repeat GCC phases |
+| `DISTRO_TOOLS_DIR` | Absolute `rootdir/root/tools` cross-toolchain prefix |
+
+Provide a deterministic PATH beginning with the constructed `root/tools/bin` when available and followed by the qualified host tools. Recipes themselves specify install prefix, sysroot, configure flags, make arguments, patches and cleanup, and must confine their installed outputs to `DISTRO_ROOT_DIR`. The ordinary `bash` script remains independently runnable if a caller supplies this contract and source/build trees. For multi-source GCC support, Build prepares declared verified supplementary sources before recipe execution and supplies their documented locations; no recipe performs implicit unverified downloads.
+
+## Source Acquisition and Verification
+
+Use release archives, not Git checkouts. Retrieve the manifest's expanded URL, verify its **required literal SHA-256 digest** against the fetched bytes before extraction, and reject absent, malformed, or mismatched digests. Selected versions never float or auto-update. Archive extraction must reject absolute paths and parent-directory traversal that could escape `build/`. Checksums are copied from independently verified upstream metadata before Build work starts; placeholder checksum values never count as verified configuration. If a selected archive needs an upstream patch, treat its source/digest as explicit verified input, with recipe-owned patch application.
+
+## Artifact and Failure Contract
+
+Produce a **POSIX pax-compatible tar archive compressed with xz**, named `cross-toolchain.tar.xz`, under `rootdir/artifacts/`. Archive paths are relative to the contents of `rootdir/root/` (not prefixed with `root/`), with symlinks and executable modes preserved. Stage 1B will extract into its installed filesystem root; it must not need `build/`. Archive publication is transactional: write to a temporary path, verify archive readability and safe relative entry names, and atomically replace the final artifact on success. Never claim a stale, partial, or failed artifact as successful; a failed run exits nonzero, and an existing artifact is not confused with the failed run. An implementation can use a fresh staging root per run to prevent accidental mixing with earlier contents while preserving unrelated user files.
+
+## Functional Evidence
+
+Successful recipe exit status alone is insufficient. Before archive publication, check: (1) expected target-prefixed assembler, linker, and GCC executable exist and report the selected target; (2) GCC can compile a minimal C source into a relocatable object and `readelf` confirms the selected x86-64 ELF machine; (3) GCC's search/sysroot paths resolve intended target headers and libraries beneath the installed filesystem and not host `/usr/include` or host libraries; (4) the initial glibc headers, crt objects, dynamic linker and libc needed for Stage 1B are installed; (5) a minimal dynamically linked C program can be linked with those target interfaces, with ELF interpreter/library references pointing to target filesystem semantics. Validate C++ include/library availability from the libstdc++ step with a small C++ compile/link check. Do not execute target binaries or claim Stage 1B was run. Check archive extraction in a separate temporary directory preserves paths, symlinks, and key toolchain executables.
 
 ## Validation and Lifecycle
 
-Planning classifies obligations below; Build registers project-native tasks for every active mechanical (`M`/`B`) requirement and binds them in `product/validation/requirement-evaluation.json`. Run canonical `./scripts/validate` as the repository mechanical gate. Also perform semantic Build Review against the accepted Design, this FS scope and the full Plan. Mechanical passing cannot substitute for semantic acceptance, and no direct integration into `main` occurs before satisfactory review.
+Build registers native validation tasks for active mechanically evaluated requirements and exact bindings in `product/validation/requirement-evaluation.json`. Run `./scripts/validate`, review functional evidence, and conduct semantic Build Review against accepted Design, scope, Plan and requirements. The active M/B requirements need not be falsely marked complete at the Planning-only commit; no PR acceptance or Build authorization follows from merely publishing this draft.
 
-## Implementation Sequencing
+## Implementation Boundaries and Sequence
 
-Implement the minimal package model and Stage 1A execution contract, then working recipes and artifact export, then functional checks and requirement bindings. Keep the engine shared in architecture but implement only the host execution capability exercised by FS-001; isolated buildroot execution remains later work.
+Implement only shared host execution exercised by Stage 1A, not chroot/buildroot execution, Manage package creation, Stage 1B, version discovery or host package installation. First establish source/list/manifest parsing and preflight, then the recipe contract and actual selected tools, then artifact export and functional checks, then mechanical requirement bindings. Build retains ordinary implementation choices (retry policy, logging, internal modules) that preserve the specified contracts.
