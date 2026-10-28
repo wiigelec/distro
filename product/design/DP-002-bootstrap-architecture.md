@@ -3,6 +3,7 @@ doc_id: DP-002
 title: Distro Bootstrap Architecture
 depends_on:
   - DP-001
+  - DP-003
 ---
 
 # Distro Bootstrap Architecture
@@ -20,6 +21,10 @@ Bootstrap is not a fourth permanent Distro component. Build owns ongoing package
 Bootstrap implementation source resides under `product/src/build/bootstrap/`. Bootstrap is invoked through Build's existing calling script, `product/scripts/build`, using Bootstrap-specific parameters. It does not have a separate top-level `product/scripts/bootstrap` entry point.
 
 The exact parameters and command syntax remain open. Locating the Bootstrap implementation within Build does not make Bootstrap a fourth ongoing primary component.
+
+## Shared Package Definitions and Selections
+
+Bootstrap uses Build's user-maintained package manifests and context-specific package lists, as established by DP-003. Package manifests define package identity, source information, and dependencies; package lists select versions and build configurations for each Bootstrap stage. Bootstrap does not maintain a separate set of package definitions or hardcode package-specific construction behavior.
 
 ## Stage 1 — `distro-chroot`
 
