@@ -36,6 +36,24 @@ Install is responsible for creating and configuring usable Distro systems.
 
 Install uses Manage for package installation rather than implementing a separate package-management mechanism. Install owns the surrounding system-installation and machine-configuration process.
 
+## Project Source and Entry-Point Layout
+
+Each primary component has a dedicated source directory and a corresponding calling script:
+
+```text
+product/
+├── src/
+│   ├── build/
+│   ├── manage/
+│   └── install/
+└── scripts/
+    ├── build
+    ├── manage
+    └── install
+```
+
+Component implementations reside in their respective `product/src/` directories. The corresponding `product/scripts/` files are the component entry points. This layout does not prescribe implementation languages, internal module organization, or command parameters.
+
 ## Bootstrap
 
 Bootstrap is a **one-time initialization process**, not a fourth primary component.

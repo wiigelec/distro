@@ -15,6 +15,12 @@ The final self-replication proof runs the Stage 1 construction sequence on the b
 
 Bootstrap is not a fourth permanent Distro component. Build owns ongoing package production, Manage owns installed package state, and Install owns system installation and configuration, as established by DP-001.
 
+## Bootstrap Implementation Location and Invocation
+
+Bootstrap implementation source resides under `product/src/build/bootstrap/`. Bootstrap is invoked through Build's existing calling script, `product/scripts/build`, using Bootstrap-specific parameters. It does not have a separate top-level `product/scripts/bootstrap` entry point.
+
+The exact parameters and command syntax remain open. Locating the Bootstrap implementation within Build does not make Bootstrap a fourth ongoing primary component.
+
 ## Stage 1 — `distro-chroot`
 
 Stage 1 is initially performed on a foreign Linux host and produces the initial published package collection needed to establish Distro's isolated production Build environment. Its three substages have explicit artifact handoffs.
