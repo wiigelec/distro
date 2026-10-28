@@ -24,7 +24,7 @@ The exact parameters and command syntax remain open. Locating the Bootstrap impl
 
 ## Shared Package Definitions and Selections
 
-Bootstrap uses Build's user-maintained package manifests and context-specific package lists, as established by DP-003. Package manifests define package identity, source information, and dependencies; package lists select versions and build configurations for each Bootstrap stage. Bootstrap does not maintain a separate set of package definitions or hardcode package-specific construction behavior.
+Bootstrap uses Build's user-maintained package manifests and context-specific package lists, as established by DP-003. Manifests define package identity, source information, and dependencies; lists select versions (including dependency versions), build instructions, and stage-specific build configurations. Bootstrap is a special configuration of the same host-agnostic Build engine, not a separate package-building engine. Build invocation parameters select direct host execution for Bootstrap construction or execution inside `distro-buildroot` for normal publishable construction. The host may be a foreign Linux distribution or Distro itself. Bootstrap does not maintain separate package definitions or hardcode package-specific construction behavior.
 
 ## Stage 1 — `distro-chroot`
 
