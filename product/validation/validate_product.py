@@ -80,7 +80,8 @@ def main(argv: list[str] | None = None) -> int:
     # they nevertheless gate the code introduced during incremental Build.
     tests = ROOT / 'product' / 'validation' / 'test_host_sandbox.py'
     additional = ROOT / 'product' / 'validation' / 'test_selection.py'
-    if not tests.is_file() or not additional.is_file():
+    pinned = ROOT / 'product' / 'validation' / 'test_fs001_manifest_data.py'
+    if not tests.is_file() or not additional.is_file() or not pinned.is_file():
         return fail('Build development tests missing')
     cp = subprocess.run([sys.executable, '-m', 'unittest', 'discover',
                          '-s', str(tests.parent), '-p', 'test_*.py'], cwd=ROOT)

@@ -1,0 +1,6 @@
+name: glibc
+source:
+  url: https://ftpmirror.gnu.org/glibc/glibc-{version}.tar.xz
+  sha256: 37f600f2bef3c5e8300147059568b2a2e40a7ad6ccc65ce942556d49429cc667
+dependencies: [gcc, linux]
+host_tools: [make, gcc, gxx, bash, tar, xz]

@@ -22,6 +22,15 @@ class SelectionTests(unittest.TestCase):
     def test_select(self):
         steps=select_steps(self.lst, load_manifests(self.m), self.r)
         self.assertEqual((steps[0].name,steps[0].version),('gcc','16.2.0'))
+    def test_repeated_version_placeholder_in_gcc_url(self):
+        source = self.m / "gcc.yaml"
+        source.write_text(source.read_text().replace(
+            "https://example.org/gcc-{version}.tar.xz",
+            "https://example.org/gcc/gcc-{version}/gcc-{version}.tar.xz"))
+        manifests = load_manifests(self.m)
+        self.assertEqual(manifests["gcc"].source.url.count("{version}"), 2)
+        self.assertEqual(len(select_steps(self.lst, manifests, self.r)), 1)
+
     def test_reject_unquoted_numeric_version(self):
         self.lst.write_text('steps:\n  - {name: gcc, version: 16.2, recipe: pass1.sh}\n')
         with self.assertRaises(SelectionError):select_steps(self.lst,load_manifests(self.m),self.r)

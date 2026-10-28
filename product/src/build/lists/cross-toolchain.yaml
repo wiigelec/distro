@@ -1,0 +1,24 @@
+# FS-001 Stage 1A: ordered LFS 13.1-systemd Chapter 5 selection.
+# Recipe files will be added in the next Build slice. Do not invoke
+# select_steps() until every referenced recipe exists.
+steps:
+  - id: binutils-pass1
+    name: binutils
+    version: "2.47"
+    recipe: recipes/binutils-pass1.sh
+  - id: gcc-pass1
+    name: gcc
+    version: "16.2.0"
+    recipe: recipes/gcc-pass1.sh
+  - id: linux-headers
+    name: linux
+    version: "7.1.8"
+    recipe: recipes/linux-headers.sh
+  - id: glibc
+    name: glibc
+    version: "2.44"
+    recipe: recipes/glibc.sh
+  - id: gcc-libstdcpp
+    name: gcc
+    version: "16.2.0"
+    recipe: recipes/gcc-libstdcpp.sh

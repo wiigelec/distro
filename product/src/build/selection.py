@@ -66,7 +66,7 @@ def _source(d):
     if not isinstance(d, dict):
         raise SelectionError("source must be a mapping")
     _keys(d, {"url", "sha256"})
-    if not isinstance(d["url"], str) or not d["url"].startswith("https://") or d["url"].count("{version}") > 1 or "{" in d["url"].replace("{version}", "") or "}" in d["url"].replace("{version}", ""):
+    if not isinstance(d["url"], str) or not d["url"].startswith("https://") or "{" in d["url"].replace("{version}", "") or "}" in d["url"].replace("{version}", ""):
         raise SelectionError("source URL must be a single HTTPS template with optional {version}")
     if not isinstance(d["sha256"], str) or not _DIGEST.fullmatch(d["sha256"]):
         raise SelectionError("source requires literal SHA-256 digest")
