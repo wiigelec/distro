@@ -12,7 +12,7 @@ depends_on:
 
 Bootstrap is the one-time process that establishes Distro's native package-production capability and a minimal bootable Distro system capable of reproducing its foundational build environment.
 
-The final self-replication proof runs the Stage 1 construction sequence on the booted Distro host, generates replacement `distro-buildroot` packages without publishing them, and compares their packaged file lists with those of the published foreign-host-built packages. If the file lists are equivalent, the Distro-host-built packages replace the foreign-host-built packages on the package server. File-list equivalence is the specified proof criterion; byte-for-byte artifact identity is not required.
+The final self-replication proof runs the Stage 1 construction sequence on the booted Distro host, generates replacement `distro-buildroot` packages without publishing them, and compares their packaged file lists with those of the published Bootstrap packages. If the file lists are equivalent, the Distro-host-built packages replace the Bootstrap packages on the package server. File-list equivalence is the specified proof criterion; byte-for-byte artifact identity is not required.
 
 Bootstrap is not a fourth permanent Distro component. Build owns ongoing package production, Manage owns installed package state, and Install owns system installation and configuration, as established by DP-001.
 
@@ -20,7 +20,7 @@ Bootstrap is not a fourth permanent Distro component. Build owns ongoing package
 
 Bootstrap implementation source resides under `product/src/build/bootstrap/`. Bootstrap is invoked through Build's existing calling script, `product/scripts/build`, using Bootstrap-specific parameters. It does not have a separate top-level `product/scripts/bootstrap` entry point.
 
-The exact parameters and command syntax remain open. Locating the Bootstrap implementation within Build does not make Bootstrap a fourth ongoing primary component.
+The Stage 1 command forms are specified below. Other Build CLI parameters and internal command syntax remain open. Locating Bootstrap within Build does not make it a fourth ongoing primary component.
 
 ## Shared Package Definitions and Selections
 
@@ -30,25 +30,49 @@ Bootstrap uses Build's user-maintained package manifests and context-specific pa
 
 Stage 1 is initially performed on a foreign Linux host and produces the initial published package collection needed to establish Distro's isolated production Build environment. Its three substages have explicit artifact handoffs.
 
-### 1A — Host (Cross) Build
+### 1A — Cross-toolchain
 
-On the foreign host, construct the cross-toolchain artifact required by Stage 1B. Linux From Scratch (LFS) Chapter 5, *Compiling a Cross-Toolchain*, is the principal technical reference.
+```sh
+./product/scripts/build cross-toolchain --root /path/to/rootdir
+```
 
-**Output:** cross-toolchain artifact.
+The `cross-toolchain` command selects host execution and the `cross-toolchain` package list. Build uses the shared manifests and selected list to identify package versions, acquire sources, and execute configured build and installation operations. `--root` designates the location of the build workspace, installed `/` filesystem hierarchy, and output artifact.
 
-### 1B — Temporary Chroot Construction
+Linux From Scratch (LFS) Chapter 5, *Compiling a Cross-Toolchain*, is the principal technical reference. The prototype is reference material, not package or implementation authority.
 
-On the foreign host, use the Stage 1A cross-toolchain to construct the temporary Distro chroot. All Stage 1B construction takes place from the foreign host; Stage 1B does not execute native builds inside the chroot it is constructing. The temporary chroot becomes functional only upon completion of Stage 1B. LFS Chapter 6, *Cross Compiling Temporary Tools*, is the principal technical reference.
+**Output:** cross-toolchain artifact within `--root`, consumed by Stage 1B.
 
-**Output:** temp-chroot artifact, available for use by Stage 1C.
+### 1B — Cross-chroot
 
-### 1C — Bootstrap Build Environment and Publish Packages
+```sh
+./product/scripts/build cross-chroot \\
+  --root /path/to/rootdir \\
+  --cross-toolchain /path/to/crosstoolchainartifact
+```
 
-Stage 1C uses the standard `distro-buildroot` execution mode to build the initial production package collection, including the `distro-buildroot` metapackage and its required packages. Ordinarily Build obtains the packages needed to establish `distro-buildroot` from the package server. Because those initial packages are not yet published, Stage 1C instead uses the local Bootstrap artifact produced by the preceding stages. Build CLI parameters select this local-artifact source; no separate package-building engine or execution mode is introduced. Publish the initial collection to the package server so subsequent `distro-buildroot` environments can be established from published packages.
+The `cross-chroot` command selects host execution and the distinct `cross-chroot` package list. `--cross-toolchain` supplies the Stage 1A artifact. The list's configuration specifies extraction of that artifact into the local `/` hierarchy under `--root`, selection and acquisition of sources, and the build, installation, and final artifact operations. Build does not hardcode knowledge that `cross-chroot` uses the extracted cross-toolchain; the list defines that behavior.
 
-`distro-buildroot` is a metapackage defining the package requirements for Build's isolated build environment. It is not itself a preassembled chroot image. In the normal case Manage installs the required packages from the package server; Stage 1C uses the local Bootstrap artifact as the source for constructing that environment. The production buildroot is distinct from the temporary Stage 1B chroot.
+All construction is executed from the host, not by building inside the temporary chroot being created. Linux From Scratch (LFS) Chapter 6, *Cross Compiling Temporary Tools*, is the principal technical reference.
 
-**Output:** published initial `distro-buildroot` package collection, installable by Manage.
+**Output:** cross-chroot artifact within `--root`, consumed by Stage 1C.
+
+### 1C — Distro-buildroot Bootstrap Packages
+
+```sh
+./product/scripts/build distro-buildroot \\
+  --root /path/to/rootdir \\
+  --cross-chroot /path/to/crosschrootartifact
+```
+
+The `distro-buildroot` command selects its own package list and construction inside a `distro-buildroot` environment. Its package list is distinct from the `cross-chroot` list because build configurations differ, even where package selections overlap. The `--cross-chroot` parameter supplies the Stage 1B artifact. Configured operations determine its use; Build does not contain stage-specific artifact handling or package-specific build instructions.
+
+Normally the `distro-buildroot` environment is assembled from packages available on the package server. In this initial Bootstrap case, CLI parameters select the local cross-chroot artifact as the source because the initial packages do not yet exist on the server. This is the standard buildroot execution mode with an alternate input source, not a separate Build engine or execution mode.
+
+The configured workflow uses Manage to create and publish the initial **Bootstrap packages**, including the `distro-buildroot` metapackage and its required packages. These are identified as Bootstrap packages independently of whether the host is a foreign Linux system or Distro itself.
+
+`distro-buildroot` is a metapackage defining the requirements for the isolated production Build environment, not a preassembled chroot image. The environment constructed for Stage 1C remains distinct from the temporary cross-chroot artifact.
+
+**Output:** published initial Bootstrap package collection, installable by Manage.
 
 ## Stage 2 — `distro-base`
 
@@ -60,7 +84,7 @@ Manage and Install use the published packages to construct the minimal system. B
 
 On the booted Distro host, repeat the logical Stage 1 sequence using Distro as the host rather than the original foreign distribution. The repeated process must acquire and extract its own sources, build from source, and package the packages comprising the `distro-buildroot` collection, without relying on the foreign distribution's build tools or libraries.
 
-The resulting Distro-host-built packages are **not** published immediately. Compare each generated package's packaged file list with that of its corresponding published foreign-host-built package. If the lists are equivalent for the complete `distro-buildroot` collection, replace the published foreign-host-built packages with the Distro-host-built equivalents. The replacement completes the Bootstrap self-replication proof. If the file lists are not equivalent, do not replace the published packages; Bootstrap's proof remains incomplete.
+The resulting Distro-host-built packages are **not** published immediately. Compare each generated package's packaged file list with that of its corresponding published Bootstrap package. If the lists are equivalent for the complete `distro-buildroot` collection, replace the published Bootstrap packages with the Distro-host-built equivalents. The replacement completes the Bootstrap self-replication proof. If the file lists are not equivalent, do not replace the published packages; Bootstrap's proof remains incomplete.
 
 The comparison concerns the package file inventories, not byte-for-byte identity of archive contents. The exact comparison mechanism and publication transaction are left to further Design.
 
