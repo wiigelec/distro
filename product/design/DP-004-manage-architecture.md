@@ -3,7 +3,6 @@ doc_id: DP-004
 title: Manage Architecture
 depends_on:
   - DP-001
-  - DP-003
 ---
 
 # Manage Architecture
