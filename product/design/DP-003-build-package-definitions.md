@@ -59,11 +59,23 @@ Build prepares the workspace and supplies a small standard execution context, in
 
 **Build does not generate another script, translate a recipe language, or maintain a configurable command map.** It invokes the selected Bash recipe directly and records its outcome. The trusted, user-managed environment permits normal Bash recipes; a restricted command language is not a Design requirement.
 
+## Host-Executed Build Isolation
+
+Every Build operation that constructs package files using host-provided tools, including host-executed Bootstrap stages, shall execute its construction recipes within a controlled sandbox rather than in the unrestricted host environment. This host-execution isolation is distinct from the `distro-buildroot` production execution mode; it does not introduce a separate Build engine or a fourth product component.
+
+The sandbox shall provide a deliberately defined construction environment: controlled environment variables, executable search paths, filesystem visibility, and explicitly designated writable build and installation locations. Required host tools and resources may be made accessible intentionally, but incidental host environment state shall not silently determine construction behavior.
+
+Host system files and directories shall be protected against accidental modification by construction recipes. Absolute paths used during construction shall resolve to the intended sandbox-visible filesystem; package installation shall be confined to designated staging roots rather than the host system. If the required isolation cannot be established, Build shall fail rather than silently fall back to unrestricted host execution.
+
+Bootstrap filesystem artifacts shall be usable after extraction into a different absolute host workspace location. A stable sandbox-visible target filesystem layout may be used to preserve toolchain path expectations without requiring the same host workspace path in successive stages. Portability means functional use after restoration, not merely successful archive extraction.
+
+The sandbox technology, namespace and mount configuration, resource allowlist, exact environment contract, and verification mechanisms remain for bounded Planning and Build. Isolation protects against accidental host writes and environment leakage; it is not asserted to be a complete security boundary against malicious recipes.
+
 ## Execution and Component Boundaries
 
-Build is one host-agnostic execution engine. It can run on a foreign Linux host (such as Arch) or on a Distro host. Invocation parameters select whether package construction executes directly on the host or inside an isolated environment established from `distro-buildroot`. For buildroot execution, CLI parameters select the source for constructing that environment: normally the package server, or the local Bootstrap artifact during Stage 1C. Host identity does not determine the execution mode.
+Build is one host-agnostic execution engine. It can run on a foreign Linux host (such as Arch) or on a Distro host. Invocation parameters select whether package construction uses host-provided tools in a controlled host-execution sandbox or runs inside an isolated environment established from `distro-buildroot`. For buildroot execution, CLI parameters select the source for constructing that environment: normally the package server, or the local Bootstrap artifact during Stage 1C. Host identity does not determine the execution mode.
 
-Bootstrap is a special Build operation using the shared manifests, lists, and recipes, not a distinct package-building engine. Bootstrap Stages 1A and 1B execute on the host. Stage 1C and normal publishable package construction execute inside `distro-buildroot`. Stage 1C selects a local Bootstrap artifact instead of package-server packages because the initial packages are not yet published. This changes the source for establishing the buildroot, not the Build engine or its execution mode.
+Bootstrap is a special Build operation using the shared manifests, lists, and recipes, not a distinct package-building engine. Bootstrap Stages 1A and 1B execute using host-provided tools within the controlled host-execution sandbox. Stage 1C and normal publishable package construction execute inside `distro-buildroot`. Stage 1C selects a local Bootstrap artifact instead of package-server packages because the initial packages are not yet published. This changes the source for establishing the buildroot, not the Build engine or its execution mode.
 
 Build resolves requirements from manifests, selects exact package versions and recipes from lists, acquires and verifies sources, prepares the execution context, executes recipes, and stages resulting package files. Package-specific construction commands belong in recipes, not in Build application code or package lists.
 
