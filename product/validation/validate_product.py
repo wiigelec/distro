@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-
 import argparse
 import json
+import subprocess
 import sys
 from pathlib import Path
 from typing import Callable
@@ -59,7 +59,6 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--list-tasks", action="store_true")
     parser.add_argument("--task")
     args = parser.parse_args(argv)
-
     if args.list_tasks and args.task:
         return fail("--list-tasks and --task are mutually exclusive")
     if args.list_tasks:
@@ -77,6 +76,15 @@ def main(argv: list[str] | None = None) -> int:
         result = execute(task)
         if result:
             return result
+    # Development regression tests do not satisfy inactive normative bindings;
+    # they nevertheless gate the code introduced during incremental Build.
+    tests = ROOT / 'product' / 'validation' / 'test_host_sandbox.py'
+    if not tests.is_file():
+        return fail('sandbox development tests missing')
+    cp = subprocess.run([sys.executable, '-m', 'unittest', 'discover',
+                         '-s', str(tests.parent), '-p', tests.name], cwd=ROOT)
+    if cp.returncode:
+        return fail('sandbox development tests failed')
     print("Product Validation: PASS")
     return 0
 
