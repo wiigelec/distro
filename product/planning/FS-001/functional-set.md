@@ -1,14 +1,14 @@
 ---
 functional_set: FS-001
 title: Cross-Toolchain Construction
-design_revision: ba3f0abd52df032d8229e3c500345abfeefaa08d
+design_revision: 436e44f25179504f9d3a28f3b1fbef96f9c746f0
 ---
 
 # FS-001 — Cross-Toolchain Construction
 
 ## Selected Design
 
-The exact accepted Design revision is `ba3f0abd52df032d8229e3c500345abfeefaa08d`.
+The exact accepted Design revision is `436e44f25179504f9d3a28f3b1fbef96f9c746f0`.
 
 Selected Product Design:
 
@@ -24,10 +24,10 @@ From a foreign Linux host, invoking `./product/scripts/build cross-toolchain --r
 ## Included Scope
 
 - Bootstrap Stage 1A command and its integration with the shared Build engine.
-- Stage 1A-specific package list with explicit versions and selected Bash recipes, authoritative package manifests, source retrieval and verification.
-- Source extraction, build workspace preparation, direct recipe execution, staged installation into the selected filesystem root, and cross-toolchain artifact creation.
-- A coherent initial cross-toolchain capable of supporting the stated Stage 1B handoff.
-- Necessary package-order/dependency handling, host/toolchain execution context, failure behavior and tests for the bounded Stage 1A construction.
+- Stage 1A-specific package list with explicit versions and selected Bash recipes, authoritative package manifests, source retrieval and verification, and verified supporting GCC inputs.
+- Source extraction, build workspace preparation, direct Bash recipe execution within controlled host sandbox isolation, staged installation into the selected filesystem root, and cross-toolchain artifact creation.
+- A coherent initial cross-toolchain demonstrably usable after archive restoration into a different absolute host workspace through the same sandbox-visible target layout.
+- Necessary package-order/dependency handling, sandboxed host/toolchain execution context, protection against accidental host writes and environment leakage, fail-closed isolation, failure behavior and tests for the bounded Stage 1A construction.
 - Applicable product mechanical validation tasks and their bindings, constructed by Build from the approved normative requirements.
 
 ## Excluded Scope

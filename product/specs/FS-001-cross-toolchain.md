@@ -97,3 +97,21 @@ Every active FS-001 requirement classified `M` or `B` shall have an exact bindin
 **Classification: S**
 
 FS-001 shall remain subject to semantic review against the selected accepted Design and complete Planning result; mechanical validation passing shall not independently constitute Acceptance, which requires intentional integration of a satisfactory candidate into `main`.
+
+### FS-001-NR-017 — Sandboxed Host Construction
+
+**Classification: B**
+
+Every FS-001 package construction recipe shall execute inside the required controlled host sandbox, using only declared writable staging locations; if the sandbox cannot be established, Stage 1A shall fail without running the recipe unrestricted. Host system files shall not be writable by construction recipes.
+
+### FS-001-NR-018 — Controlled Host Environment and Paths
+
+**Classification: B**
+
+Stage 1A shall explicitly control the sandbox execution environment, host resource visibility, executable search paths, installation paths, and toolchain target/sysroot paths so that inherited host variables, host system libraries, and absolute host workspace locations do not silently control target construction.
+
+### FS-001-NR-019 — Cross-Workspace Handoff Portability
+
+**Classification: B**
+
+The Stage 1A filesystem archive shall be functionally usable after restoration into a different absolute host workspace, using a stable sandbox-visible installed filesystem location without relying on the original construction workspace. This shall be demonstrated by target compilation and linking against the restored toolchain and target interfaces with the original workspace unavailable.
