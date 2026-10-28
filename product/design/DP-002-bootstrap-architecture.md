@@ -37,7 +37,7 @@ Stage 1 is initially performed on a foreign Linux host and produces the initial 
 ./product/scripts/build cross-toolchain --root /path/to/rootdir
 ```
 
-The `cross-toolchain` command selects host execution and the `cross-toolchain` package list. Build uses the shared manifests and selected list to identify package versions, acquire sources, and execute the selected Bash recipes. `--root` designates the location of the build workspace, installed `/` filesystem hierarchy, and output artifact.
+The `cross-toolchain` command selects host execution and the `cross-toolchain` package list. Build uses the shared manifests and selected list to identify package versions, acquire sources, and execute the selected Bash recipes. `--root` designates the Bootstrap workspace directory. The workspace contains `build/` for source extraction and compilation, `root/` for the installed `/` filesystem hierarchy, and `artifacts/` for archives of the installed filesystem. Build installs the cross-toolchain files into `root/` and archives the contents of `root/` into `artifacts/`. The archive, not the temporary build workspace, is the Stage 1A output consumed by Stage 1B. The archive format, filename, and detailed filesystem contents remain for subsequent Planning.
 
 Linux From Scratch (LFS) Chapter 5, *Compiling a Cross-Toolchain*, is the principal technical reference. The prototype is reference material, not package or implementation authority.
 
