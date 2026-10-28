@@ -18,23 +18,41 @@ Distro has three primary components: **Build**, **Manage**, and **Install**.
 
 ### Build
 
-Build is an autonomous system responsible for creating and updating Distro's package collection.
+Build is an autonomous system responsible for producing the files from source that make up Distro packages and orchestrating their creation and publication through Manage.
 
-It produces packages from source and maintains the distribution's package collection as software changes over time. Build owns package-production activity; it does not own the installed package state of individual systems.
+It acquires sources, compiles them, and installs build outputs into staging filesystems. Build owns creation of package file contents and coordinates package production as software changes over time; it does not assemble or publish package archives or own installed package state.
 
-The detailed scope of autonomy, its policy boundaries, package discovery, production workflow, and publication mechanisms remain to be designed.
+The detailed scope of autonomy, its policy boundaries, package discovery, and production workflow remain to be designed.
 
 ### Manage
 
-Manage is responsible for managing packages on a target system, including installation, removal, upgrades, and tracking installed package state.
+Manage is responsible for creating Distro packages from Build-produced files, publishing packages to a specified repository, and managing packages on target systems, including installation, removal, upgrades, and tracking installed package state. Manage owns package assembly, package metadata, publication, and installed package state; it does not compile source or produce build output files.
 
-Manage owns installed package state. It does not own package production.
+The package creation and publication interfaces are defined in DP-004.
 
 ### Install
 
 Install is responsible for creating and configuring usable Distro systems.
 
 Install uses Manage for package installation rather than implementing a separate package-management mechanism. Install owns the surrounding system-installation and machine-configuration process.
+
+## Project Source and Entry-Point Layout
+
+Each primary component has a dedicated source directory and a corresponding calling script:
+
+```text
+product/
+├── src/
+│   ├── build/
+│   ├── manage/
+│   └── install/
+└── scripts/
+    ├── build
+    ├── manage
+    └── install
+```
+
+Component implementations reside in their respective `product/src/` directories. The corresponding `product/scripts/` files are the component entry points. This layout does not prescribe implementation languages, internal module organization, or command parameters.
 
 ## Bootstrap
 
@@ -46,7 +64,7 @@ Once Distro's native capabilities are established, ongoing package production an
 
 ## Component Relationships
 
-Build creates and maintains packages for consumption by Manage. Manage applies package operations to target systems. Install uses Manage while creating and configuring a system.
+Build produces package file contents and invokes Manage to create and publish packages. Manage also applies package operations to target systems. Install uses Manage while creating and configuring a system.
 
 The mechanisms for package publication, distribution, and consumption remain to be defined. This document does not establish the package repository as an additional primary component.
 
