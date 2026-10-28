@@ -5,7 +5,7 @@ import subprocess
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-RECIPES = ROOT / 'src' / 'build' / 'recipes'
+RECIPES = ROOT / 'src' / 'build' / 'bootstrap' / 'cross-toolchain' / 'recipes'
 NAMES = ('binutils-pass1.sh', 'gcc-pass1.sh', 'linux-headers.sh', 'glibc.sh', 'gcc-libstdcpp.sh')
 
 class RecipeTests(unittest.TestCase):

@@ -7,7 +7,7 @@ from build.selection import load_manifests, _yaml, _keys, _name, _version
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGES = ROOT / 'src' / 'build' / 'packages'
-LIST = ROOT / 'src' / 'build' / 'lists' / 'cross-toolchain.yaml'
+LIST = ROOT / 'src' / 'build' / 'bootstrap' / 'cross-toolchain' / 'lists' / 'cross-toolchain.yaml'
 
 class PinnedManifestTests(unittest.TestCase):
     def test_package_set_and_checksums(self):

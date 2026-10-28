@@ -47,11 +47,11 @@ The selected version determines the version used to resolve source archive refer
 
 Lists select the appropriate recipe for the build context; they do not contain the package's configure, make, installation, or other construction commands. The same manifest can be used by different lists with different recipes. For example, Binutils can have separate cross-toolchain, cross-chroot, and distro-buildroot recipes without duplicating its manifest.
 
-Package-list storage is under `product/src/build/lists/`. Precise filename conventions, dependency-version resolution, and any optional list-level or recipe-specific parameters not yet demonstrated by a bounded Functional Set remain open.
+General package-list storage is under `product/src/build/lists/`; Bootstrap stage-specific lists are stored under `product/src/build/bootstrap/<stage>/lists/` (for Stage 1A, `product/src/build/bootstrap/cross-toolchain/lists/`). Precise filename conventions, dependency-version resolution, and any optional list-level or recipe-specific parameters not yet demonstrated by a bounded Functional Set remain open.
 
 ## Package Recipes — Bash Build Instructions
 
-Recipes are user-maintained **Bash scripts** under `product/src/build/recipes/`. Each recipe is selected by a package list and directly executed by Build. Recipes contain the ordered, package-specific operations needed to configure, compile, and install their package, including fixed compiler flags, configure options, patches, and cleanup where appropriate.
+Recipes are user-maintained **Bash scripts** under `product/src/build/recipes/` for general Build operations and `product/src/build/bootstrap/<stage>/recipes/` for Bootstrap stage-specific operations (for Stage 1A, `product/src/build/bootstrap/cross-toolchain/recipes/`). Each recipe is selected by a package list and directly executed by Build. Recipes contain the ordered, package-specific operations needed to configure, compile, and install their package, including fixed compiler flags, configure options, patches, and cleanup where appropriate.
 
 Recipes should remain straightforward to read, run, and modify, resembling the upstream or LFS construction instructions. Rather than requiring one heavily parameterized recipe to support every build context, separate recipes may hardcode the relevant build-context-specific options.
 

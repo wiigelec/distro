@@ -16,7 +16,7 @@ Require the essential host capabilities from LFS 13.1 Chapter 2 host requirement
 
 ## Initial Package Versions and Construction Sequence
 
-Pin the initial package selection to the released LFS 13.1-systemd Chapter 5 reference set and commit these literal versions to `product/src/build/lists/cross-toolchain.yaml`:
+Pin the initial package selection to the released LFS 13.1-systemd Chapter 5 reference set and commit these literal versions to `product/src/build/bootstrap/cross-toolchain/lists/cross-toolchain.yaml`:
 
 | Ordered recipe selection | Manifest identity | Version |
 | --- | --- | --- |

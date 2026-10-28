@@ -40,7 +40,7 @@ Package identity, upstream archive references, verification schemes and dependen
 
 **State: Inactive**
 
-The user-maintained YAML `cross-toolchain` list shall select explicit versions, their corresponding verification values (including any supplementary source versions and values), and Bash recipes for the selected packages and supply any required dependency version selections without redefining package dependency declarations or embedding construction commands.
+The user-maintained YAML `product/src/build/bootstrap/cross-toolchain/lists/cross-toolchain.yaml` list shall select explicit versions, their corresponding verification values (including any supplementary source versions and values), and Bash recipes for the selected packages and supply any required dependency version selections without redefining package dependency declarations or embedding construction commands.
 
 ### FS-001-NR-006 — Direct Bash Recipes
 
@@ -48,7 +48,7 @@ The user-maintained YAML `cross-toolchain` list shall select explicit versions, 
 
 **State: Inactive**
 
-Build shall directly execute the selected user-maintained Bash recipes under `product/src/build/recipes/`. Package-specific configure, compile, patch and installation instructions shall remain in those recipes, not in Build application code or an interpreted/generated recipe language.
+Build shall directly execute the selected user-maintained Bash recipes under `product/src/build/bootstrap/cross-toolchain/recipes/`. Package-specific configure, compile, patch and installation instructions shall remain in those recipes, not in Build application code or an interpreted/generated recipe language.
 
 ### FS-001-NR-007 — Recipe Execution Context
 
