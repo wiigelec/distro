@@ -11,10 +11,10 @@ from urllib.parse import urlsplit
 from .selection import Source, SelectionError
 
 
-def fetch_verified(source: Source, version: str, destination: Path) -> Path:
+def fetch_verified(source: Source, version: str, destination: Path, checksum: str) -> Path:
     """Download only HTTPS bytes, verify before publication, never accept a stale file."""
     url = source.url.replace('{version}', version)
-    if urlsplit(url).scheme != 'https' or not re.fullmatch(r'[0-9a-fA-F]{64}', source.sha256):
+    if source.verification != 'sha256' or urlsplit(url).scheme != 'https' or not re.fullmatch(r'[0-9a-fA-F]{64}', checksum):
         raise SelectionError('unverified or non-HTTPS source')
     destination.parent.mkdir(parents=True, exist_ok=True)
     temporary = destination.with_name(destination.name + '.partial')
@@ -26,7 +26,7 @@ def fetch_verified(source: Source, version: str, destination: Path) -> Path:
             while piece := response.read(1024 * 1024):
                 digest.update(piece)
                 out.write(piece)
-        if digest.hexdigest() != source.sha256:
+        if digest.hexdigest() != checksum.lower():
             raise SelectionError('source SHA-256 mismatch')
         temporary.replace(destination)
         return destination

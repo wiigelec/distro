@@ -15,10 +15,9 @@ class PinnedManifestTests(unittest.TestCase):
         self.assertEqual(set(ms), {'binutils','gcc','linux','glibc'})
         self.assertEqual(set(ms['gcc'].supplements), {'gmp','mpfr','mpc'})
         for m in ms.values():
-            self.assertEqual(len(m.source.sha256), 64)
-            self.assertTrue(all(c in '0123456789abcdef' for c in m.source.sha256))
+            self.assertEqual(m.source.verification, "sha256")
             for source in m.supplements.values():
-                self.assertEqual(len(source.sha256), 64)
+                self.assertEqual(source.verification, "sha256")
 
     def test_exact_order_and_repeated_gcc(self):
         d = _yaml(LIST)
@@ -34,11 +33,18 @@ class PinnedManifestTests(unittest.TestCase):
         self.assertIsInstance(steps, list)
         actual=[]
         for step in steps:
-            _keys(step, {'id','name','version','recipe'})
+            _keys(step, {'id','name','version','recipe','checksum'}, {'supplements'})
+            self.assertRegex(step['checksum'], r'^[0-9a-f]{64}$')
             self.assertTrue(_name(step['id']) and _name(step['name']))
             self.assertTrue(_version(step['version']))
             self.assertIsInstance(step['recipe'],str)
             actual.append(tuple(step[k] for k in ('id','name','version','recipe')))
         self.assertEqual(actual, expected)
+        self.assertEqual(set(steps[1]['supplements']), {'gmp','mpfr','mpc'})
+        self.assertNotIn('supplements', steps[4])
+        self.assertEqual(steps[1]['checksum'], steps[4]['checksum'])
+        for src in steps[1]['supplements'].values():
+            self.assertRegex(src['checksum'], r'^[0-9a-f]{64}$')
+            self.assertIsInstance(src['version'], str)
 
 if __name__ == '__main__': unittest.main()

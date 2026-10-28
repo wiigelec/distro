@@ -16,7 +16,7 @@ Build and Bootstrap share a user-maintained, configuration-driven package model 
 
 Package manifests form one authoritative, user-maintained collection under `product/src/build/packages/`. The collection consists of multiple files, which users may organize in subdirectories by functionality or any other scheme. File organization does not determine package identity or behavior. Each package has one authoritative manifest, maintained independently of individual build requests.
 
-Manifests are YAML files defining package identity and characteristics, including the package name, upstream project and release locations, source archive naming, source verification information, and dependencies. An archive name or URL may use `{version}`, resolved from the package list's selected version. Initially, sources are upstream release archives rather than Git checkouts. Verification information, including checksum or signature requirements where applicable, belongs in the manifest.
+Manifests are YAML files defining package identity and characteristics, including the package name, upstream project and release locations, source archive naming, source verification information, and dependencies. An archive name or URL may use `{version}`, resolved from the package list's selected version. Initially, sources are upstream release archives rather than Git checkouts. The manifest declares the verification scheme (such as SHA-256 or an applicable signature-verification method), not a checksum for any selected release. The package list owns version-specific expected checksum values or signature identities, which Build must verify before extraction. This division does not permit a list to redefine source locations, verification schemes, or dependencies.
 
 **Manifests do not select versions, define version formats or discovery rules, or contain build instructions.**
 
@@ -32,7 +32,7 @@ Where dependency requirements vary with build context, that conditional meaning 
 
 ## Package Lists — Explicit Build Selections
 
-Package lists are user-maintained YAML files selecting packages, their **explicit versions**, and the Bash recipes to execute. A list references authoritative manifests rather than duplicating package identity, source descriptions, or dependency declarations. Version selections for dependencies are also supplied by the applicable package lists; the dependency relationships themselves remain defined only by manifests.
+Package lists are user-maintained YAML files selecting packages, their **explicit versions**, corresponding version-specific verification values, and the Bash recipes to execute. A list references authoritative manifests rather than duplicating package identity, source descriptions, verification schemes, or dependency declarations. Version-specific checksums are selections, not manifest-source redefinitions. Version selections for dependencies are also supplied by the applicable package lists; the dependency relationships themselves remain defined only by manifests.
 
 A representative entry is:
 

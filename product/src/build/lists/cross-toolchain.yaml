@@ -5,20 +5,35 @@ steps:
   - id: binutils-pass1
     name: binutils
     version: "2.47"
+    checksum: 154ab23b60070e8f27013c22977f1129425d67d1e8acd6e13010e617811e4cff
     recipe: recipes/binutils-pass1.sh
   - id: gcc-pass1
     name: gcc
     version: "16.2.0"
+    checksum: e6738e29597f733270731aa90600f37ffdc045079dfc27ec7e8192cc81085c3e
+    supplements:
+      gmp:
+        version: "6.3.0"
+        checksum: a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898
+      mpfr:
+        version: "4.2.2"
+        checksum: b67ba0383ef7e8a8563734e2e889ef5ec3c3b898a01d00fa0a6869ad81c6ce01
+      mpc:
+        version: "1.4.1"
+        checksum: 91204cd32f164bd3b7c992d4a6a8ce6519511aadab30f78b6982d0bf8d73e931
     recipe: recipes/gcc-pass1.sh
   - id: linux-headers
     name: linux
     version: "7.1.8"
+    checksum: ff01dcb449279d5b4cfccdb01fee639cf5ff1803f1749a77844dd33915422c49
     recipe: recipes/linux-headers.sh
   - id: glibc
     name: glibc
     version: "2.44"
+    checksum: 37f600f2bef3c5e8300147059568b2a2e40a7ad6ccc65ce942556d49429cc667
     recipe: recipes/glibc.sh
   - id: gcc-libstdcpp
     name: gcc
     version: "16.2.0"
+    checksum: e6738e29597f733270731aa90600f37ffdc045079dfc27ec7e8192cc81085c3e
     recipe: recipes/gcc-libstdcpp.sh

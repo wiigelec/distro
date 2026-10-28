@@ -32,7 +32,7 @@ The selected Bootstrap workspace shall use `build/` for extraction and compilati
 
 **State: Inactive**
 
-Package identity, upstream archive references, verification information and dependency declarations shall come from user-maintained YAML manifests in `product/src/build/packages/`, with exactly one authoritative manifest per selected package. Manifests shall not select versions or contain build instructions.
+Package identity, upstream archive references, verification schemes and dependency declarations shall come from user-maintained YAML manifests in `product/src/build/packages/`, with exactly one authoritative manifest per selected package. Expected version-specific checksums or signature identities shall come from the explicit selections in the user-maintained package list. Manifests shall not select versions or contain build instructions.
 
 ### FS-001-NR-005 — Exact List Selections
 
@@ -40,7 +40,7 @@ Package identity, upstream archive references, verification information and depe
 
 **State: Inactive**
 
-The user-maintained YAML `cross-toolchain` list shall select explicit versions and Bash recipes for the selected packages and supply any required dependency version selections without redefining package dependency declarations or embedding construction commands.
+The user-maintained YAML `cross-toolchain` list shall select explicit versions, their corresponding verification values (including any supplementary source versions and values), and Bash recipes for the selected packages and supply any required dependency version selections without redefining package dependency declarations or embedding construction commands.
 
 ### FS-001-NR-006 — Direct Bash Recipes
 

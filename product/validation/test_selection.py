@@ -15,10 +15,10 @@ class SelectionTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory(); self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name); self.m = self.root/'packages'; self.r = self.root/'recipes'
         self.m.mkdir(); self.r.mkdir()
-        (self.m/'gcc.yaml').write_text('name: gcc\nsource:\n  url: https://example.org/gcc-{version}.tar.xz\n  sha256: '+ 'a'*64+'\ndependencies: []\nhost_tools: [make]\n')
+        (self.m/'gcc.yaml').write_text('name: gcc\nsource:\n  url: https://example.org/gcc-{version}.tar.xz\n  verification: sha256\n'+'\ndependencies: []\nhost_tools: [make]\n')
         (self.r/'pass1.sh').write_text('true\n')
         self.lst=self.root/'list.yaml'
-        self.lst.write_text('steps:\n  - {id: gcc-pass1, name: gcc, version: "16.2.0", recipe: pass1.sh}\n')
+        self.lst.write_text('steps:\n  - {id: gcc-test, name: gcc, version: "16.2.0", checksum: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", recipe: pass1.sh}\n')
     def test_select(self):
         steps=select_steps(self.lst, load_manifests(self.m), self.r)
         self.assertEqual((steps[0].name,steps[0].version),('gcc','16.2.0'))
@@ -32,10 +32,10 @@ class SelectionTests(unittest.TestCase):
         self.assertEqual(len(select_steps(self.lst, manifests, self.r)), 1)
 
     def test_reject_unquoted_numeric_version(self):
-        self.lst.write_text('steps:\n  - {name: gcc, version: 16.2, recipe: pass1.sh}\n')
+        self.lst.write_text('steps:\n  - {name: gcc, version: 16.2, checksum: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", recipe: pass1.sh}\n')
         with self.assertRaises(SelectionError):select_steps(self.lst,load_manifests(self.m),self.r)
     def test_reject_unsafe_recipe(self):
-        self.lst.write_text('steps:\n  - {name: gcc, version: "16.2.0", recipe: ../other.sh}\n')
+        self.lst.write_text('steps:\n  - {name: gcc, version: "16.2.0", checksum: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", recipe: ../other.sh}\n')
         with self.assertRaises(SelectionError):select_steps(self.lst,load_manifests(self.m),self.r)
     def test_reject_missing_dependency(self):
         (self.m/'gcc.yaml').write_text((self.m/'gcc.yaml').read_text().replace('dependencies: []','dependencies: [binutils]'))
@@ -45,7 +45,7 @@ class SelectionTests(unittest.TestCase):
         class Response(io.BytesIO):
             def geturl(self):return 'https://example.org/archive'
         with patch('build.sources.urlopen',return_value=Response(b'wrong')):
-            with self.assertRaises(SelectionError):fetch_verified(Source('https://example.org/archive','a'*64),'1',dest)
+            with self.assertRaises(SelectionError):fetch_verified(Source('https://example.org/archive','sha256'),'1',dest,'a'*64)
         self.assertEqual(dest.read_bytes(),b'prior')
     def test_archive_traversal_rejected(self):
         archive=self.root/'bad.tar'; dest=self.root/'out'
@@ -56,15 +56,15 @@ class SelectionTests(unittest.TestCase):
 
     def test_repeated_gcc_steps(self):
         (self.r/'pass2.sh').write_text('true\n')
-        self.lst.write_text('steps:\n  - {id: gcc-pass1, name: gcc, version: "16.2.0", recipe: pass1.sh}\n  - {id: gcc-libstdcpp, name: gcc, version: "16.2.0", recipe: pass2.sh}\n')
+        self.lst.write_text('steps:\n  - {id: gcc-test, name: gcc, version: "16.2.0", checksum: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", recipe: pass1.sh}\n  - {id: gcc-libstdcpp, name: gcc, version: "16.2.0", checksum: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", recipe: pass2.sh}\n')
         steps = select_steps(self.lst, load_manifests(self.m), self.r)
-        self.assertEqual([s.id for s in steps], ['gcc-pass1', 'gcc-libstdcpp'])
+        self.assertEqual([s.id for s in steps], ['gcc-test', 'gcc-libstdcpp'])
 
     def test_cyclic_manifest_dependencies_rejected(self):
         (self.m/'gcc.yaml').write_text((self.m/'gcc.yaml').read_text().replace('dependencies: []','dependencies: [binutils]'))
-        (self.m/'binutils.yaml').write_text('name: binutils\nsource:\n  url: https://example.org/binutils-{version}.tar.xz\n  sha256: '+ 'b'*64+'\ndependencies: [gcc]\n')
+        (self.m/'binutils.yaml').write_text('name: binutils\nsource:\n  url: https://example.org/binutils-{version}.tar.xz\n  verification: sha256\n'+'\ndependencies: [gcc]\n')
         (self.r/'binutils.sh').write_text('true\n')
-        self.lst.write_text('steps:\n  - {name: binutils, version: "2.47", recipe: binutils.sh}\n  - {name: gcc, version: "16.2.0", recipe: pass1.sh}\n')
+        self.lst.write_text('steps:\n  - {name: binutils, version: "2.47", checksum: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", recipe: binutils.sh}\n  - {name: gcc, version: "16.2.0", checksum: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", recipe: pass1.sh}\n')
         with self.assertRaises(SelectionError):
             select_steps(self.lst, load_manifests(self.m), self.r)
 
@@ -73,7 +73,7 @@ class SelectionTests(unittest.TestCase):
             def geturl(self): return 'http://example.org/archive'
         with patch('build.sources.urlopen', return_value=Response(b'data')):
             with self.assertRaises(SelectionError):
-                fetch_verified(Source('https://example.org/archive', hashlib.sha256(b'data').hexdigest()), '1', self.root/'archive')
+                fetch_verified(Source('https://example.org/archive', 'sha256'), '1', self.root/'archive', hashlib.sha256(b'data').hexdigest())
         self.assertFalse((self.root/'archive').exists())
 
     def test_safe_symlink_extraction(self):
@@ -99,5 +99,17 @@ class SelectionTests(unittest.TestCase):
             device=tarfile.TarInfo('dev');device.type=tarfile.CHRTYPE;tar.addfile(device)
         with self.assertRaises(SelectionError):extract_verified(archive,dest)
         self.assertFalse(dest.exists())
+
+    def test_reject_missing_checksum(self):
+        self.lst.write_text(self.lst.read_text().replace('checksum:', 'not-a-checksum:'))
+        with self.assertRaises(SelectionError):
+            select_steps(self.lst, load_manifests(self.m), self.r)
+
+    def test_fetch_requires_matching_selected_checksum(self):
+        class Response(io.BytesIO):
+            def geturl(self): return 'https://example.org/archive'
+        with patch('build.sources.urlopen', return_value=Response(b'known')):
+            with self.assertRaises(SelectionError):
+                fetch_verified(Source('https://example.org/archive', 'sha256'), '1', self.root/'archive', '0'*64)
 
 if __name__=='__main__':unittest.main()

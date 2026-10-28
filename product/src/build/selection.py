@@ -42,7 +42,7 @@ def _version(s):
 @dataclass(frozen=True)
 class Source:
     url: str
-    sha256: str
+    verification: str
 
 
 @dataclass(frozen=True)
@@ -60,17 +60,19 @@ class Step:
     name: str
     version: str
     recipe: Path
+    checksum: str
+    supplements: dict[str, tuple[str, str]]
 
 
 def _source(d):
     if not isinstance(d, dict):
         raise SelectionError("source must be a mapping")
-    _keys(d, {"url", "sha256"})
+    _keys(d, {"url", "verification"})
     if not isinstance(d["url"], str) or not d["url"].startswith("https://") or "{" in d["url"].replace("{version}", "") or "}" in d["url"].replace("{version}", ""):
         raise SelectionError("source URL must be a single HTTPS template with optional {version}")
-    if not isinstance(d["sha256"], str) or not _DIGEST.fullmatch(d["sha256"]):
-        raise SelectionError("source requires literal SHA-256 digest")
-    return Source(d["url"], d["sha256"].lower())
+    if d["verification"] != "sha256":
+        raise SelectionError("unsupported source verification scheme")
+    return Source(d["url"], d["verification"])
 
 
 def load_manifests(directory: Path) -> dict[str, Manifest]:
@@ -105,11 +107,27 @@ def select_steps(list_file: Path, manifests: dict[str, Manifest], recipes_root: 
     for position, item in enumerate(d["steps"]):
         if not isinstance(item, dict):
             raise SelectionError("step must be a mapping")
-        _keys(item, {"name", "version", "recipe"}, {"id"})
+        _keys(item, {"name", "version", "recipe", "checksum"}, {"id", "supplements"})
         name, version, rel = item["name"], item["version"], item["recipe"]
         sid = item.get("id", f"{name}-{position+1}")
         if not _name(name) or name not in manifests or not _version(version) or not _name(sid):
             raise SelectionError("invalid step identity/version or unknown package")
+        checksum = item["checksum"]
+        if not isinstance(checksum, str) or not _DIGEST.fullmatch(checksum):
+            raise SelectionError("invalid selected source checksum")
+        raw_supp = item.get("supplements", {})
+        if not isinstance(raw_supp, dict) or set(raw_supp) - set(manifests[name].supplements):
+            raise SelectionError("unknown supplementary selection")
+        supplements = {}
+        for identity, selected in raw_supp.items():
+            if not isinstance(selected, dict):
+                raise SelectionError("invalid supplementary selection")
+            _keys(selected, {"version", "checksum"})
+            if not _version(selected["version"]) or not isinstance(selected["checksum"], str) or not _DIGEST.fullmatch(selected["checksum"]):
+                raise SelectionError("invalid supplementary version/checksum")
+            supplements[identity] = (selected["version"], selected["checksum"].lower())
+        if sid == "gcc-pass1" and set(supplements) != {"gmp", "mpfr", "mpc"}:
+            raise SelectionError("GCC pass 1 requires pinned GMP/MPFR/MPC")
         if sid in ids or (name in versions and versions[name] != version):
             raise SelectionError("duplicate step ID or conflicting package versions")
         if not isinstance(rel, str) or not rel.endswith(".sh"):
@@ -125,5 +143,5 @@ def select_steps(list_file: Path, manifests: dict[str, Manifest], recipes_root: 
                 raise SelectionError(f"{name}: required prerequisite not selected earlier: {dependency}")
         ids.add(sid)
         versions[name] = version
-        steps.append(Step(sid, name, version, recipe))
+        steps.append(Step(sid, name, version, recipe, checksum.lower(), supplements))
     return tuple(steps)
