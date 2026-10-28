@@ -25,7 +25,7 @@ The Stage 1 command forms are specified below. Other Build CLI parameters and in
 
 ## Shared Package Definitions and Selections
 
-Bootstrap uses Build's user-maintained package manifests and context-specific package lists, as established by DP-003. Manifests define package identity, source information, and dependencies; lists select versions (including dependency versions), build instructions, and stage-specific build configurations. Bootstrap is a special configuration of the same host-agnostic Build engine, not a separate package-building engine. Build invocation parameters select host execution for Stages 1A and 1B, or construction inside `distro-buildroot` for Stage 1C and normal publishable builds. Stage 1C selects a local Bootstrap artifact instead of the package server as the source for establishing `distro-buildroot`. The host may be a foreign Linux distribution or Distro itself. Bootstrap does not maintain separate package definitions or hardcode package-specific construction behavior.
+Bootstrap uses Build's user-maintained package manifests, context-specific package lists, and Bash recipes, as established by DP-003. Manifests define package identity, source information, verification, and dependencies; lists select explicit versions (including dependency versions) and stage-appropriate recipes; recipes provide package-specific construction commands. Bootstrap is a special configuration of the same host-agnostic Build engine, not a separate package-building engine. Build invocation parameters select host execution for Stages 1A and 1B, or construction inside `distro-buildroot` for Stage 1C and normal publishable builds. Stage 1C selects a local Bootstrap artifact instead of the package server as the source for establishing `distro-buildroot`. The host may be a foreign Linux distribution or Distro itself. Bootstrap does not maintain separate package definitions or hardcode package-specific construction behavior in Build's application code.
 
 ## Stage 1 — `distro-chroot`
 
@@ -37,7 +37,7 @@ Stage 1 is initially performed on a foreign Linux host and produces the initial 
 ./product/scripts/build cross-toolchain --root /path/to/rootdir
 ```
 
-The `cross-toolchain` command selects host execution and the `cross-toolchain` package list. Build uses the shared manifests and selected list to identify package versions, acquire sources, and execute configured build and installation operations. `--root` designates the location of the build workspace, installed `/` filesystem hierarchy, and output artifact.
+The `cross-toolchain` command selects host execution and the `cross-toolchain` package list. Build uses the shared manifests and selected list to identify package versions, acquire sources, and execute the selected Bash recipes. `--root` designates the location of the build workspace, installed `/` filesystem hierarchy, and output artifact.
 
 Linux From Scratch (LFS) Chapter 5, *Compiling a Cross-Toolchain*, is the principal technical reference. The prototype is reference material, not package or implementation authority.
 
@@ -51,7 +51,7 @@ Linux From Scratch (LFS) Chapter 5, *Compiling a Cross-Toolchain*, is the princi
   --cross-toolchain /path/to/crosstoolchainartifact
 ```
 
-The `cross-chroot` command selects host execution and the distinct `cross-chroot` package list. `--cross-toolchain` supplies the Stage 1A artifact. The list's configuration specifies extraction of that artifact into the local `/` hierarchy under `--root`, selection and acquisition of sources, and the build, installation, and final artifact operations. Build does not hardcode knowledge that `cross-chroot` uses the extracted cross-toolchain; the list defines that behavior.
+The `cross-chroot` command selects host execution and the distinct `cross-chroot` package list. `--cross-toolchain` supplies the Stage 1A artifact. Stage configuration determines how that artifact is extracted into the local `/` hierarchy under `--root` and made available to the selected recipes. Build handles source acquisition and recipe execution without hardcoding package-specific construction commands. The exact stage-configuration interface remains to be defined.
 
 All construction is executed from the host, not by building inside the temporary chroot being created. Linux From Scratch (LFS) Chapter 6, *Cross Compiling Temporary Tools*, is the principal technical reference.
 
@@ -65,7 +65,7 @@ All construction is executed from the host, not by building inside the temporary
   --cross-chroot /path/to/crosschrootartifact
 ```
 
-The `distro-buildroot` command selects its own package list and construction inside a `distro-buildroot` environment. Its package list is distinct from the `cross-chroot` list because build configurations differ, even where package selections overlap. The `--cross-chroot` parameter supplies the Stage 1B artifact. Configured operations determine its use; Build does not contain stage-specific artifact handling or package-specific build instructions.
+The `distro-buildroot` command selects its own package list and construction inside a `distro-buildroot` environment. Its package list is distinct from the `cross-chroot` list because recipe selections differ, even where package selections overlap. The `--cross-chroot` parameter supplies the Stage 1B artifact. Stage configuration determines how the local artifact supplies the buildroot environment; Build does not contain package-specific construction commands. The exact stage-configuration interface remains to be defined.
 
 Normally the `distro-buildroot` environment is assembled from packages available on the package server. In this initial Bootstrap case, CLI parameters select the local cross-chroot artifact as the source because the initial packages do not yet exist on the server. This is the standard buildroot execution mode with an alternate input source, not a separate Build engine or execution mode.
 
