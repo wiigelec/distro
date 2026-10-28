@@ -3,6 +3,7 @@ doc_id: DP-003
 title: Build Package Definitions and Selections
 depends_on:
   - DP-001
+  - DP-004
 ---
 
 # Build Package Definitions and Selections
@@ -39,11 +40,11 @@ Package-list storage location, file format, configuration precedence, version-st
 
 Build is one host-agnostic, configuration-driven execution engine. It can run on a foreign Linux host (such as Arch) or on a Distro host. Invocation parameters select whether package construction executes directly on the host or inside an isolated environment established from `distro-buildroot`. For a buildroot execution, CLI parameters also select the source for constructing that environment: normally the package server, or the local Bootstrap artifact during Stage 1C. Host identity does not determine the execution mode.
 
-Bootstrap is a special Build operation controlled by Bootstrap-specific configuration, not a distinct package-building engine. It uses the same manifest/list model and generic Build capabilities. Bootstrap Stages 1A and 1B execute on the host. Stage 1C and normal publishable package construction execute inside `distro-buildroot`. The normal buildroot is established using packages obtained from the package server; Stage 1C instead selects a local Bootstrap artifact through Build CLI parameters because the initial packages are not yet published. This changes the source used to establish the buildroot, not the Build engine or execution mode. Stage 1C may publish the initial package collection produced through this exception.
+Bootstrap is a special Build operation controlled by Bootstrap-specific configuration, not a distinct package-building engine. It uses the same manifest/list model and generic Build capabilities. Bootstrap Stages 1A and 1B execute on the host. Stage 1C and normal publishable package construction execute inside `distro-buildroot`. The normal buildroot is established using packages obtained from the package server; Stage 1C instead selects a local Bootstrap artifact through Build CLI parameters because the initial packages are not yet published. This changes the source used to establish the buildroot, not the Build engine or execution mode. Stage 1C uses Manage to create and publish the initial Bootstrap package collection produced through this exception.
 
 Build may provide generic support for build systems and operations, but must not require package-specific source-code changes to add a package expressible through those capabilities. Package-specific build instructions belong in lists, never in application code or manifests.
 
-Build resolves build requirements from manifests and produces package metadata for Manage. Manage consumes published package dependency information for installation; it does not maintain another authoritative source of dependency declarations. Install uses Manage for package installation.
+Build resolves build requirements from manifests and produces the staged package files. Build invokes Manage for package creation and publication. Manage assembles staged files into packages with metadata and publishes them through the interfaces defined in DP-004. This applies to Bootstrap and normal package builds. Manage derives dependency metadata from the authoritative manifest information supplied by Build; it does not maintain another source of dependency declarations. Install uses Manage for package installation.
 
 The `distro-buildroot` metapackage defines the requirements for Build's isolated build environment, and `distro-base` identifies the minimal bootable package set. They use the common package-definition model; their detailed selection and dependency mechanics remain for subsequent Design.
 

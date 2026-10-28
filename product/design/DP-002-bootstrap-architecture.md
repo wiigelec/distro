@@ -4,6 +4,7 @@ title: Distro Bootstrap Architecture
 depends_on:
   - DP-001
   - DP-003
+  - DP-004
 ---
 
 # Distro Bootstrap Architecture
@@ -14,7 +15,7 @@ Bootstrap is the one-time process that establishes Distro's native package-produ
 
 The final self-replication proof runs the Stage 1 construction sequence on the booted Distro host, generates replacement `distro-buildroot` packages without publishing them, and compares their packaged file lists with those of the published Bootstrap packages. If the file lists are equivalent, the Distro-host-built packages replace the Bootstrap packages on the package server. File-list equivalence is the specified proof criterion; byte-for-byte artifact identity is not required.
 
-Bootstrap is not a fourth permanent Distro component. Build owns ongoing package production, Manage owns installed package state, and Install owns system installation and configuration, as established by DP-001.
+Bootstrap is not a fourth permanent Distro component. Build produces package file contents and coordinates package production, Manage owns package creation, publication, and installed package state, and Install owns system installation and configuration, as established by DP-001.
 
 ## Bootstrap Implementation Location and Invocation
 
@@ -45,8 +46,8 @@ Linux From Scratch (LFS) Chapter 5, *Compiling a Cross-Toolchain*, is the princi
 ### 1B — Cross-chroot
 
 ```sh
-./product/scripts/build cross-chroot \\
-  --root /path/to/rootdir \\
+./product/scripts/build cross-chroot \
+  --root /path/to/rootdir \
   --cross-toolchain /path/to/crosstoolchainartifact
 ```
 
@@ -59,8 +60,8 @@ All construction is executed from the host, not by building inside the temporary
 ### 1C — Distro-buildroot Bootstrap Packages
 
 ```sh
-./product/scripts/build distro-buildroot \\
-  --root /path/to/rootdir \\
+./product/scripts/build distro-buildroot \
+  --root /path/to/rootdir \
   --cross-chroot /path/to/crosschrootartifact
 ```
 
@@ -68,7 +69,7 @@ The `distro-buildroot` command selects its own package list and construction ins
 
 Normally the `distro-buildroot` environment is assembled from packages available on the package server. In this initial Bootstrap case, CLI parameters select the local cross-chroot artifact as the source because the initial packages do not yet exist on the server. This is the standard buildroot execution mode with an alternate input source, not a separate Build engine or execution mode.
 
-The configured workflow uses Manage to create and publish the initial **Bootstrap packages**, including the `distro-buildroot` metapackage and its required packages. These are identified as Bootstrap packages independently of whether the host is a foreign Linux system or Distro itself.
+The configured workflow has Build produce the staged files and invoke Manage to create and publish the initial **Bootstrap packages**, including the `distro-buildroot` metapackage and its required packages. Manage assembles each package from Build's files and publishes it using the standard creation and publication operations defined by DP-004. These are identified as Bootstrap packages independently of whether the host is a foreign Linux system or Distro itself.
 
 `distro-buildroot` is a metapackage defining the requirements for the isolated production Build environment, not a preassembled chroot image. The environment constructed for Stage 1C remains distinct from the temporary cross-chroot artifact.
 
@@ -94,7 +95,7 @@ The comparison concerns the package file inventories, not byte-for-byte identity
 
 `distro-base` names the package set required for the minimal bootable Distro system. The exact inventories, dependency relationships, and overlap of these sets remain open.
 
-The cross-toolchain artifact, temp-chroot artifact, production isolated Build environment, published package collections, and bootable Distro system are distinct outputs or environments. Bootstrap establishes the first production Build environment; Build owns subsequent package production through that environment.
+The cross-toolchain artifact, cross-chroot artifact, production isolated Build environment, published package collections, and bootable Distro system are distinct outputs or environments. Bootstrap establishes the first production Build environment; Build owns subsequent package production through that environment.
 
 ## Progressive Decomposition
 
