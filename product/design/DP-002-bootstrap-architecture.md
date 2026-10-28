@@ -24,7 +24,7 @@ The exact parameters and command syntax remain open. Locating the Bootstrap impl
 
 ## Shared Package Definitions and Selections
 
-Bootstrap uses Build's user-maintained package manifests and context-specific package lists, as established by DP-003. Manifests define package identity, source information, and dependencies; lists select versions (including dependency versions), build instructions, and stage-specific build configurations. Bootstrap is a special configuration of the same host-agnostic Build engine, not a separate package-building engine. Build invocation parameters select direct host execution for Bootstrap construction or execution inside `distro-buildroot` for normal publishable construction. The host may be a foreign Linux distribution or Distro itself. Bootstrap does not maintain separate package definitions or hardcode package-specific construction behavior.
+Bootstrap uses Build's user-maintained package manifests and context-specific package lists, as established by DP-003. Manifests define package identity, source information, and dependencies; lists select versions (including dependency versions), build instructions, and stage-specific build configurations. Bootstrap is a special configuration of the same host-agnostic Build engine, not a separate package-building engine. Build invocation parameters select host execution for Stages 1A and 1B, or construction inside `distro-buildroot` for Stage 1C and normal publishable builds. Stage 1C selects a local Bootstrap artifact instead of the package server as the source for establishing `distro-buildroot`. The host may be a foreign Linux distribution or Distro itself. Bootstrap does not maintain separate package definitions or hardcode package-specific construction behavior.
 
 ## Stage 1 — `distro-chroot`
 
@@ -44,9 +44,9 @@ On the foreign host, use the Stage 1A cross-toolchain to construct the temporary
 
 ### 1C — Bootstrap Build Environment and Publish Packages
 
-Use the Stage 1B temp-chroot artifact to bootstrap the initial production package collection, including the `distro-buildroot` metapackage and its required packages. Publish the initial collection to the package server so Manage can install it and establish a production Build environment. This initial bootstrapping is the exception required before `distro-buildroot` can itself be used to build published packages.
+Stage 1C uses the standard `distro-buildroot` execution mode to build the initial production package collection, including the `distro-buildroot` metapackage and its required packages. Ordinarily Build obtains the packages needed to establish `distro-buildroot` from the package server. Because those initial packages are not yet published, Stage 1C instead uses the local Bootstrap artifact produced by the preceding stages. Build CLI parameters select this local-artifact source; no separate package-building engine or execution mode is introduced. Publish the initial collection to the package server so subsequent `distro-buildroot` environments can be established from published packages.
 
-`distro-buildroot` is a metapackage defining the package requirements for Build's isolated build environment. It is not itself a preassembled chroot image. Manage installs its required package set to create that environment; the resulting environment is not a copy of the temporary Stage 1B chroot.
+`distro-buildroot` is a metapackage defining the package requirements for Build's isolated build environment. It is not itself a preassembled chroot image. In the normal case Manage installs the required packages from the package server; Stage 1C uses the local Bootstrap artifact as the source for constructing that environment. The production buildroot is distinct from the temporary Stage 1B chroot.
 
 **Output:** published initial `distro-buildroot` package collection, installable by Manage.
 
