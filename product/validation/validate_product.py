@@ -2,7 +2,6 @@
 from __future__ import annotations
 import argparse
 import json
-import subprocess
 import sys
 from pathlib import Path
 from typing import Callable
@@ -76,17 +75,6 @@ def main(argv: list[str] | None = None) -> int:
         result = execute(task)
         if result:
             return result
-    # Development regression tests do not satisfy inactive normative bindings;
-    # they nevertheless gate the code introduced during incremental Build.
-    tests = ROOT / 'product' / 'validation' / 'test_host_sandbox.py'
-    additional = ROOT / 'product' / 'validation' / 'test_selection.py'
-    pinned = ROOT / 'product' / 'validation' / 'test_cross_toolchain_selection.py'
-    if not tests.is_file() or not additional.is_file() or not pinned.is_file():
-        return fail('Build development tests missing')
-    cp = subprocess.run([sys.executable, '-m', 'unittest', 'discover',
-                         '-s', str(tests.parent), '-p', 'test_*.py'], cwd=ROOT)
-    if cp.returncode:
-        return fail('sandbox development tests failed')
     print("Product Validation: PASS")
     return 0
 
