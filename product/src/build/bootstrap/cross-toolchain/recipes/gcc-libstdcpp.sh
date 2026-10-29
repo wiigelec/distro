@@ -17,7 +17,8 @@ JOBS="${DISTRO_JOBS:-1}"
 [[ -f "$DISTRO_SOURCE_DIR/libstdc++-v3/configure" ]] || { echo 'missing libstdc++ source' >&2; exit 2; }
 "$DISTRO_SOURCE_DIR/libstdc++-v3/configure" \
   --host="$DISTRO_TARGET" --build="$(gcc -dumpmachine)" \
+  CXX="$DISTRO_TARGET-gcc" \
   --prefix=/usr --disable-multilib --disable-nls \
-  --disable-nls
+  --with-gxx-include-dir="/tools/$DISTRO_TARGET/include/c++/$DISTRO_PACKAGE_VERSION"
 make -j"$JOBS"
 make DESTDIR="$DISTRO_ROOT_DIR" install
