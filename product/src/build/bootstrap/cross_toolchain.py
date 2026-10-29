@@ -1,4 +1,4 @@
-"""FS-001 Stage 1A orchestration slice; artifact publication is not implemented."""
+"""Cross-toolchain Bootstrap orchestration; artifact publication is not implemented."""
 from __future__ import annotations
 
 import hashlib
@@ -70,7 +70,7 @@ def prepare_step(step, manifest, build: Path, cache: Path):
 def run_stage(root: Path):
     """Construct selected sources in a sandbox; no successful handoff claim."""
     if sys.platform != "linux":
-        raise RuntimeError("FS-001 construction requires a Linux host")
+        raise RuntimeError("Cross-toolchain construction requires a Linux host")
     manifests, steps = selected_steps()
     # Never mutate the workspace if required isolation is unavailable.
     probe_bubblewrap()
@@ -95,4 +95,4 @@ def run_stage(root: Path):
                    target=TARGET)
     # Separate functional checks and transactional artifact publication are mandatory
     # before this can become the successful cross-toolchain CLI operation.
-    raise NotImplementedError("FS-001 archive/relocation acceptance gate not implemented")
+    raise NotImplementedError("Cross-toolchain archive/relocation acceptance gate not implemented")

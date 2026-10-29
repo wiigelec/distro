@@ -1,4 +1,4 @@
-"""Unit tests for Stage 1A orchestration without downloads or Linux sandbox."""
+"""Unit tests for cross-toolchain orchestration without downloads or Linux sandbox."""
 import hashlib
 import io
 from pathlib import Path

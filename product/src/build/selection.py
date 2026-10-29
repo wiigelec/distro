@@ -1,4 +1,4 @@
-"""Strict manifest and ordered step selection for FS-001 (no recipe evaluation)."""
+"""Strict manifest and ordered build-step selection (no recipe evaluation)."""
 from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path

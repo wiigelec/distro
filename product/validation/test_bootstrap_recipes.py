@@ -1,4 +1,4 @@
-"""Development-only structural checks for directly executed FS-001 Bash recipes."""
+"""Development-only structural checks for directly executed Bootstrap Bash recipes."""
 from pathlib import Path
 import shutil
 import subprocess

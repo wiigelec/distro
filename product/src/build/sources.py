@@ -1,4 +1,4 @@
-"""Verified archive acquisition and safe extraction for FS-001."""
+"""Verified archive acquisition and safe extraction for Build."""
 from __future__ import annotations
 import hashlib
 from pathlib import Path
