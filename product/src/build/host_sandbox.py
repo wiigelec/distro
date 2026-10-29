@@ -67,7 +67,7 @@ def _base_command() -> list[str]:
 
 def recipe_command(host_build: Path, host_root: Path, recipe: Path, *,
                    source_dir: str, build_dir: str, package: str, version: str,
-                   step_id: str, target: str = "x86_64-distro-linux-gnu") -> list[str]:
+                   step_id: str, target: str = "x86_64-distro-linux-gnu", jobs: int = 1) -> list[str]:
     cmd = _base_command()
     cmd += _workspace_mounts(host_build, host_root)
     try:
@@ -84,6 +84,8 @@ def recipe_command(host_build: Path, host_root: Path, recipe: Path, *,
         raise SandboxError("recipe source directory is missing")
     if not (Path(host_build) / Path(build_dir).relative_to(WORK)).is_dir():
         raise SandboxError("recipe build directory is missing")
+    if isinstance(jobs, bool) or not isinstance(jobs, int) or jobs < 1:
+        raise SandboxError("jobs must be a positive integer")
     if not all((package, version, step_id, target)):
         raise SandboxError("recipe identity and target are required")
     # Use an existing read-only directory and retain the recipe's basename;
@@ -95,7 +97,7 @@ def recipe_command(host_build: Path, host_root: Path, recipe: Path, *,
         "DISTRO_BUILD_DIR": build_dir, "DISTRO_ROOT_DIR": str(TARGET_ROOT),
         "DISTRO_TOOLS_DIR": "/toolchain/tools", "DISTRO_PACKAGE_NAME": package,
         "DISTRO_PACKAGE_VERSION": version, "DISTRO_STEP_ID": step_id,
-        "DISTRO_TARGET": target,
+        "DISTRO_TARGET": target, "DISTRO_JOBS": str(jobs),
     }
     for key, value in env.items():
         cmd += ["--setenv", key, value]

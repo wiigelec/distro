@@ -6,6 +6,9 @@ from pathlib import Path
 import shutil
 import sys
 import tempfile
+import os
+import subprocess
+import time
 
 from build.host_sandbox import probe_bubblewrap, run_recipe
 from build.host_requirements import qualify_host
@@ -69,14 +72,30 @@ def prepare_step(step, manifest, build: Path, cache: Path):
     return source_dir, construction_dir
 
 
+def _host_jobs() -> int:
+    """Use host CPU affinity-aware nproc, never inherited shell variables."""
+    result = subprocess.run(["nproc"], check=True, capture_output=True, text=True,
+                            env={"PATH": os.defpath}, timeout=10)
+    value = result.stdout.strip()
+    if not value.isdecimal() or int(value) < 1:
+        raise RuntimeError("nproc returned invalid processor count")
+    return int(value)
+
 def run_stage(root: Path):
     """Construct selected sources in a sandbox; no successful handoff claim."""
     if sys.platform != "linux":
         raise RuntimeError("Cross-toolchain construction requires a Linux host")
+    started = time.monotonic()
+    print("[cross-toolchain] Selecting package definitions", flush=True)
     manifests, steps = selected_steps()
     # Qualify host binaries before probing sandbox or altering workspace.
+    print("[cross-toolchain] Host qualification", flush=True)
     qualify_host()
+    print("[cross-toolchain] Sandbox preflight", flush=True)
     probe_bubblewrap()
+    print("[cross-toolchain] Preflight complete", flush=True)
+    jobs = _host_jobs()
+    print(f"[cross-toolchain] Parallel compilation: nproc={jobs} (make -j{jobs})", flush=True)
     root = Path(root).absolute()
     if root.is_symlink() or not root.is_dir():
         raise SelectionError("workspace must be an existing real directory")
@@ -89,14 +108,26 @@ def run_stage(root: Path):
     installed.mkdir()
     cache = build / "sources"
     cache.mkdir()
-    for step in steps:
-        source_dir, construction_dir = prepare_step(step, manifests[step.name], build, cache)
-        run_recipe(build, installed, step.recipe,
+    total = len(steps)
+    for index, step in enumerate(steps, 1):
+        step_started = time.monotonic()
+        prefix = f"[cross-toolchain] [{index}/{total}] {step.id} ({step.name} {step.version})"
+        print(f"{prefix}: Preparing verified sources", flush=True)
+        try:
+            source_dir, construction_dir = prepare_step(step, manifests[step.name], build, cache)
+            print(f"{prefix}: Source ready; Starting recipe", flush=True)
+            run_recipe(build, installed, step.recipe,
                    source_dir="/work/" + str(source_dir.relative_to(build)),
                    build_dir="/work/" + str(construction_dir.relative_to(build)),
                    package=step.name, version=step.version, step_id=step.id,
-                   target=TARGET)
+                       target=TARGET, jobs=jobs)
+        except Exception as exc:
+            print(f"{prefix}: FAILED after {time.monotonic() - step_started:.1f}s: {exc}", flush=True)
+            raise RuntimeError(f"{step.id} failed: {exc}") from exc
+        print(f"{prefix}: Recipe complete ({time.monotonic() - step_started:.1f}s)", flush=True)
+    print("[cross-toolchain] Functional verification", flush=True)
     verify_cross_toolchain(build, installed, target=TARGET)
+    print(f"[cross-toolchain] Verification complete ({time.monotonic() - started:.1f}s total)", flush=True)
     # Separate functional checks and transactional artifact publication are mandatory
     # before this can become the successful cross-toolchain CLI operation.
     raise NotImplementedError("Cross-toolchain archive/relocation acceptance gate not implemented")
