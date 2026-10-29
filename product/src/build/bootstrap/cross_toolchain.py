@@ -9,6 +9,7 @@ import tempfile
 
 from build.host_sandbox import probe_bubblewrap, run_recipe
 from build.host_requirements import qualify_host
+from build.bootstrap.cross_toolchain_verification import verify_cross_toolchain
 from build.selection import load_manifests, select_steps, SelectionError
 from build.sources import fetch_verified, extract_verified
 
@@ -95,6 +96,7 @@ def run_stage(root: Path):
                    build_dir="/work/" + str(construction_dir.relative_to(build)),
                    package=step.name, version=step.version, step_id=step.id,
                    target=TARGET)
+    verify_cross_toolchain(build, installed, target=TARGET)
     # Separate functional checks and transactional artifact publication are mandatory
     # before this can become the successful cross-toolchain CLI operation.
     raise NotImplementedError("Cross-toolchain archive/relocation acceptance gate not implemented")
