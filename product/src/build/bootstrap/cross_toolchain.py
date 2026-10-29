@@ -8,6 +8,7 @@ import sys
 import tempfile
 
 from build.host_sandbox import probe_bubblewrap, run_recipe
+from build.host_requirements import qualify_host
 from build.selection import load_manifests, select_steps, SelectionError
 from build.sources import fetch_verified, extract_verified
 
@@ -72,7 +73,8 @@ def run_stage(root: Path):
     if sys.platform != "linux":
         raise RuntimeError("Cross-toolchain construction requires a Linux host")
     manifests, steps = selected_steps()
-    # Never mutate the workspace if required isolation is unavailable.
+    # Qualify host binaries before probing sandbox or altering workspace.
+    qualify_host()
     probe_bubblewrap()
     root = Path(root).absolute()
     if root.is_symlink() or not root.is_dir():
