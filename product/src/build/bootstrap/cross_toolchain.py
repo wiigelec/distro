@@ -89,15 +89,47 @@ def _host_jobs() -> int:
 
 def _validate_candidate_archive(archive: Path) -> None:
     """Reject unsafe entries before extracting an unpublished handoff candidate."""
-    from build.sources import _safe_tar_members
-    with tarfile.open(archive, 'r:xz') as tar:
+    # Installed target filesystems may legitimately contain absolute symlinks.
+    # Unlike source extraction, those links are interpreted within the target root.
+    import posixpath
+    with tarfile.open(archive, "r:xz") as tar:
         members = tar.getmembers()
         if not members:
             raise RuntimeError("empty cross-toolchain archive")
-        _safe_tar_members(members)
+        symlinks = set()
+        names = set()
         for member in members:
-            # Python's data filter checks resolved links and special extraction effects.
-            tarfile.data_filter(member, '/toolchain')
+            name = member.name
+            if (not name or name.startswith("/") or
+                    any(part == ".." for part in name.split("/"))):
+                raise RuntimeError(f"unsafe archive member name: {name}")
+            if not (member.isdir() or member.isfile() or member.issym() or member.islnk()):
+                raise RuntimeError(f"unsupported filesystem archive member: {name}")
+            normalized = posixpath.normpath(name)
+            if normalized in names and normalized != ".":
+                raise RuntimeError(f"duplicate archive member: {name}")
+            names.add(normalized)
+            if member.issym():
+                if not member.linkname:
+                    raise RuntimeError(f"empty symlink target: {name}")
+                symlinks.add(normalized)
+                if not member.linkname.startswith("/"):
+                    relative = posixpath.normpath(posixpath.join(posixpath.dirname(normalized), member.linkname))
+                    if relative == ".." or relative.startswith("../"):
+                        raise RuntimeError(f"escaping relative symlink: {name}")
+            if member.islnk():
+                target = member.linkname
+                if (not target or target.startswith("/") or
+                        posixpath.normpath(target) in ("..",) or
+                        posixpath.normpath(target).startswith("../")):
+                    raise RuntimeError(f"unsafe hardlink: {name}")
+        # GNU tar must never traverse a symlink while writing another entry.
+        for name in names:
+            parent = posixpath.dirname(name)
+            while parent not in ("", ".", "/"):
+                if parent in symlinks:
+                    raise RuntimeError(f"archive entry beneath a symlink: {name}")
+                parent = posixpath.dirname(parent)
 
 
 def publish_archive(root: Path, installed: Path, *, target: str, steps,
@@ -141,9 +173,15 @@ def publish_archive(root: Path, installed: Path, *, target: str, steps,
         candidate_meta.write_text(json.dumps(metadata, indent=2, sort_keys=True) + "\n",
                                   encoding="utf-8")
         # Metadata last: a lone archive must never be treated as published.
-        candidate.replace(final)
-        candidate_meta.replace(final_metadata)
-        validate_published_handoff(artifacts)
+        try:
+            candidate.replace(final)
+            candidate_meta.replace(final_metadata)
+            validate_published_handoff(artifacts)
+        except Exception:
+            # Neither file may survive a failed handoff publication.
+            final_metadata.unlink(missing_ok=True)
+            final.unlink(missing_ok=True)
+            raise
     print(f"[cross-toolchain] Published {final}", flush=True)
     return final
 

@@ -31,25 +31,26 @@ for tool in gcc g++; do
         echo "incorrect compiler sysroot: $tool" >&2; exit 1;
     }
 done
-# Confirm target headers and startup objects resolve beneath the mounted sysroot.
-for compiler in gcc g++; do
-    driver="$TOOLS/$TARGET-$compiler"
-    search="$("$driver" -print-search-dirs)"
-    case "$search" in
-      *"/work/steps/"*) echo "compiler search depends on build workspace" >&2; exit 1 ;;
-    esac
-    includes="$(printf '' | "$driver" -x c++ -E -v - 2>&1 >/dev/null)"
-    printf '%s\n' "$includes" | grep -Fq '/toolchain/usr/include' || {
-        echo "target include directory absent from compiler search" >&2; exit 1;
+# Inspect actual preprocessor dependencies, not GCC's preferred textual
+# representation of a search directory or startup-object filename.
+for language in c c++; do
+    if [[ "$language" = c ]]; then
+        driver="$TOOLS/$TARGET-gcc"
+        header=stdio.h
+    else
+        driver="$TOOLS/$TARGET-g++"
+        header=iostream
+    fi
+    dependencies="$(printf '#include <%s>\n' "$header" | "$driver" -x "$language" -M -)"
+    printf '%s\n' "$dependencies" | grep -Fq '/toolchain/' || {
+        echo "target headers not resolved beneath sysroot: $language" >&2; exit 1;
     }
+    if printf '%s\n' "$dependencies" | grep -Eq '(^|[[:space:]])/(usr|lib|lib64)/'; then
+        echo "host header fallback detected: $language" >&2; exit 1
+    fi
 done
-for object in crt1.o crti.o crtn.o; do
-    resolved="$("$TOOLS/$TARGET-gcc" -print-file-name="$object")"
-    case "$resolved" in
-        /toolchain/*) test -f "$resolved" || exit 1 ;;
-        *) echo "target startup object not found in sysroot: $object => $resolved" >&2; exit 1 ;;
-    esac
-done
+# The following actual C/C++ links exercise the startup objects and target
+# linker resolution without assuming GCC prints absolute -print-file-name paths.
 "$TOOLS/$TARGET-ld" --version >/dev/null
 "$TOOLS/$TARGET-readelf" --version >/dev/null
 test -d "$SYSROOT/usr/include" || { echo "missing target headers" >&2; exit 1; }
