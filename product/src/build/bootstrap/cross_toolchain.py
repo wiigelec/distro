@@ -1,4 +1,4 @@
-"""Cross-toolchain Bootstrap orchestration; artifact publication is not implemented."""
+"""Cross-toolchain Bootstrap construction and verified artifact handoff."""
 from __future__ import annotations
 
 import hashlib
@@ -81,8 +81,43 @@ def _host_jobs() -> int:
         raise RuntimeError("nproc returned invalid processor count")
     return int(value)
 
+def publish_archive(root: Path, installed: Path, *, target: str) -> Path:
+    """Publish only a candidate that works after extraction in an isolated workspace."""
+    artifacts = root / "artifacts"
+    if artifacts.is_symlink():
+        raise RuntimeError("artifact directory must not be a symlink")
+    artifacts.mkdir(exist_ok=True)
+    if not artifacts.is_dir() or artifacts.resolve() != artifacts.absolute():
+        raise RuntimeError("artifact directory must be a real directory")
+    final = artifacts / "cross-toolchain.tar.xz"
+    if final.exists() or final.is_symlink():
+        raise RuntimeError("refusing to replace an existing handoff archive")
+    with tempfile.TemporaryDirectory(dir=artifacts, prefix="handoff-") as candidate_dir:
+        candidate = Path(candidate_dir) / "cross-toolchain.tar.xz"
+        # POSIX pax format, relative paths, symlinks, hardlinks and modes preserved.
+        subprocess.run(["tar", "--format=posix", "-cJf", str(candidate),
+                        "-C", str(installed), "."], check=True, env={"PATH": os.defpath})
+        print("[cross-toolchain] Candidate archive created; verifying relocation", flush=True)
+        # This independent host workspace is NOT mounted when the restored toolchain
+        # executes. The original build/root filesystem is also NOT mounted.
+        with tempfile.TemporaryDirectory(prefix="distro-cross-relocated-") as tmp:
+            relocated = Path(tmp)
+            scratch = relocated / "build"
+            restored = relocated / "root"
+            scratch.mkdir()
+            restored.mkdir()
+            subprocess.run(["tar", "-xJf", str(candidate), "-C", str(restored),
+                            "--no-same-owner"], check=True, env={"PATH": os.defpath})
+            verify_cross_toolchain(scratch, restored, target=target,
+                                   original_workspace=root)
+        # Rename inside the same filesystem only after relocation verification passes.
+        candidate.replace(final)
+    print(f"[cross-toolchain] Published {final}", flush=True)
+    return final
+
+
 def run_stage(root: Path):
-    """Construct selected sources in a sandbox; no successful handoff claim."""
+    """Construct and verify a relocatable Stage 1A archive."""
     if sys.platform != "linux":
         raise RuntimeError("Cross-toolchain construction requires a Linux host")
     started = time.monotonic()
@@ -128,6 +163,7 @@ def run_stage(root: Path):
     print("[cross-toolchain] Functional verification", flush=True)
     verify_cross_toolchain(build, installed, target=TARGET)
     print(f"[cross-toolchain] Verification complete ({time.monotonic() - started:.1f}s total)", flush=True)
-    # Separate functional checks and transactional artifact publication are mandatory
-    # before this can become the successful cross-toolchain CLI operation.
-    raise NotImplementedError("Cross-toolchain archive/relocation acceptance gate not implemented")
+    print("[cross-toolchain] Archiving and relocation verification", flush=True)
+    published = publish_archive(root, installed, target=TARGET)
+    print(f"[cross-toolchain] Stage 1A complete ({time.monotonic() - started:.1f}s): {published}", flush=True)
+    return published

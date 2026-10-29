@@ -15,6 +15,9 @@ class CrossToolchainVerificationError(RuntimeError):
 # The sandbox mounts the build tree at /work and target sysroot at /toolchain.
 CHECK_SCRIPT = r'''set -euo pipefail
 TARGET="$1"
+if [[ -n "${DISTRO_ORIGINAL_HOST_PATH:-}" && -e "$DISTRO_ORIGINAL_HOST_PATH" ]]; then
+    echo "original workspace unexpectedly accessible" >&2; exit 1
+fi
 TOOLS="/toolchain/tools/bin"
 SYSROOT="/toolchain"
 for tool in gcc g++ ld readelf; do
@@ -45,20 +48,42 @@ for binary in "$tmp/check-c" "$tmp/check-cxx"; do
     printf '%s\n' "$header" | grep -Eq 'Class:[[:space:]]+ELF64' || exit 1
     printf '%s\n' "$header" | grep -Eq 'Machine:[[:space:]]+Advanced Micro Devices X86-64' || exit 1
     printf '%s\n' "$header" | grep -Eq 'Type:[[:space:]]+(DYN|EXEC)' || exit 1
-    "$TOOLS/$TARGET-readelf" -l "$binary" | grep -q 'Requesting program interpreter' || {
+    program_headers="$("$TOOLS/$TARGET-readelf" -l "$binary")"
+    printf '%s\n' "$program_headers" | grep -q 'Requesting program interpreter' || {
         echo "missing dynamic interpreter" >&2; exit 1;
     }
+    interp="$(printf '%s\n' "$program_headers" | sed -n 's/.*Requesting program interpreter: \([^]]*\)\].*/\1/p')"
+    case "$interp" in
+        /lib/*|/lib64/*|/usr/lib/*|/usr/lib64/*) ;;
+        *) echo "invalid target interpreter: $interp" >&2; exit 1 ;;
+    esac
+    dynamic="$("$TOOLS/$TARGET-readelf" -d "$binary")"
+    if printf '%s\n' "$dynamic" | grep -E 'NEEDED.*\[/' ; then
+        echo "absolute library dependency" >&2; exit 1
+    fi
 done
 '''
 
 
-def verify_cross_toolchain(build: Path, installed: Path, *, target: str) -> None:
+def verify_cross_toolchain(build: Path, installed: Path, *, target: str,
+                           original_workspace: Path | None = None) -> None:
     """Fail closed on unavailable target tools, linking failures or wrong ELF output."""
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.+-]*", target):
         raise CrossToolchainVerificationError("invalid target triplet")
     build, installed = Path(build), Path(installed)
     try:
-        command = _base_command() + _workspace_mounts(build, installed)
+        mounts = _workspace_mounts(build, installed)
+        # Verification never needs to modify the candidate installed filesystem.
+        mounts[3] = "--ro-bind"
+        command = _base_command() + mounts
+        if original_workspace is not None:
+            original = Path(original_workspace).resolve(strict=True)
+            relocated = Path(installed).resolve(strict=True)
+            if original == relocated or original in relocated.parents or relocated in original.parents:
+                raise CrossToolchainVerificationError("relocation workspace overlaps original")
+            # The sandbox exposes only /work and /toolchain, not either host path.
+            # Reject accidental exposure of the original tree inside the sandbox.
+            command += ["--setenv", "DISTRO_ORIGINAL_HOST_PATH", str(original)]
         command += ["--setenv", "PATH", "/toolchain/tools/bin:/usr/bin:/bin",
                     "--setenv", "HOME", "/work", "--setenv", "LC_ALL", "C",
                     "--", "/bin/bash", "-c", CHECK_SCRIPT, "cross-verify", target]
