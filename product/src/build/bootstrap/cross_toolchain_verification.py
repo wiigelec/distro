@@ -31,6 +31,25 @@ for tool in gcc g++; do
         echo "incorrect compiler sysroot: $tool" >&2; exit 1;
     }
 done
+# Confirm target headers and startup objects resolve beneath the mounted sysroot.
+for compiler in gcc g++; do
+    driver="$TOOLS/$TARGET-$compiler"
+    search="$("$driver" -print-search-dirs)"
+    case "$search" in
+      *"/work/steps/"*) echo "compiler search depends on build workspace" >&2; exit 1 ;;
+    esac
+    includes="$(printf '' | "$driver" -x c++ -E -v - 2>&1 >/dev/null)"
+    printf '%s\n' "$includes" | grep -Fq '/toolchain/usr/include' || {
+        echo "target include directory absent from compiler search" >&2; exit 1;
+    }
+done
+for object in crt1.o crti.o crtn.o; do
+    resolved="$("$TOOLS/$TARGET-gcc" -print-file-name="$object")"
+    case "$resolved" in
+        /toolchain/*) test -f "$resolved" || exit 1 ;;
+        *) echo "target startup object not found in sysroot: $object => $resolved" >&2; exit 1 ;;
+    esac
+done
 "$TOOLS/$TARGET-ld" --version >/dev/null
 "$TOOLS/$TARGET-readelf" --version >/dev/null
 test -d "$SYSROOT/usr/include" || { echo "missing target headers" >&2; exit 1; }

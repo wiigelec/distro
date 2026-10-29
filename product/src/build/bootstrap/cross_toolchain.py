@@ -9,6 +9,7 @@ import sys
 import tempfile
 import os
 import subprocess
+import tarfile
 import time
 
 from build.host_sandbox import probe_bubblewrap, run_recipe
@@ -86,6 +87,19 @@ def _host_jobs() -> int:
         raise RuntimeError("nproc returned invalid processor count")
     return int(value)
 
+def _validate_candidate_archive(archive: Path) -> None:
+    """Reject unsafe entries before extracting an unpublished handoff candidate."""
+    from build.sources import _safe_tar_members
+    with tarfile.open(archive, 'r:xz') as tar:
+        members = tar.getmembers()
+        if not members:
+            raise RuntimeError("empty cross-toolchain archive")
+        _safe_tar_members(members)
+        for member in members:
+            # Python's data filter checks resolved links and special extraction effects.
+            tarfile.data_filter(member, '/toolchain')
+
+
 def publish_archive(root: Path, installed: Path, *, target: str, steps,
                     host_triplet: str, started: float) -> Path:
     """Publish only a candidate that works after extraction in an isolated workspace."""
@@ -104,6 +118,7 @@ def publish_archive(root: Path, installed: Path, *, target: str, steps,
         # POSIX pax format, relative paths, symlinks, hardlinks and modes preserved.
         subprocess.run(["tar", "--format=posix", "-cJf", str(candidate),
                         "-C", str(installed), "."], check=True, env={"PATH": os.defpath})
+        _validate_candidate_archive(candidate)
         print("[cross-toolchain] Candidate archive created; verifying relocation", flush=True)
         # This independent host workspace is NOT mounted when the restored toolchain
         # executes. The original build/root filesystem is also NOT mounted.
