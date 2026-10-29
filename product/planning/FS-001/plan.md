@@ -71,6 +71,38 @@ Use release archives, not Git checkouts. Retrieve the manifest's expanded URL, v
 
 Produce a **POSIX pax-compatible tar archive compressed with xz**, named `cross-toolchain.tar.xz`, under `rootdir/artifacts/`. Archive paths are relative to the contents of `rootdir/root/` (not prefixed with `root/`), with symlinks and executable modes preserved. Stage 1B will extract into its installed filesystem root; it must not need `build/`. Archive publication is transactional: create a candidate tar.xz archive at a temporary path under `artifacts/`, verify its readability and safe relative entry names, restore this **candidate** into a differently located workspace and complete all restored-toolchain functional and isolation tests, then atomically replace the final `artifacts/cross-toolchain.tar.xz` only after every gate passes. The final named archive is not an input to its own pre-publication verification. A failed candidate remains unpublished. Never claim a stale, partial, or failed artifact as successful; a failed run exits nonzero, and an existing artifact is not confused with the failed run. An implementation can use a fresh staging root per run to prevent accidental mixing with earlier contents while preserving unrelated user files.
 
+
+### Stage 1A Handoff Metadata (FS-001 amendment)
+
+Alongside `artifacts/cross-toolchain.tar.xz`, Stage 1A shall emit
+`artifacts/cross-toolchain.json` (UTF-8 JSON, `schema_version: 1`). The JSON
+is the machine-readable completion marker for this handoff, not a package
+manifest and not part of the installed filesystem archive. Required fields:
+
+- `artifact`: type `cross-toolchain`, stage `1A`, basename, `tar.xz` format,
+  archive SHA-256 and size in bytes.
+- `toolchain`: selected target triplet, sandbox sysroot `/toolchain`, and tools
+  prefix `/toolchain/tools`.
+- `sources`: ordered list of selected step IDs, authoritative package identities,
+  selected versions, source SHA-256 values, recipe basenames, and selected
+  supplementary source identities, versions and SHA-256 values.
+- `build`: UTC creation timestamp, duration, qualified host GCC triplet, Git
+  revision if available, and three-state Git working-tree cleanliness (true,
+  false, or null if it cannot be established). A commit SHA does not claim
+  complete reproducibility when the working tree is dirty.
+- `verification`: successful initial functional and restored-toolchain checks.
+
+Build derives source metadata from the selected list, not a parallel definition.
+It creates and verifies an unpublished archive candidate, generates metadata
+from the verified candidate, checks their agreement, then publishes the archive
+before publishing metadata **last** via a same-filesystem rename. Two renames
+are not atomically paired; therefore the metadata file is the sole completion
+marker and consumers must require both files and check the metadata SHA-256
+and size against the archive. Build refuses an existing named archive or
+metadata file, and failure before publication leaves no valid completed handoff.
+A consumer must not treat an archive alone as a usable handoff. Actual Stage 1B
+consumption remains out of FS-001 scope.
+
 ## Functional Evidence
 
 Successful recipe exit status alone is insufficient. Before archive publication, check: (1) expected target-prefixed assembler, linker, and GCC executable exist and report the selected target; (2) GCC can compile a minimal C source into a relocatable object and `readelf` confirms the selected x86-64 ELF machine; (3) GCC's search/sysroot paths resolve intended target headers and libraries beneath the installed filesystem and not host `/usr/include` or host libraries; (4) the initial glibc headers, crt objects, dynamic linker and libc needed for Stage 1B are installed; (5) a minimal dynamically linked C program can be linked with those target interfaces, with ELF interpreter/library references pointing to target filesystem semantics. Validate C++ include/library availability from the libstdc++ step with a small C++ compile/link check. Do not execute target binaries or claim Stage 1B was run. Check extraction of the unpublished candidate archive into a second, differently located workspace preserves paths, symlinks, and key toolchain executables; the restored toolchain must pass compile/link checks inside a fresh sandbox with the original workspace inaccessible.

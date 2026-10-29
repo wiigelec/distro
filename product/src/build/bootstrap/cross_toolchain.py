@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from pathlib import Path
 import shutil
 import sys
@@ -11,6 +12,10 @@ import subprocess
 import time
 
 from build.host_sandbox import probe_bubblewrap, run_recipe
+from build.bootstrap.cross_toolchain_metadata import (
+    ARCHIVE_NAME, METADATA_NAME, make_metadata, validate_handoff,
+    validate_published_handoff,
+)
 from build.host_requirements import qualify_host
 from build.bootstrap.cross_toolchain_verification import verify_cross_toolchain
 from build.selection import load_manifests, select_steps, SelectionError
@@ -81,7 +86,8 @@ def _host_jobs() -> int:
         raise RuntimeError("nproc returned invalid processor count")
     return int(value)
 
-def publish_archive(root: Path, installed: Path, *, target: str) -> Path:
+def publish_archive(root: Path, installed: Path, *, target: str, steps,
+                    host_triplet: str, started: float) -> Path:
     """Publish only a candidate that works after extraction in an isolated workspace."""
     artifacts = root / "artifacts"
     if artifacts.is_symlink():
@@ -89,11 +95,12 @@ def publish_archive(root: Path, installed: Path, *, target: str) -> Path:
     artifacts.mkdir(exist_ok=True)
     if not artifacts.is_dir() or artifacts.resolve() != artifacts.absolute():
         raise RuntimeError("artifact directory must be a real directory")
-    final = artifacts / "cross-toolchain.tar.xz"
-    if final.exists() or final.is_symlink():
-        raise RuntimeError("refusing to replace an existing handoff archive")
+    final = artifacts / ARCHIVE_NAME
+    final_metadata = artifacts / METADATA_NAME
+    if any(p.exists() or p.is_symlink() for p in (final, final_metadata)):
+        raise RuntimeError("refusing to replace an existing handoff archive or metadata")
     with tempfile.TemporaryDirectory(dir=artifacts, prefix="handoff-") as candidate_dir:
-        candidate = Path(candidate_dir) / "cross-toolchain.tar.xz"
+        candidate = Path(candidate_dir) / ARCHIVE_NAME
         # POSIX pax format, relative paths, symlinks, hardlinks and modes preserved.
         subprocess.run(["tar", "--format=posix", "-cJf", str(candidate),
                         "-C", str(installed), "."], check=True, env={"PATH": os.defpath})
@@ -110,8 +117,18 @@ def publish_archive(root: Path, installed: Path, *, target: str) -> Path:
                             "--no-same-owner"], check=True, env={"PATH": os.defpath})
             verify_cross_toolchain(scratch, restored, target=target,
                                    original_workspace=root)
-        # Rename inside the same filesystem only after relocation verification passes.
+        # Metadata becomes the completion marker after full relocation verification.
+        metadata = make_metadata(candidate, steps, target=target,
+                                 host_triplet=host_triplet,
+                                 duration_seconds=time.monotonic() - started)
+        validate_handoff(candidate, metadata)
+        candidate_meta = Path(candidate_dir) / METADATA_NAME
+        candidate_meta.write_text(json.dumps(metadata, indent=2, sort_keys=True) + "\n",
+                                  encoding="utf-8")
+        # Metadata last: a lone archive must never be treated as published.
         candidate.replace(final)
+        candidate_meta.replace(final_metadata)
+        validate_published_handoff(artifacts)
     print(f"[cross-toolchain] Published {final}", flush=True)
     return final
 
@@ -164,6 +181,10 @@ def run_stage(root: Path):
     verify_cross_toolchain(build, installed, target=TARGET)
     print(f"[cross-toolchain] Verification complete ({time.monotonic() - started:.1f}s total)", flush=True)
     print("[cross-toolchain] Archiving and relocation verification", flush=True)
-    published = publish_archive(root, installed, target=TARGET)
+    host_triplet = subprocess.run(["gcc", "-dumpmachine"], check=True,
+                                  capture_output=True, text=True,
+                                  env={"PATH": "/usr/bin:/bin", "LC_ALL": "C"}).stdout.strip()
+    published = publish_archive(root, installed, target=TARGET, steps=steps,
+                                host_triplet=host_triplet, started=started)
     print(f"[cross-toolchain] Stage 1A complete ({time.monotonic() - started:.1f}s): {published}", flush=True)
     return published
