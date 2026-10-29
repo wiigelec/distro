@@ -57,7 +57,7 @@ def _base_command() -> list[str]:
     # before any bind, proc, or tmpfs mount is attempted.
     cmd = [_bwrap(), "--die-with-parent", "--unshare-user", "--unshare-pid",
            "--unshare-net", "--new-session", "--clearenv", "--dir", "/tmp",
-           "--dir", "/run", "--dir", "/proc", "--dir", "/work",
+           "--dir", "/run", "--dir", "/proc", "--dev", "/dev", "--dir", "/work",
            "--dir", "/toolchain", "--tmpfs", "/tmp", "--tmpfs", "/run",
            "--proc", "/proc"]
     # Host executables and runtime libraries are read-only.

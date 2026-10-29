@@ -32,6 +32,12 @@ class SandboxTests(unittest.TestCase):
         for item in ('--unshare-user','--unshare-net','--clearenv','--proc','--tmpfs','--dir','/toolchain','/work'):
             self.assertIn(item,cmd)
         self.assertNotIn('LD_LIBRARY_PATH',cmd)
+        # A private /dev is necessary for /dev/null and compiler runtime needs.
+        # Never bind the host's actual /dev into a recipe sandbox.
+        self.assertEqual(cmd.count('--dev'), 1)
+        dev_index = cmd.index('--dev')
+        self.assertEqual(cmd[dev_index + 1], '/dev')
+        self.assertNotIn('--dev-bind', cmd)
         self.assertEqual(cmd[-2:], ['/bin/bash','/recipe/selected.sh'])
 
     @patch('build.host_sandbox.shutil.which', return_value=None)
