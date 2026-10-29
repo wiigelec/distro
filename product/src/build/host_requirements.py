@@ -42,7 +42,7 @@ MINIMUMS = {
 
 def _version(value: str) -> tuple[int, ...]:
     """Compare numeric components, including historic suffixes such as 2.5.1a."""
-    match = re.search(r"(?<![A-Za-z0-9])([0-9]+(?:\.[0-9]+)+)([a-z]?)", value, re.I)
+    match = re.search(r"(?<![A-Za-z0-9])([0-9]+(?:\.[0-9]+)+)([a-z]?)(?![A-Za-z0-9])", value, re.I)
     if match is None:
         raise HostRequirementsError(f"cannot determine tool version: {value[:120]!r}")
     parts = tuple(int(v) for v in match.group(1).split("."))
@@ -69,16 +69,29 @@ def _check_tools() -> None:
         exe = shutil.which(command, path="/usr/bin:/bin")
         if not exe:
             raise HostRequirementsError(f"missing required host tool: {name} ({command})")
+        # Reject aliases that resolve outside the host tool roots exposed to bwrap.
+        resolved = Path(exe).resolve(strict=True)
+        if not resolved.is_file() or not any(resolved.is_relative_to(Path(prefix))
+                                                  for prefix in ('/usr', '/bin')):
+            raise HostRequirementsError(f"host tool outside sandbox mounts: {command}: {resolved}")
         output = (_capture([exe, "-e", 'printf "%vd\n", $^V']) if name == "perl"
                   else _capture([exe, "--version"]))
-        # Uutils coreutils is a separately qualified implementation.
-        if name == "coreutils" and "uutils" in output.lower():
+        # Parse only the version banner, not unrelated library/version text later.
+        banner = output.splitlines()[0] if output else ''
+        if not banner:
+            raise HostRequirementsError(f"empty version output: {name}")
+        if name == "coreutils" and "uutils" in banner.lower():
             minimum = "0.8"
-        if not _at_least(output, minimum):
+        if not _at_least(banner, minimum):
             raise HostRequirementsError(f"{name} below required {minimum}: {output.splitlines()[0]}")
     for command in ("readelf", "as", "ld", "gcc", "g++", "bwrap"):
-        if not shutil.which(command, path="/usr/bin:/bin"):
+        exe = shutil.which(command, path="/usr/bin:/bin")
+        if not exe:
             raise HostRequirementsError(f"missing required host command: {command}")
+        resolved = Path(exe).resolve(strict=True)
+        if not resolved.is_file() or not any(resolved.is_relative_to(Path(prefix))
+                                                  for prefix in ('/usr', '/bin')):
+            raise HostRequirementsError(f"host command outside sandbox mounts: {command}: {resolved}")
 
 
 def _check_shell_tools() -> None:
@@ -98,7 +111,11 @@ def _check_shell_tools() -> None:
 
 
 def _check_native_compilers() -> None:
-    machine = _capture(['/usr/bin/gcc', '-dumpmachine']).splitlines()[0]
+    gcc = shutil.which('gcc', path='/usr/bin:/bin')
+    gxx = shutil.which('g++', path='/usr/bin:/bin')
+    if not gcc or not gxx:
+        raise HostRequirementsError('native C and C++ compilers required')
+    machine = _capture([gcc, '-dumpmachine']).splitlines()[0]
     if not machine.startswith('x86_64-'):
         raise HostRequirementsError(f'unsupported native GCC host triplet: {machine}')
     for compiler, suffix, source in (
@@ -109,7 +126,7 @@ def _check_native_compilers() -> None:
             src = Path(tmp) / ('probe' + suffix)
             out = Path(tmp) / 'probe'
             src.write_text(source)
-            _capture([f'/usr/bin/{compiler}', str(src), '-o', str(out)])
+            _capture([gcc if compiler == 'gcc' else gxx, str(src), '-o', str(out)])
             result = _capture([str(out)])
             if result != ('host-c-ok' if compiler == 'gcc' else 'host-cxx-ok'):
                 raise HostRequirementsError(f'{compiler} compiled host executable failed')

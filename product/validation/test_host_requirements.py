@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
-from build.host_requirements import _version, _at_least, qualify_host, HostRequirementsError
+from build.host_requirements import _version, _at_least, qualify_host, HostRequirementsError, _check_tools, _check_native_compilers
 from build.bootstrap.cross_toolchain import run_stage
 
 
@@ -34,6 +34,30 @@ class HostQualificationTests(unittest.TestCase):
             with self.assertRaises(HostRequirementsError): run_stage(Path(tmp))
             self.assertEqual(list(Path(tmp).iterdir()), [])
             sandbox.assert_not_called()
+
+    def test_banner_does_not_use_later_version_lines(self):
+        # A library version printed later must not qualify an older tool.
+        with patch('build.host_requirements.MINIMUMS', {'make': ('make', '4.0')}), \
+             patch('build.host_requirements.shutil.which', return_value='/usr/bin/make'), \
+             patch('build.host_requirements.Path.resolve', return_value=Path('/usr/bin/make')), \
+             patch('build.host_requirements.Path.is_file', return_value=True), \
+             patch('build.host_requirements._capture', return_value='GNU Make 3.8\nGNU libc 9.9'):
+            with self.assertRaisesRegex(HostRequirementsError, 'below required'):
+                _check_tools()
+
+    def test_compilers_use_qualified_resolved_command_path(self):
+        commands = []
+        def capture(args):
+            commands.append(args)
+            if '-dumpmachine' in args: return 'x86_64-pc-linux-gnu'
+            if len(args) == 1: return 'host-c-ok' if args[0].endswith('/probe') else ''
+            return ''
+        # Compiler invocation is tested without actually running a host compiler.
+        with patch('build.host_requirements.shutil.which', side_effect=lambda name, **kw: '/bin/' + name), \
+             patch('build.host_requirements._capture', side_effect=capture):
+            with self.assertRaises(HostRequirementsError):
+                _check_native_compilers()
+        self.assertEqual(commands[0], ['/bin/gcc', '-dumpmachine'])
 
     def test_tool_checks_use_minimums(self):
         from build.host_requirements import MINIMUMS

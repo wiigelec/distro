@@ -119,9 +119,14 @@ def probe_bubblewrap() -> None:
     cmd = _base_command()
     cmd += ["--setenv", "PATH", "/usr/bin:/bin", "--", exe, "-c",
             "test -d /tmp && test -d /proc && test ! -w /usr && "
-            "test ! -e /home && test ! -e /work/unexpected"]
+            "test ! -e /home && test ! -e /work/unexpected && "
+            "test -z \"${DISTRO_PREFLIGHT_SECRET+x}\" && "
+            "test -z \"${HOME+x}\" && "
+            "test -w /tmp && test ! -w /etc && "
+            "! (echo forbidden > /etc/distro-preflight-write-test) 2>/dev/null"]
     try:
-        subprocess.run(cmd, check=True, env={"PATH": os.defpath},
+        subprocess.run(cmd, check=True,
+                       env={"PATH": os.defpath, "DISTRO_PREFLIGHT_SECRET": "not-for-sandbox"},
                        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     except (OSError, subprocess.CalledProcessError) as exc:
         raise SandboxError(f"Bubblewrap namespace/mount preflight failed: {exc}") from exc

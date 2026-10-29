@@ -1,4 +1,4 @@
-"""FS-001 host-sandbox tests; no inactive requirements are marked complete."""
+"""Host-sandbox isolation and command construction regression tests."""
 from __future__ import annotations
 import os
 import shutil
@@ -51,6 +51,16 @@ class SandboxTests(unittest.TestCase):
         link=self.base/'linked'; link.symlink_to(self.work,target_is_directory=True)
         with self.assertRaises(SandboxError):
             recipe_command(link,self.root,self.recipe,**self.kwargs)
+
+    @patch('build.host_sandbox.shutil.which', return_value='/usr/bin/bwrap')
+    def test_probe_command_rejects_write_and_host_env_leak(self, _):
+        with patch('build.host_sandbox.Path.is_file', return_value=True),              patch('build.host_sandbox.subprocess.run') as run:
+            probe_bubblewrap()
+            cmd = run.call_args.args[0]
+            self.assertIn('DISTRO_PREFLIGHT_SECRET', cmd[-1])
+            self.assertIn('/etc/distro-preflight-write-test', cmd[-1])
+            self.assertEqual(run.call_args.kwargs['env']['DISTRO_PREFLIGHT_SECRET'], 'not-for-sandbox')
+            self.assertIn('--clearenv', cmd)
 
     def test_actual_bwrap_probe_and_recipe(self):
         if not shutil.which('bwrap'):
