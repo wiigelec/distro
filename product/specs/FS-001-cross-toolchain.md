@@ -86,8 +86,6 @@ The completed Stage 1A result shall provide the target assembler/linker, initial
 
 **Classification: B**
 
-**State: Inactive**
-
 On success, Stage 1A shall create in `<rootdir>/artifacts/` an independently usable archive of the installed `<rootdir>/root/` filesystem, preserving the filesystem semantics needed for Stage 1B and excluding temporary construction work. It shall also produce `cross-toolchain.json` metadata identifying the archive, SHA-256, size, selected target and mount contract, source selections and verification outcome. The metadata shall be derived from authoritative selections and shall act as the completion marker for a verified handoff.
 
 ### FS-001-NR-013 — Failure Integrity

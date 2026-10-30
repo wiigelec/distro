@@ -31,6 +31,12 @@
         "fs001-entrypoint-contract",
         "fs001-selection-contract"
       ]
+    },
+    {
+      "requirement": "FS-001-NR-012",
+      "tasks": [
+        "fs001-handoff-contract"
+      ]
     }
   ]
 }
