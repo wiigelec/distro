@@ -68,8 +68,6 @@ Stage 1A shall install constructed target filesystem contents beneath `<rootdir>
 
 **Classification: B**
 
-**State: Inactive**
-
 The completed Stage 1A result shall provide the target assembler/linker, initial compiler and target header/C-library interface capabilities selected as necessary for the subsequent cross-chroot construction, and shall be demonstrated usable by relevant compile/link and target-artifact checks without requiring implementation of Stage 1B.
 
 ### FS-001-NR-012 — Archive Handoff
@@ -81,8 +79,6 @@ On success, Stage 1A shall create in `<rootdir>/artifacts/` an independently usa
 ### FS-001-NR-013 — Failure Integrity
 
 **Classification: B**
-
-**State: Inactive**
 
 A failed source verification, package construction, installation, functional check, archive export or metadata publication shall fail the Stage 1A command and shall not report a partial or stale archive as a successful Stage 1B handoff. A handoff is complete only when archive and metadata are both present and the archive matches the recorded checksum and size.
 
@@ -123,7 +119,5 @@ Stage 1A shall explicitly control the sandbox execution environment, host resour
 ### FS-001-NR-019 — Cross-Workspace Handoff Portability
 
 **Classification: B**
-
-**State: Inactive**
 
 The Stage 1A filesystem archive shall be functionally usable after restoration into a different absolute host workspace, using a stable sandbox-visible installed filesystem location without relying on the original construction workspace. This shall be demonstrated by target compilation and linking against the restored toolchain and target interfaces with the original workspace unavailable.

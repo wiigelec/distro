@@ -301,3 +301,108 @@ with TemporaryDirectory(prefix="fs001-source-contract-") as tmp:
         raise AssertionError("insecure URL accepted")
 '''
     return _contract_subprocess(code)
+
+
+
+def failure_integrity_contract() -> bool:
+    """Exercise failure propagation and incomplete handoff cleanup without rebuilding."""
+    code = r'''from pathlib import Path
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
+from types import SimpleNamespace
+import io,tarfile,subprocess
+from build.bootstrap import cross_toolchain as ct
+from build.bootstrap import cross_toolchain_metadata as md
+from build.selection import SelectionError
+
+def rejected(fn, exception):
+    try: fn()
+    except exception: return
+    raise AssertionError("expected failure was accepted")
+
+with TemporaryDirectory(prefix="fs001-failure-gate-") as tmp:
+    root=Path(tmp)
+    installed=root/"root"
+    installed.mkdir()
+    (installed/"sentinel").write_text("installed")
+    build=root/"build"
+    build.mkdir()
+    artifacts=root/"artifacts"
+    artifacts.mkdir()
+    # Invalid partial handoffs cannot be considered completed artifacts.
+    (artifacts/md.ARCHIVE_NAME).write_bytes(b"partial")
+    rejected(lambda: md.validate_published_handoff(artifacts), ValueError)
+    (artifacts/md.ARCHIVE_NAME).unlink()
+    # Construction failures propagate and cannot publish handoff metadata.
+    construction=root/"construction"
+    construction.mkdir()
+    with patch.object(ct,"selected_steps",return_value=({},[SimpleNamespace(id="bad",name="bad",version="1",recipe=root/"missing.sh")])), \
+         patch.object(ct,"qualify_host"), patch.object(ct,"probe_bubblewrap"), \
+         patch.object(ct,"_host_jobs",return_value=1), \
+         patch.object(ct,"prepare_step",side_effect=SelectionError("source rejected")):
+        rejected(lambda: ct.run_stage(construction), RuntimeError)
+    assert not (artifacts/md.METADATA_NAME).exists()
+    # Pre-existing handoffs must not be silently replaced.
+    (artifacts/md.ARCHIVE_NAME).write_bytes(b"existing")
+    rejected(lambda: ct.publish_archive(root,installed,target=ct.TARGET,steps=[],host_triplet="host",started=0),RuntimeError)
+    assert (artifacts/md.ARCHIVE_NAME).read_bytes()==b"existing"
+    (artifacts/md.ARCHIVE_NAME).unlink()
+    # Inject failure after archive rename and before metadata publication.
+    # This tests the cleanup block at the actual two-file commit boundary.
+    real_replace=Path.replace
+    def fail_metadata_replace(self,target):
+        if self.name == md.METADATA_NAME:
+            raise OSError("simulated metadata publication failure")
+        return real_replace(self,target)
+    def make_archive(args,**kwargs):
+        if args[0]=="tar" and "-cJf" in args:
+            candidate=Path(args[args.index("-cJf")+1])
+            with tarfile.open(candidate,"w:xz",format=tarfile.PAX_FORMAT) as t:
+                info=tarfile.TarInfo("./sentinel")
+                data=b"installed"
+                info.size=len(data)
+                t.addfile(info,io.BytesIO(data))
+        elif args[0]=="tar" and "-xJf" in args:
+            pass
+        else: raise AssertionError("unexpected subprocess")
+        return subprocess.CompletedProcess(args,0)
+    with patch.object(ct.subprocess,"run",side_effect=make_archive), \
+         patch.object(ct,"verify_cross_toolchain"), \
+         patch.object(ct,"make_metadata",return_value={"synthetic":True}), \
+         patch.object(ct,"validate_handoff"), \
+         patch.object(Path,"replace",new=fail_metadata_replace):
+        rejected(lambda: ct.publish_archive(root,installed,target=ct.TARGET,steps=[],host_triplet="host",started=0),OSError)
+    assert not (artifacts/md.ARCHIVE_NAME).exists(), "archive survived failed metadata publication"
+    assert not (artifacts/md.METADATA_NAME).exists(), "metadata survived failed metadata publication"
+    # Relocation verification failure occurs before either publication.
+    with patch.object(ct.subprocess,"run",side_effect=make_archive), \
+         patch.object(ct,"verify_cross_toolchain",side_effect=RuntimeError("relocation failed")):
+        rejected(lambda: ct.publish_archive(root,installed,target=ct.TARGET,steps=[],host_triplet="host",started=0),RuntimeError)
+    assert not (artifacts/md.ARCHIVE_NAME).exists()
+    assert not (artifacts/md.METADATA_NAME).exists()
+'''
+    return _contract_subprocess(code)
+
+
+def functional_relocation_evidence_contract() -> bool:
+    """Check immutable FS-001 handoff evidence identity; do not claim to rerun compilation."""
+    import json
+    from pathlib import Path
+    evidence_path = ROOT / "product" / "validation" / "fs001-stage1a-evidence.json"
+    evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+    expected = {
+        "source_revision": "f9d34c58308e7d9f66033ec9256b51b79feefc3c",
+        "target": "x86_64-distro-linux-gnu",
+        "archive_sha256": "05eccf763bb6621553a0a738cba9e88c7b0e562194eeb535f4b9587b39ddc9b7",
+        "archive_size_bytes": 469689576,
+        "archive_entries": 4625,
+        "functional": "passed",
+        "relocation": "passed",
+    }
+    for key, value in expected.items():
+        if evidence.get(key) != value:
+            print(f"FAIL FS-001 evidence {key}: {evidence.get(key)!r}", file=sys.stderr)
+            return False
+    if evidence.get("evidence_kind") != "recorded-completed-build-and-independent-handoff-inspection":
+        return False
+    return True

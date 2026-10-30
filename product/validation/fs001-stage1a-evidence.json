@@ -1,0 +1,13 @@
+{
+  "evidence_kind": "recorded-completed-build-and-independent-handoff-inspection",
+  "source_revision": "f9d34c58308e7d9f66033ec9256b51b79feefc3c",
+  "target": "x86_64-distro-linux-gnu",
+  "archive_sha256": "05eccf763bb6621553a0a738cba9e88c7b0e562194eeb535f4b9587b39ddc9b7",
+  "archive_size_bytes": 469689576,
+  "archive_entries": 4625,
+  "functional": "passed",
+  "relocation": "passed",
+  "limitations": "Archived independent inspection checks metadata, checksum and tar readability; actual compiler and relocation executions were reported in the Stage 1A build verification, not re-executed by this gate.",
+  "source_metadata": "cross-toolchain.json in Stage 1A artifacts",
+  "independent_report": "fs001-handoff-evidence.json, 2026-10-30"
+}

@@ -79,6 +79,25 @@
       "tasks": [
         "fs001-workspace-recipe-sandbox"
       ]
+    },
+    {
+      "requirement": "FS-001-NR-013",
+      "tasks": [
+        "fs001-failure-integrity",
+        "fs001-handoff-contract"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-011",
+      "tasks": [
+        "fs001-functional-relocation-evidence"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-019",
+      "tasks": [
+        "fs001-functional-relocation-evidence"
+      ]
     }
   ]
 }
