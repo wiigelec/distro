@@ -43,9 +43,8 @@ for language in c c++; do
         header=iostream
     fi
     dependencies="$(printf '#include <%s>\n' "$header" | "$driver" -x "$language" -M -MT fs001_headers -)"
-    dependencies="$(printf '%s
-' "$dependencies" | tr '
-' ' ' | sed 's/\ / /g')"
+    # Remove GCC backslash-newline continuations before splitting paths.
+    dependencies="$(printf '%s\n' "$dependencies" | sed 's/\\$//' | tr '\n' ' ')"
     case "$dependencies" in
         'fs001_headers:'*) ;;
         *) echo "invalid compiler dependency output: $language" >&2; exit 1 ;;
