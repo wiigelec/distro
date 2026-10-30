@@ -88,48 +88,65 @@ def _host_jobs() -> int:
     return int(value)
 
 def _validate_candidate_archive(archive: Path) -> None:
-    """Reject unsafe entries before extracting an unpublished handoff candidate."""
-    # Installed target filesystems may legitimately contain absolute symlinks.
-    # Unlike source extraction, those links are interpreted within the target root.
+    """Validate a GNU-tar filesystem snapshot before restoring into an empty root.
+
+    Absolute symlink targets are valid *target-runtime* paths; the archive must
+    never contain a member below any symlink, so extraction cannot write through
+    one into the host. Member names have a single unambiguous GNU tar form.
+    """
     import posixpath
+
     with tarfile.open(archive, "r:xz") as tar:
         members = tar.getmembers()
         if not members:
             raise RuntimeError("empty cross-toolchain archive")
+        names = {}
         symlinks = set()
-        names = set()
         for member in members:
-            name = member.name
+            raw = member.name
+            if raw == ".":
+                if not member.isdir():
+                    raise RuntimeError("archive root must be a directory")
+                continue
+            if not raw.startswith("./") or raw.startswith("././"):
+                raise RuntimeError(f"noncanonical archive member name: {raw}")
+            name = raw[2:].rstrip("/")
             if (not name or name.startswith("/") or
-                    any(part == ".." for part in name.split("/"))):
-                raise RuntimeError(f"unsafe archive member name: {name}")
+                    any(part in ("", ".", "..") for part in name.split("/")) or
+                    posixpath.normpath(name) != name):
+                raise RuntimeError(f"unsafe archive member name: {raw}")
+            if name in names:
+                raise RuntimeError(f"duplicate archive member: {raw}")
             if not (member.isdir() or member.isfile() or member.issym() or member.islnk()):
-                raise RuntimeError(f"unsupported filesystem archive member: {name}")
-            normalized = posixpath.normpath(name)
-            if normalized in names and normalized != ".":
-                raise RuntimeError(f"duplicate archive member: {name}")
-            names.add(normalized)
+                raise RuntimeError(f"unsupported filesystem archive member: {raw}")
+            names[name] = member
             if member.issym():
                 if not member.linkname:
-                    raise RuntimeError(f"empty symlink target: {name}")
-                symlinks.add(normalized)
+                    raise RuntimeError(f"empty symlink target: {raw}")
+                symlinks.add(name)
+                # Absolute links are target-root paths, not host extraction paths.
+                # No archive member may descend through them (checked below).
                 if not member.linkname.startswith("/"):
-                    relative = posixpath.normpath(posixpath.join(posixpath.dirname(normalized), member.linkname))
-                    if relative == ".." or relative.startswith("../"):
-                        raise RuntimeError(f"escaping relative symlink: {name}")
+                    resolved = posixpath.normpath(posixpath.join(posixpath.dirname(name), member.linkname))
+                    if resolved in ("..",) or resolved.startswith("../"):
+                        raise RuntimeError(f"escaping relative symlink: {raw}")
+        for name, member in names.items():
+            parent = posixpath.dirname(name)
+            while parent:
+                if parent in symlinks:
+                    raise RuntimeError(f"archive member beneath symlink: {name}")
+                parent = posixpath.dirname(parent)
             if member.islnk():
                 target = member.linkname
+                if target.startswith("./"):
+                    target = target[2:]
+                target = target.rstrip("/")
                 if (not target or target.startswith("/") or
-                        posixpath.normpath(target) in ("..",) or
-                        posixpath.normpath(target).startswith("../")):
-                    raise RuntimeError(f"unsafe hardlink: {name}")
-        # GNU tar must never traverse a symlink while writing another entry.
-        for name in names:
-            parent = posixpath.dirname(name)
-            while parent not in ("", ".", "/"):
-                if parent in symlinks:
-                    raise RuntimeError(f"archive entry beneath a symlink: {name}")
-                parent = posixpath.dirname(parent)
+                        any(part in ("", ".", "..") for part in target.split("/"))):
+                    raise RuntimeError(f"unsafe hardlink target: {name}")
+                linked = names.get(target)
+                if linked is None or not linked.isfile():
+                    raise RuntimeError(f"hardlink target must be an archived regular file: {name}")
 
 
 def publish_archive(root: Path, installed: Path, *, target: str, steps,
@@ -160,8 +177,11 @@ def publish_archive(root: Path, installed: Path, *, target: str, steps,
             restored = relocated / "root"
             scratch.mkdir()
             restored.mkdir()
+            # Validated entries have no symlinked ancestor; restored is fresh.
+            # GNU tar creates absolute symlinks without dereferencing them.
             subprocess.run(["tar", "-xJf", str(candidate), "-C", str(restored),
-                            "--no-same-owner"], check=True, env={"PATH": os.defpath})
+                            "--no-same-owner", "--no-overwrite-dir"],
+                           check=True, env={"PATH": os.defpath})
             verify_cross_toolchain(scratch, restored, target=target,
                                    original_workspace=root)
         # Metadata becomes the completion marker after full relocation verification.

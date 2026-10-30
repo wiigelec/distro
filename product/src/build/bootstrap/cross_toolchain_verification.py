@@ -31,8 +31,9 @@ for tool in gcc g++; do
         echo "incorrect compiler sysroot: $tool" >&2; exit 1;
     }
 done
-# Inspect actual preprocessor dependencies, not GCC's preferred textual
-# representation of a search directory or startup-object filename.
+# Resolve every header actually used by a C/C++ standard-library include.
+# Compiler-private headers under /toolchain/tools are permitted; host fallback
+# and symlinks resolving outside the mounted target are not.
 for language in c c++; do
     if [[ "$language" = c ]]; then
         driver="$TOOLS/$TARGET-gcc"
@@ -41,12 +42,31 @@ for language in c c++; do
         driver="$TOOLS/$TARGET-g++"
         header=iostream
     fi
-    dependencies="$(printf '#include <%s>\n' "$header" | "$driver" -x "$language" -M -)"
-    printf '%s\n' "$dependencies" | grep -Fq '/toolchain/' || {
-        echo "target headers not resolved beneath sysroot: $language" >&2; exit 1;
-    }
-    if printf '%s\n' "$dependencies" | grep -Eq '(^|[[:space:]])/(usr|lib|lib64)/'; then
-        echo "host header fallback detected: $language" >&2; exit 1
+    dependencies="$(printf '#include <%s>\n' "$header" | "$driver" -x "$language" -M -MT fs001_headers -)"
+    dependencies="$(printf '%s
+' "$dependencies" | tr '
+' ' ' | sed 's/\ / /g')"
+    case "$dependencies" in
+        'fs001_headers:'*) ;;
+        *) echo "invalid compiler dependency output: $language" >&2; exit 1 ;;
+    esac
+    saw_target=false
+    for dependency in ${dependencies#fs001_headers:}; do
+        case "$dependency" in
+            /toolchain/*) ;;
+            *) echo "non-toolchain header dependency: $dependency" >&2; exit 1 ;;
+        esac
+        real="$(readlink -f -- "$dependency")"
+        case "$real" in
+            /toolchain/*) test -f "$real" || exit 1 ;;
+            *) echo "header resolves outside target root: $dependency => $real" >&2; exit 1 ;;
+        esac
+        case "$real" in
+            /toolchain/usr/include/*) saw_target=true ;;
+        esac
+    done
+    if [[ "$saw_target" != true ]]; then
+        echo "no target C library headers observed: $language" >&2; exit 1
     fi
 done
 # The following actual C/C++ links exercise the startup objects and target
