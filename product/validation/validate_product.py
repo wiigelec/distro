@@ -8,12 +8,14 @@ from typing import Callable
 
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST = ROOT / "product" / "validation" / "requirement-evaluation.json"
-from fs001_tasks import entrypoint_contract, selection_contract, handoff_contract
+from fs001_tasks import entrypoint_contract, selection_contract, handoff_contract, workspace_recipe_sandbox_contract, verified_source_contract
 
 TASKS: dict[str, Callable[[], bool | None]] = {
     "fs001-entrypoint-contract": entrypoint_contract,
     "fs001-selection-contract": selection_contract,
     "fs001-handoff-contract": handoff_contract,
+    "fs001-workspace-recipe-sandbox": workspace_recipe_sandbox_contract,
+    "fs001-verified-source": verified_source_contract,
 }
 
 

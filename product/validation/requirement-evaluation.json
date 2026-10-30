@@ -37,6 +37,48 @@
       "tasks": [
         "fs001-handoff-contract"
       ]
+    },
+    {
+      "requirement": "FS-001-NR-003",
+      "tasks": [
+        "fs001-workspace-recipe-sandbox"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-006",
+      "tasks": [
+        "fs001-workspace-recipe-sandbox"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-007",
+      "tasks": [
+        "fs001-workspace-recipe-sandbox"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-008",
+      "tasks": [
+        "fs001-verified-source"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-010",
+      "tasks": [
+        "fs001-workspace-recipe-sandbox"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-017",
+      "tasks": [
+        "fs001-workspace-recipe-sandbox"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-018",
+      "tasks": [
+        "fs001-workspace-recipe-sandbox"
+      ]
     }
   ]
 }

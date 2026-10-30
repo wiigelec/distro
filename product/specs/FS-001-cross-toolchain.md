@@ -20,8 +20,6 @@ Stage 1A shall remain an operation of Build, implemented under the established B
 
 **Classification: B**
 
-**State: Inactive**
-
 The selected Bootstrap workspace shall use `build/` for extraction and compilation, `root/` for the installed `/` filesystem, and `artifacts/` for the archived installed filesystem. Temporary build work shall not be part of the delivered filesystem archive.
 
 ### FS-001-NR-004 — Authoritative Manifests
@@ -40,23 +38,17 @@ The user-maintained YAML `product/src/build/bootstrap/cross-toolchain/lists/cros
 
 **Classification: B**
 
-**State: Inactive**
-
 Build shall directly execute the selected user-maintained Bash recipes under `product/src/build/bootstrap/cross-toolchain/recipes/`. Package-specific configure, compile, patch and installation instructions shall remain in those recipes, not in Build application code or an interpreted/generated recipe language.
 
 ### FS-001-NR-007 — Recipe Execution Context
 
 **Classification: B**
 
-**State: Inactive**
-
 Build shall provide the documented source, build, installation-root, version/identity and target context required by selected recipes, and those recipes shall be independently executable when supplied with that context.
 
 ### FS-001-NR-008 — Source Selection and Verification
 
 **Classification: B**
-
-**State: Inactive**
 
 Build shall resolve upstream release archives using the explicitly selected versions, acquire and verify sources according to the authoritative manifests before construction, and reject a selected source when its required verification fails. Stage 1A shall not discover or silently substitute a different upstream version.
 
@@ -69,8 +61,6 @@ Stage 1A shall honor the relevant manifest-defined requirements and provide a de
 ### FS-001-NR-010 — Installed Root Isolation
 
 **Classification: B**
-
-**State: Inactive**
 
 Stage 1A shall install constructed target filesystem contents beneath `<rootdir>/root/` rather than into the foreign host's system filesystem. Any expected reliance on foreign-host tools during host execution shall remain explicit.
 
@@ -122,15 +112,11 @@ FS-001 shall remain subject to semantic review against the selected accepted Des
 
 **Classification: B**
 
-**State: Inactive**
-
 Every FS-001 package construction recipe shall execute inside the required controlled host sandbox, using only declared writable staging locations; if the sandbox cannot be established, Stage 1A shall fail without running the recipe unrestricted. Host system files shall not be writable by construction recipes.
 
 ### FS-001-NR-018 — Controlled Host Environment and Paths
 
 **Classification: B**
-
-**State: Inactive**
 
 Stage 1A shall explicitly control the sandbox execution environment, host resource visibility, executable search paths, installation paths, and toolchain target/sysroot paths so that inherited host variables, host system libraries, and absolute host workspace locations do not silently control target construction.
 

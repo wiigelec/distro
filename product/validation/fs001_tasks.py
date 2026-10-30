@@ -147,3 +147,157 @@ with tempfile.TemporaryDirectory(prefix="fs001-handoff-gate-") as tmp:
         print(result.stderr or result.stdout, file=sys.stderr)
         return False
     return True
+
+
+
+def _contract_subprocess(code: str) -> bool:
+    env = {"PATH": os.defpath, "PYTHONPATH": str(BUILD_SRC), "PYTHONDONTWRITEBYTECODE": "1"}
+    result = subprocess.run([sys.executable, "-B", "-c", code], cwd=ROOT,
+                            env=env, capture_output=True, text=True)
+    if result.returncode:
+        print(result.stderr or result.stdout, file=sys.stderr)
+        return False
+    return True
+
+
+def workspace_recipe_sandbox_contract() -> bool:
+    """Exercise per-step roots, sandbox invocation, environment, and mount rejection."""
+    code = r'''from pathlib import Path
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
+import subprocess
+from build.bootstrap import cross_toolchain as ct
+from build import host_sandbox as hs
+from build.selection import Step, Source, Manifest
+
+with TemporaryDirectory(prefix="fs001-native-contract-") as directory:
+    root = Path(directory)
+    work = root / "build"
+    work.mkdir()
+    installed = root / "root"
+    installed.mkdir()
+    cache = work / "sources"
+    cache.mkdir()
+    recipe = root / "step.sh"
+    recipe.write_text("#!/bin/bash\nexit 0\n")
+    manifest = Manifest("gcc", Source("https://example.invalid/{version}","sha256"), (), (), {})
+    step1 = Step("gcc-pass1", "gcc", "16.2.0", recipe, "a"*64, {})
+    step2 = Step("gcc-libstdcpp", "gcc", "16.2.0", recipe, "a"*64, {})
+    extracted = []
+    def extract(_archive, dest):
+        dest.mkdir()
+        extracted.append(dest)
+    with patch.object(ct,"_archive",return_value=root/"download.tar.xz"), patch.object(ct,"_extract_single",side_effect=extract):
+        first = ct.prepare_step(step1,manifest,work,cache)
+        second = ct.prepare_step(step2,manifest,work,cache)
+    assert first[0] != second[0] and first[1] != second[1]
+    assert first[0].parent == work/"steps"/"gcc-pass1"
+    assert second[0].parent == work/"steps"/"gcc-libstdcpp"
+    assert all(p.is_dir() for p in (*first,*second))
+    try:
+        ct.prepare_step(step1,manifest,work,cache)
+    except Exception:
+        pass
+    else:
+        raise AssertionError("reused step workspace accepted")
+    with patch.object(hs,"_bwrap",return_value="/usr/bin/bwrap"):
+        cmd = hs.recipe_command(work,installed,recipe,source_dir="/work/steps/gcc-pass1/source",
+               build_dir="/work/steps/gcc-pass1/build",package="gcc",version="16.2.0",
+               step_id="gcc-pass1",target="x86_64-distro-linux-gnu",jobs=2)
+        for flag in ("--unshare-user","--unshare-pid","--unshare-net","--clearenv","--ro-bind","--bind","--setenv"):
+            assert flag in cmd, flag
+        assert cmd.count("--bind") == 2
+        assert cmd[cmd.index("--bind")+2] == "/work"
+        assert cmd[cmd.index("--bind",cmd.index("--bind")+1)+2] == "/toolchain"
+        assert cmd[-2:] == ["/bin/bash","/recipe/selected.sh"]
+        for label,value in (("DISTRO_ROOT_DIR","/toolchain"),("DISTRO_PACKAGE_VERSION","16.2.0"),
+                            ("DISTRO_TARGET","x86_64-distro-linux-gnu"),("HOME","/work")):
+            assert ["--setenv",label,value] == cmd[cmd.index(label)-1:cmd.index(label)+2]
+        assert "LD_LIBRARY_PATH" not in cmd and "CPATH" not in cmd
+        assert "--" in cmd
+        try:
+            hs.recipe_command(work,installed,recipe,source_dir="/etc",build_dir="/work/steps/gcc-pass1/build",
+                   package="gcc",version="16.2.0",step_id="gcc-pass1")
+        except hs.SandboxError:
+            pass
+        else:
+            raise AssertionError("outside source directory accepted")
+        try:
+            hs._workspace_mounts(work,work)
+        except hs.SandboxError:
+            pass
+        else:
+            raise AssertionError("overlapping writable mounts accepted")
+    # A missing sandbox executable cannot fall through to unrestricted execution.
+    with patch.object(hs.shutil,"which",return_value=None):
+        try:
+            hs._base_command()
+        except hs.SandboxError:
+            pass
+        else:
+            raise AssertionError("missing bwrap accepted")
+    # Recipe invocation must use the constructed sandbox command, never bare bash.
+    with patch.object(hs,"recipe_command",return_value=["false"]), patch.object(hs.subprocess,"run",side_effect=subprocess.CalledProcessError(1,"false")) as runner:
+        try:
+            hs.run_recipe()
+        except hs.SandboxError:
+            pass
+        else:
+            raise AssertionError("failed sandbox command accepted")
+        runner.assert_called_once()
+'''
+    return _contract_subprocess(code)
+
+
+def verified_source_contract() -> bool:
+    """Exercise HTTPS source checksum rejection, successful publication, and cleanup."""
+    code = r'''from pathlib import Path
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
+import io
+import hashlib
+from build.selection import Source, SelectionError
+from build.sources import fetch_verified
+
+class Response(io.BytesIO):
+    def __init__(self, content, url):
+        super().__init__(content)
+        self.url=url
+    def geturl(self): return self.url
+    def __enter__(self): return self
+    def __exit__(self,*args): self.close()
+
+with TemporaryDirectory(prefix="fs001-source-contract-") as tmp:
+    dest = Path(tmp)/"verified.tar.xz"
+    payload = b"verified upstream archive bytes"
+    digest = hashlib.sha256(payload).hexdigest()
+    source = Source("https://example.invalid/archive-{version}.tar.xz","sha256")
+    with patch("build.sources.urlopen",side_effect=lambda url,timeout: Response(payload,url)) as opener:
+        assert fetch_verified(source,"1.2",dest,digest) == dest
+        assert dest.read_bytes() == payload
+        assert opener.call_args.args[0].endswith("archive-1.2.tar.xz")
+    dest.unlink()
+    with patch("build.sources.urlopen",side_effect=lambda url,timeout: Response(payload,url)):
+        try:
+            fetch_verified(source,"1.2",dest,"0"*64)
+        except SelectionError:
+            pass
+        else:
+            raise AssertionError("wrong checksum accepted")
+    assert not dest.exists() and not dest.with_name(dest.name+".partial").exists()
+    with patch("build.sources.urlopen",side_effect=lambda url,timeout: Response(payload,"http://example.invalid/archive")):
+        try:
+            fetch_verified(source,"1.2",dest,digest)
+        except SelectionError:
+            pass
+        else:
+            raise AssertionError("insecure redirect accepted")
+    assert not dest.exists() and not dest.with_name(dest.name+".partial").exists()
+    try:
+        fetch_verified(Source("http://example.invalid/{version}","sha256"),"1.2",dest,digest)
+    except SelectionError:
+        pass
+    else:
+        raise AssertionError("insecure URL accepted")
+'''
+    return _contract_subprocess(code)
