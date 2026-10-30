@@ -6,8 +6,6 @@ Evaluation classifications: **M** mechanical; **S** semantic; **B** both. Requir
 
 **Classification: B**
 
-**State: Inactive**
-
 `product/scripts/build` shall support `cross-toolchain --root <rootdir>`, selecting the Stage 1A package list and host execution through the shared Build engine.
 
 ### FS-001-NR-002 — Bootstrap Ownership
@@ -30,15 +28,11 @@ The selected Bootstrap workspace shall use `build/` for extraction and compilati
 
 **Classification: B**
 
-**State: Inactive**
-
 Package identity, upstream archive references, verification schemes and dependency declarations shall come from user-maintained YAML manifests in `product/src/build/packages/`, with exactly one authoritative manifest per selected package. Expected version-specific checksums or signature identities shall come from the explicit selections in the user-maintained package list. Manifests shall not select versions or contain build instructions.
 
 ### FS-001-NR-005 — Exact List Selections
 
 **Classification: B**
-
-**State: Inactive**
 
 The user-maintained YAML `product/src/build/bootstrap/cross-toolchain/lists/cross-toolchain.yaml` list shall select explicit versions, their corresponding verification values (including any supplementary source versions and values), and Bash recipes for the selected packages and supply any required dependency version selections without redefining package dependency declarations or embedding construction commands.
 
@@ -69,8 +63,6 @@ Build shall resolve upstream release archives using the explicitly selected vers
 ### FS-001-NR-009 — Requirements and Ordering
 
 **Classification: B**
-
-**State: Inactive**
 
 Stage 1A shall honor the relevant manifest-defined requirements and provide a deterministic construction order that makes needed prerequisites available before dependent recipes execute; missing or unsatisfiable required selections shall fail rather than be silently invented.
 
@@ -117,8 +109,6 @@ FS-001 shall not implement Stage 1B/1C, managed package creation/publication, ge
 ### FS-001-NR-015 — Mechanical Traceability and Gate
 
 **Classification: M**
-
-**State: Inactive**
 
 Every active FS-001 requirement classified `M` or `B` shall have an exact binding to one or more registered required product validation tasks, and canonical repository validation shall fail when a required mechanically decidable task fails.
 

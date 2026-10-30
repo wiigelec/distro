@@ -8,7 +8,12 @@ from typing import Callable
 
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST = ROOT / "product" / "validation" / "requirement-evaluation.json"
-TASKS: dict[str, Callable[[], bool | None]] = {}
+from fs001_tasks import entrypoint_contract, selection_contract
+
+TASKS: dict[str, Callable[[], bool | None]] = {
+    "fs001-entrypoint-contract": entrypoint_contract,
+    "fs001-selection-contract": selection_contract,
+}
 
 
 def fail(message: str) -> int:

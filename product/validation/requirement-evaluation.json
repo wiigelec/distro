@@ -1,4 +1,36 @@
 {
   "version": 1,
-  "bindings": []
+  "bindings": [
+    {
+      "requirement": "FS-001-NR-001",
+      "tasks": [
+        "fs001-entrypoint-contract"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-004",
+      "tasks": [
+        "fs001-selection-contract"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-005",
+      "tasks": [
+        "fs001-selection-contract"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-009",
+      "tasks": [
+        "fs001-selection-contract"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-015",
+      "tasks": [
+        "fs001-entrypoint-contract",
+        "fs001-selection-contract"
+      ]
+    }
+  ]
 }
