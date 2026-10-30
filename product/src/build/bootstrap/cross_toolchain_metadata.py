@@ -86,6 +86,35 @@ def validate_handoff(archive: Path, metadata: dict) -> None:
         raise ValueError("missing target")
     if not isinstance(metadata.get("sources"), list) or not metadata["sources"]:
         raise ValueError("missing source provenance")
+    # Validate schema rather than merely requiring a nonempty provenance array.
+    seen_steps = set()
+    for source in metadata["sources"]:
+        if not isinstance(source, dict):
+            raise ValueError("source provenance entry must be an object")
+        if set(source) != {"step", "package", "version", "sha256", "recipe", "supplements"}:
+            raise ValueError("source provenance entry has missing or unknown fields")
+        if not all(isinstance(source[k], str) and source[k] for k in ("step", "package", "version", "recipe")):
+            raise ValueError("invalid source identity")
+        if source["step"] in seen_steps:
+            raise ValueError("duplicate source step identity")
+        seen_steps.add(source["step"])
+        if not re.fullmatch(r"[0-9a-f]{64}", source["sha256"]):
+            raise ValueError("invalid source digest")
+        if not source["recipe"].endswith(".sh") or "/" in source["recipe"] or "\\" in source["recipe"]:
+            raise ValueError("invalid source recipe basename")
+        if not isinstance(source["supplements"], list):
+            raise ValueError("supplements must be a list")
+        identities = set()
+        for supplement in source["supplements"]:
+            if not isinstance(supplement, dict) or set(supplement) != {"package", "version", "sha256"}:
+                raise ValueError("invalid supplementary provenance fields")
+            if not all(isinstance(supplement[k], str) and supplement[k] for k in ("package", "version")):
+                raise ValueError("invalid supplementary identity")
+            if supplement["package"] in identities:
+                raise ValueError("duplicate supplementary source identity")
+            identities.add(supplement["package"])
+            if not re.fullmatch(r"[0-9a-f]{64}", supplement["sha256"]):
+                raise ValueError("invalid supplementary source digest")
     if metadata.get("verification") != {"functional": "passed", "relocation": "passed"}:
         raise ValueError("verification is incomplete")
     archive = Path(archive)

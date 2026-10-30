@@ -35,7 +35,8 @@
     {
       "requirement": "FS-001-NR-012",
       "tasks": [
-        "fs001-handoff-contract"
+        "fs001-handoff-contract",
+        "fs001-review-fix-contract"
       ]
     },
     {
@@ -84,7 +85,8 @@
       "requirement": "FS-001-NR-013",
       "tasks": [
         "fs001-failure-integrity",
-        "fs001-handoff-contract"
+        "fs001-handoff-contract",
+        "fs001-review-fix-contract"
       ]
     },
     {

@@ -97,7 +97,8 @@ with tempfile.TemporaryDirectory(prefix="fs001-handoff-gate-") as tmp:
                      "sha256": sha256_file(archive), "size_bytes": archive.stat().st_size},
         "toolchain": {"target": "x86_64-distro-linux-gnu",
                       "sysroot": "/toolchain", "tools_prefix": "/toolchain/tools"},
-        "sources": [{"step": "synthetic"}],
+        "sources": [{"step": "synthetic", "package": "example", "version": "1.0",
+                     "sha256": "a" * 64, "recipe": "example.sh", "supplements": []}],
         "verification": {"functional": "passed", "relocation": "passed"},
     }
     validate_handoff(archive, metadata)
@@ -406,3 +407,86 @@ def functional_relocation_evidence_contract() -> bool:
     if evidence.get("evidence_kind") != "recorded-completed-build-and-independent-handoff-inspection":
         return False
     return True
+
+
+
+def fs001_review_fix_contract() -> bool:
+    """Validate negative cases for metadata schema and failure boundaries."""
+    code = r'''import copy, io, tarfile, subprocess
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
+from types import SimpleNamespace
+from build.bootstrap import cross_toolchain as ct
+from build.bootstrap import cross_toolchain_metadata as md
+
+def rejected(fn, exc=Exception):
+    try: fn()
+    except exc: return
+    raise AssertionError("incorrectly accepted failure")
+
+with TemporaryDirectory(prefix="fs001-review-gate-") as tmp:
+    root = Path(tmp)
+    root.joinpath("root").mkdir()
+    root.joinpath("root", "sentinel").write_text("sentinel")
+    archive = root / md.ARCHIVE_NAME
+    with tarfile.open(archive,"w:xz") as tar:
+        payload=b"sentinel"
+        info=tarfile.TarInfo("./sentinel")
+        info.size=len(payload)
+        tar.addfile(info,io.BytesIO(payload))
+    valid={
+        "schema_version":1,
+        "artifact":{"type":"cross-toolchain","stage":"1A", "filename":md.ARCHIVE_NAME,
+                    "format":"tar.xz","sha256":md.sha256_file(archive),"size_bytes":archive.stat().st_size},
+        "toolchain":{"target":"x86_64-distro-linux-gnu","sysroot":"/toolchain","tools_prefix":"/toolchain/tools"},
+        "sources":[{"step":"binutils-pass1","package":"binutils","version":"2.47",
+                    "sha256":"a"*64,"recipe":"binutils-pass1.sh","supplements":[]}],
+        "verification":{"functional":"passed","relocation":"passed"},
+    }
+    md.validate_handoff(archive,valid)
+    for change in (
+        lambda d: d["sources"][0].pop("sha256"),
+        lambda d: d["sources"][0].update(sha256="invalid"),
+        lambda d: d["sources"][0].update(recipe="../evil.sh"),
+        lambda d: d["sources"][0].update(supplements=[{"package":"gmp","version":"6.3","sha256":"bad"}]),
+        lambda d: d["sources"].append(copy.deepcopy(d["sources"][0])),
+        lambda d: d["sources"][0].update(unexpected="unknown"),
+    ):
+        altered=copy.deepcopy(valid)
+        change(altered)
+        rejected(lambda: md.validate_handoff(archive,altered),ValueError)
+    # The initial functional check must stop publication even when compilation is mocked.
+    workspace = root / "build-workspace"
+    workspace.mkdir()
+    step=SimpleNamespace(id="one",name="one",version="1",recipe=root/"fake.sh")
+    with patch.object(ct,"selected_steps",return_value=({"one":object()},[step])), \
+         patch.object(ct,"qualify_host"),patch.object(ct,"probe_bubblewrap"), \
+         patch.object(ct,"_host_jobs",return_value=1), \
+         patch.object(ct,"prepare_step",return_value=(root,root)), \
+         patch.object(ct,"run_recipe"), \
+         patch.object(ct,"verify_cross_toolchain",side_effect=RuntimeError("initial functional failure")), \
+         patch.object(ct,"publish_archive") as publish:
+        rejected(lambda: ct.run_stage(workspace),RuntimeError)
+        publish.assert_not_called()
+    assert not (workspace/"artifacts"/md.METADATA_NAME).exists()
+    # Recipe execution failure must likewise prevent publication.
+    second=root/"recipe-workspace"
+    second.mkdir()
+    with patch.object(ct,"selected_steps",return_value=({"one":object()},[step])), \
+         patch.object(ct,"qualify_host"),patch.object(ct,"probe_bubblewrap"), \
+         patch.object(ct,"_host_jobs",return_value=1), \
+         patch.object(ct,"prepare_step",return_value=(root,root)), \
+         patch.object(ct,"run_recipe",side_effect=RuntimeError("recipe failed")), \
+         patch.object(ct,"publish_archive") as publish:
+        rejected(lambda: ct.run_stage(second),RuntimeError)
+        publish.assert_not_called()
+    # Export failures must not leave a published pair.
+    output=root/"export-workspace"
+    output.mkdir()
+    with patch.object(ct.subprocess,"run",side_effect=subprocess.CalledProcessError(1,"tar")):
+        rejected(lambda: ct.publish_archive(output,root/"root",target=ct.TARGET,steps=[],host_triplet="host",started=0))
+    assert not (output/"artifacts"/md.ARCHIVE_NAME).exists()
+    assert not (output/"artifacts"/md.METADATA_NAME).exists()
+'''
+    return _contract_subprocess(code)
