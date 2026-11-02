@@ -16,7 +16,7 @@ Build and Bootstrap share a user-maintained, configuration-driven package model 
 
 Package manifests form one authoritative, user-maintained collection under `product/src/build/packages/`. The collection consists of multiple files, which users may organize in subdirectories by functionality or any other scheme. File organization does not determine package identity or behavior. Each package has one authoritative manifest, maintained independently of individual build requests.
 
-Manifests are YAML files defining package identity and characteristics, including the package name, upstream project and release locations, source archive naming, source verification information, and dependencies. An archive name or URL may use `{version}`, resolved from the package list's selected version. Initially, sources are upstream release archives rather than Git checkouts. Verification information, including checksum or signature requirements where applicable, belongs in the manifest.
+Manifests are YAML files defining package identity and characteristics, including the package name, upstream project and release locations, source archive naming, source verification information, and dependencies. An archive name or URL may use `{version}`, resolved from the package list's selected version. Initially, sources are upstream release archives rather than Git checkouts. The manifest declares the verification scheme (such as SHA-256 or an applicable signature-verification method), not a checksum for any selected release. The package list owns version-specific expected checksum values or signature identities, which Build must verify before extraction. This division does not permit a list to redefine source locations, verification schemes, or dependencies.
 
 **Manifests do not select versions, define version formats or discovery rules, or contain build instructions.**
 
@@ -32,7 +32,7 @@ Where dependency requirements vary with build context, that conditional meaning 
 
 ## Package Lists — Explicit Build Selections
 
-Package lists are user-maintained YAML files selecting packages, their **explicit versions**, and the Bash recipes to execute. A list references authoritative manifests rather than duplicating package identity, source descriptions, or dependency declarations. Version selections for dependencies are also supplied by the applicable package lists; the dependency relationships themselves remain defined only by manifests.
+Package lists are user-maintained YAML files selecting packages, their **explicit versions**, corresponding version-specific verification values, and the Bash recipes to execute. A list references authoritative manifests rather than duplicating package identity, source descriptions, verification schemes, or dependency declarations. Version-specific checksums are selections, not manifest-source redefinitions. Version selections for dependencies are also supplied by the applicable package lists; the dependency relationships themselves remain defined only by manifests.
 
 A representative entry is:
 
@@ -47,11 +47,11 @@ The selected version determines the version used to resolve source archive refer
 
 Lists select the appropriate recipe for the build context; they do not contain the package's configure, make, installation, or other construction commands. The same manifest can be used by different lists with different recipes. For example, Binutils can have separate cross-toolchain, cross-chroot, and distro-buildroot recipes without duplicating its manifest.
 
-Package-list storage is under `product/src/build/lists/`. Precise filename conventions, dependency-version resolution, and any optional list-level or recipe-specific parameters not yet demonstrated by a bounded Functional Set remain open.
+General package-list storage is under `product/src/build/lists/`; Bootstrap stage-specific lists are stored under `product/src/build/bootstrap/<stage>/lists/` (for Stage 1A, `product/src/build/bootstrap/cross-toolchain/lists/`). Precise filename conventions, dependency-version resolution, and any optional list-level or recipe-specific parameters not yet demonstrated by a bounded Functional Set remain open.
 
 ## Package Recipes — Bash Build Instructions
 
-Recipes are user-maintained **Bash scripts** under `product/src/build/recipes/`. Each recipe is selected by a package list and directly executed by Build. Recipes contain the ordered, package-specific operations needed to configure, compile, and install their package, including fixed compiler flags, configure options, patches, and cleanup where appropriate.
+Recipes are user-maintained **Bash scripts** under `product/src/build/recipes/` for general Build operations and `product/src/build/bootstrap/<stage>/recipes/` for Bootstrap stage-specific operations (for Stage 1A, `product/src/build/bootstrap/cross-toolchain/recipes/`). Each recipe is selected by a package list and directly executed by Build. Recipes contain the ordered, package-specific operations needed to configure, compile, and install their package, including fixed compiler flags, configure options, patches, and cleanup where appropriate.
 
 Recipes should remain straightforward to read, run, and modify, resembling the upstream or LFS construction instructions. Rather than requiring one heavily parameterized recipe to support every build context, separate recipes may hardcode the relevant build-context-specific options.
 

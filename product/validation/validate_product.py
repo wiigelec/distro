@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-
 import argparse
 import json
 import sys
@@ -9,7 +8,18 @@ from typing import Callable
 
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST = ROOT / "product" / "validation" / "requirement-evaluation.json"
-TASKS: dict[str, Callable[[], bool | None]] = {}
+from fs001_tasks import entrypoint_contract, selection_contract, handoff_contract, workspace_recipe_sandbox_contract, verified_source_contract, failure_integrity_contract, functional_relocation_evidence_contract, fs001_review_fix_contract
+
+TASKS: dict[str, Callable[[], bool | None]] = {
+    "fs001-entrypoint-contract": entrypoint_contract,
+    "fs001-selection-contract": selection_contract,
+    "fs001-handoff-contract": handoff_contract,
+    "fs001-workspace-recipe-sandbox": workspace_recipe_sandbox_contract,
+    "fs001-verified-source": verified_source_contract,
+    "fs001-failure-integrity": failure_integrity_contract,
+    "fs001-functional-relocation-evidence": functional_relocation_evidence_contract,
+    "fs001-review-fix-contract": fs001_review_fix_contract,
+}
 
 
 def fail(message: str) -> int:
@@ -59,7 +69,6 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--list-tasks", action="store_true")
     parser.add_argument("--task")
     args = parser.parse_args(argv)
-
     if args.list_tasks and args.task:
         return fail("--list-tasks and --task are mutually exclusive")
     if args.list_tasks:

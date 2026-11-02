@@ -1,0 +1,6 @@
+name: binutils
+source:
+  url: https://sourceware.org/pub/binutils/releases/binutils-{version}.tar.xz
+  verification: sha256
+dependencies: []
+host_tools: [make, bash, tar, xz]

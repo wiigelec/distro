@@ -12,11 +12,11 @@ Require the essential host capabilities from LFS 13.1 Chapter 2 host requirement
 
 ## Workspace and Stage Data Flow
 
-`--root` is the workspace, not an installation prefix. The workspace contains `build/` for downloaded/extracted sources and compilation, `root/` for the installed target `/` hierarchy, and `artifacts/` for archives of `root/`. Resolve selected packages; fetch and verify all required sources; extract into isolated package source directories; prepare out-of-tree build directories when needed; run recipes on the host in prerequisite order; verify toolchain; then archive `root/` only. Build workspace paths are never included in the handoff archive.
+`--root` is the workspace, not an installation prefix. The workspace contains `build/` for downloaded/extracted sources and compilation, `root/` for the installed target `/` hierarchy, and `artifacts/` for archives of `root/`. Resolve the complete selected package sequence and prerequisites before construction. For each step, acquire and verify its selected sources before extracting them into its isolated source directory, prepare its build directory, and only then execute its recipe. A source verification failure aborts the stage without publishing an artifact. After all steps, verify the toolchain and archive `root/` only. Build workspace paths are never included in the handoff archive.
 
 ## Initial Package Versions and Construction Sequence
 
-Pin the initial package selection to the released LFS 13.1-systemd Chapter 5 reference set and commit these literal versions to `product/src/build/lists/cross-toolchain.yaml`:
+Pin the initial package selection to the released LFS 13.1-systemd Chapter 5 reference set and commit these literal versions to `product/src/build/bootstrap/cross-toolchain/lists/cross-toolchain.yaml`:
 
 | Ordered recipe selection | Manifest identity | Version |
 | --- | --- | --- |
@@ -32,13 +32,13 @@ This sequence is a *planning baseline*, not a claim that these versions have bee
 
 ## Manifest, List, and Ordering Contract
 
-Each YAML manifest under `product/src/build/packages/` is uniquely identified by package name and owns upstream source locations/name templates, SHA-256 source digests, and all dependency declarations. Manifest source templates may substitute only the selected `{version}`. Supplementary GCC source archives and their literal SHA-256 digests are declared as GCC manifest-owned verified source inputs; Build verifies the supplementary archives and prepares all three for GCC pass 1 in that step's private source tree; the clean libstdc++ extraction is independent and receives only supplementary sources needed by its recipe. The `cross-toolchain` YAML list contains ordered entries with `name`, quoted `version`, and repository-relative `recipe`, plus an optional explicit step identifier for repeated GCC selection. No list entry may declare dependencies or embed build commands. Every manifest dependency needed to execute a selected step must be resolved to an explicitly selected list version or a preflight-checked host capability defined by the manifest's build-tool category. Manifest dependency relationships control prerequisite validity; the prescribed step ordering resolves sequence among same-package phases. Reject unresolved or cyclic prerequisites. Avoid a general conditional-expression system unless this selected sequence demonstrates its need.
+Each YAML manifest under `product/src/build/packages/` is uniquely identified by package name and owns upstream source locations/name templates, verification schemes (initially `sha256`), and all dependency declarations. The YAML package list owns each selected version and its literal SHA-256 digest. Manifest source templates may substitute only the selected `{version}`. Supplementary GCC source identities, URL templates, and verification schemes are declared in the GCC manifest; their selected versions and literal SHA-256 digests are declared in the list under the GCC pass-1 step; Build verifies the supplementary archives and prepares all three for GCC pass 1 in that step's private source tree; the clean libstdc++ extraction is independent and receives only supplementary sources needed by its recipe. The `cross-toolchain` YAML list contains ordered entries with `name`, quoted `version`, literal `checksum`, and repository-relative `recipe`, plus an optional explicit step identifier for repeated GCC selection. The GCC pass-1 step also owns `supplements` entries mapping each manifest-declared supplementary identity to a quoted `version` and literal `checksum`; the later libstdc++ step uses the same GCC archive checksum but no supplemental inputs. No list entry may declare dependencies, redefine source URLs or verification algorithms, or embed build commands. Every manifest dependency needed to execute a selected step must be resolved to an explicitly selected list version or a preflight-checked host capability defined by the manifest's build-tool category. Manifest dependency relationships control prerequisite validity; the prescribed step ordering resolves sequence among same-package phases. Reject unresolved or cyclic prerequisites. Avoid a general conditional-expression system unless this selected sequence demonstrates its need.
 
 ## Host-Execution Sandbox and Portability
 
 Use Bubblewrap (`bwrap`) as the initial shared host-execution sandbox backend. Preflight must confirm unprivileged user/mount namespace availability and enforce sandbox setup before any package recipe runs; missing or unusable isolation fails closed without an unrestricted fallback. Run as an unprivileged user. This sandbox is the execution boundary for host-based Stage 1A recipes, not `distro-buildroot` execution and not a second Build engine.
 
-Each recipe subprocess is launched by Build directly as `bash` inside its own Bubblewrap sandbox. Clear the inherited environment, then explicitly set the documented `DISTRO_*` contract, a fixed `PATH` containing `/toolchain/tools/bin` and qualified host executable locations, `HOME=/work`, `TMPDIR=/tmp`, and `LC_ALL=C`. Deny implicit leakage of `CPATH`, `LIBRARY_PATH`, `LD_LIBRARY_PATH`, `PKG_CONFIG_PATH`, compiler overrides, and similar host variables unless deliberately qualified and provided in the explicit contract. The qualified host tools and their runtime libraries are mounted read-only; host `/usr`, `/bin`, `/lib*`, and necessary `/etc` entries may be exposed read-only as required, but do not expose host `/` as a writable or automatically inherited mount. Restrict host resource mounts to the qualified allowlist. Use private `/tmp` and `/run`, a private process mount, and separate namespaces as supported by the chosen backend. Network access is not required by recipes because Build acquires and verifies sources before execution; disable recipe network access.
+Each recipe subprocess is launched by Build directly as `bash` inside its own Bubblewrap sandbox. Clear the inherited environment, then explicitly set the documented `DISTRO_*` contract, a fixed `PATH` containing `/toolchain/tools/bin` and qualified host executable locations, `HOME=/work`, `TMPDIR=/tmp`, and `LC_ALL=C`. Deny implicit leakage of `CPATH`, `LIBRARY_PATH`, `LD_LIBRARY_PATH`, `PKG_CONFIG_PATH`, compiler overrides, and similar host variables unless deliberately qualified and provided in the explicit contract. The qualified host tools and their runtime libraries are mounted read-only; host `/usr`, `/bin`, `/lib*`, and necessary `/etc` entries may be exposed read-only as required, but do not expose host `/` as a writable or automatically inherited mount. Restrict host resource mounts to the qualified allowlist. Use private `/tmp` and `/run`, a private process mount, and separate namespaces as supported by the chosen backend. Network access is not required by recipes because Build acquires and verifies each step’s sources before executing that recipe; disable recipe network access.
 
 The selected host workspace `rootdir` is exposed through controlled writable mounts: `build/` at `/work` and the installed filesystem `root/` at `/toolchain`. Build never grants write access to the actual host system directories. Installation destinations, configure `--prefix` paths, sysroot arguments, GCC search paths, and the executable PATH refer only to these sandbox-visible paths. Specifically the installed cross-tools live in `/toolchain/tools/`, and target headers and libraries in the corresponding `/toolchain/usr` and `/toolchain/lib*` hierarchy. The exported archive still contains only the contents of host `rootdir/root/`, not a `/toolchain` enclosing directory. Host absolute workspace paths may not be embedded in the artifact as a runtime requirement. Distinguish sandbox-visible **build-time sysroot and compiler lookup paths** (for example `/toolchain/usr/include`, `/toolchain/usr/lib*`) from **target-runtime ELF paths** (for example `/lib64/ld-linux-x86-64.so.2`, where appropriate). The ELF interpreter is interpreted relative to the eventual target system root, not prefixed with `/toolchain`; the cross-linker must nevertheless find the corresponding interpreter, crt objects and libraries beneath the sandbox-mounted target sysroot. Validate compiler search paths and final ELF interpreter/NEEDED entries independently, and reject host-library fallback without incorrectly rejecting valid target-runtime absolute paths.
 
@@ -70,6 +70,38 @@ Use release archives, not Git checkouts. Retrieve the manifest's expanded URL, v
 ## Artifact and Failure Contract
 
 Produce a **POSIX pax-compatible tar archive compressed with xz**, named `cross-toolchain.tar.xz`, under `rootdir/artifacts/`. Archive paths are relative to the contents of `rootdir/root/` (not prefixed with `root/`), with symlinks and executable modes preserved. Stage 1B will extract into its installed filesystem root; it must not need `build/`. Archive publication is transactional: create a candidate tar.xz archive at a temporary path under `artifacts/`, verify its readability and safe relative entry names, restore this **candidate** into a differently located workspace and complete all restored-toolchain functional and isolation tests, then atomically replace the final `artifacts/cross-toolchain.tar.xz` only after every gate passes. The final named archive is not an input to its own pre-publication verification. A failed candidate remains unpublished. Never claim a stale, partial, or failed artifact as successful; a failed run exits nonzero, and an existing artifact is not confused with the failed run. An implementation can use a fresh staging root per run to prevent accidental mixing with earlier contents while preserving unrelated user files.
+
+
+### Stage 1A Handoff Metadata (FS-001 amendment)
+
+Alongside `artifacts/cross-toolchain.tar.xz`, Stage 1A shall emit
+`artifacts/cross-toolchain.json` (UTF-8 JSON, `schema_version: 1`). The JSON
+is the machine-readable completion marker for this handoff, not a package
+manifest and not part of the installed filesystem archive. Required fields:
+
+- `artifact`: type `cross-toolchain`, stage `1A`, basename, `tar.xz` format,
+  archive SHA-256 and size in bytes.
+- `toolchain`: selected target triplet, sandbox sysroot `/toolchain`, and tools
+  prefix `/toolchain/tools`.
+- `sources`: ordered list of selected step IDs, authoritative package identities,
+  selected versions, source SHA-256 values, recipe basenames, and selected
+  supplementary source identities, versions and SHA-256 values.
+- `build`: UTC creation timestamp, duration, qualified host GCC triplet, Git
+  revision if available, and three-state Git working-tree cleanliness (true,
+  false, or null if it cannot be established). A commit SHA does not claim
+  complete reproducibility when the working tree is dirty.
+- `verification`: successful initial functional and restored-toolchain checks.
+
+Build derives source metadata from the selected list, not a parallel definition.
+It creates and verifies an unpublished archive candidate, generates metadata
+from the verified candidate, checks their agreement, then publishes the archive
+before publishing metadata **last** via a same-filesystem rename. Two renames
+are not atomically paired; therefore the metadata file is the sole completion
+marker and consumers must require both files and check the metadata SHA-256
+and size against the archive. Build refuses an existing named archive or
+metadata file, and failure before publication leaves no valid completed handoff.
+A consumer must not treat an archive alone as a usable handoff. Actual Stage 1B
+consumption remains out of FS-001 scope.
 
 ## Functional Evidence
 

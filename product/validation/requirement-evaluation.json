@@ -1,4 +1,105 @@
 {
   "version": 1,
-  "bindings": []
+  "bindings": [
+    {
+      "requirement": "FS-001-NR-001",
+      "tasks": [
+        "fs001-entrypoint-contract"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-004",
+      "tasks": [
+        "fs001-selection-contract"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-005",
+      "tasks": [
+        "fs001-selection-contract"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-009",
+      "tasks": [
+        "fs001-selection-contract"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-015",
+      "tasks": [
+        "fs001-entrypoint-contract",
+        "fs001-selection-contract"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-012",
+      "tasks": [
+        "fs001-handoff-contract",
+        "fs001-review-fix-contract"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-003",
+      "tasks": [
+        "fs001-workspace-recipe-sandbox"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-006",
+      "tasks": [
+        "fs001-workspace-recipe-sandbox"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-007",
+      "tasks": [
+        "fs001-workspace-recipe-sandbox"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-008",
+      "tasks": [
+        "fs001-verified-source"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-010",
+      "tasks": [
+        "fs001-workspace-recipe-sandbox"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-017",
+      "tasks": [
+        "fs001-workspace-recipe-sandbox"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-018",
+      "tasks": [
+        "fs001-workspace-recipe-sandbox"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-013",
+      "tasks": [
+        "fs001-failure-integrity",
+        "fs001-handoff-contract",
+        "fs001-review-fix-contract"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-011",
+      "tasks": [
+        "fs001-functional-relocation-evidence"
+      ]
+    },
+    {
+      "requirement": "FS-001-NR-019",
+      "tasks": [
+        "fs001-functional-relocation-evidence"
+      ]
+    }
+  ]
 }

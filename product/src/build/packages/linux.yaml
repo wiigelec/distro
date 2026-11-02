@@ -1,0 +1,6 @@
+name: linux
+source:
+  url: https://www.kernel.org/pub/linux/kernel/v7.x/linux-{version}.tar.xz
+  verification: sha256
+dependencies: [gcc]
+host_tools: [make, bash, tar, xz]
