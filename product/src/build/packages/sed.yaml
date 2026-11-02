@@ -1,0 +1,6 @@
+name: sed
+source:
+  url: https://ftp.gnu.org/gnu/sed/sed-{version}.tar.xz
+  verification: sha256
+dependencies: []
+host_tools: [make, bash, tar]

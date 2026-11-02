@@ -1,0 +1,6 @@
+name: diffutils
+source:
+  url: https://ftp.gnu.org/gnu/diffutils/diffutils-{version}.tar.xz
+  verification: sha256
+dependencies: []
+host_tools: [make, bash, tar]
