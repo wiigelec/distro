@@ -7,6 +7,7 @@ from pathlib import Path
 import sys
 
 from build.bootstrap.cross_toolchain import run_stage, selected_steps
+from build.bootstrap.cross_chroot import prepare_stage
 from build.host_requirements import qualify_host
 from build.host_sandbox import probe_bubblewrap
 
@@ -18,9 +19,17 @@ def main(argv: list[str] | None = None) -> int:
     cross.add_argument("--root", type=Path, help="existing, empty Stage 1A workspace")
     cross.add_argument("--check-host", action="store_true",
                        help="validate selections, host and sandbox without changing workspace")
+    chroot = commands.add_parser("cross-chroot", help="prepare verified Stage 1B input and selection")
+    chroot.add_argument("--root", type=Path, required=True, help="existing, empty Stage 1B workspace")
+    chroot.add_argument("--cross-toolchain", type=Path, required=True, help="verified Stage 1A tar.xz handoff")
     args = parser.parse_args(argv)
-    if args.operation != "cross-toolchain":
-        parser.error("unsupported operation")
+    if args.operation == "cross-chroot":
+        try:
+            prepare_stage(args.root, args.cross_toolchain)
+            return 0
+        except (OSError, RuntimeError, ValueError) as exc:
+            print(f"FAIL cross-chroot: {exc}", file=sys.stderr)
+            return 1
     if not args.check_host and args.root is None:
         cross.error("--root is required for construction")
     try:
