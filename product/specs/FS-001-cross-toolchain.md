@@ -12,8 +12,6 @@ Evaluation classifications: **M** mechanical; **S** semantic; **B** both. Requir
 
 **Classification: S**
 
-**State: Inactive**
-
 Stage 1A shall remain an operation of Build, implemented under the established Build/Bootstrap ownership, without introducing a separate permanent Bootstrap component or independent package-building engine.
 
 ### FS-001-NR-003 — Workspace Separation
@@ -86,8 +84,6 @@ A failed source verification, package construction, installation, functional che
 
 **Classification: S**
 
-**State: Inactive**
-
 FS-001 shall not implement Stage 1B/1C, managed package creation/publication, general isolated-buildroot execution, native system installation or the final Bootstrap self-replication proof merely as prerequisites of cross-toolchain construction.
 
 ### FS-001-NR-015 — Mechanical Traceability and Gate
@@ -99,8 +95,6 @@ Every active FS-001 requirement classified `M` or `B` shall have an exact bindin
 ### FS-001-NR-016 — Semantic Fidelity and Acceptance
 
 **Classification: S**
-
-**State: Inactive**
 
 FS-001 shall remain subject to semantic review against the selected accepted Design and complete Planning result; mechanical validation passing shall not independently constitute Acceptance, which requires intentional integration of a satisfactory candidate into `main`.
 
