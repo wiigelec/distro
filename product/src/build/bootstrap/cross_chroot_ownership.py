@@ -89,3 +89,84 @@ def check_staged_install(installed: Path, staged: Path) -> dict[str, tuple[str, 
             if existing_parent is not None and existing_parent[0] != "dir":
                 raise OwnershipError(f"staged path has non-directory parent: {name}")
     return additions
+
+
+def merge_staged_install(installed: Path, staged: Path) -> dict[str, tuple[str, int, str]]:
+    """Copy only noncolliding staged entries, with best-effort rollback on failure.
+
+    No replacement or ownership transition is authorized. Call only with
+    quiescent, privately controlled roots; concurrent filesystem writers are
+    outside this operation's guarantees. Recipe execution remains disabled.
+    """
+    import shutil
+
+    installed, staged = Path(installed).absolute(), Path(staged).absolute()
+    before = snapshot_imported_root(installed)
+    planned = check_staged_install(installed, staged)
+    if snapshot_imported_root(installed) != before:
+        raise OwnershipError("installed filesystem changed during preflight")
+    created: list[tuple[Path, str]] = []
+    directories: list[tuple[Path, int]] = []
+    try:
+        # Directories first; never follow installed or staged symlinks.
+        for name, identity in sorted(planned.items(), key=lambda item: (item[0].count("/"), item[0])):
+            kind, mode, value = identity
+            if kind != "dir" or name in before:
+                continue
+            destination = installed / name
+            destination.mkdir(mode=0o700)
+            created.append((destination, "dir"))
+            directories.append((destination, mode))
+        for name, identity in sorted(planned.items()):
+            kind, mode, value = identity
+            if kind == "dir":
+                continue
+            destination = installed / name
+            origin = staged / name
+            if kind == "link":
+                os.symlink(value, destination)
+                created.append((destination, "link"))
+            elif kind == "file":
+                read_flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+                write_flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
+                source_fd = os.open(origin, read_flags)
+                with os.fdopen(source_fd, "rb") as source:
+                    output_fd = os.open(destination, write_flags, 0o600)
+                    created.append((destination, "file"))
+                    with os.fdopen(output_fd, "wb") as output:
+                        shutil.copyfileobj(source, output)
+                        output.flush()
+                        os.fchmod(output.fileno(), mode)
+            else:
+                raise OwnershipError(f"unsupported staged entry: {name}")
+        # A staged payload must not mutate while it is being copied.
+        if snapshot_imported_root(staged) != planned:
+            raise OwnershipError("staged installation changed during merge")
+        # Apply final directory modes only after writing children.
+        for directory, mode in sorted(directories, key=lambda entry: -len(entry[0].parts)):
+            os.chmod(directory, mode)
+        after = snapshot_imported_root(installed)
+        for name, identity in before.items():
+            if after.get(name) != identity:
+                raise OwnershipError(f"existing filesystem entry changed during merge: {name}")
+        for name, identity in planned.items():
+            if after.get(name) != identity:
+                raise OwnershipError(f"merged filesystem entry differs from staging: {name}")
+        return planned
+    except Exception as exc:
+        # Restore write access to newly created parents before rollback.
+        for directory, _ in directories:
+            try:
+                os.chmod(directory, 0o700)
+            except OSError:
+                pass
+        # Roll back this operation's newly created paths, deepest first.
+        for path, kind in reversed(created):
+            try:
+                if kind == "dir":
+                    path.rmdir()
+                else:
+                    path.unlink()
+            except OSError:
+                pass
+        raise OwnershipError(f"staged installation merge failed (inspect target root): {exc}") from exc
