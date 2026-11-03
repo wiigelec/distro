@@ -16,15 +16,15 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="build")
     commands = parser.add_subparsers(dest="operation", required=True)
     cross = commands.add_parser("cross-toolchain", help="construct the initial cross-toolchain")
-    cross.add_argument("--root", type=Path, help="existing, empty Stage 1A workspace")
+    cross.add_argument("--root", type=Path, help="existing, empty cross-toolchain workspace")
     cross.add_argument("--check-host", action="store_true",
                        help="validate selections, host and sandbox without changing workspace")
-    chroot = commands.add_parser("cross-chroot", help="prepare verified Stage 1B input and selection")
-    chroot.add_argument("--root", type=Path, required=True, help="existing, empty Stage 1B workspace")
-    chroot.add_argument("--cross-toolchain", type=Path, required=True, help="verified Stage 1A tar.xz handoff")
+    chroot = commands.add_parser("cross-chroot", help="prepare verified cross-chroot input and selection")
+    chroot.add_argument("--root", type=Path, required=True, help="existing, empty cross-chroot workspace")
+    chroot.add_argument("--cross-toolchain", type=Path, required=True, help="verified cross-toolchain tar.xz handoff")
     args = parser.parse_args(argv)
     if args.operation == "cross-chroot":
-        print("[cross-chroot] Starting Stage 1B preparation", flush=True)
+        print("[cross-chroot] Starting cross-chroot preparation", flush=True)
         try:
             prepare_stage(args.root, args.cross_toolchain)
             return 0
