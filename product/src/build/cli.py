@@ -24,6 +24,7 @@ def main(argv: list[str] | None = None) -> int:
     chroot.add_argument("--cross-toolchain", type=Path, required=True, help="verified Stage 1A tar.xz handoff")
     args = parser.parse_args(argv)
     if args.operation == "cross-chroot":
+        print("[cross-chroot] Starting Stage 1B preparation", flush=True)
         try:
             prepare_stage(args.root, args.cross_toolchain)
             return 0
