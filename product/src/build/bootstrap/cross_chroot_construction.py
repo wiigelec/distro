@@ -21,7 +21,7 @@ from build.selection import SelectionError
 
 
 def omit_generated_info_index(stage: Path) -> None:
-    """Exclude only GNU Info's shared, generated menu index from ordinary DESTDIR.
+    """Exclude only GNU Info's shared, generated menu index from staged DESTDIR.
 
     Individual .info manuals remain staged. Rebuilding the combined target
     index is a later governed operation, not an ownership collision exception.
@@ -85,6 +85,9 @@ def run_selected_recipes(workspace: Path, manifests: dict, steps: tuple,
                 package=step.name, version=step.version, step_id=step.id,
                 target=TARGET, jobs=jobs,
             )
+            # Exclude the shared generated Info menu before either ordinary
+            # ownership preflight or native Binutils collision inventory.
+            omit_generated_info_index(stage)
             if step.id == "native-binutils":
                 print(f"{prefix}: collecting native collision evidence", flush=True)
                 require_preserved_imports(installed, imported_baseline)
@@ -115,8 +118,6 @@ def run_selected_recipes(workspace: Path, manifests: dict, steps: tuple,
                 )
             if step.id.startswith("native-"):
                 raise SelectionError("native GCC construction remains disabled")
-            # The shared Info menu is derived state, never a package-owned file.
-            omit_generated_info_index(stage)
             print(f"{prefix}: checking staged installation ownership", flush=True)
             check_staged_install(installed, stage)
             require_preserved_imports(installed, imported_baseline)
