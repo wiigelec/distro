@@ -8,6 +8,7 @@ from build.bootstrap.cross_toolchain import PACKAGES, TARGET
 from build.bootstrap.cross_chroot_import import restore_cross_toolchain
 from build.bootstrap.cross_chroot_prerequisites import imported_prerequisites
 from build.bootstrap.cross_chroot_ownership import snapshot_imported_root
+from build.bootstrap.cross_chroot_construction import run_selected_recipes
 from build.host_requirements import qualify_host
 from build.host_sandbox import probe_bubblewrap
 from build.selection import load_manifests, select_steps, SelectionError
@@ -15,11 +16,12 @@ from build.selection import load_manifests, select_steps, SelectionError
 STAGE = Path(__file__).resolve().parent / "cross-chroot"
 
 
-def prepare_stage(root: Path, archive: Path):
-    """Establish a validated cross-chroot workspace; never claim a completed artifact.
+def prepare_stage(root: Path, archive: Path, *, diagnose_native_binutils: bool = False):
+    """Validate import and selection, optionally run a non-publishing diagnostic.
 
-    Deliberately stop before recipe execution until installed-file ownership,
-    target-native verification and relocation publication are implemented.
+    The regular cross-chroot command is deliberately disabled until native
+    ownership, functional verification and relocation publication exist.
+    Diagnostic mode stops after native Binutils staging and collision inventory.
     """
     if sys.platform != "linux":
         raise RuntimeError("Cross-chroot preparation requires a Linux host")
@@ -51,6 +53,14 @@ def prepare_stage(root: Path, archive: Path):
     print("[cross-chroot] Recording cross-toolchain filesystem ownership", flush=True)
     baseline = snapshot_imported_root(installed)
     print(f"[cross-chroot] Imported {len(baseline)} entries; selected {len(steps)} steps", flush=True)
+    if diagnose_native_binutils:
+        if len(steps) < 2 or [step.id for step in steps[-2:]] != [
+            "native-binutils", "native-gcc"
+        ]:
+            raise SelectionError("diagnostic requires native Binutils and GCC as the final steps")
+        print("[cross-chroot] DIAGNOSTIC ONLY: executing through native Binutils staging", flush=True)
+        run_selected_recipes(root, manifests, steps, baseline)
+        raise RuntimeError("diagnostic runner returned unexpectedly; no verified cross-chroot artifact")
     raise RuntimeError(
         "cross-chroot construction is not yet enabled: collision ownership, native "
         "verification and portable publication remain unimplemented"

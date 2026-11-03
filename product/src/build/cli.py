@@ -22,11 +22,17 @@ def main(argv: list[str] | None = None) -> int:
     chroot = commands.add_parser("cross-chroot", help="prepare verified cross-chroot input and selection")
     chroot.add_argument("--root", type=Path, required=True, help="existing, empty cross-chroot workspace")
     chroot.add_argument("--cross-toolchain", type=Path, required=True, help="verified cross-toolchain tar.xz handoff")
+    chroot.add_argument("--diagnose-native-binutils", action="store_true",
+                       help="run an incomplete diagnostic build through native Binutils staging; never publish")
     args = parser.parse_args(argv)
     if args.operation == "cross-chroot":
-        print("[cross-chroot] Starting cross-chroot preparation", flush=True)
+        if args.diagnose_native_binutils:
+            print("[cross-chroot] DIAGNOSTIC: build may be lengthy and will exit unsuccessfully; no artifact publication", flush=True)
+        else:
+            print("[cross-chroot] Starting cross-chroot preparation", flush=True)
         try:
-            prepare_stage(args.root, args.cross_toolchain)
+            prepare_stage(args.root, args.cross_toolchain,
+                          diagnose_native_binutils=args.diagnose_native_binutils)
             return 0
         except (OSError, RuntimeError, ValueError) as exc:
             print(f"FAIL cross-chroot: {exc}", file=sys.stderr)
