@@ -24,3 +24,20 @@ BUILD_TRIPLET="$(gcc -dumpmachine)"
 make -j"$JOBS"
 make DESTDIR="$DISTRO_ROOT_DIR" install
 [[ -f "$DISTRO_ROOT_DIR/usr/lib/libc.so.6" || -f "$DISTRO_ROOT_DIR/lib64/libc.so.6" ]]
+
+# FS-001 #6: glibc's fortified headers must agree with GCC private limits.h.
+# Compile only: do not execute target code in the host sandbox.
+probe="$DISTRO_BUILD_DIR/fs001-limits-probe.c"
+object="$DISTRO_BUILD_DIR/fs001-limits-probe.o"
+cat > "$probe" <<'C'
+#include <limits.h>
+#include <wchar.h>
+#include <stdlib.h>
+#if MB_LEN_MAX != 16
+#error "FS-001: incorrect target MB_LEN_MAX"
+#endif
+int fs001_limits_probe(void) { return MB_LEN_MAX; }
+C
+"$DISTRO_TOOLS_DIR/bin/$DISTRO_TARGET-gcc" --sysroot="$DISTRO_ROOT_DIR" \
+  -O2 -D_FORTIFY_SOURCE=2 -c "$probe" -o "$object"
+[[ -s "$object" ]] || { echo 'FS-001 target limits compile did not produce an object' >&2; exit 1; }
