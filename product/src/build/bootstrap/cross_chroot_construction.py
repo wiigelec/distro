@@ -8,6 +8,7 @@ from __future__ import annotations
 from pathlib import Path
 import json
 import shutil
+import stat
 import time
 
 from build.bootstrap.cross_toolchain import TARGET, _host_jobs, prepare_step
@@ -17,6 +18,22 @@ from build.bootstrap.cross_chroot_ownership import (
 from build.bootstrap.cross_chroot_sandbox import run_staged_recipe
 from build.bootstrap.cross_chroot_transitions import native_collision_evidence
 from build.selection import SelectionError
+
+
+def omit_generated_info_index(stage: Path) -> None:
+    """Exclude only GNU Info's shared, generated menu index from ordinary DESTDIR.
+
+    Individual .info manuals remain staged. Rebuilding the combined target
+    index is a later governed operation, not an ownership collision exception.
+    """
+    index = stage / "usr/share/info/dir"
+    try:
+        mode = index.lstat().st_mode
+    except FileNotFoundError:
+        return
+    if not stat.S_ISREG(mode):
+        raise SelectionError(f"unexpected staged GNU Info index type: {index}")
+    index.unlink()
 
 
 def run_selected_recipes(workspace: Path, manifests: dict, steps: tuple,
@@ -98,6 +115,8 @@ def run_selected_recipes(workspace: Path, manifests: dict, steps: tuple,
                 )
             if step.id.startswith("native-"):
                 raise SelectionError("native GCC construction remains disabled")
+            # The shared Info menu is derived state, never a package-owned file.
+            omit_generated_info_index(stage)
             print(f"{prefix}: checking staged installation ownership", flush=True)
             check_staged_install(installed, stage)
             require_preserved_imports(installed, imported_baseline)
