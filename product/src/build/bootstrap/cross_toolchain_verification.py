@@ -89,7 +89,7 @@ cat > "$tmp/limits.c" <<'FS001_LIMITS'
 #endif
 int fs001_limits_probe(void) { return MB_LEN_MAX; }
 FS001_LIMITS
-"$TOOLS/$TARGET-gcc" --sysroot="$SYSROOT" -O2 -D_FORTIFY_SOURCE=2 \\
+"$TOOLS/$TARGET-gcc" --sysroot="$SYSROOT" -O2 -D_FORTIFY_SOURCE=2 \
     -c "$tmp/limits.c" -o "$tmp/limits.o"
 test -s "$tmp/limits.o" || { echo "fortified target limits probe missing" >&2; exit 1; }
 printf '#include <stdio.h>\nint main(void){puts("target-c");return 0;}\n' > "$tmp/check.c"
