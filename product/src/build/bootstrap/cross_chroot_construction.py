@@ -58,6 +58,31 @@ def omit_native_gcc_staging_lib64_link(stage: Path) -> None:
     alias.unlink()
 
 
+REVIEWED_GCC_DUPLICATES = {'usr/lib/libstdc++.so': ['link', 511, 'libstdc++.so.6.0.36'], 'usr/lib/libstdc++.so.6': ['link', 511, 'libstdc++.so.6.0.36'], 'usr/lib/libstdc++.so.6.0.36-gdb.py': ['file', 420, 'e902dff806755b242bdb7d60f7ee147f8b96dac10668c9bba5774445cb301f9d'], 'usr/lib/libstdc++exp.la': ['file', 493, 'a981392b76b0b6b0f117aa50806cdb52e2de711230e963b62333eb3d3e387261'], 'usr/lib/libstdc++fs.la': ['file', 493, 'a409dc0be5efb4829d00f18063db4f03db0a326cadf136ec13b7fc72019c5d1c'], 'usr/lib/libsupc++.la': ['file', 493, 'b5a25b60e4df965e89506ed5a1818025f5d8130319937e429c0e96b3444d6929'], 'usr/share/gcc-16.2.0/python/libstdcxx/__init__.py': ['file', 420, '01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b'], 'usr/share/gcc-16.2.0/python/libstdcxx/v6/__init__.py': ['file', 420, 'b431bb0caac43dc1e20bf29c21026539dbfd40dd22f85539d59327d9d172cee5'], 'usr/share/gcc-16.2.0/python/libstdcxx/v6/printers.py': ['file', 420, '72bb3b2fcfef5ef438fba84376e93d5aff85fcde4aaf45d38db0790c99b3011c'], 'usr/share/gcc-16.2.0/python/libstdcxx/v6/xmethods.py': ['file', 420, '2d4ce7ea282617969f435ff59a14430f77907720ba28171808f7b9809df77993']}
+REVIEWED_GCC_DIFFERING = frozenset(['usr/lib/libstdc++.a', 'usr/lib/libstdc++.la', 'usr/lib/libstdc++.modules.json', 'usr/lib/libstdc++.so.6.0.36', 'usr/lib/libstdc++exp.a', 'usr/lib/libstdc++fs.a', 'usr/lib/libsupc++.a'])
+
+
+def preserve_reviewed_native_gcc_duplicates(stage: Path, collisions: dict, imported_baseline: dict) -> dict:
+    """Omit exactly ten byte-identical FS-001 entries, retaining audit evidence.
+
+    This grants no replacement rights to the differing native runtime objects.
+    Only exact-path, exact-mode, exact-content imported duplicates qualify.
+    """
+    reviewed = {name: tuple(identity) for name, identity in REVIEWED_GCC_DUPLICATES.items()}
+    for name, identity in reviewed.items():
+        pair = collisions.get(name)
+        if pair is None or pair != (identity, identity):
+            raise SelectionError(f"reviewed GCC duplicate absent or changed: {name}")
+        if imported_baseline.get(name) != identity:
+            raise SelectionError(f"GCC duplicate is not owned by verified FS-001 import: {name}")
+    # The seven differing paths are inventory-only; never delete or replace them.
+    if set(collisions) != set(reviewed) | REVIEWED_GCC_DIFFERING:
+        raise SelectionError("native GCC collision set diverged from reviewed inventory")
+    for name in sorted(reviewed):
+        (stage / name).unlink()
+    return {name: list(identity) for name, identity in sorted(reviewed.items())}
+
+
 def verify_native_binutils_structure(root: Path) -> None:
     """Check native Binutils executables without running target binaries.
 
@@ -183,6 +208,20 @@ def run_selected_recipes(workspace: Path, manifests: dict, steps: tuple,
                 require_preserved_imports(installed, imported_baseline)
                 verify_native_binutils_structure(installed)
                 collisions = native_collision_evidence(installed, stage)
+                print(f"{prefix}: verifying ten reviewed identical FS-001 entries", flush=True)
+                preserved = preserve_reviewed_native_gcc_duplicates(
+                    stage, collisions, imported_baseline
+                )
+                with (staging_root / "native-gcc-preserved-duplicates.json").open(
+                    "x", encoding="utf-8"
+                ) as output:
+                    json.dump({"schema_version": 1, "step_id": step.id,
+                               "preserved_imported_entries": preserved}, output,
+                              indent=2, sort_keys=True)
+                    output.write("\n")
+                collisions = native_collision_evidence(installed, stage)
+                if set(collisions) != REVIEWED_GCC_DIFFERING:
+                    raise SelectionError("native GCC differing collision inventory changed")
                 evidence = {
                     "schema_version": 1,
                     "step_id": step.id,
