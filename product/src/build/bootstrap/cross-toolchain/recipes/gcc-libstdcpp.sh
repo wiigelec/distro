@@ -18,7 +18,14 @@ JOBS="${DISTRO_JOBS:-1}"
 "$DISTRO_SOURCE_DIR/libstdc++-v3/configure" \
   --host="$DISTRO_TARGET" --build="$(gcc -dumpmachine)" \
   CXX="$DISTRO_TARGET-gcc" \
-  --prefix=/usr --disable-multilib --disable-nls \
+  --prefix=/usr --libdir=/usr/lib --disable-multilib --disable-nls \
   --with-gxx-include-dir="/tools/$DISTRO_TARGET/include/c++/$DISTRO_PACKAGE_VERSION"
 make -j"$JOBS"
 make DESTDIR="$DISTRO_ROOT_DIR" install
+# FS-001 Issue #8: refuse split /usr/lib64 and confirm the canonical runtime.
+[[ -L "$DISTRO_ROOT_DIR/usr/lib64" && "$(readlink -- "$DISTRO_ROOT_DIR/usr/lib64")" == lib ]] || {
+  echo 'libstdc++ violated /usr/lib64 -> lib layout' >&2; exit 1;
+}
+[[ -f "$DISTRO_ROOT_DIR/usr/lib/libstdc++.so.6" ]] || {
+  echo 'canonical libstdc++ runtime missing' >&2; exit 1;
+}
