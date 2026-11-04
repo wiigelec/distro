@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import json
+import os
 import shutil
 import stat
 import time
@@ -34,6 +35,27 @@ def omit_generated_info_index(stage: Path) -> None:
     if not stat.S_ISREG(mode):
         raise SelectionError(f"unexpected staged GNU Info index type: {index}")
     index.unlink()
+
+
+def omit_native_gcc_staging_lib64_link(stage: Path) -> None:
+    """Verify GCC installed through the merged-/usr alias, then drop its duplicate.
+
+    Stage /usr/lib64 is not part of the payload to merge: the imported root
+    already owns that exact link. Never delete a real directory or other link.
+    Installed runtime files remain in the real stage /usr/lib directory.
+    """
+    canonical = stage / "usr/lib"
+    alias = stage / "usr/lib64"
+    try:
+        canonical_mode = canonical.lstat().st_mode
+        alias_mode = alias.lstat().st_mode
+    except FileNotFoundError as exc:
+        raise SelectionError("native GCC staging merged-/usr layout is incomplete") from exc
+    if not stat.S_ISDIR(canonical_mode) or stat.S_ISLNK(canonical_mode):
+        raise SelectionError("native GCC staging usr/lib must be a real directory")
+    if not stat.S_ISLNK(alias_mode) or os.readlink(alias) != "lib":
+        raise SelectionError("native GCC staging usr/lib64 must be a link to lib")
+    alias.unlink()
 
 
 def verify_native_binutils_structure(root: Path) -> None:
@@ -155,6 +177,8 @@ def run_selected_recipes(workspace: Path, manifests: dict, steps: tuple,
                 print(f"{prefix}: installed ({time.monotonic() - started:.1f}s)", flush=True)
                 continue
             if step.id == "native-gcc":
+                print(f"{prefix}: verifying merged-/usr staging alias", flush=True)
+                omit_native_gcc_staging_lib64_link(stage)
                 print(f"{prefix}: collecting native GCC collision evidence", flush=True)
                 require_preserved_imports(installed, imported_baseline)
                 verify_native_binutils_structure(installed)
