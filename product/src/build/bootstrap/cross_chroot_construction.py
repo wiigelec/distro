@@ -15,6 +15,7 @@ import time
 from build.bootstrap.cross_toolchain import TARGET, _host_jobs, prepare_step
 from build.bootstrap.cross_chroot_ownership import (
     check_staged_install, merge_staged_install, require_preserved_imports,
+    snapshot_imported_root,
 )
 from build.bootstrap.cross_chroot_sandbox import run_staged_recipe
 from build.bootstrap.cross_chroot_transitions import native_collision_evidence
@@ -81,6 +82,72 @@ def preserve_reviewed_native_gcc_duplicates(stage: Path, collisions: dict, impor
     for name in sorted(reviewed):
         (stage / name).unlink()
     return {name: list(identity) for name, identity in sorted(reviewed.items())}
+
+
+# Exact imported FS-001 identities for the seven native GCC runtime overlaps.
+# Candidate identities are recorded per verified build; GCC static archives can vary.
+REVIEWED_GCC_PRIOR_RUNTIME = {'usr/lib/libstdc++.a': (420, '617d14fe2286b14b53c95f244f5b42c9db4e74ab3e9fd038ab706e27645137d7'), 'usr/lib/libstdc++.la': (493, '86da35442e9e176eef0c2adbf128c30ff8516b0e6cebe75e70a51fb86530fc248f2afb9ce53f467a314e'), 'usr/lib/libstdc++.modules.json': (420, 'd670cc25b4640f2facad8f6483e91884b63c6d53cfbd697989e07c8b7cbf372a'), 'usr/lib/libstdc++.so.6.0.36': (493, 'ec29336384e69667b163e0be937127d3b91fa4712d36dc66834521b00ea7102d'), 'usr/lib/libstdc++exp.a': (420, '376be2a7035b0f9872a92105f371fd9555f4edbd4d95f950c972fba6f634c0a1'), 'usr/lib/libstdc++fs.a': (420, 'cd481263d737a1d29e1baabf223c9b89a5da6d129425a111d934718abf525fbb'), 'usr/lib/libsupc++.a': (420, '12cd9bb171538a34b6df4f28cb8f3e53957ed2ab5334815df995999422e14496')}
+
+
+def construct_native_gcc_candidate_root(
+    installed: Path, stage: Path, staging_root: Path,
+    imported_baseline: dict, collisions: dict,
+) -> dict:
+    """Create a separately copied native-GCC candidate; never mutate FS-001.
+
+    Both the seven approved overlaps and all additions are installed through
+    the existing no-overwrite staging preflight, into a private full copy.
+    The caller still stops before native execution, root promotion or publish.
+    """
+    expected_names = set(REVIEWED_GCC_PRIOR_RUNTIME)
+    if set(collisions) != expected_names:
+        raise SelectionError("native GCC runtime transition paths changed")
+    reviewed = {}
+    for name, (mode, digest) in sorted(REVIEWED_GCC_PRIOR_RUNTIME.items()):
+        prior, incoming = collisions[name]
+        expected_prior = ("file", mode, digest)
+        if prior != expected_prior or imported_baseline.get(name) != expected_prior:
+            raise SelectionError(f"unapproved FS-001 GCC runtime identity: {name}")
+        if (incoming[0] != "file" or incoming[1] != mode or
+                len(incoming[2]) != 64 or
+                any(c not in "0123456789abcdef" for c in incoming[2])):
+            raise SelectionError(f"invalid staged GCC runtime identity: {name}")
+        reviewed[name] = {"installed": list(prior), "staged": list(incoming)}
+    original_snapshot = snapshot_imported_root(installed)
+    staged_snapshot = snapshot_imported_root(stage)
+    if any(original_snapshot.get(name) != tuple(identity)
+           for name, identity in imported_baseline.items()):
+        raise SelectionError("FS-001 imported ownership changed before trial")
+    candidate = staging_root / "native-gcc-candidate-root"
+    if candidate.exists() or candidate.is_symlink():
+        raise SelectionError("GCC candidate root already exists")
+    # Full copy, NOT hard links: later native verification must not be able to
+    # mutate the imported root via shared inodes. Preserve symlinks as symlinks.
+    shutil.copytree(installed, candidate, symlinks=True)
+    if snapshot_imported_root(candidate) != original_snapshot:
+        raise SelectionError("GCC candidate copy differs from imported root")
+    # Remove only the seven verified old *copies* in the candidate, then use
+    # the standard collision-rejecting merge for the staged GCC payload.
+    for name in sorted(expected_names):
+        (candidate / name).unlink()
+    merge_staged_install(candidate, stage)
+    if snapshot_imported_root(stage) != staged_snapshot:
+        raise SelectionError("native GCC staging changed during candidate construction")
+    after = snapshot_imported_root(candidate)
+    expected = original_snapshot.copy()
+    expected.update(staged_snapshot)
+    if after != expected:
+        raise SelectionError("candidate root differs from approved GCC staging result")
+    if snapshot_imported_root(installed) != original_snapshot:
+        raise SelectionError("imported root changed during GCC candidate construction")
+    return {
+        "schema_version": 1, "step_id": "native-gcc",
+        "state": "diagnostic-candidate-not-promoted",
+        "candidate_root": str(candidate),
+        "reviewed_runtime_transitions": reviewed,
+        "imported_entry_count": len(original_snapshot),
+        "candidate_entry_count": len(after),
+    }
 
 
 def verify_native_binutils_structure(root: Path) -> None:
@@ -237,10 +304,20 @@ def run_selected_recipes(workspace: Path, manifests: dict, steps: tuple,
                     json.dump(evidence, output, sort_keys=True, indent=2)
                     output.write("\n")
                 print(f"{prefix}: {len(collisions)} collisions recorded in {report}", flush=True)
-                print(f"{prefix}: GCC stage retained for separate ownership review", flush=True)
+                print(f"{prefix}: constructing isolated GCC candidate root", flush=True)
+                candidate_evidence = construct_native_gcc_candidate_root(
+                    installed, stage, staging_root, imported_baseline, collisions
+                )
+                with (staging_root / "native-gcc-candidate-root.json").open(
+                    "x", encoding="utf-8"
+                ) as output:
+                    json.dump(candidate_evidence, output, indent=2, sort_keys=True)
+                    output.write("\n")
+                require_preserved_imports(installed, imported_baseline)
+                print(f"{prefix}: isolated GCC candidate completed; original root preserved", flush=True)
                 raise RuntimeError(
-                    "diagnostic stop after native GCC staging: "
-                    "GCC merge, native verification and publication remain disabled"
+                    "diagnostic stop after native GCC candidate construction: "
+                    "native execution, promotion and publication remain disabled"
                 )
             if step.id.startswith("native-"):
                 raise SelectionError("unsupported native construction step")

@@ -63,7 +63,7 @@ Every Stage 1B construction recipe shall execute from the host in the existing f
 
 **State: Inactive**
 
-Stage 1B shall install only into its target filesystem, reject unintended collisions with imported or previously installed files, and permit any necessary Binutils/GCC private-file ownership transition only when the prior content and transition scope have been explicitly verified.
+Stage 1B shall install only into its target filesystem and reject unintended collisions with imported or previously installed files. Any Binutils/GCC compiler-private transition, or GCC runtime/development-library transition under `/usr/lib` arising from the verified Stage 1A GCC handoff, shall require an explicitly bounded set of paths, verification of the prior imported content, and recorded identities of the staged replacements. A candidate assembled for review shall not supersede the imported root or become a published artifact until functional and relocation verification succeeds.
 
 ### FS-002-NR-010 — Functional Target-Native Tools
 **Classification: B**
