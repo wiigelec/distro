@@ -30,3 +30,29 @@ make -j"$JOBS" all-target-libgcc
 make install-gcc
 make install-target-libgcc
 "$DISTRO_TOOLS_DIR/bin/$DISTRO_TARGET-gcc" --version
+
+# FS-001 #6: GCC was built without libc headers. After installing pass 1,
+# assemble the target-aware limits.h so it can include glibc's limits.h when
+# target libc is installed. See LFS GCC Pass 1; do not use mkheaders.
+for fragment in limitx.h glimits.h limity.h; do
+  [[ -f "$DISTRO_SOURCE_DIR/gcc/$fragment" && ! -L "$DISTRO_SOURCE_DIR/gcc/$fragment" ]] || {
+    echo "missing regular GCC limits fragment: $fragment" >&2; exit 1;
+  }
+done
+compiler="$DISTRO_TOOLS_DIR/bin/$DISTRO_TARGET-gcc"
+libgcc_file="$("$compiler" -print-libgcc-file-name)"
+private_dir="$(dirname -- "$libgcc_file")"
+expected_dir="$DISTRO_TOOLS_DIR/lib/gcc/$DISTRO_TARGET/$DISTRO_PACKAGE_VERSION"
+[[ "$private_dir" == "$expected_dir" && -d "$private_dir/include" && ! -L "$private_dir/include" ]] || {
+  echo "unexpected GCC private header path: $private_dir" >&2; exit 1;
+}
+limits="$private_dir/include/limits.h"
+[[ -f "$limits" && ! -L "$limits" ]] || { echo 'unexpected GCC limits.h target' >&2; exit 1; }
+tmp="$(mktemp "$private_dir/include/.limits.h.XXXXXXXX")"
+trap 'rm -f -- "$tmp"' EXIT
+cat -- "$DISTRO_SOURCE_DIR/gcc/limitx.h" "$DISTRO_SOURCE_DIR/gcc/glimits.h" \
+  "$DISTRO_SOURCE_DIR/gcc/limity.h" > "$tmp"
+grep -q '#include_next' "$tmp" || { echo 'GCC limits.h lacks include_next' >&2; exit 1; }
+chmod --reference="$limits" "$tmp"
+mv -f -- "$tmp" "$limits"
+trap - EXIT

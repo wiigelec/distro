@@ -31,6 +31,43 @@ for tool in gcc g++; do
         echo "incorrect compiler sysroot: $tool" >&2; exit 1;
     }
 done
+# FS-001 Issue #8: enforce the Arch x86-64 merged-/usr layout in both
+# the original sysroot and independently restored artifact. Do not trust
+# directory existence alone: check link type, exact target, and containment.
+for spec in \
+    'bin:usr/bin' \
+    'sbin:usr/bin' \
+    'lib:usr/lib' \
+    'lib64:usr/lib' \
+    'usr/sbin:bin' \
+    'usr/lib64:lib'; do
+    name="${spec%%:*}"
+    expected="${spec#*:}"
+    link="$SYSROOT/$name"
+    if [[ ! -L "$link" || "$(readlink -- "$link")" != "$expected" ]]; then
+        echo "incorrect merged-/usr link: $name (expected $expected)" >&2; exit 1
+    fi
+done
+for name in bin lib; do
+    [[ -d "$SYSROOT/usr/$name" && ! -L "$SYSROOT/usr/$name" ]] || {
+        echo "missing canonical real directory: /usr/$name" >&2; exit 1;
+    }
+done
+for name in libc.so.6 ld-linux-x86-64.so.2 libstdc++.so.6; do
+    [[ -f "$SYSROOT/usr/lib/$name" ]] || {
+        echo "missing canonical runtime file: /usr/lib/$name" >&2; exit 1;
+    }
+    resolved="$(readlink -f -- "$SYSROOT/usr/lib/$name")" || exit 1
+    case "$resolved" in
+        "$SYSROOT/usr/lib/"*) [[ -f "$resolved" ]] || exit 1 ;;
+        *) echo "runtime library escapes canonical sysroot: $name => $resolved" >&2; exit 1 ;;
+    esac
+done
+loader="$(readlink -f -- "$SYSROOT/lib64/ld-linux-x86-64.so.2")" || exit 1
+[[ "$loader" == "$SYSROOT/usr/lib/ld-linux-x86-64.so.2" ]] || {
+    echo "target /lib64 loader does not resolve to canonical glibc" >&2; exit 1;
+}
+# Resolve only *within the mounted target*, never against host /lib64.
 # Resolve every header actually used by a C/C++ standard-library include.
 # Compiler-private headers under /toolchain/tools are permitted; host fallback
 # and symlinks resolving outside the mounted target are not.
@@ -73,11 +110,22 @@ done
 "$TOOLS/$TARGET-ld" --version >/dev/null
 "$TOOLS/$TARGET-readelf" --version >/dev/null
 test -d "$SYSROOT/usr/include" || { echo "missing target headers" >&2; exit 1; }
-if ! test -f "$SYSROOT/usr/lib/libc.so.6" && ! test -f "$SYSROOT/lib64/libc.so.6"; then
-    echo "missing target libc" >&2; exit 1
-fi
 tmp="$(mktemp -d /work/cross-verify.XXXXXXXX)"
 trap 'rm -rf "$tmp"' EXIT
+# FS-001 Issue #6: GCC's limits.h must integrate with target glibc.
+# Run in this common verification path, including relocated handoff checks.
+cat > "$tmp/limits.c" <<'FS001_LIMITS'
+#include <limits.h>
+#include <wchar.h>
+#include <stdlib.h>
+#if MB_LEN_MAX != 16
+#error "FS-001: incorrect target MB_LEN_MAX"
+#endif
+int fs001_limits_probe(void) { return MB_LEN_MAX; }
+FS001_LIMITS
+"$TOOLS/$TARGET-gcc" --sysroot="$SYSROOT" -O2 -D_FORTIFY_SOURCE=2 \
+    -c "$tmp/limits.c" -o "$tmp/limits.o"
+test -s "$tmp/limits.o" || { echo "fortified target limits probe missing" >&2; exit 1; }
 printf '#include <stdio.h>\nint main(void){puts("target-c");return 0;}\n' > "$tmp/check.c"
 printf '#include <iostream>\nint main(){std::cout << "target-cxx";return 0;}\n' > "$tmp/check.cpp"
 "$TOOLS/$TARGET-gcc" "$tmp/check.c" -o "$tmp/check-c"
@@ -92,10 +140,12 @@ for binary in "$tmp/check-c" "$tmp/check-cxx"; do
         echo "missing dynamic interpreter" >&2; exit 1;
     }
     interp="$(printf '%s\n' "$program_headers" | sed -n 's/.*Requesting program interpreter: \([^]]*\)\].*/\1/p')"
-    case "$interp" in
-        /lib/*|/lib64/*|/usr/lib/*|/usr/lib64/*) ;;
-        *) echo "invalid target interpreter: $interp" >&2; exit 1 ;;
-    esac
+    [[ "$interp" == /lib64/ld-linux-x86-64.so.2 ]] || {
+        echo "unexpected target interpreter: $interp" >&2; exit 1;
+    }
+    [[ "$(readlink -f -- "$SYSROOT$interp")" == "$SYSROOT/usr/lib/ld-linux-x86-64.so.2" ]] || {
+        echo "linked binary interpreter absent from target sysroot" >&2; exit 1;
+    }
     dynamic="$("$TOOLS/$TARGET-readelf" -d "$binary")"
     if printf '%s\n' "$dynamic" | grep -E 'NEEDED.*\[/' ; then
         echo "absolute library dependency" >&2; exit 1
