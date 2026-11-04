@@ -1,6 +1,7 @@
-"""Bounded FS-002 diagnostic: collision-safe staged installs through native Binutils.
+"""Bounded FS-002 diagnostic: collision-safe staged installs through native GCC.
 
-Native GCC, complete functional verification and artifact publication remain gated.
+Native GCC is installed only to separate staging; ownership transitions,
+functional verification, and artifact publication remain gated.
 """
 from __future__ import annotations
 
@@ -62,8 +63,8 @@ def run_selected_recipes(workspace: Path, manifests: dict, steps: tuple,
                          imported_baseline: dict) -> None:
     """Install ordinary packages and native Binutils without file replacement.
 
-    Stop intentionally after bounded native Binutils installation and initial
-    structural checks. Native GCC and artifact publication remain disabled.
+    Run native GCC into an isolated staging root, inventory collisions and
+    stop before merging GCC or publishing a cross-chroot artifact.
     """
     workspace = Path(workspace).absolute()
     if workspace.is_symlink() or not workspace.is_dir() or workspace.resolve() != workspace:
@@ -149,12 +150,37 @@ def run_selected_recipes(workspace: Path, manifests: dict, steps: tuple,
                 print(f"{prefix}: checking installed native ELF executables", flush=True)
                 verify_native_binutils_structure(installed)
                 print(f"{prefix}: native Binutils installed; functional verification pending", flush=True)
+                print(f"{prefix}: continuing to staged native GCC diagnostic", flush=True)
+                shutil.rmtree(stage)
+                print(f"{prefix}: installed ({time.monotonic() - started:.1f}s)", flush=True)
+                continue
+            if step.id == "native-gcc":
+                print(f"{prefix}: collecting native GCC collision evidence", flush=True)
+                require_preserved_imports(installed, imported_baseline)
+                verify_native_binutils_structure(installed)
+                collisions = native_collision_evidence(installed, stage)
+                evidence = {
+                    "schema_version": 1,
+                    "step_id": step.id,
+                    "target": TARGET,
+                    "version": step.version,
+                    "collisions": {
+                        name: {"installed": list(prior), "staged": list(candidate)}
+                        for name, (prior, candidate) in sorted(collisions.items())
+                    },
+                }
+                report = staging_root / "native-gcc-collisions.json"
+                with report.open("x", encoding="utf-8") as output:
+                    json.dump(evidence, output, sort_keys=True, indent=2)
+                    output.write("\n")
+                print(f"{prefix}: {len(collisions)} collisions recorded in {report}", flush=True)
+                print(f"{prefix}: GCC stage retained for separate ownership review", flush=True)
                 raise RuntimeError(
-                    "diagnostic stop after native Binutils installation: "
-                    "native GCC and artifact publication remain disabled"
+                    "diagnostic stop after native GCC staging: "
+                    "GCC merge, native verification and publication remain disabled"
                 )
             if step.id.startswith("native-"):
-                raise SelectionError("native GCC construction remains disabled")
+                raise SelectionError("unsupported native construction step")
             print(f"{prefix}: checking staged installation ownership", flush=True)
             check_staged_install(installed, stage)
             require_preserved_imports(installed, imported_baseline)

@@ -21,7 +21,7 @@ def prepare_stage(root: Path, archive: Path, *, diagnose_native_binutils: bool =
 
     The regular cross-chroot command is deliberately disabled until native
     ownership, functional verification and relocation publication exist.
-    Diagnostic mode stops after native Binutils staging and collision inventory.
+    Diagnostic mode stages native GCC and records collisions without merging GCC.
     """
     if sys.platform != "linux":
         raise RuntimeError("Cross-chroot preparation requires a Linux host")
@@ -58,7 +58,7 @@ def prepare_stage(root: Path, archive: Path, *, diagnose_native_binutils: bool =
             "native-binutils", "native-gcc"
         ]:
             raise SelectionError("diagnostic requires native Binutils and GCC as the final steps")
-        print("[cross-chroot] DIAGNOSTIC ONLY: executing through native Binutils staging", flush=True)
+        print("[cross-chroot] DIAGNOSTIC ONLY: staging native GCC for collision inventory", flush=True)
         run_selected_recipes(root, manifests, steps, baseline)
         raise RuntimeError("diagnostic runner returned unexpectedly; no verified cross-chroot artifact")
     raise RuntimeError(
