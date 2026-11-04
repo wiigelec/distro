@@ -1,7 +1,6 @@
-"""Bounded cross-chroot package construction with staged, collision-checked installs.
+"""Bounded FS-002 diagnostic: collision-safe staged installs through native Binutils.
 
-This runner is not yet called from the public CLI: native tool ownership
-transitions, functional verification and artifact publication remain gated.
+Native GCC, complete functional verification and artifact publication remain gated.
 """
 from __future__ import annotations
 
@@ -36,13 +35,35 @@ def omit_generated_info_index(stage: Path) -> None:
     index.unlink()
 
 
+def verify_native_binutils_structure(root: Path) -> None:
+    """Check native Binutils executables without running target binaries.
+
+    ELF structure is only an initial sanity gate, not functional verification.
+    """
+    for name in ("as", "ld", "ar", "nm", "objdump", "readelf"):
+        path = root / "usr/bin" / name
+        try:
+            meta = path.lstat()
+        except FileNotFoundError as exc:
+            raise SelectionError(f"missing native Binutils executable: {path}") from exc
+        if not stat.S_ISREG(meta.st_mode) or not meta.st_mode & 0o111:
+            raise SelectionError(f"native Binutils executable must be a regular executable file: {path}")
+        with path.open("rb") as executable:
+            header = executable.read(64)
+        # ELF64, little-endian, x86-64; executable or position-independent executable.
+        if (len(header) < 64 or header[:4] != b"\x7fELF" or
+                header[4] != 2 or header[5] != 1 or
+                int.from_bytes(header[16:18], "little") not in (2, 3) or
+                int.from_bytes(header[18:20], "little") != 62):
+            raise SelectionError(f"invalid native x86-64 ELF executable: {path}")
+
+
 def run_selected_recipes(workspace: Path, manifests: dict, steps: tuple,
                          imported_baseline: dict) -> None:
-    """Install ordinary packages; capture native Binutils evidence then stop.
+    """Install ordinary packages and native Binutils without file replacement.
 
-    The caller must first validate/restore the cross-toolchain and select
-    dependencies. No native ownership transition is permitted. This path
-    never completes a full cross-chroot artifact or enters native GCC.
+    Stop intentionally after bounded native Binutils installation and initial
+    structural checks. Native GCC and artifact publication remain disabled.
     """
     workspace = Path(workspace).absolute()
     if workspace.is_symlink() or not workspace.is_dir() or workspace.resolve() != workspace:
@@ -112,9 +133,25 @@ def run_selected_recipes(workspace: Path, manifests: dict, steps: tuple,
                     "staged files retained",
                     flush=True,
                 )
+                if collisions:
+                    raise RuntimeError(
+                        "native Binutils collisions require ownership review; "
+                        "native files were not merged"
+                    )
+                print(f"{prefix}: checking staged native ELF executables", flush=True)
+                verify_native_binutils_structure(stage)
+                print(f"{prefix}: preflighting noncolliding native installation", flush=True)
+                check_staged_install(installed, stage)
+                require_preserved_imports(installed, imported_baseline)
+                print(f"{prefix}: merging native Binutils without replacements", flush=True)
+                merge_staged_install(installed, stage)
+                require_preserved_imports(installed, imported_baseline)
+                print(f"{prefix}: checking installed native ELF executables", flush=True)
+                verify_native_binutils_structure(installed)
+                print(f"{prefix}: native Binutils installed; functional verification pending", flush=True)
                 raise RuntimeError(
-                    "native Binutils installation requires explicit ownership review; "
-                    "no native files merged and no artifact published"
+                    "diagnostic stop after native Binutils installation: "
+                    "native GCC and artifact publication remain disabled"
                 )
             if step.id.startswith("native-"):
                 raise SelectionError("native GCC construction remains disabled")
