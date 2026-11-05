@@ -102,19 +102,55 @@ def construct_native_gcc_candidate_root(
     expected_names = set(REVIEWED_GCC_PRIOR_RUNTIME)
     if set(collisions) != expected_names:
         raise SelectionError("native GCC runtime transition paths changed")
-    reviewed = {}
+    # Preserve the full imported baseline: a matching installed file alone
+    # does not establish that it was present in the FS-001 archive.
+    original_snapshot = snapshot_imported_root(installed)
+    staged_snapshot = snapshot_imported_root(stage)
+    provenance = {}
+    invalid = []
     for name, (mode, digest) in sorted(REVIEWED_GCC_PRIOR_RUNTIME.items()):
         prior, incoming = collisions[name]
         expected_prior = ("file", mode, digest)
-        if prior != expected_prior or imported_baseline.get(name) != expected_prior:
-            raise SelectionError(f"unapproved FS-001 GCC runtime identity: {name}")
-        if (incoming[0] != "file" or incoming[1] != mode or
-                len(incoming[2]) != 64 or
-                any(c not in "0123456789abcdef" for c in incoming[2])):
-            raise SelectionError(f"invalid staged GCC runtime identity: {name}")
-        reviewed[name] = {"installed": list(prior), "staged": list(incoming)}
-    original_snapshot = snapshot_imported_root(installed)
-    staged_snapshot = snapshot_imported_root(stage)
+        imported = imported_baseline.get(name)
+        installed_identity = original_snapshot.get(name)
+        installed_ok = prior == expected_prior and installed_identity == prior
+        imported_ok = imported == expected_prior
+        staged_ok = (
+            incoming[0] == "file" and incoming[1] == mode and
+            isinstance(incoming[2], str) and len(incoming[2]) == 64 and
+            all(c in "0123456789abcdef" for c in incoming[2])
+        )
+        provenance[name] = {
+            "expected_prior": list(expected_prior),
+            "imported_baseline": list(imported) if imported is not None else None,
+            "installed": list(installed_identity) if installed_identity is not None else None,
+            "staged": list(incoming),
+            "installed_matches_reviewed": installed_ok,
+            "imported_matches_reviewed": imported_ok,
+            "staged_identity_valid": staged_ok,
+            "imported_baseline_missing": imported is None,
+        }
+        if not (installed_ok and imported_ok and staged_ok):
+            invalid.append(name)
+    provenance_report = staging_root / "native-gcc-ownership-provenance.json"
+    with provenance_report.open("x", encoding="utf-8") as output:
+        json.dump({
+            "schema_version": 1,
+            "step_id": "native-gcc",
+            "state": "diagnostic-no-ownership-authorization",
+            "invalid_paths": invalid,
+            "paths": provenance,
+        }, output, indent=2, sort_keys=True)
+        output.write("\n")
+    if invalid:
+        raise SelectionError(
+            f"GCC ownership provenance failed for {len(invalid)} paths; "
+            f"inspect {provenance_report}; original root preserved"
+        )
+    reviewed = {
+        name: {"installed": list(pair[0]), "staged": list(pair[1])}
+        for name, pair in sorted(collisions.items())
+    }
     if any(original_snapshot.get(name) != tuple(identity)
            for name, identity in imported_baseline.items()):
         raise SelectionError("FS-001 imported ownership changed before trial")
