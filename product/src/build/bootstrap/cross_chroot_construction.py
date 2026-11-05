@@ -249,14 +249,33 @@ printf 'hello\n' > /verify/a.txt
 /usr/bin/readelf -l /verify/smoke-cpp | /usr/bin/grep -q 'Requesting program interpreter'
 printf 'NATIVE_BASH_UTILITIES_C_CPP_OK\n'
 """
-    # Fresh filesystem namespace, private network/PID/user namespaces, no host
-    # userspace or filesystem read mounts. Candidate is read-only at /.
+    # Bubblewrap requires mount targets to exist before it can mount /dev,
+    # /proc, /tmp, /run and /verify. The candidate itself must remain immutable:
+    # construct a private verification copy and add only missing mountpoints.
+    verification_root = staging_root / "native-gcc-verification-root"
+    if verification_root.exists() or verification_root.is_symlink():
+        raise SelectionError("native GCC verification root already exists")
+    shutil.copytree(candidate, verification_root, symlinks=True)
+    verification_snapshot = snapshot_imported_root(verification_root)
+    if verification_snapshot != before_candidate:
+        raise SelectionError("native GCC verification copy differs from candidate")
+    for name in ("dev", "proc", "tmp", "run", "verify"):
+        mountpoint = verification_root / name
+        if mountpoint.is_symlink():
+            raise SelectionError(f"verification mountpoint is a symlink: {name}")
+        if mountpoint.exists():
+            if not mountpoint.is_dir():
+                raise SelectionError(f"verification mountpoint is not a directory: {name}")
+        else:
+            mountpoint.mkdir(mode=0o755)
+    # No host userspace mounts: only the target-derived verification copy is /
+    # and a separate scratch mount is writable. The candidate stays unchanged.
     cmd = [
         _bwrap(), "--die-with-parent", "--unshare-user", "--unshare-pid",
         "--unshare-net", "--new-session", "--clearenv",
-        "--ro-bind", str(candidate), "/", "--dev", "/dev",
+        "--ro-bind", str(verification_root), "/", "--dev", "/dev",
         "--proc", "/proc", "--tmpfs", "/tmp", "--tmpfs", "/run",
-        "--dir", "/verify", "--bind", str(scratch), "/verify",
+        "--bind", str(scratch), "/verify",
         "--setenv", "PATH", "/usr/bin:/bin", "--setenv", "LC_ALL", "C",
         "--setenv", "HOME", "/verify", "--setenv", "TMPDIR", "/verify",
         "--chdir", "/verify", "--", "/bin/bash", "-c", checks,
