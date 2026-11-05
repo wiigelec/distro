@@ -305,6 +305,22 @@ printf 'NATIVE_BASH_UTILITIES_C_CPP_OK\n'
             "host_userspace_mounted": False, "success": False,
             "error": str(exc),
         }
+    # Record the representative ELF interpreter and dependency closure using
+    # candidate paths only. The same check runs after independent restoration.
+    if success:
+        from build.bootstrap.cross_chroot_elf_audit import audit_native_elf
+        audit_report = staging_root / "native-gcc-elf-dependencies.json"
+        audit = audit_native_elf(candidate, scratch, audit_report)
+        payload["elf_dependencies"] = {
+            "success": audit["success"],
+            "dependency_graph_sha256": audit["dependency_graph_sha256"],
+            "elf_object_count": audit["elf_object_count"],
+            "errors": audit["errors"],
+        }
+        if not audit["success"]:
+            success = False
+            payload["success"] = False
+            payload["state"] = "diagnostic-elf-dependency-audit-failed"
     # Sandbox is read-only for the candidate, and the root saved before GCC
     # candidate creation must still match exactly on all imported entries.
     if snapshot_imported_root(candidate) != before_candidate:
@@ -395,10 +411,14 @@ def verify_native_gcc_relocation(
             )
             if relocated_smoke.get("success") is not True:
                 raise SelectionError("restored candidate functional verification failed")
+            if (smoke.get("elf_dependencies", {}).get("dependency_graph_sha256") !=
+                    relocated_smoke.get("elf_dependencies", {}).get("dependency_graph_sha256")):
+                raise SelectionError("ELF dependency graph changed after independent restoration")
             payload["relocated_smoke"] = {
                 "success": True,
                 "exit_code": relocated_smoke.get("exit_code"),
                 "stdout": relocated_smoke.get("stdout", "")[-4000:],
+                "elf_dependencies": relocated_smoke.get("elf_dependencies"),
             }
         if snapshot_imported_root(candidate) != before_candidate:
             raise SelectionError("relocation changed the native GCC candidate")
