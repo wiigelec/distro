@@ -186,6 +186,122 @@ def construct_native_gcc_candidate_root(
     }
 
 
+
+def verify_native_gcc_candidate(
+    installed: Path, candidate: Path, staging_root: Path,
+    imported_baseline: dict,
+) -> dict:
+    """Smoke-test target-native utilities and C/C++ inside the candidate root.
+
+    Bubblewrap exposes NO host /usr, /bin, /lib, /lib64 or /etc. A read-only
+    candidate is the sandbox /, with only an isolated scratch directory writable.
+    This diagnostic grants neither ownership promotion nor publication rights.
+    """
+    import subprocess
+
+    from build.host_sandbox import _bwrap, _workspace_mounts
+
+    candidate = Path(candidate).absolute()
+    installed = Path(installed).absolute()
+    staging_root = Path(staging_root).absolute()
+    if candidate != staging_root / "native-gcc-candidate-root":
+        raise SelectionError("native verification candidate must be the reviewed GCC root")
+    if not candidate.is_dir() or candidate.is_symlink():
+        raise SelectionError("native GCC candidate must be a real directory")
+    if not installed.is_dir() or installed.is_symlink():
+        raise SelectionError("installed root must be a real directory")
+    before_candidate = snapshot_imported_root(candidate)
+    before_installed = snapshot_imported_root(installed)
+    require_preserved_imports(installed, imported_baseline)
+    scratch = staging_root / "native-gcc-verification-scratch"
+    if scratch.exists() or scratch.is_symlink():
+        raise SelectionError("native GCC verification scratch already exists")
+    scratch.mkdir(mode=0o700)
+    # Apply the established no-symlink / no-overlap writable-root guard.
+    _workspace_mounts(scratch, candidate)
+    (scratch / "smoke.c").write_text(
+        "#include <stdio.h>\nint main(void){puts(\"NATIVE_C_OK\");return 0;}\n",
+        encoding="utf-8",
+    )
+    (scratch / "smoke.cpp").write_text(
+        '#include <iostream>\n#include <string>\n'
+        'int main(){std::string s="NATIVE_CPP_OK";std::cout<<s<<"\\n";return 0;}\n',
+        encoding="utf-8",
+    )
+    checks = r"""
+set -euo pipefail
+export PATH=/usr/bin:/bin LC_ALL=C HOME=/verify TMPDIR=/verify
+for tool in bash sh cat grep sed gawk make diff tar as ld ar readelf gcc g++; do
+    command -v "$tool" >/dev/null || { printf 'MISSING:%s\n' "$tool"; exit 20; }
+done
+printf 'alpha\n' | /usr/bin/sed 's/alpha/beta/' | /usr/bin/grep -qx beta
+printf '1 2\n' | /usr/bin/gawk '{exit ($1+$2 == 3 ? 0 : 1)}'
+printf 'hello\n' > /verify/a.txt
+/usr/bin/cat /verify/a.txt > /verify/b.txt
+/usr/bin/diff -q /verify/a.txt /verify/b.txt >/dev/null
+/usr/bin/tar -cf /verify/test.tar -C /verify a.txt
+/usr/bin/gcc -O0 -o /verify/smoke-c /verify/smoke.c
+/usr/bin/g++ -O0 -o /verify/smoke-cpp /verify/smoke.cpp
+[[ "$(/verify/smoke-c)" == NATIVE_C_OK ]]
+[[ "$(/verify/smoke-cpp)" == NATIVE_CPP_OK ]]
+/usr/bin/readelf -h /verify/smoke-c | /usr/bin/grep -q 'ELF64'
+/usr/bin/readelf -l /verify/smoke-c | /usr/bin/grep -q 'Requesting program interpreter'
+/usr/bin/readelf -l /verify/smoke-cpp | /usr/bin/grep -q 'Requesting program interpreter'
+printf 'NATIVE_BASH_UTILITIES_C_CPP_OK\n'
+"""
+    # Fresh filesystem namespace, private network/PID/user namespaces, no host
+    # userspace or filesystem read mounts. Candidate is read-only at /.
+    cmd = [
+        _bwrap(), "--die-with-parent", "--unshare-user", "--unshare-pid",
+        "--unshare-net", "--new-session", "--clearenv",
+        "--ro-bind", str(candidate), "/", "--dev", "/dev",
+        "--proc", "/proc", "--tmpfs", "/tmp", "--tmpfs", "/run",
+        "--dir", "/verify", "--bind", str(scratch), "/verify",
+        "--setenv", "PATH", "/usr/bin:/bin", "--setenv", "LC_ALL", "C",
+        "--setenv", "HOME", "/verify", "--setenv", "TMPDIR", "/verify",
+        "--chdir", "/verify", "--", "/bin/bash", "-c", checks,
+    ]
+    report = staging_root / "native-gcc-functional-verification.json"
+    try:
+        result = subprocess.run(
+            cmd, env={"PATH": os.defpath}, text=True, capture_output=True,
+            timeout=180,
+        )
+        success = result.returncode == 0 and "NATIVE_BASH_UTILITIES_C_CPP_OK" in result.stdout
+        payload = {
+            "schema_version": 1, "step_id": "native-gcc",
+            "state": "diagnostic-functional-smoke-not-accepted",
+            "isolated_candidate_root": str(candidate),
+            "host_userspace_mounted": False,
+            "exit_code": result.returncode,
+            "success": success,
+            "stdout": result.stdout[-16000:], "stderr": result.stderr[-16000:],
+        }
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        success = False
+        payload = {
+            "schema_version": 1, "step_id": "native-gcc",
+            "state": "diagnostic-functional-smoke-not-accepted",
+            "isolated_candidate_root": str(candidate),
+            "host_userspace_mounted": False, "success": False,
+            "error": str(exc),
+        }
+    # Sandbox is read-only for the candidate, and the root saved before GCC
+    # candidate creation must still match exactly on all imported entries.
+    if snapshot_imported_root(candidate) != before_candidate:
+        raise SelectionError("native functional check modified candidate filesystem")
+    if snapshot_imported_root(installed) != before_installed:
+        raise SelectionError("native functional check modified original installed root")
+    require_preserved_imports(installed, imported_baseline)
+    with report.open("x", encoding="utf-8") as output:
+        json.dump(payload, output, indent=2, sort_keys=True)
+        output.write("\n")
+    if not success:
+        raise SelectionError(f"native GCC candidate functional smoke failed; inspect {report}")
+    return payload
+
+
+
 def verify_native_binutils_structure(root: Path) -> None:
     """Check native Binutils executables without running target binaries.
 
@@ -350,6 +466,12 @@ def run_selected_recipes(workspace: Path, manifests: dict, steps: tuple,
                     json.dump(candidate_evidence, output, indent=2, sort_keys=True)
                     output.write("\n")
                 require_preserved_imports(installed, imported_baseline)
+                print(f"{prefix}: checking native utilities and C/C++ in candidate-only root", flush=True)
+                functional = verify_native_gcc_candidate(
+                    installed, staging_root / "native-gcc-candidate-root",
+                    staging_root, imported_baseline,
+                )
+                print(f"{prefix}: native candidate functional smoke passed; no publication", flush=True)
                 print(f"{prefix}: isolated GCC candidate completed; original root preserved", flush=True)
                 raise RuntimeError(
                     "diagnostic stop after native GCC candidate construction: "
