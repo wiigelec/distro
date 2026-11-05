@@ -1,4 +1,4 @@
-"""FS-002 cross-chroot: verified import and selection; construction not enabled yet."""
+"""FS-002 cross-chroot: verified Stage 1A import, Stage 1B build and handoff."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -17,11 +17,10 @@ STAGE = Path(__file__).resolve().parent / "cross-chroot"
 
 
 def prepare_stage(root: Path, archive: Path, *, diagnose_native_binutils: bool = False):
-    """Validate import and selection, optionally run a non-publishing diagnostic.
+    """Validate inputs and run Stage 1B; optionally stop after diagnostics.
 
-    The regular cross-chroot command is deliberately disabled until native
-    ownership, functional verification and relocation publication exist.
-    Diagnostic mode stages native GCC and records collisions without merging GCC.
+    Normal execution publishes only after functional and relocation gates pass.
+    Diagnostic mode retains staging evidence without a completed handoff.
     """
     if sys.platform != "linux":
         raise RuntimeError("Cross-chroot preparation requires a Linux host")

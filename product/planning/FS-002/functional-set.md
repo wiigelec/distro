@@ -42,3 +42,7 @@ FS-002 is complete when a qualified host can consume a valid Stage 1A handoff, c
 ## Initial Requirement State
 
 During Planning, FS-002-NR-001 through FS-002-NR-012 and FS-002-NR-014 are inactive until Build implements their enforcement and Planning reactivates them. FS-002-NR-013 and FS-002-NR-015 remain active for semantic evaluation. Evaluation classifications are unchanged; inactive requirements do not impose current mechanical or semantic evaluation obligations. Reactivation and required bindings precede acceptance.
+
+## Implementation Evaluation State
+
+The initial inactive requirement state above records the Planning baseline. Following Build implementation, FS-002-NR-001 through FS-002-NR-012 and FS-002-NR-014 were activated in the normative specification and assigned required product mechanical-validation tasks. This transition does not itself establish Semantic Review or Acceptance. Successful native-tool and relocation execution must be corroborated with qualified-host handoff evidence.
