@@ -321,6 +321,102 @@ printf 'NATIVE_BASH_UTILITIES_C_CPP_OK\n'
 
 
 
+def verify_native_gcc_relocation(
+    installed: Path, candidate: Path, staging_root: Path,
+    imported_baseline: dict,
+) -> dict:
+    """Diagnostic-only candidate archive -> independent restore -> native smoke.
+
+    This MUST NOT publish an artifact or a completion marker. The restored root
+    resides outside the construction workspace, and its sandbox receives no
+    mounts from that workspace or the host's userspace.
+    """
+    import hashlib
+    import subprocess
+    import tempfile
+    from build.bootstrap.cross_toolchain import _validate_candidate_archive
+
+    installed, candidate, staging_root = map(
+        lambda p: Path(p).absolute(), (installed, candidate, staging_root)
+    )
+    if candidate != staging_root / "native-gcc-candidate-root":
+        raise SelectionError("relocation requires the reviewed native GCC candidate")
+    if not candidate.is_dir() or candidate.is_symlink():
+        raise SelectionError("missing native GCC relocation candidate")
+    if (staging_root / "native-gcc-functional-verification.json").is_file() is False:
+        raise SelectionError("native functional verification evidence is missing")
+    smoke = json.loads((staging_root / "native-gcc-functional-verification.json").read_text())
+    if smoke.get("success") is not True:
+        raise SelectionError("native functional smoke has not passed")
+    before_candidate = snapshot_imported_root(candidate)
+    before_installed = snapshot_imported_root(installed)
+    require_preserved_imports(installed, imported_baseline)
+    archive = staging_root / "native-gcc-relocation-candidate.tar.xz"
+    report = staging_root / "native-gcc-relocation-verification.json"
+    if archive.exists() or archive.is_symlink() or report.exists() or report.is_symlink():
+        raise SelectionError("relocation archive or evidence already exists")
+    payload = {
+        "schema_version": 1, "step_id": "native-gcc",
+        "state": "diagnostic-relocation-not-published",
+        "success": False, "archive": str(archive),
+        "independent_restoration": True,
+        "host_userspace_mounted": False,
+    }
+    try:
+        # GNU tar emits a filesystem-only archive. Fail before restoration if
+        # member names, symlink traversal, or hardlink targets are unsafe.
+        subprocess.run(
+            ["tar", "--format=posix", "-cJf", str(archive), "-C", str(candidate), "."],
+            check=True, env={"PATH": os.defpath}, timeout=600,
+        )
+        _validate_candidate_archive(archive)
+        digest = hashlib.sha256()
+        with archive.open("rb") as stream:
+            for block in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(block)
+        payload.update({"archive_size": archive.stat().st_size,
+                        "archive_sha256": digest.hexdigest()})
+        # tmpdir is outside staging; neither construction nor original root is
+        # available inside the sandbox used by verify_native_gcc_candidate().
+        with tempfile.TemporaryDirectory(prefix="distro-fs002-relocation-") as tmp:
+            restore_staging = Path(tmp) / "staging"
+            restore_staging.mkdir()
+            restored = restore_staging / "native-gcc-candidate-root"
+            restored.mkdir()
+            subprocess.run(
+                ["tar", "-xJf", str(archive), "-C", str(restored),
+                 "--no-same-owner", "--no-overwrite-dir"],
+                check=True, env={"PATH": os.defpath}, timeout=600,
+            )
+            if snapshot_imported_root(restored) != before_candidate:
+                raise SelectionError("restored candidate identity differs from archived candidate")
+            relocated_smoke = verify_native_gcc_candidate(
+                installed, restored, restore_staging, imported_baseline
+            )
+            if relocated_smoke.get("success") is not True:
+                raise SelectionError("restored candidate functional verification failed")
+            payload["relocated_smoke"] = {
+                "success": True,
+                "exit_code": relocated_smoke.get("exit_code"),
+                "stdout": relocated_smoke.get("stdout", "")[-4000:],
+            }
+        if snapshot_imported_root(candidate) != before_candidate:
+            raise SelectionError("relocation changed the native GCC candidate")
+        if snapshot_imported_root(installed) != before_installed:
+            raise SelectionError("relocation changed the original installed root")
+        require_preserved_imports(installed, imported_baseline)
+        payload["success"] = True
+    except Exception as exc:
+        payload["error"] = str(exc)
+        raise
+    finally:
+        # This is diagnostic evidence, NOT Stage 1C handoff metadata.
+        with report.open("x", encoding="utf-8") as output:
+            json.dump(payload, output, sort_keys=True, indent=2)
+            output.write("\n")
+    return payload
+
+
 def verify_native_binutils_structure(root: Path) -> None:
     """Check native Binutils executables without running target binaries.
 
@@ -490,7 +586,13 @@ def run_selected_recipes(workspace: Path, manifests: dict, steps: tuple,
                     installed, staging_root / "native-gcc-candidate-root",
                     staging_root, imported_baseline,
                 )
-                print(f"{prefix}: native candidate functional smoke passed; no publication", flush=True)
+                print(f"{prefix}: native candidate functional smoke passed", flush=True)
+                print(f"{prefix}: archiving, restoring and rechecking candidate in separate workspace", flush=True)
+                verify_native_gcc_relocation(
+                    installed, staging_root / "native-gcc-candidate-root",
+                    staging_root, imported_baseline,
+                )
+                print(f"{prefix}: relocated native candidate functional smoke passed; no publication", flush=True)
                 print(f"{prefix}: isolated GCC candidate completed; original root preserved", flush=True)
                 raise RuntimeError(
                     "diagnostic stop after native GCC candidate construction: "
