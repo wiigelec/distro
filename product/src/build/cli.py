@@ -29,7 +29,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.diagnose_native_binutils:
             print("[cross-chroot] DIAGNOSTIC: build may be lengthy and will exit unsuccessfully; no artifact publication", flush=True)
         else:
-            print("[cross-chroot] Starting cross-chroot preparation", flush=True)
+            print("[cross-chroot] Starting verified Stage 1B construction and Stage 1C handoff", flush=True)
         try:
             prepare_stage(args.root, args.cross_toolchain,
                           diagnose_native_binutils=args.diagnose_native_binutils)

@@ -461,7 +461,8 @@ def verify_native_binutils_structure(root: Path) -> None:
 
 
 def run_selected_recipes(workspace: Path, manifests: dict, steps: tuple,
-                         imported_baseline: dict) -> None:
+                         imported_baseline: dict, *, parent_metadata: dict,
+                         publish: bool = False) -> Path | None:
     """Install ordinary packages and native Binutils without file replacement.
 
     Run native GCC into an isolated staging root, inventory collisions and
@@ -612,12 +613,21 @@ def run_selected_recipes(workspace: Path, manifests: dict, steps: tuple,
                     installed, staging_root / "native-gcc-candidate-root",
                     staging_root, imported_baseline,
                 )
-                print(f"{prefix}: relocated native candidate functional smoke passed; no publication", flush=True)
-                print(f"{prefix}: isolated GCC candidate completed; original root preserved", flush=True)
-                raise RuntimeError(
-                    "diagnostic stop after native GCC candidate construction: "
-                    "native execution, promotion and publication remain disabled"
+                print(f"{prefix}: relocated native candidate functional smoke passed", flush=True)
+                require_preserved_imports(installed, imported_baseline)
+                if not publish:
+                    raise RuntimeError(
+                        "diagnostic stop after native GCC candidate verification: "
+                        "publication disabled in diagnostic mode"
+                    )
+                from build.bootstrap.cross_chroot_handoff import publish_cross_chroot
+                print(f"{prefix}: publishing verified Stage 1C handoff", flush=True)
+                result = publish_cross_chroot(
+                    workspace, staging_root, staging_root / "native-gcc-candidate-root",
+                    steps, parent_metadata,
                 )
+                print(f"{prefix}: Stage 1C handoff published: {result}", flush=True)
+                return result
             if step.id.startswith("native-"):
                 raise SelectionError("unsupported native construction step")
             print(f"{prefix}: checking staged installation ownership", flush=True)

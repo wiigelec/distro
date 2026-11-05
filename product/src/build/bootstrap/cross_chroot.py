@@ -59,9 +59,12 @@ def prepare_stage(root: Path, archive: Path, *, diagnose_native_binutils: bool =
         ]:
             raise SelectionError("diagnostic requires native Binutils and GCC as the final steps")
         print("[cross-chroot] DIAGNOSTIC ONLY: staging native GCC for collision inventory", flush=True)
-        run_selected_recipes(root, manifests, steps, baseline)
+        run_selected_recipes(root, manifests, steps, baseline,
+                             parent_metadata=metadata, publish=False)
         raise RuntimeError("diagnostic runner returned unexpectedly; no verified cross-chroot artifact")
-    raise RuntimeError(
-        "cross-chroot construction is not yet enabled: collision ownership, native "
-        "verification and portable publication remain unimplemented"
-    )
+    if len(steps) < 2 or [step.id for step in steps[-2:]] != [
+        "native-binutils", "native-gcc"
+    ]:
+        raise SelectionError("cross-chroot selection requires native Binutils and GCC last")
+    return run_selected_recipes(root, manifests, steps, baseline,
+                                parent_metadata=metadata, publish=True)
