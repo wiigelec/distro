@@ -100,6 +100,87 @@
       "tasks": [
         "fs001-functional-relocation-evidence"
       ]
+    },
+    {
+      "requirement": "FS-002-NR-001",
+      "tasks": [
+        "fs002-invocation-selection"
+      ]
+    },
+    {
+      "requirement": "FS-002-NR-002",
+      "tasks": [
+        "fs002-input-import"
+      ]
+    },
+    {
+      "requirement": "FS-002-NR-003",
+      "tasks": [
+        "fs002-input-import"
+      ]
+    },
+    {
+      "requirement": "FS-002-NR-004",
+      "tasks": [
+        "fs002-invocation-selection"
+      ]
+    },
+    {
+      "requirement": "FS-002-NR-005",
+      "tasks": [
+        "fs002-invocation-selection"
+      ]
+    },
+    {
+      "requirement": "FS-002-NR-006",
+      "tasks": [
+        "fs002-sandbox-install"
+      ]
+    },
+    {
+      "requirement": "FS-002-NR-007",
+      "tasks": [
+        "fs002-invocation-selection",
+        "fs002-input-import"
+      ]
+    },
+    {
+      "requirement": "FS-002-NR-008",
+      "tasks": [
+        "fs002-sandbox-install"
+      ]
+    },
+    {
+      "requirement": "FS-002-NR-009",
+      "tasks": [
+        "fs002-sandbox-install",
+        "fs002-native-verification"
+      ]
+    },
+    {
+      "requirement": "FS-002-NR-010",
+      "tasks": [
+        "fs002-native-verification"
+      ]
+    },
+    {
+      "requirement": "FS-002-NR-011",
+      "tasks": [
+        "fs002-native-verification",
+        "fs002-publication-failure"
+      ]
+    },
+    {
+      "requirement": "FS-002-NR-012",
+      "tasks": [
+        "fs002-publication-failure"
+      ]
+    },
+    {
+      "requirement": "FS-002-NR-014",
+      "tasks": [
+        "fs002-traceability"
+      ]
     }
   ]
 }

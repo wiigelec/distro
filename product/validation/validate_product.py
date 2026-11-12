@@ -8,9 +8,18 @@ from typing import Callable
 
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST = ROOT / "product" / "validation" / "requirement-evaluation.json"
+sys.dont_write_bytecode = True  # keep Validation mechanically read-only
 from fs001_tasks import entrypoint_contract, selection_contract, handoff_contract, workspace_recipe_sandbox_contract, verified_source_contract, failure_integrity_contract, functional_relocation_evidence_contract, fs001_review_fix_contract
 
+from fs002_tasks import (invocation_selection_contract as fs002_invocation_selection, import_contract as fs002_import, sandbox_install_contract as fs002_sandbox_install, native_verification_contract as fs002_native_verification, publication_failure_contract as fs002_publication_failure, traceability_contract as fs002_traceability)
+
 TASKS: dict[str, Callable[[], bool | None]] = {
+    "fs002-invocation-selection": fs002_invocation_selection,
+    "fs002-input-import": fs002_import,
+    "fs002-sandbox-install": fs002_sandbox_install,
+    "fs002-native-verification": fs002_native_verification,
+    "fs002-publication-failure": fs002_publication_failure,
+    "fs002-traceability": fs002_traceability,
     "fs001-entrypoint-contract": entrypoint_contract,
     "fs001-selection-contract": selection_contract,
     "fs001-handoff-contract": handoff_contract,

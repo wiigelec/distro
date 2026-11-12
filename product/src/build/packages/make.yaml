@@ -1,0 +1,6 @@
+name: make
+source:
+  url: https://ftp.gnu.org/gnu/make/make-{version}.tar.gz
+  verification: sha256
+dependencies: []
+host_tools: [make, bash, tar]

@@ -1,0 +1,6 @@
+name: bash
+source:
+  url: https://ftp.gnu.org/gnu/bash/bash-{version}.tar.gz
+  verification: sha256
+dependencies: []
+host_tools: [make, bash, tar]

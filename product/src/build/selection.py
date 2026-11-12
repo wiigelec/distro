@@ -2,6 +2,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
+from collections.abc import Mapping
 import re
 
 class SelectionError(ValueError):
@@ -98,7 +99,20 @@ def load_manifests(directory: Path) -> dict[str, Manifest]:
     return found
 
 
-def select_steps(list_file: Path, manifests: dict[str, Manifest], recipes_root: Path) -> tuple[Step, ...]:
+def select_steps(list_file: Path, manifests: dict[str, Manifest], recipes_root: Path,
+                 *, imported: Mapping[str, str] | None = None) -> tuple[Step, ...]:
+    """Resolve manifest dependencies against prior steps or verified imported capabilities.
+
+    `imported` must come from a validated Stage 1A handoff and filesystem check,
+    not a stage list. Without it, Stage 1A's existing selection is unchanged.
+    """
+    if imported is None:
+        imported = {}
+    if not isinstance(imported, Mapping):
+        raise SelectionError("imported prerequisites must be a package/version mapping")
+    for name, version in imported.items():
+        if not _name(name) or name not in manifests or not _version(version):
+            raise SelectionError("invalid imported prerequisite identity/version")
     d = _yaml(list_file)
     _keys(d, {"steps"})
     if not isinstance(d["steps"], list) or not d["steps"]:
@@ -130,6 +144,8 @@ def select_steps(list_file: Path, manifests: dict[str, Manifest], recipes_root: 
             raise SelectionError("GCC pass 1 requires pinned GMP/MPFR/MPC")
         if sid in ids or (name in versions and versions[name] != version):
             raise SelectionError("duplicate step ID or conflicting package versions")
+        if name in imported and imported[name] != version:
+            raise SelectionError(f"{name}: selected version conflicts with imported prerequisite")
         if not isinstance(rel, str) or not rel.endswith(".sh"):
             raise SelectionError("recipe must be a relative Bash script")
         relative = Path(rel)
@@ -139,8 +155,8 @@ def select_steps(list_file: Path, manifests: dict[str, Manifest], recipes_root: 
         if not recipe.is_relative_to(recipes_root.resolve()) or not recipe.is_file():
             raise SelectionError(f"recipe unavailable or outside recipe root: {rel}")
         for dependency in manifests[name].dependencies:
-            if dependency not in versions:
-                raise SelectionError(f"{name}: required prerequisite not selected earlier: {dependency}")
+            if dependency not in versions and dependency not in imported:
+                raise SelectionError(f"{name}: required prerequisite not selected earlier or verified in Stage 1A: {dependency}")
         ids.add(sid)
         versions[name] = version
         steps.append(Step(sid, name, version, recipe, checksum.lower(), supplements))
