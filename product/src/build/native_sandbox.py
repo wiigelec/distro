@@ -93,3 +93,28 @@ def run_native_recipe(*args, **kwargs) -> None:
         subprocess.run(cmd, check=True, env={"PATH": os.defpath})
     except (OSError, subprocess.CalledProcessError) as exc:
         raise SandboxError(f"isolated native recipe failed: {exc}") from exc
+
+
+def verify_staged_sed(root: Path, stage: Path) -> None:
+    """Execute the staged native Sed against the imported target runtime only."""
+    root, stage = Path(root).absolute(), Path(stage).absolute()
+    _workspace_mounts(root, stage)
+    program = stage / "usr/bin/sed"
+    if program.is_symlink() or not program.is_file():
+        raise SandboxError("staged native Sed binary missing or not a regular file")
+    cmd = [
+        _bwrap(), "--die-with-parent", "--unshare-user", "--unshare-pid",
+        "--unshare-net", "--new-session", "--clearenv",
+        "--ro-bind", str(root), "/", "--dev", "/dev", "--proc", "/proc",
+        "--tmpfs", "/tmp", "--tmpfs", "/run",
+        "--ro-bind", str(stage), "/install",
+        "--setenv", "PATH", "/usr/bin:/bin", "--setenv", "LC_ALL", "C",
+        "--", "/install/usr/bin/sed", "-e", "s/foo/bar/",
+    ]
+    try:
+        result = subprocess.run(cmd, input=b"foo\n", capture_output=True, check=True,
+                                timeout=60, env={"PATH": os.defpath})
+    except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+        raise SandboxError(f"staged Sed failed within target-native runtime: {exc}") from exc
+    if result.stdout != b"bar\n":
+        raise SandboxError("staged Sed native functional output mismatch")

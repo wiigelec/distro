@@ -252,3 +252,48 @@ def verify(archive: Path) -> dict:
             return metadata
     except (tarfile.TarError, OSError, EOFError) as exc:
         raise PackageError(f"invalid package archive: {exc}") from exc
+
+
+def restore(archive: Path, destination: Path) -> dict:
+    """Safely consume a verified package into a fresh, private filesystem root.
+
+    No tar extraction shortcuts: only individually verified regular members and
+    in-root-relative symlinks are materialized; no member can traverse a link.
+    """
+    metadata = verify(archive)
+    destination = _regular_directory(destination, empty=True)
+    with tarfile.open(archive, "r:xz") as tar:
+        members = {member.name: member for member in tar.getmembers()[1:]}
+        # The verified metadata lists only leaves, never directory ownership.
+        # Create all required directory ancestors first, without following links.
+        directory_names = set()
+        for record in metadata["paths"]:
+            parts = record["path"].split("/")
+            directory_names.update("/".join(parts[:n]) for n in range(1, len(parts)))
+        for name in sorted(directory_names, key=lambda value: (value.count("/"), value)):
+            folder = destination / name
+            if folder.exists() or folder.is_symlink():
+                raise PackageError("package restoration target unexpectedly occupied")
+            folder.mkdir(mode=0o755)
+        for record in metadata["paths"]:
+            if record["type"] != "file":
+                continue
+            member = members["payload/" + record["path"]]
+            stream = tar.extractfile(member)
+            if stream is None:
+                raise PackageError("verified file contents missing during restoration")
+            target = destination / record["path"]
+            fd = os.open(target, os.O_CREAT | os.O_EXCL | os.O_WRONLY |
+                         getattr(os, "O_NOFOLLOW", 0), 0o600)
+            with os.fdopen(fd, "wb") as output:
+                for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                    output.write(chunk)
+                os.fchmod(output.fileno(), record["mode"])
+        # Symlinks are installed last. No package path has a non-directory
+        # ancestor, so restored symlinks are never traversed during creation.
+        for record in metadata["paths"]:
+            if record["type"] == "symlink":
+                os.symlink(record["target"], destination / record["path"])
+    if inventory(destination) != metadata["paths"]:
+        raise PackageError("restored package does not match verified inventory")
+    return metadata

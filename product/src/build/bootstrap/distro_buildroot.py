@@ -15,7 +15,7 @@ from build.bootstrap.cross_toolchain import PACKAGES, TARGET, _host_jobs, prepar
 from build.bootstrap.cross_chroot_ownership import snapshot_imported_root, require_preserved_imports
 from build.bootstrap.distro_buildroot_import import restore_cross_chroot
 from build.host_requirements import qualify_host
-from build.native_sandbox import run_native_recipe
+from build.native_sandbox import run_native_recipe, verify_staged_sed
 from build.selection import SelectionError, load_manifests, select_steps
 
 STAGE = Path(__file__).resolve().parent / "distro-buildroot"
@@ -88,6 +88,9 @@ def run_stage(root: Path, archive: Path, *, diagnostic: bool = False) -> Path | 
         raise SelectionError("native Sed did not install an independent usr/bin/sed")
     print(f"[distro-buildroot] Native staging contains {len(stage_inventory)} entries", flush=True)
     require_preserved_imports(imported, baseline)
+    print("[distro-buildroot] Verifying staged Sed inside the target-native runtime", flush=True)
+    verify_staged_sed(imported, package_stage)
+    print("[distro-buildroot] Native staged Sed functional verification passed", flush=True)
     if diagnostic:
         raise RuntimeError("FS-003 diagnostic reached native Sed staging; "
                            "no package created or published")
