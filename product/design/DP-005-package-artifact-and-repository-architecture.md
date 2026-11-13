@@ -21,7 +21,7 @@ A published package is identified by **name, upstream version, target architectu
 
 ## Build-to-Manage interface
 
-Build provides Manage with a per-package staged filesystem, the selected package identity, and the manifest-derived package relationships relevant to installation. Manage consumes this input without reading build recipes or inventing dependency relationships. Each package's staged payload remains distinct from both the temporary Bootstrap filesystem and other packages' staged payloads.
+Build provides Manage with a per-package staged filesystem, one selected package identity, and the manifest-derived package relationships relevant to installation. The selected identity is fixed for that package-creation request before Manage creates or publishes an artifact; Manage verifies and records the supplied identity rather than independently selecting or reinterpreting its values. A future revision-allocation policy may govern how Build establishes the selection, but must preserve this single-authority handoff. Manage consumes this input without reading build recipes or inventing dependency relationships. Each package's staged payload remains distinct from both the temporary Bootstrap filesystem and other packages' staged payloads.
 
 Manage creates a package artifact containing an installable target-root-relative payload and enough embedded identity to verify that it is the selected artifact. The repository's authoritative package record associates the identity with package relationships, its installed-path inventory, artifact location, and integrity checksum. The package archive need not duplicate the repository's full dependency graph. A package may have no payload, as with a metapackage.
 
@@ -38,6 +38,8 @@ Package creation and application reject unsafe paths, inappropriate archive memb
 ## Repository and publication
 
 The initial repository may be a local directory containing package artifacts and an authoritative index; no package server or remote transport is required merely to bootstrap. The index is the publication authority for selectable package identities and their corresponding verified artifacts. Publication must not expose a package index entry before its referenced artifact is complete and integrity-verifiable. A failed publication must not leave an authoritative index that points to absent, incomplete, or unverified artifacts. Replacing an existing published selection must not invalidate the previously usable selection before the replacement is ready.
+
+The initial Bootstrap collection is a coherent selectable `distro-buildroot` environment only after its package closure has been published and independently verified as usable. Individually valid packages may be created or published before this gate, but an incomplete or unverified collection must not be presented as a completed, selectable `distro-buildroot` environment. Verification may operate on an isolated candidate collection before that collection is made authoritative; this is not an alternate package format or publisher. The exact visibility and promotion mechanism is left to Planning. Failure must preserve the last usable authoritative selection, if one exists.
 
 Manage owns both `create` and `publish` as distinct operations under DP-004. Build may orchestrate those operations but does not implement an alternative publisher. Exact repository files, index serialization, concurrency policy and atomic-update mechanisms are left to Planning when required.
 

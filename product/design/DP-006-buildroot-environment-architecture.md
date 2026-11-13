@@ -43,7 +43,7 @@ Package identities and manifest-derived dependencies are not reconstructed from 
 
 The `distro-buildroot` metapackage declares the intended production environment requirements through the authoritative package model. The published closure must contain the native tools, runtime libraries, headers, executable interpreters and other capabilities necessary to run the chosen Build construction workload, including dependencies needed by the Build executor where that executor runs. The exact package inventory, version selections and representative workload belong to Planning. The Stage 1B baseline alone does not establish this closure.
 
-Stage 1C is complete only when the initial Bootstrap package collection has been created and published through Manage and is independently installable into a fresh managed root. The published collection must be sufficient to establish an isolated production buildroot without importing undeclared files or tools from Stage 1B or the foreign host.
+Stage 1C's product output is the initial Bootstrap package collection created and published through Manage. Stage completion additionally requires independent verification that the collection is installable into a fresh managed root and can establish an isolated production buildroot without importing undeclared files or tools from Stage 1B or the foreign host. An isolated candidate collection may be tested before it becomes the authoritative selectable collection; a successful test does not itself publish or accept the collection. Verification evidence establishes the completion gate and is not a separate package artifact, publication authority, or repository-governance acceptance record.
 
 ## Independent verification
 
@@ -51,7 +51,7 @@ Verification must distinguish:
 
 1. **Bootstrap-input capability:** the verified Stage 1B environment can execute the selected native construction workload.
 2. **Package correctness:** selected package artifacts have valid identity, integrity, dependency and ownership information and can be consumed independently by Manage.
-3. **Production-environment closure:** a fresh root assembled from the published `distro-buildroot` package closure can execute a representative native package build using the normal buildroot execution mode, with no undeclared host userspace or temporary-bootstrap dependency.
+3. **Production-environment closure:** a fresh root assembled from the complete `distro-buildroot` package closure can execute a representative native package build using the normal production Build environment-assembly and recipe-execution path, with no undeclared host userspace or temporary-bootstrap dependency. The test may use a candidate local package collection, but must use the same Manage-resolved package installation and Build execution behavior required for subsequent production builds, not a Stage 1C-only assembly or execution substitute.
 
 Static dependency/ELF inspection supports the third condition but is not sufficient alone; representative execution is required. Tests must not claim that a successful Stage 1B handoff establishes full Stage 1C readiness or that one representative build establishes universal package buildability.
 
