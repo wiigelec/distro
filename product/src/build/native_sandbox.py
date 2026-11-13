@@ -68,6 +68,9 @@ def native_recipe_command(work: Path, root: Path, stage: Path, recipe: Path, *,
         "--ro-bind", str(root), "/", "--dev", "/dev", "--proc", "/proc",
         "--tmpfs", "/tmp", "--tmpfs", "/run",
         "--bind", str(work), "/work", "--bind", str(stage), "/install",
+        # The target root is read-only; a private tmpfs allows bwrap to
+        # create the destination of this single-file recipe mount.
+        "--tmpfs", "/recipe",
         "--ro-bind", str(recipe), "/recipe/selected.sh",
     ]
     environment = {

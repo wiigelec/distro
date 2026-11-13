@@ -31,7 +31,9 @@ def run_diagnostic(root: Path, archive: Path) -> None:
         raise SelectionError("native buildroot workspace must be a real directory")
     if any(root.iterdir()):
         raise SelectionError("native buildroot workspace must be empty")
+    print("[distro-buildroot] Qualifying host tools", flush=True)
     qualify_host()
+    print("[distro-buildroot] Selecting native packages", flush=True)
     manifests = load_manifests(PACKAGES)
     steps = select_steps(STAGE / "lists/distro-buildroot.yaml", manifests, STAGE)
     if len(steps) != 1 or (steps[0].name, steps[0].version) != ("sed", "4.10"):
@@ -39,18 +41,22 @@ def run_diagnostic(root: Path, archive: Path) -> None:
     build, imported, staged = root / "build", root / "root", root / "staging"
     for path in (build, imported, staged):
         path.mkdir()
+    print("[distro-buildroot] Verifying and restoring Stage 1B handoff", flush=True)
     restore_cross_chroot(archive, imported)
+    print("[distro-buildroot] Stage 1B handoff restored", flush=True)
     # Source access and verification happen in Build's controller on the host;
     # recipe execution itself is entirely target-native in the isolated root.
     cache = build / "sources"
     cache.mkdir()
     (build / "steps").mkdir()
     step = steps[0]
+    print(f"[distro-buildroot] Fetching and verifying {step.name} {step.version} sources", flush=True)
     source, construction = prepare_step(step, manifests[step.name], build, cache)
+    print(f"[distro-buildroot] Verified sources ready", flush=True)
     package_stage = staged / step.id
     package_stage.mkdir()
     jobs = _host_jobs()
-    print("[distro-buildroot] DIAGNOSTIC: native Sed construction", flush=True)
+    print(f"[distro-buildroot] DIAGNOSTIC: starting native {step.name} {step.version} recipe (make -j{jobs})", flush=True)
     run_native_recipe(
         build, imported, package_stage, step.recipe,
         source_dir="/work/" + source.relative_to(build).as_posix(),
@@ -58,6 +64,7 @@ def run_diagnostic(root: Path, archive: Path) -> None:
         package=step.name, version=step.version, step_id=step.id,
         target=TARGET, jobs=jobs,
     )
+    print("[distro-buildroot] Native recipe returned; inventorying staged output", flush=True)
     stage_inventory = snapshot_imported_root(package_stage)
     if not any(path.startswith("usr/bin/sed") and kind[0] == "file"
                for path, kind in stage_inventory.items()):
