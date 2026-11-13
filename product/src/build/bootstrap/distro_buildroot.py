@@ -1,15 +1,18 @@
-"""FS-003 first-package native construction diagnostic.
+"""FS-003 initial native package: shared Build runner and Manage handoff.
 
-The common native executor is production-shaped, but this bounded diagnostic
-must not claim a completed distro-buildroot or publish a Manage package.
+Only the selected Sed 4.10 package is produced. This is not an assertion that
+the distro-buildroot collection or the Functional Set is accepted.
 """
 from __future__ import annotations
 
 from pathlib import Path
+import json
+import os
+import subprocess
 import sys
 
 from build.bootstrap.cross_toolchain import PACKAGES, TARGET, _host_jobs, prepare_step
-from build.bootstrap.cross_chroot_ownership import snapshot_imported_root
+from build.bootstrap.cross_chroot_ownership import snapshot_imported_root, require_preserved_imports
 from build.bootstrap.distro_buildroot_import import restore_cross_chroot
 from build.host_requirements import qualify_host
 from build.native_sandbox import run_native_recipe
@@ -18,11 +21,11 @@ from build.selection import SelectionError, load_manifests, select_steps
 STAGE = Path(__file__).resolve().parent / "distro-buildroot"
 
 
-def run_diagnostic(root: Path, archive: Path) -> None:
-    """Build and stage one Sed package; deliberately fail before publication.
+def run_stage(root: Path, archive: Path, *, diagnostic: bool = False) -> Path | None:
+    """Construct one target-native Sed package with the shared Build execution.
 
-    Full Stage 1C success awaits standard Manage create/publish, verification,
-    and requirement reactivation. The diagnostic preserves its staged output.
+    Diagnostic mode retains the legacy staged output and exits unsuccessfully.
+    Normal mode delegates archive and index operations to Manage.
     """
     if sys.platform != "linux":
         raise SelectionError("native buildroot requires a Linux host")
@@ -53,10 +56,24 @@ def run_diagnostic(root: Path, archive: Path) -> None:
     print(f"[distro-buildroot] Fetching and verifying {step.name} {step.version} sources", flush=True)
     source, construction = prepare_step(step, manifests[step.name], build, cache)
     print(f"[distro-buildroot] Verified sources ready", flush=True)
-    package_stage = staged / step.id
-    package_stage.mkdir()
+    # Build creates the fixed identity and manifest-selected relationships.
+    # The initial Sed manifest has no dependencies; future resolved selections
+    # must not be silently guessed from Bootstrap input or ELF observation.
+    if manifests[step.name].dependencies:
+        raise SelectionError("unresolved install relationships are not permitted")
+    baseline = snapshot_imported_root(imported)
+    if diagnostic:
+        package_stage = staged / step.id
+        package_stage.mkdir()
+        exchange = None
+    else:
+        exchange = root / "exchange" / step.id
+        exchange.mkdir(parents=True)
+        package_stage = exchange / "payload"
+        package_stage.mkdir()
     jobs = _host_jobs()
-    print(f"[distro-buildroot] DIAGNOSTIC: starting native {step.name} {step.version} recipe (make -j{jobs})", flush=True)
+    label = "DIAGNOSTIC" if diagnostic else "BUILD"
+    print(f"[distro-buildroot] {label}: starting native {step.name} {step.version} recipe (make -j{jobs})", flush=True)
     run_native_recipe(
         build, imported, package_stage, step.recipe,
         source_dir="/work/" + source.relative_to(build).as_posix(),
@@ -70,7 +87,42 @@ def run_diagnostic(root: Path, archive: Path) -> None:
                for path, kind in stage_inventory.items()):
         raise SelectionError("native Sed did not install an independent usr/bin/sed")
     print(f"[distro-buildroot] Native staging contains {len(stage_inventory)} entries", flush=True)
-    raise RuntimeError(
-        "FS-003 diagnostic reached native Sed staging; Manage creation, "
-        "publication and independent verification not yet implemented"
+    require_preserved_imports(imported, baseline)
+    if diagnostic:
+        raise RuntimeError("FS-003 diagnostic reached native Sed staging; "
+                           "no package created or published")
+
+    assert exchange is not None
+    selection = {
+        "schema_version": 1,
+        "identity": {"name": step.name, "version": step.version,
+                     "architecture": "x86_64", "revision": 1},
+        "relationships": [],
+    }
+    selection_bytes = (json.dumps(selection, sort_keys=True, separators=(",", ":"),
+                                  ensure_ascii=True) + "\n").encode("ascii")
+    with (exchange / "selection.json").open("xb") as selected:
+        selected.write(selection_bytes)
+    manage = Path(__file__).resolve().parents[3] / "scripts" / "manage"
+    # Manage is invoked through its public operations, not imported into Build.
+    # In particular Build never serializes a package or modifies the index.
+    commands = (
+        ("create", "--package", step.name, "--build", str(exchange)),
+        ("publish", "--package", step.name, "--repo", str(root / "repository"),
+         "--build", str(exchange)),
+        ("verify-repo", "--repo", str(root / "repository")),
     )
+    repository = root / "repository"
+    repository.mkdir()
+    for command in commands:
+        print(f"[distro-buildroot] Manage {command[0]}", flush=True)
+        subprocess.run([sys.executable, str(manage), *command], check=True,
+                       env={"PATH": os.defpath, "PYTHONDONTWRITEBYTECODE": "1"})
+    require_preserved_imports(imported, baseline)
+    print("[distro-buildroot] One native Sed package published and repository verified; "
+          "distro-buildroot collection remains incomplete", flush=True)
+    return repository / "artifacts" / "sed-4.10-x86_64-r1.tar.xz"
+
+
+def run_diagnostic(root: Path, archive: Path) -> None:
+    run_stage(root, archive, diagnostic=True)

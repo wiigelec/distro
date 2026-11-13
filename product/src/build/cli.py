@@ -8,7 +8,7 @@ import sys
 
 from build.bootstrap.cross_toolchain import run_stage, selected_steps
 from build.bootstrap.cross_chroot import prepare_stage
-from build.bootstrap.distro_buildroot import run_diagnostic
+from build.bootstrap.distro_buildroot import run_diagnostic, run_stage as run_native_stage
 from build.host_requirements import qualify_host
 from build.host_sandbox import probe_bubblewrap
 
@@ -32,16 +32,15 @@ def main(argv: list[str] | None = None) -> int:
                         help="run only native Sed construction/staging; always fail, never publish")
     args = parser.parse_args(argv)
     if args.operation == "distro-buildroot":
-        if not args.diagnose_native_sed:
-            print("FAIL distro-buildroot: Manage create/publish not implemented; "+
-                  "refusing incomplete Stage 1C success", file=sys.stderr)
-            return 1
         try:
-            run_diagnostic(args.root, args.cross_chroot)
+            if args.diagnose_native_sed:
+                run_diagnostic(args.root, args.cross_chroot)
+                return 1  # diagnostic never reports accepted completion
+            run_native_stage(args.root, args.cross_chroot)
+            return 0
         except (OSError, RuntimeError, ValueError) as exc:
             print(f"FAIL distro-buildroot: {exc}", file=sys.stderr)
             return 1
-        return 1  # diagnostics must never declare Stage 1C completion
     if args.operation == "cross-chroot":
         if args.diagnose_native_binutils:
             print("[cross-chroot] DIAGNOSTIC: build may be lengthy and will exit unsuccessfully; no artifact publication", flush=True)
