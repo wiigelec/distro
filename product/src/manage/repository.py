@@ -74,6 +74,7 @@ def verify_repository(repo: Path) -> dict:
     records = data["packages"]
     identities: set[tuple] = set()
     owners: dict[str, tuple] = {}
+    directories: dict[str, int] = {}
     for record in records:
         _validate_record(record, repo)
         ident = record["identity"]
@@ -83,9 +84,22 @@ def verify_repository(repo: Path) -> dict:
         identities.add(key)
         for path in record["paths"]:
             owned = path["path"]
-            if owned in owners:
-                raise PackageError(f"published path ownership collision: {owned}")
-            owners[owned] = key
+            if path["type"] == "directory":
+                if owned in owners or (owned in directories and directories[owned] != path["mode"]):
+                    raise PackageError(f"published directory ownership conflict: {owned}")
+                directories[owned] = path["mode"]
+            else:
+                if owned in owners or owned in directories:
+                    raise PackageError(f"published path ownership collision: {owned}")
+                owners[owned] = key
+    # A directory may be shared only with identical mode. No regular file or
+    # symlink can be an ancestor of another package's installed path.
+    for path in set(owners) | set(directories):
+        parts = path.split("/")
+        for n in range(1, len(parts)):
+            ancestor = "/".join(parts[:n])
+            if ancestor in owners:
+                raise PackageError(f"published non-directory ancestor: {ancestor}")
     if records != sorted(records, key=lambda r: (r['identity']['name'], r['identity']['version'], r['identity']['architecture'], r['identity']['revision'])):
         raise PackageError("repository records are not canonically ordered")
     return data
@@ -136,12 +150,31 @@ def publish(package: str, repo: Path, exchange: Path) -> Path:
         else:
             data = {'schema_version': 1, 'packages': []}
         key = (ident['name'], ident['version'], ident['architecture'], ident['revision'])
-        owners = {p['path'] for record in data['packages'] for p in record['paths']}
+        occupied = {p['path']: p for record in data['packages'] for p in record['paths']
+                    if p['type'] != 'directory'}
+        directories = {p['path']: p['mode'] for record in data['packages']
+                       for p in record['paths'] if p['type'] == 'directory'}
         if any((r['identity']['name'],r['identity']['version'],r['identity']['architecture'],r['identity']['revision']) == key for r in data['packages']):
             raise PackageError("published identity already exists; use a new packaging revision")
-        overlap = owners.intersection(p['path'] for p in metadata['paths'])
+        overlap = []
+        for item in metadata['paths']:
+            path = item['path']
+            if item['type'] == 'directory':
+                if path in occupied or (path in directories and directories[path] != item['mode']):
+                    overlap.append(path)
+            elif path in occupied or path in directories:
+                overlap.append(path)
+            for n in range(1, len(path.split('/'))):
+                if '/'.join(path.split('/')[:n]) in occupied:
+                    overlap.append(path)
+        proposed_nondirs = {p['path'] for p in metadata['paths'] if p['type'] != 'directory'}
+        existing_paths = set(occupied) | set(directories)
+        for existing in existing_paths:
+            for candidate in proposed_nondirs:
+                if existing.startswith(candidate + '/'):
+                    overlap.append(candidate)
         if overlap:
-            raise PackageError(f"published path ownership conflict: {sorted(overlap)[0]}")
+            raise PackageError(f"published path ownership conflict: {sorted(set(overlap))[0]}")
         if (repo / ARTIFACTS).is_symlink():
             raise PackageError("repository artifacts directory is a symlink")
         (repo / ARTIFACTS).mkdir(exist_ok=True)

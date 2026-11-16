@@ -106,6 +106,7 @@ def inventory(payload: Path) -> list[dict]:
             meta = child.lstat()
             mode = stat.S_IMODE(meta.st_mode)
             if stat.S_ISDIR(meta.st_mode):
+                records.append({"path": name, "type": "directory", "mode": mode})
                 stack.append(child)
             elif stat.S_ISLNK(meta.st_mode):
                 target = os.readlink(child)
@@ -121,8 +122,8 @@ def inventory(payload: Path) -> list[dict]:
             else:
                 raise PackageError(f"unsupported special payload file: {name}")
     records.sort(key=lambda item: item["path"])
-    if not records:
-        raise PackageError("initial FS-003 package must contain installed payload")
+    # Only the explicitly selected metadata-only metapackage may be empty.
+    # Ordinary packages remain subject to the nonempty-payload requirement.
     kinds = {record["path"]: record["type"] for record in records}
     for name in kinds:
         for i in range(1, len(name.split("/"))):
@@ -152,6 +153,10 @@ def create(package: str, exchange: Path) -> Path:
         raise PackageError("CLI package differs from selected identity")
     payload = _regular_directory(exchange / "payload")
     entries = inventory(payload)
+    if not entries and (ident["name"] != "distro-buildroot" or not selection["relationships"]):
+        raise PackageError("only a dependency-bearing distro-buildroot metapackage may be empty")
+    if entries and ident["name"] == "distro-buildroot":
+        raise PackageError("distro-buildroot metapackage must be payload-free")
     basename = f"{ident['name']}-{ident['version']}-{ident['architecture']}-r{ident['revision']}.tar.xz"
     destination = exchange / basename
     if destination.exists() or destination.is_symlink():
@@ -167,7 +172,11 @@ def create(package: str, exchange: Path) -> Path:
             for entry in entries:
                 src = payload / entry["path"]
                 arc = "payload/" + entry["path"]
-                if entry["type"] == "symlink":
+                if entry["type"] == "directory":
+                    if src.is_symlink() or not src.is_dir() or stat.S_IMODE(src.stat().st_mode) != entry["mode"]:
+                        raise PackageError("staged directory changed during packaging")
+                    tar.addfile(_tarinfo(arc, entry["mode"], type_=tarfile.DIRTYPE))
+                elif entry["type"] == "symlink":
                     if not src.is_symlink() or os.readlink(src) != entry["target"]:
                         raise PackageError("staged symlink changed while packaging")
                     tar.addfile(_tarinfo(arc, entry["mode"], type_=tarfile.SYMTYPE, linkname=entry["target"]))
@@ -208,8 +217,13 @@ def verify(archive: Path) -> dict:
                 raise PackageError("invalid package metadata fields")
             _identity({"schema_version": metadata["schema_version"], "identity": metadata["identity"], "relationships": metadata["relationships"]})
             entries = metadata["paths"]
-            if not isinstance(entries, list) or not entries or entries != sorted(entries, key=lambda x: x.get("path", "") if isinstance(x, dict) else ""):
+            if not isinstance(entries, list) or entries != sorted(entries, key=lambda x: x.get("path", "") if isinstance(x, dict) else ""):
                 raise PackageError("invalid ordered path inventory")
+            if not entries:
+                if metadata["identity"]["name"] != "distro-buildroot" or not metadata["relationships"]:
+                    raise PackageError("empty payload requires dependency-bearing distro-buildroot")
+            elif metadata["identity"]["name"] == "distro-buildroot":
+                raise PackageError("distro-buildroot metapackage must be payload-free")
             if len(members) != len(entries) + 1:
                 raise PackageError("archive and metadata path count mismatch")
             seen = set()
@@ -222,7 +236,10 @@ def verify(archive: Path) -> dict:
                 seen.add(name)
                 if type(record.get("mode")) is not int or not 0 <= record["mode"] <= 0o7777 or member.mode != record["mode"]:
                     raise PackageError("invalid payload mode")
-                if record.get("type") == "file":
+                if record.get("type") == "directory":
+                    if set(record) != {"path", "type", "mode"} or not member.isdir() or member.size != 0:
+                        raise PackageError("directory metadata mismatch")
+                elif record.get("type") == "file":
                     if set(record) != {"path", "type", "mode", "size", "sha256"} or not member.isfile() or member.size != record["size"] or not _DIGEST.fullmatch(str(record["sha256"])):
                         raise PackageError("regular file metadata mismatch")
                     contents = tar.extractfile(member)
@@ -239,10 +256,12 @@ def verify(archive: Path) -> dict:
                     _link(name, member.linkname)
                 else:
                     raise PackageError("unsupported payload member type")
-            for name in seen:
+            kinds = {entry["path"]: entry["type"] for entry in entries}
+            for name in kinds:
                 parts = name.split("/")
                 for i in range(1, len(parts)):
-                    if "/".join(parts[:i]) in seen:
+                    ancestor = "/".join(parts[:i])
+                    if ancestor in kinds and kinds[ancestor] != "directory":
                         raise PackageError("payload path has non-directory ancestor")
             ident = metadata["identity"]
             expected_name = f"{ident['name']}-{ident['version']}-{ident['architecture']}-r{ident['revision']}.tar.xz"
@@ -255,27 +274,30 @@ def verify(archive: Path) -> dict:
 
 
 def restore(archive: Path, destination: Path) -> dict:
-    """Safely consume a verified package into a fresh, private filesystem root.
+    """Restore a single verified package into a fresh root.
 
-    No tar extraction shortcuts: only individually verified regular members and
-    in-root-relative symlinks are materialized; no member can traverse a link.
+    Legacy FS-003 packages omit directories. New archives explicitly preserve
+    directory modes. This is NOT the multi-package Manage installer.
     """
     metadata = verify(archive)
     destination = _regular_directory(destination, empty=True)
+    records = metadata["paths"]
+    if not records:
+        return metadata  # metadata-only distro-buildroot
     with tarfile.open(archive, "r:xz") as tar:
         members = {member.name: member for member in tar.getmembers()[1:]}
-        # The verified metadata lists only leaves, never directory ownership.
-        # Create all required directory ancestors first, without following links.
         directory_names = set()
-        for record in metadata["paths"]:
+        for record in records:
             parts = record["path"].split("/")
             directory_names.update("/".join(parts[:n]) for n in range(1, len(parts)))
+            if record["type"] == "directory":
+                directory_names.add(record["path"])
         for name in sorted(directory_names, key=lambda value: (value.count("/"), value)):
             folder = destination / name
             if folder.exists() or folder.is_symlink():
                 raise PackageError("package restoration target unexpectedly occupied")
-            folder.mkdir(mode=0o755)
-        for record in metadata["paths"]:
+            folder.mkdir(mode=0o700)
+        for record in records:
             if record["type"] != "file":
                 continue
             member = members["payload/" + record["path"]]
@@ -289,11 +311,20 @@ def restore(archive: Path, destination: Path) -> dict:
                 for chunk in iter(lambda: stream.read(1024 * 1024), b""):
                     output.write(chunk)
                 os.fchmod(output.fileno(), record["mode"])
-        # Symlinks are installed last. No package path has a non-directory
-        # ancestor, so restored symlinks are never traversed during creation.
-        for record in metadata["paths"]:
+        # Symlinks are created after all files. No installed record has a
+        # non-directory ancestor, and target contents were verified by verify().
+        for record in records:
             if record["type"] == "symlink":
                 os.symlink(record["target"], destination / record["path"])
-    if inventory(destination) != metadata["paths"]:
+        # Apply declared modes last, after installation, so read-only directories
+        # cannot interfere with creation of their contents.
+        declared = {r["path"]: r["mode"] for r in records if r["type"] == "directory"}
+        for name in sorted(directory_names, key=lambda value: (-value.count("/"), value)):
+            (destination / name).chmod(declared.get(name, 0o755))
+    final_inventory = inventory(destination)
+    if not any(r["type"] == "directory" for r in records):
+        # Historical FS-003 artifacts never owned directory entries.
+        final_inventory = [r for r in final_inventory if r["type"] != "directory"]
+    if final_inventory != records:
         raise PackageError("restored package does not match verified inventory")
     return metadata
