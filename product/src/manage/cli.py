@@ -1,4 +1,9 @@
-"""Manage's initial package creation and verification command line."""
+"""Manage create, publish, and independent verification CLI.
+
+FS-003 publish uses --build to locate the previously created artifact and the
+fixed selection in the same explicit Build-to-Manage exchange. No implicit
+repository-wide or ambient source selection is permitted.
+"""
 from __future__ import annotations
 
 import argparse
@@ -20,7 +25,8 @@ def main(argv: list[str] | None = None) -> int:
     pub = commands.add_parser("publish", help="publish a created package to a local repository")
     pub.add_argument("--package", required=True)
     pub.add_argument("--repo", required=True, type=Path)
-    pub.add_argument("--build", required=True, type=Path, help="Build-to-Manage exchange directory")
+    pub.add_argument("--build", required=True, type=Path,
+                     help="source exchange holding created artifact and selection.json (FS-003 required locator)")
     repo_check = commands.add_parser("verify-repo", help="independently verify a local repository")
     repo_check.add_argument("--repo", required=True, type=Path)
     args = parser.parse_args(argv)

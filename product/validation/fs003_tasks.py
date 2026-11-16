@@ -44,6 +44,21 @@ assert '"$DISTRO_SOURCE_DIR/configure"' in script and 'DESTDIR="$DISTRO_ROOT_DIR
 assert 'make -j"$DISTRO_JOBS"' in script
 p=subprocess.run([sys.executable,'-B','-m','build.cli','distro-buildroot','--help'],capture_output=True,text=True)
 assert p.returncode==0 and '--cross-chroot' in p.stdout and '--root' in p.stdout
+# FS-003 explicitly refines the DP-004 publish transport with a required
+# Build exchange source locator; never select an implicit ambient artifact.
+from manage.cli import main as manage_main
+from unittest.mock import patch
+with patch('manage.cli.publish', side_effect=AssertionError('unexpected publish')):
+    try:manage_main(['publish','--package','sed','--repo','/unused'])
+    except SystemExit as exc:assert exc.code==2
+    else:raise AssertionError('Manage publish silently inferred a source')
+with patch('manage.cli.publish', return_value=Path('/published/sed.tar.xz')) as mock_publish:
+    assert manage_main(['publish','--package','sed','--repo','/repository','--build','/exchange'])==0
+    assert mock_publish.call_count==1
+    args=mock_publish.call_args.args
+    assert args==('sed',Path('/repository'),Path('/exchange'))
+plan=(Path('product/planning/FS-003/plan.md')).read_text()
+assert 'publish --package <name> --repo <repository> --build <exchange>' in plan
 ''')
 
 
