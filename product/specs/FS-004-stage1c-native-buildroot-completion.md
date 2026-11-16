@@ -12,7 +12,7 @@ Build shall select a reviewed, pinned native package collection sufficient for t
 **Classification: B**
 **State: Inactive**
 
-Build shall resolve exact selected package relationships and a deterministic construction order from authoritative manifest dependency categories, rejecting absent, ambiguous, cyclic and inconsistent selections; install-relevant relationships shall not be inferred from recipes or ELF inspection.
+Build shall resolve exact selected package relationships and a deterministic construction order from authoritative manifest dependency categories, rejecting absent, ambiguous, cyclic and inconsistent selections. Imported Stage 1B capabilities may satisfy verified bootstrap construction prerequisites but shall not satisfy final installed-package relationships; construction and installed dependency graphs shall each be validated separately. Install-relevant relationships shall not be inferred from recipes or ELF inspection.
 
 ### FS-004-NR-003 — Verified Bootstrap Input
 **Classification: B**
@@ -78,7 +78,7 @@ Normal Build shall consume a Manage-installed package-derived root through the s
 **Classification: B**
 **State: Inactive**
 
-On a qualified host, a fresh root installed independently from published package artifacts, without the original Stage 1B or Build workspaces, shall execute a representative native package build through ordinary Build, and the staged and published result shall be functionally and structurally verified.
+On a qualified host, a fresh root installed independently from published package artifacts, without the original Stage 1B or Build workspaces, shall execute a representative native package build through ordinary Build, and the staged and published result shall be functionally and structurally verified. Its verification publication shall preserve the immutable identity and artifact selection of the initial Sed package and shall verify actual native executable-interpreter and loader closure under the installed filesystem layout.
 
 ### FS-004-NR-014 — Negative and Interruption Integrity
 **Classification: B**
