@@ -12,7 +12,7 @@ import sys
 
 from manage.package import PackageError, create, verify
 from manage.repository import publish, verify_repository
-from manage.install import install_candidate
+from manage.install import install_candidate, install_prerequisites
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -33,9 +33,16 @@ def main(argv: list[str] | None = None) -> int:
     candidate = commands.add_parser("install-candidate", help="install unaccepted FS-004 candidate into an absent root")
     candidate.add_argument("--repo", required=True, type=Path)
     candidate.add_argument("--root", required=True, type=Path)
+    prerequisite = commands.add_parser('install-prerequisites',
+                                      help='install unaccepted FS-004 filesystem and Linux headers')
+    prerequisite.add_argument('--repo', required=True, type=Path)
+    prerequisite.add_argument('--root', required=True, type=Path)
     args = parser.parse_args(argv)
     try:
-        if args.operation == "install-candidate":
+        if args.operation == 'install-prerequisites':
+            root = install_prerequisites(args.repo, args.root)
+            print(f'[manage] Installed unaccepted prerequisite root {root}', flush=True)
+        elif args.operation == "install-candidate":
             root = install_candidate(args.repo, args.root)
             print(f"[manage] Installed unaccepted candidate {root}", flush=True)
         elif args.operation == "create":

@@ -123,7 +123,7 @@ def _install_payload(archive: Path, records: list[dict], root: Path,
                 continue
             if rel in leaf_owners or rel in directory_modes or target.exists() or target.is_symlink():
                 raise PackageError(f'candidate leaf ownership conflict: {rel}')
-            item = members['payload/' + rel]
+            item = members['payload/' + raw]
             if kind == 'file':
                 stream = package.extractfile(item)
                 if stream is None:
@@ -144,8 +144,9 @@ def _install_payload(archive: Path, records: list[dict], root: Path,
             leaf_owners[rel] = identity
 
 
-def install_candidate(repo: Path, destination: Path) -> Path:
-    """Build a private installation from verified bytes, then atomically expose it.
+def _install_selected(repo: Path, destination: Path, records: tuple[dict, ...],
+                      *, status: str, selection: str) -> Path:
+    """Install a previously resolved, verified package selection privately.
 
     The destination must not exist. Nothing is exposed on partial failure; a
     persistent lock rejects concurrent installers and requires manual cleanup
@@ -158,7 +159,7 @@ def install_candidate(repo: Path, destination: Path) -> Path:
         raise PackageError('candidate destination must not exist')
     if repo == parent or repo.is_relative_to(destination) or destination.is_relative_to(repo):
         raise PackageError('candidate root must be outside repository')
-    records = resolve_candidate(repo)
+    canonical_claims(list(records))
     lock = parent / ('.' + destination.name + '.install.lock')
     try:
         fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY |
@@ -202,8 +203,8 @@ def install_candidate(repo: Path, destination: Path) -> Path:
             root.chmod(0o755)
             state = {
                 'schema_version': 1,
-                'status': 'candidate-not-accepted',
-                'selection': 'distro-buildroot',
+                'status': status,
+                'selection': selection,
                 'packages': [
                     {'identity': r['identity'], 'relationships': r['relationships'],
                      'artifact': r['artifact'], 'owned_paths': r['paths']}
@@ -238,3 +239,51 @@ def install_candidate(repo: Path, destination: Path) -> Path:
                 raise PackageError('candidate promoted but install lock cleanup failed') from exc
             raise
     return destination
+
+
+def resolve_prerequisites(repo: Path) -> tuple[dict, ...]:
+    """Resolve only the selected FS-004 filesystem and Linux-headers prefix.
+
+    An incomplete prefix is not a shell, compiler, or native construction root.
+    It supplies independently packaged data for the bootstrap transition.
+    """
+    index = verify_repository(repo)
+    records = index['packages']
+    selected = {record['identity']['name']: record for record in records}
+    if len(records) != 2 or set(selected) != {'filesystem', 'linux'}:
+        raise PackageError('prerequisite repository must contain only filesystem and linux')
+    if (selected['filesystem']['identity']['version'] != '1' or
+            selected['linux']['identity']['version'] != '7.1.8'):
+        raise PackageError('incorrect FS-004 prerequisite package versions')
+    if any(record['identity']['architecture'] != 'x86_64' for record in records):
+        raise PackageError('prerequisites must have x86_64 architecture')
+    fs = selected['filesystem']
+    linux = selected['linux']
+    if fs['relationships'] or linux['relationships'] != [
+            {'name': 'filesystem', 'version': '1'}]:
+        raise PackageError('prerequisites must form the exact installed dependency closure')
+    if not linux['paths'] or not all(
+            (p['path'].startswith('usr/include/') or
+             p['path'] in {'usr', 'usr/include'}) and
+            p['type'] in {'file', 'directory', 'symlink'}
+            for p in linux['paths']):
+        raise PackageError('Linux prerequisite is not a headers-only payload')
+    ordered = (fs, linux)
+    canonical_claims(list(ordered))
+    return ordered
+
+
+def install_prerequisites(repo: Path, destination: Path) -> Path:
+    """Install Manage-verified prerequisites without advertising full closure."""
+    records = resolve_prerequisites(repo)
+    return _install_selected(repo, destination, records,
+                             status='prerequisites-not-accepted',
+                             selection='filesystem+linux-headers')
+
+
+def install_candidate(repo: Path, destination: Path) -> Path:
+    """Install the complete unaccepted distro-buildroot candidate."""
+    records = resolve_candidate(repo)
+    return _install_selected(repo, destination, records,
+                             status='candidate-not-accepted',
+                             selection='distro-buildroot')
