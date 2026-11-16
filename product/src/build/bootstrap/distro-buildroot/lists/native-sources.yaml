@@ -1,0 +1,16 @@
+# FS-004 reviewed source identities only. Not the runnable FS-003 recipe list.
+# Complete native recipes and categorized manifests will be bound in later slices.
+packages:
+  - {name: filesystem, version: '1', kind: local}
+  - {name: bash, version: '5.3', kind: upstream, checksum: 0d5cd86965f869a26cf64f4b71be7b96f90a3ba8b3d74e27e8e9d9d5550f31ba}
+  - {name: coreutils, version: '9.10', kind: upstream, checksum: 16535a9adf0b10037364e2d612aad3d9f4eca3a344949ced74d12faf4bd51d25}
+  - {name: sed, version: '4.10', kind: upstream, checksum: b8e72182b2ec96a3574e2998c47b7aaa64cc20ce000d8e9ac313cc07cecf28c7}
+  - {name: grep, version: '3.12', kind: upstream, checksum: 2649b27c0e90e632eadcd757be06c6e9a4f48d941de51e7c0f83ff76408a07b9}
+  - {name: gawk, version: '5.4.0', kind: upstream, checksum: 3dd430f0cd3b4428c6c3f6afc021b9cd3c1f8c93f7a688dc268ca428a90b4ac1}
+  - {name: make, version: '4.4.1', kind: upstream, checksum: dd16fb1d67bfab79a72f5e8390735c49e3e8e70b4945a15ab1f81ddb78658fb3}
+  - {name: diffutils, version: '3.12', kind: upstream, checksum: 7c8b7f9fc8609141fdea9cece85249d308624391ff61dedaf528fcb337727dfd}
+  - {name: tar, version: '1.35', kind: upstream, checksum: 4d62ff37342ec7aed748535323930c7cf94acf71c3591882b26a7ea50f3edc16}
+  - {name: binutils, version: '2.47', kind: upstream, checksum: 154ab23b60070e8f27013c22977f1129425d67d1e8acd6e13010e617811e4cff}
+  - {name: gcc, version: '16.2.0', kind: upstream, checksum: e6738e29597f733270731aa90600f37ffdc045079dfc27ec7e8192cc81085c3e}
+  - {name: linux, version: '7.1.8', kind: upstream, checksum: ff01dcb449279d5b4cfccdb01fee639cf5ff1803f1749a77844dd33915422c49}
+  - {name: glibc, version: '2.44', kind: upstream, checksum: 37f600f2bef3c5e8300147059568b2a2e40a7ad6ccc65ce942556d49429cc667}

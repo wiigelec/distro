@@ -75,3 +75,52 @@ with TemporaryDirectory() as d:
     if r.returncode:
         print(r.stderr or r.stdout, file=sys.stderr)
     return r.returncode == 0
+
+
+def native_catalog_contract() -> bool:
+    script = r'''
+from pathlib import Path
+from tempfile import TemporaryDirectory
+import subprocess
+from build.selection import Source, SelectionError
+from build.native_catalog import load_native_catalog
+from build.local_provenance import verify_local_source
+p=Path('product/src/build/bootstrap/distro-buildroot/lists/native-sources.yaml')
+selected=load_native_catalog(p)
+assert len(selected)==13
+assert selected[0].name=='filesystem' and selected[0].checksum is None
+assert selected[-1].name=='glibc' and selected[-1].version=='2.44'
+with TemporaryDirectory() as d:
+    r=Path(d).resolve()
+    def git(*a):
+        return subprocess.check_output(['git','-C',str(r),*a],stderr=subprocess.DEVNULL).decode().strip()
+    git('init','-q')
+    git('config','user.name','FS004 Validation')
+    git('config','user.email','fs004@example.invalid')
+    (r/'definition.txt').write_bytes(b'selected definition\n')
+    git('add','definition.txt')
+    git('commit','-qm','selected source')
+    head=git('rev-parse','HEAD')
+    src=Source('', 'git-tree', 'local', ('definition.txt',))
+    first=verify_local_source(src,r,head)
+    assert len(first['definition.txt'])==64
+    (r/'definition.txt').write_bytes(b'modified working copy\n')
+    try:verify_local_source(src,r,head)
+    except SelectionError:pass
+    else:raise AssertionError('uncommitted local content accepted')
+    (r/'definition.txt').write_bytes(b'selected definition\n')
+    try:verify_local_source(src,r,'0'*40)
+    except SelectionError:pass
+    else:raise AssertionError('incorrect commit accepted')
+    try:verify_local_source(Source('', 'git-tree','local',('missing.txt',)),r,head)
+    except SelectionError:pass
+    else:raise AssertionError('untracked source accepted')
+    try:verify_local_source(Source('', 'git-tree','local',('../escape',)),r,head)
+    except SelectionError:pass
+    else:raise AssertionError('escaping path accepted')
+'''
+    env={'PATH':os.defpath, 'PYTHONPATH':str(SRC),'PYTHONDONTWRITEBYTECODE':'1'}
+    r=subprocess.run([sys.executable,'-B','-c',script],cwd=ROOT,env=env,capture_output=True,text=True)
+    if r.returncode:
+        print(r.stderr or r.stdout,file=sys.stderr)
+    return r.returncode==0
