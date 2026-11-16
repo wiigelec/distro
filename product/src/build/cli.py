@@ -9,6 +9,7 @@ import sys
 from build.bootstrap.cross_toolchain import run_stage, selected_steps
 from build.bootstrap.cross_chroot import prepare_stage
 from build.bootstrap.distro_buildroot import run_diagnostic, run_stage as run_native_stage
+from build.native_bootstrap_prefix import run_bootstrap_prefix
 from build.host_requirements import qualify_host
 from build.host_sandbox import probe_bubblewrap
 
@@ -30,7 +31,26 @@ def main(argv: list[str] | None = None) -> int:
     native.add_argument("--cross-chroot", type=Path, required=True, help="verified Stage 1B tar.xz handoff")
     native.add_argument("--diagnose-native-sed", action="store_true",
                         help="run only native Sed construction/staging; always fail, never publish")
+    prefix = commands.add_parser('distro-buildroot-prefix',
+                                 help='build only authenticated FS-004 filesystem and Linux headers')
+    prefix.add_argument('--root', type=Path, required=True,
+                        help='existing, empty construction workspace')
+    prefix.add_argument('--cross-chroot', type=Path, required=True,
+                        help='verified Stage 1B handoff archive')
+    prefix.add_argument('--source-repo', type=Path, required=True,
+                        help='selected source repository root')
+    prefix.add_argument('--revision', required=True,
+                        help='immutable source repository Git revision')
     args = parser.parse_args(argv)
+    if args.operation == 'distro-buildroot-prefix':
+        try:
+            run_bootstrap_prefix(args.root, args.cross_chroot,
+                                 source_repository=args.source_repo,
+                                 revision=args.revision)
+            return 0
+        except (OSError, RuntimeError, ValueError) as exc:
+            print(f'FAIL distro-buildroot-prefix: {exc}', file=sys.stderr)
+            return 1
     if args.operation == "distro-buildroot":
         try:
             if args.diagnose_native_sed:
