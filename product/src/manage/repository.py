@@ -121,6 +121,9 @@ def publish(package: str, repo: Path, exchange: Path) -> Path:
         lock_fd = os.open(repo / LOCK, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, 'O_NOFOLLOW', 0), 0o600)
     except FileExistsError as exc:
         raise PackageError("repository publish lock exists; concurrent or interrupted publisher") from exc
+    index_promoted = False
+    failure: Exception | None = None
+    result: Path | None = None
     try:
         with os.fdopen(lock_fd, 'w') as f:
             f.write('FS-003 exclusive publisher\n')
@@ -180,10 +183,30 @@ def publish(package: str, repo: Path, exchange: Path) -> Path:
                 f.write(_json_bytes(updated)); f.flush(); os.fsync(f.fileno())
             # All referenced bytes are complete before the index promotion.
             candidate_index.replace(index)
+            index_promoted = True
             _sync_dir(repo)
         finally:
             candidate_index.unlink(missing_ok=True)
-        return target
+        result = target
+    except Exception as exc:
+        failure = exc
     finally:
-        (repo / LOCK).unlink(missing_ok=True)
-        _sync_dir(repo)
+        # Release the lock even when publication or directory durability fails.
+        # Preserve the original failure if lock cleanup also encounters an error.
+        try:
+            (repo / LOCK).unlink(missing_ok=True)
+            _sync_dir(repo)
+        except OSError as exc:
+            if failure is None:
+                failure = exc
+    if failure is not None:
+        if index_promoted:
+            # The authoritative index may already be visible and valid. Never
+            # misreport this as a clean pre-commit failure or retry implicitly.
+            raise PackageError(
+                "repository index already promoted; post-commit durability or "
+                "cleanup failed; verify repository state before any retry"
+            ) from failure
+        raise failure
+    assert result is not None
+    return result

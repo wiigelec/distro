@@ -160,6 +160,61 @@ with TemporaryDirectory(prefix='fs003-publish-') as d:
     restore(published,independent)
     assert (independent/'usr/bin/sed').read_bytes()==b'synthetic content'
     assert not (repo/'.publish.lock').exists()
+    # A distinct identity claiming an already owned path must be rejected
+    # without altering the authoritative repository index.
+    conflict=root/'conflict';c=conflict/'payload';c.mkdir(parents=True)
+    owned=c/'usr/bin/sed';owned.parent.mkdir(parents=True)
+    owned.write_bytes(b'conflicting owner')
+    conflicting={'schema_version':1,'identity':{'name':'awk','version':'1.0','architecture':'x86_64','revision':1},'relationships':[]}
+    (conflict/'selection.json').write_bytes(_json_bytes(conflicting))
+    create('awk',conflict)
+    try:
+        with patch('manage.repository.os.fsync', return_value=None):
+            publish('awk',repo,conflict)
+    except PackageError as exc:
+        assert 'ownership conflict' in str(exc)
+    else:raise AssertionError('conflicting path owner was accepted')
+    assert (repo/'index.json').read_bytes()==previous
+    assert not (repo/'.publish.lock').exists()
+
+    # A corrupt candidate must not be indexed or replace the existing record.
+    candidate=conflict/'awk-1.0-x86_64-r1.tar.xz'
+    candidate.write_bytes(b'corrupt archive')
+    try:publish('awk',repo,conflict)
+    except PackageError:pass
+    else:raise AssertionError('corrupt artifact was accepted')
+    assert (repo/'index.json').read_bytes()==previous
+    assert not (repo/'.publish.lock').exists()
+    candidate.unlink()
+
+    # Inject a failure before the index promotion: existing selections survive.
+    owned.unlink();(c/'usr/bin/awk').write_bytes(b'independent package')
+    create('awk',conflict)
+    with patch('manage.repository.os.fsync', return_value=None), \
+         patch('manage.repository.os.link', side_effect=OSError('injected artifact promotion failure')):
+        try:publish('awk',repo,conflict)
+        except OSError:pass
+        else:raise AssertionError('failed artifact promotion was accepted')
+    assert (repo/'index.json').read_bytes()==previous
+    assert verify_repository(repo)['packages'][0]['identity']==selection['identity']
+    assert not (repo/'.publish.lock').exists()
+
+    # A failure AFTER atomic index replacement must report that promotion
+    # occurred; neither silently claim success nor report a clean rollback.
+    calls=[0]
+    def sync_with_post_commit_failure(directory):
+        calls[0]+=1
+        if calls[0]==2:
+            raise OSError('injected index-directory sync failure')
+    with patch('manage.repository.os.fsync', return_value=None), \
+         patch('manage.repository._sync_dir', side_effect=sync_with_post_commit_failure):
+        try:publish('awk',repo,conflict)
+        except PackageError as exc:
+            assert 'index already promoted' in str(exc)
+        else:raise AssertionError('post-promotion failure was reported as success')
+    updated=verify_repository(repo)
+    assert {x['identity']['name'] for x in updated['packages']}=={'sed','awk'}
+    assert not (repo/'.publish.lock').exists()
 ''')
 
 
