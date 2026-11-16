@@ -13,7 +13,22 @@ from fs001_tasks import entrypoint_contract, selection_contract, handoff_contrac
 
 from fs002_tasks import (invocation_selection_contract as fs002_invocation_selection, import_contract as fs002_import, sandbox_install_contract as fs002_sandbox_install, native_verification_contract as fs002_native_verification, publication_failure_contract as fs002_publication_failure, traceability_contract as fs002_traceability)
 
+from fs003_tasks import (
+    invocation_selection_contract as fs003_invocation_selection,
+    import_workspace_contract as fs003_import_workspace,
+    native_staging_contract as fs003_native_staging,
+    package_creation_contract as fs003_package_creation,
+    publication_integrity_contract as fs003_publication_integrity,
+    traceability_contract as fs003_traceability,
+)
+
 TASKS: dict[str, Callable[[], bool | None]] = {
+    "fs003-invocation-selection": fs003_invocation_selection,
+    "fs003-import-workspace": fs003_import_workspace,
+    "fs003-native-staging": fs003_native_staging,
+    "fs003-package-creation": fs003_package_creation,
+    "fs003-publication-integrity": fs003_publication_integrity,
+    "fs003-traceability": fs003_traceability,
     "fs002-invocation-selection": fs002_invocation_selection,
     "fs002-input-import": fs002_import,
     "fs002-sandbox-install": fs002_sandbox_install,

@@ -181,6 +181,85 @@
       "tasks": [
         "fs002-traceability"
       ]
+    },
+    {
+      "requirement": "FS-003-NR-001",
+      "tasks": [
+        "fs003-invocation-selection"
+      ]
+    },
+    {
+      "requirement": "FS-003-NR-002",
+      "tasks": [
+        "fs003-import-workspace"
+      ]
+    },
+    {
+      "requirement": "FS-003-NR-003",
+      "tasks": [
+        "fs003-import-workspace"
+      ]
+    },
+    {
+      "requirement": "FS-003-NR-004",
+      "tasks": [
+        "fs003-invocation-selection"
+      ]
+    },
+    {
+      "requirement": "FS-003-NR-005",
+      "tasks": [
+        "fs003-native-staging"
+      ]
+    },
+    {
+      "requirement": "FS-003-NR-006",
+      "tasks": [
+        "fs003-native-staging"
+      ]
+    },
+    {
+      "requirement": "FS-003-NR-007",
+      "tasks": [
+        "fs003-package-creation"
+      ]
+    },
+    {
+      "requirement": "FS-003-NR-008",
+      "tasks": [
+        "fs003-package-creation"
+      ]
+    },
+    {
+      "requirement": "FS-003-NR-009",
+      "tasks": [
+        "fs003-publication-integrity"
+      ]
+    },
+    {
+      "requirement": "FS-003-NR-010",
+      "tasks": [
+        "fs003-publication-integrity"
+      ]
+    },
+    {
+      "requirement": "FS-003-NR-011",
+      "tasks": [
+        "fs003-publication-integrity",
+        "fs003-package-creation"
+      ]
+    },
+    {
+      "requirement": "FS-003-NR-012",
+      "tasks": [
+        "fs003-native-staging"
+      ]
+    },
+    {
+      "requirement": "FS-003-NR-013",
+      "tasks": [
+        "fs003-traceability"
+      ]
     }
   ]
 }

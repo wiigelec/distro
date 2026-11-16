@@ -8,6 +8,7 @@ import sys
 
 from build.bootstrap.cross_toolchain import run_stage, selected_steps
 from build.bootstrap.cross_chroot import prepare_stage
+from build.bootstrap.distro_buildroot import run_diagnostic, run_stage as run_native_stage
 from build.host_requirements import qualify_host
 from build.host_sandbox import probe_bubblewrap
 
@@ -24,7 +25,22 @@ def main(argv: list[str] | None = None) -> int:
     chroot.add_argument("--cross-toolchain", type=Path, required=True, help="verified cross-toolchain tar.xz handoff")
     chroot.add_argument("--diagnose-native-binutils", action="store_true",
                        help="run an incomplete diagnostic build through native Binutils staging; never publish")
+    native = commands.add_parser("distro-buildroot", help="Stage 1C initial native package production")
+    native.add_argument("--root", type=Path, required=True, help="existing empty native buildroot workspace")
+    native.add_argument("--cross-chroot", type=Path, required=True, help="verified Stage 1B tar.xz handoff")
+    native.add_argument("--diagnose-native-sed", action="store_true",
+                        help="run only native Sed construction/staging; always fail, never publish")
     args = parser.parse_args(argv)
+    if args.operation == "distro-buildroot":
+        try:
+            if args.diagnose_native_sed:
+                run_diagnostic(args.root, args.cross_chroot)
+                return 1  # diagnostic never reports accepted completion
+            run_native_stage(args.root, args.cross_chroot)
+            return 0
+        except (OSError, RuntimeError, ValueError) as exc:
+            print(f"FAIL distro-buildroot: {exc}", file=sys.stderr)
+            return 1
     if args.operation == "cross-chroot":
         if args.diagnose_native_binutils:
             print("[cross-chroot] DIAGNOSTIC: build may be lengthy and will exit unsuccessfully; no artifact publication", flush=True)
