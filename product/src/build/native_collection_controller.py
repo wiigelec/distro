@@ -21,6 +21,7 @@ from build.native_imported_capabilities import plan_native_packages_from_handoff
 from build.native_manifest import load_native_manifests
 from build.native_package_execution import NativePackageStep, prepare_native_package, execute_native_package
 from build.selection import SelectionError
+from build.native_managed_provider import authenticate_managed_candidate
 
 
 @dataclass(frozen=True)
@@ -132,3 +133,27 @@ def require_collection_provider(plan: CollectionPlan) -> None:
         raise SelectionError('Stage 1C requires verified Manage-installed construction dependencies; '
                              'Stage 1B is insufficient for complete collection execution')
     raise SelectionError('Manage-installed collection provider is not implemented')
+
+
+def produce_from_managed_candidate(step: NativePackageStep, *, workspace: Path,
+                                   repository_root: Path, installed_root: Path,
+                                   source_repository: Path, manage: Path,
+                                   jobs: int) -> Path:
+    """Build one selected native package through the ordinary shared executor.
+
+    The root is authenticated against Manage repository and installed state,
+    then re-authenticated before returning. This remains a candidate-mode
+    construction operation, not Stage 1C completion or promotion.
+    """
+    before = authenticate_managed_candidate(installed_root, repository_root)
+    if not any(name == step.name and version == step.version and arch == 'x86_64'
+               for name, version, arch, _revision in before.identities):
+        raise SelectionError('native package version is outside managed candidate selection')
+    result = produce_one_native_package(
+        step, workspace=workspace, repository_root=repository_root,
+        selected_provider=before.root, source_repository=source_repository,
+        manage=manage, jobs=jobs)
+    after = authenticate_managed_candidate(installed_root, repository_root)
+    if before.identities != after.identities or before.root != after.root:
+        raise SelectionError('managed construction provider changed during build')
+    return result
