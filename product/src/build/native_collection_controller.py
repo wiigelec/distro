@@ -23,6 +23,7 @@ from build.native_package_execution import NativePackageStep, prepare_native_pac
 from build.selection import SelectionError
 from build.native_managed_provider import (
     authenticate_managed_candidate, authenticate_managed_prerequisites,
+    authenticate_managed_toolchain_seed,
 )
 
 
@@ -93,7 +94,8 @@ def _manage_create_publish(step: NativePackageStep, exchange: Path,
 def produce_one_native_package(step: NativePackageStep, *, workspace: Path,
                                repository_root: Path, selected_provider: Path,
                                source_repository: Path, manage: Path,
-                               jobs: int, linux_headers: Path | None = None) -> Path:
+                               jobs: int, linux_headers: Path | None = None,
+                               native_seed: Path | None = None) -> Path:
     """Produce one independent package; no staging merges or filesystem copies.
 
     This API is the per-step unit for the future Manage-driven collection runner.
@@ -117,7 +119,7 @@ def produce_one_native_package(step: NativePackageStep, *, workspace: Path,
     source, construction = prepare_native_package(step, build, cache, source_repository)
     execute_native_package(step, build, selected_provider, exchange / 'payload',
                            jobs=jobs, source=source, construction=construction,
-                           linux_headers=linux_headers)
+                           linux_headers=linux_headers, native_seed=native_seed)
     _write_selection(exchange, step)
     _manage_create_publish(step, exchange, repository_root, manage)
     return exchange
@@ -183,4 +185,26 @@ def produce_glibc_with_prerequisites(step: NativePackageStep, *, workspace: Path
     verified = authenticate_managed_prerequisites(installed_root, repository_root)
     if verified.identities != provider.identities or verified.root != provider.root:
         raise SelectionError('managed Linux headers provider changed during Glibc construction')
+    return result
+
+
+def produce_binutils_with_seed(step: NativePackageStep, *, workspace: Path,
+                               repository_root: Path, installed_root: Path,
+                               bootstrap_root: Path, source_repository: Path,
+                               manage: Path, jobs: int) -> Path:
+    """Bootstrap Binutils with Stage 1B tools and a verified read-only native seed.
+
+    The three-package seed is not installed as the runtime root. Build must
+    never merge or install package contents itself.
+    """
+    if step.name != "binutils":
+        raise SelectionError("native-seed transition permits only Binutils")
+    before = authenticate_managed_toolchain_seed(installed_root, repository_root)
+    result = produce_one_native_package(
+        step, workspace=workspace, repository_root=repository_root,
+        selected_provider=bootstrap_root, source_repository=source_repository,
+        manage=manage, jobs=jobs, native_seed=before.root)
+    after = authenticate_managed_toolchain_seed(installed_root, repository_root)
+    if before.identities != after.identities or before.root != after.root:
+        raise SelectionError("managed native seed changed during Binutils construction")
     return result

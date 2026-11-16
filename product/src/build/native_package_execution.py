@@ -115,7 +115,8 @@ def prepare_native_package(step: NativePackageStep, build: Path, cache: Path,
 def execute_native_package(step: NativePackageStep, build: Path,
                            verified_root: Path, staging: Path, *, jobs: int,
                            source: Path, construction: Path,
-                           linux_headers: Path | None = None) -> dict:
+                           linux_headers: Path | None = None,
+                           native_seed: Path | None = None) -> dict:
     """Execute selected script in shared sandbox and inventory *independent* stage.
 
     Manage packaging/publication is deliberately absent. The restored root is
@@ -137,7 +138,8 @@ def execute_native_package(step: NativePackageStep, build: Path,
                           source_dir='/work/' + source.relative_to(build).as_posix(),
                           build_dir='/work/' + construction.relative_to(build).as_posix(),
                           package=step.name, version=step.version, step_id=step.name,
-                          target=TARGET, jobs=jobs, linux_headers=linux_headers)
+                          target=TARGET, jobs=jobs, linux_headers=linux_headers,
+                          native_seed=native_seed)
     finally:
         require_preserved_imports(verified_root, baseline)
     inventory = snapshot_imported_root(staging)

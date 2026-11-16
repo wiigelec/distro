@@ -11,6 +11,7 @@ from build.bootstrap.cross_chroot import prepare_stage
 from build.bootstrap.distro_buildroot import run_diagnostic, run_stage as run_native_stage
 from build.native_bootstrap_prefix import run_bootstrap_prefix
 from build.native_glibc_transition import run_glibc_transition
+from build.native_binutils_transition import run_binutils_transition
 from build.host_requirements import qualify_host
 from build.host_sandbox import probe_bubblewrap
 
@@ -50,7 +51,26 @@ def main(argv: list[str] | None = None) -> int:
     glibc.add_argument('--revision', required=True)
     glibc.add_argument('--prerequisite-repo', required=True, type=Path)
     glibc.add_argument('--prerequisite-root', required=True, type=Path)
+    binutils = commands.add_parser(
+        'distro-buildroot-binutils',
+        help='bootstrap native Binutils with Stage 1B tools and Manage-installed Glibc seed')
+    binutils.add_argument('--root', required=True, type=Path)
+    binutils.add_argument('--cross-chroot', required=True, type=Path)
+    binutils.add_argument('--source-repo', required=True, type=Path)
+    binutils.add_argument('--revision', required=True)
+    binutils.add_argument('--seed-repo', required=True, type=Path)
+    binutils.add_argument('--seed-root', required=True, type=Path)
     args = parser.parse_args(argv)
+    if args.operation == 'distro-buildroot-binutils':
+        try:
+            run_binutils_transition(
+                args.root, args.cross_chroot,
+                source_repository=args.source_repo, revision=args.revision,
+                seed_repository=args.seed_repo, installed_seed=args.seed_root)
+            return 0
+        except (OSError, RuntimeError, ValueError) as exc:
+            print(f'FAIL distro-buildroot-binutils: {exc}', file=sys.stderr)
+            return 1
     if args.operation == 'distro-buildroot-glibc':
         try:
             run_glibc_transition(args.root, args.cross_chroot,
