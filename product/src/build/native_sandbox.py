@@ -30,7 +30,7 @@ def _mountpoint(root: Path, name: str) -> None:
 def native_recipe_command(work: Path, root: Path, stage: Path, recipe: Path, *,
                           source_dir: str, build_dir: str, package: str,
                           version: str, step_id: str, target: str,
-                          jobs: int = 1) -> list[str]:
+                          jobs: int = 1, linux_headers: Path | None = None) -> list[str]:
     """Produce the same target-native execution command for every root provider.
 
     Root filesystem is mounted read-only at /. /work and /install alone are
@@ -57,6 +57,17 @@ def native_recipe_command(work: Path, root: Path, stage: Path, recipe: Path, *,
             raise SandboxError("native recipe paths must be beneath /work")
         if not (work / candidate.relative_to("/work")).is_dir():
             raise SandboxError(f"native recipe workspace unavailable: {value}")
+    if linux_headers is not None:
+        linux_headers = Path(linux_headers).absolute()
+        if (linux_headers.is_symlink() or not linux_headers.is_dir() or
+                linux_headers.resolve(strict=True) != linux_headers):
+            raise SandboxError("selected Linux headers must be a real directory")
+        if not (linux_headers / "linux").is_dir() or not (linux_headers / "asm-generic").is_dir():
+            raise SandboxError("selected Linux headers directories missing")
+        for other in (work, root, stage):
+            _workspace_mounts(linux_headers, other)
+        if package != "glibc":
+            raise SandboxError("Linux headers overlay is permitted only for Glibc")
     recipe = Path(recipe).resolve(strict=True)
     if not recipe.is_file():
         raise SandboxError("native recipe must be an existing regular file")
@@ -73,6 +84,11 @@ def native_recipe_command(work: Path, root: Path, stage: Path, recipe: Path, *,
         "--tmpfs", "/recipe",
         "--ro-bind", str(recipe), "/recipe/selected.sh",
     ]
+    if linux_headers is not None:
+        # A private tmpfs provides the bind destination without writing
+        # into the authenticated read-only bootstrap root.
+        cmd += ["--tmpfs", "/distro-prerequisites",
+                "--ro-bind", str(linux_headers), "/distro-prerequisites/include"]
     environment = {
         "PATH": "/usr/bin:/bin", "HOME": "/work", "TMPDIR": "/tmp",
         "LC_ALL": "C", "DISTRO_SOURCE_DIR": source_dir,

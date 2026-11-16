@@ -10,6 +10,7 @@ from build.bootstrap.cross_toolchain import run_stage, selected_steps
 from build.bootstrap.cross_chroot import prepare_stage
 from build.bootstrap.distro_buildroot import run_diagnostic, run_stage as run_native_stage
 from build.native_bootstrap_prefix import run_bootstrap_prefix
+from build.native_glibc_transition import run_glibc_transition
 from build.host_requirements import qualify_host
 from build.host_sandbox import probe_bubblewrap
 

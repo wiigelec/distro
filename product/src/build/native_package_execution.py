@@ -114,7 +114,8 @@ def prepare_native_package(step: NativePackageStep, build: Path, cache: Path,
 
 def execute_native_package(step: NativePackageStep, build: Path,
                            verified_root: Path, staging: Path, *, jobs: int,
-                           source: Path, construction: Path) -> dict:
+                           source: Path, construction: Path,
+                           linux_headers: Path | None = None) -> dict:
     """Execute selected script in shared sandbox and inventory *independent* stage.
 
     Manage packaging/publication is deliberately absent. The restored root is

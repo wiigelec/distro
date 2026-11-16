@@ -15,7 +15,7 @@ import stat
 from build.selection import SelectionError
 from manage.package import _parse_json, _regular_directory, PackageError
 from manage.repository import verify_repository
-from manage.install import resolve_candidate, STATE_DIR, STATE_NAME
+from manage.install import resolve_candidate, resolve_prerequisites, STATE_DIR, STATE_NAME
 from manage.layout import LINKS, canonical_path, canonical_claims
 
 
@@ -34,8 +34,9 @@ def _hash_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def authenticate_managed_candidate(root: Path, repository: Path) -> ManagedCandidateProvider:
-    """Verify installed state, exact package closure, and every selected leaf.
+def _authenticate_managed_root(root: Path, repository: Path, *,
+                               prerequisite: bool = False) -> ManagedCandidateProvider:
+    """Verify installed state, selected closure, and every selected leaf.
 
     Verification is read-only. Use this gate immediately before construction;
     Build does not write the provider root. This is not an ELF/runtime proof.

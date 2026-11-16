@@ -21,7 +21,9 @@ from build.native_imported_capabilities import plan_native_packages_from_handoff
 from build.native_manifest import load_native_manifests
 from build.native_package_execution import NativePackageStep, prepare_native_package, execute_native_package
 from build.selection import SelectionError
-from build.native_managed_provider import authenticate_managed_candidate
+from build.native_managed_provider import (
+    authenticate_managed_candidate, authenticate_managed_prerequisites,
+)
 
 
 @dataclass(frozen=True)
@@ -91,7 +93,7 @@ def _manage_create_publish(step: NativePackageStep, exchange: Path,
 def produce_one_native_package(step: NativePackageStep, *, workspace: Path,
                                repository_root: Path, selected_provider: Path,
                                source_repository: Path, manage: Path,
-                               jobs: int) -> Path:
+                               jobs: int, linux_headers: Path | None = None) -> Path:
     """Produce one independent package; no staging merges or filesystem copies.
 
     This API is the per-step unit for the future Manage-driven collection runner.
