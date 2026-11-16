@@ -4,3 +4,7 @@ source:
   verification: sha256
 dependencies: [gcc, linux]
 host_tools: [make, gcc, gxx, bash, tar, xz]
+native:
+  build_tools: ["make","gcc","linux"]
+  build_link_dependencies: ["linux"]
+  runtime_dependencies: ["filesystem"]

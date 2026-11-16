@@ -51,6 +51,13 @@ class Source:
 
 
 @dataclass(frozen=True)
+class NativeCategories:
+    build_tools: tuple[str, ...]
+    build_link_dependencies: tuple[str, ...]
+    runtime_dependencies: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class Manifest:
     name: str
     source: Source
@@ -61,6 +68,7 @@ class Manifest:
     build_tools: tuple[str, ...] = ()
     build_link_dependencies: tuple[str, ...] = ()
     runtime_dependencies: tuple[str, ...] = ()
+    native: NativeCategories | None = None
 
 
 @dataclass(frozen=True)
@@ -99,7 +107,7 @@ def load_manifests(directory: Path) -> dict[str, Manifest]:
     for path in sorted(directory.glob("*.yaml")):
         d = _yaml(path)
         _keys(d, {"name", "source"}, {"dependencies", "host_tools", "supplements",
-                                     "build_tools", "build_link_dependencies", "runtime_dependencies"})
+                                     "build_tools", "build_link_dependencies", "runtime_dependencies", "native"})
         name = d["name"]
         if not _name(name) or path.stem != name or name in found:
             raise SelectionError(f"manifest name/file mismatch or duplicate: {path}")
@@ -121,10 +129,28 @@ def load_manifests(directory: Path) -> dict[str, Manifest]:
             raise SelectionError(f"invalid host tools: {name}")
         if not isinstance(supp, dict) or not all(_name(k) for k in supp):
             raise SelectionError(f"invalid supplementary sources: {name}")
+        native_raw = d.get("native")
+        native_categories = None
+        if native_raw is not None:
+            if not isinstance(native_raw, dict):
+                raise SelectionError(f"{name}: native categories must be a mapping")
+            _keys(native_raw, {"build_tools", "build_link_dependencies", "runtime_dependencies"})
+            checked = {}
+            for field in ("build_tools", "build_link_dependencies", "runtime_dependencies"):
+                values = native_raw[field]
+                if (not isinstance(values, list) or not all(_name(value) for value in values)
+                        or len(values) != len(set(values)) or name in values):
+                    raise SelectionError(f"{name}: invalid native {field}")
+                checked[field] = tuple(values)
+            if any(field in d for field in categories):
+                raise SelectionError(f"{name}: competing top-level and native categories")
+            native_categories = NativeCategories(checked["build_tools"],
+                                                checked["build_link_dependencies"],
+                                                checked["runtime_dependencies"])
         found[name] = Manifest(name, _source(d["source"]), tuple(deps), tuple(hosts),
                                {k: _source(v) for k,v in supp.items()},
                                categorized["build_tools"], categorized["build_link_dependencies"],
-                               categorized["runtime_dependencies"])
+                               categorized["runtime_dependencies"], native_categories)
     if not found:
         raise SelectionError("no package manifests")
     return found
