@@ -12,6 +12,7 @@ from build.bootstrap.distro_buildroot import run_diagnostic, run_stage as run_na
 from build.native_bootstrap_prefix import run_bootstrap_prefix
 from build.native_glibc_transition import run_glibc_transition
 from build.native_binutils_transition import run_binutils_transition
+from build.native_gcc_transition import run_gcc_transition
 from build.host_requirements import qualify_host
 from build.host_sandbox import probe_bubblewrap
 
@@ -60,7 +61,27 @@ def main(argv: list[str] | None = None) -> int:
     binutils.add_argument('--revision', required=True)
     binutils.add_argument('--seed-repo', required=True, type=Path)
     binutils.add_argument('--seed-root', required=True, type=Path)
+    gcc = commands.add_parser(
+        'distro-buildroot-gcc',
+        help='build native GCC 16.2.0 with authenticated Manage-installed linker seed')
+    gcc.add_argument('--root', required=True, type=Path)
+    gcc.add_argument('--cross-chroot', required=True, type=Path)
+    gcc.add_argument('--source-repo', required=True, type=Path)
+    gcc.add_argument('--revision', required=True)
+    gcc.add_argument('--linker-repo', required=True, type=Path)
+    gcc.add_argument('--linker-root', required=True, type=Path)
     args = parser.parse_args(argv)
+    if args.operation == 'distro-buildroot-gcc':
+        try:
+            run_gcc_transition(
+                args.root, args.cross_chroot,
+                source_repository=args.source_repo, revision=args.revision,
+                linker_repository=args.linker_repo,
+                installed_linker=args.linker_root)
+            return 0
+        except (OSError, RuntimeError, ValueError) as exc:
+            print(f'FAIL distro-buildroot-gcc: {exc}', file=sys.stderr)
+            return 1
     if args.operation == 'distro-buildroot-binutils':
         try:
             run_binutils_transition(

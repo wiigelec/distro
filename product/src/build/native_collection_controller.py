@@ -24,6 +24,7 @@ from build.selection import SelectionError
 from build.native_managed_provider import (
     authenticate_managed_candidate, authenticate_managed_prerequisites,
     authenticate_managed_toolchain_seed,
+    authenticate_managed_native_linker_seed,
 )
 
 
@@ -96,6 +97,7 @@ def produce_one_native_package(step: NativePackageStep, *, workspace: Path,
                                source_repository: Path, manage: Path,
                                jobs: int, linux_headers: Path | None = None,
                                native_seed: Path | None = None,
+                               native_linker_seed: Path | None = None,
                                before_publish: Callable[[], None] | None = None) -> Path:
     """Produce one independent package; no staging merges or filesystem copies.
 
@@ -120,7 +122,8 @@ def produce_one_native_package(step: NativePackageStep, *, workspace: Path,
     source, construction = prepare_native_package(step, build, cache, source_repository)
     execute_native_package(step, build, selected_provider, exchange / 'payload',
                            jobs=jobs, source=source, construction=construction,
-                           linux_headers=linux_headers, native_seed=native_seed)
+                           linux_headers=linux_headers, native_seed=native_seed,
+                           native_linker_seed=native_linker_seed)
     # Re-authenticate externally installed prerequisites *before* publishing.
     # The Build->Manage exchange must not be published with changed inputs.
     if before_publish is not None:
@@ -222,4 +225,35 @@ def produce_binutils_with_seed(step: NativePackageStep, *, workspace: Path,
     after = authenticate_managed_toolchain_seed(installed_root, repository_root)
     if before.identities != after.identities or before.root != after.root:
         raise SelectionError("managed native seed changed during Binutils construction")
+    return result
+
+
+def produce_gcc_with_native_linker_seed(step: NativePackageStep, *,
+                                        workspace: Path, repository_root: Path,
+                                        installed_root: Path, bootstrap_root: Path,
+                                        source_repository: Path, manage: Path,
+                                        jobs: int) -> Path:
+    """Build selected GCC against an authenticated four-package Manage seed.
+
+    The Stage 1B executor supplies bootstrap compiler/make only; the selected
+    Binutils, Linux headers and Glibc are supplied read-only. Each package is
+    independently staged and handed to Manage for creation and publication.
+    """
+    if step.name != 'gcc' or step.version != '16.2.0':
+        raise SelectionError('native linker seed construction permits only GCC 16.2.0')
+    if step.step is None or set(step.step.supplements) != {'gmp', 'mpfr', 'mpc'}:
+        raise SelectionError('native GCC supplement selection is incomplete')
+    before = authenticate_managed_native_linker_seed(installed_root, repository_root)
+
+    def guard() -> None:
+        after = authenticate_managed_native_linker_seed(installed_root, repository_root)
+        if after.root != before.root or after.identities != before.identities:
+            raise SelectionError('installed linker seed changed during GCC construction')
+
+    result = produce_one_native_package(
+        step, workspace=workspace, repository_root=repository_root,
+        selected_provider=bootstrap_root, source_repository=source_repository,
+        manage=manage, jobs=jobs, native_linker_seed=before.root,
+        before_publish=guard)
+    guard()
     return result

@@ -31,7 +31,8 @@ def native_recipe_command(work: Path, root: Path, stage: Path, recipe: Path, *,
                           source_dir: str, build_dir: str, package: str,
                           version: str, step_id: str, target: str,
                           jobs: int = 1, linux_headers: Path | None = None,
-                          native_seed: Path | None = None) -> list[str]:
+                          native_seed: Path | None = None,
+                          native_linker_seed: Path | None = None) -> list[str]:
     """Produce the same target-native execution command for every root provider.
 
     Root filesystem is mounted read-only at /. /work and /install alone are
@@ -82,6 +83,21 @@ def native_recipe_command(work: Path, root: Path, stage: Path, recipe: Path, *,
                 not (native_seed / "usr/lib").is_dir() or
                 not (native_seed / ".distro/installed.json").is_file()):
             raise SandboxError("native seed lacks selected header/library/state layout")
+    if native_linker_seed is not None:
+        if linux_headers is not None or native_seed is not None or package != 'gcc':
+            raise SandboxError('native linker seed overlay is restricted to GCC')
+        native_linker_seed = Path(native_linker_seed).absolute()
+        if (native_linker_seed.is_symlink() or not native_linker_seed.is_dir() or
+                native_linker_seed.resolve(strict=True) != native_linker_seed):
+            raise SandboxError('selected native linker seed must be a real directory')
+        for other in (work, root, stage):
+            _workspace_mounts(native_linker_seed, other)
+        required = ('usr/include/linux', 'usr/include/asm-generic',
+                    'usr/bin/as', 'usr/bin/ld', 'usr/lib', '.distro/installed.json')
+        for rel in required:
+            entry = native_linker_seed / rel
+            if not entry.exists() or entry.is_symlink():
+                raise SandboxError(f'native linker seed path missing or unsafe: {rel}')
     recipe = Path(recipe).resolve(strict=True)
     if not recipe.is_file():
         raise SandboxError("native recipe must be an existing regular file")
@@ -106,6 +122,9 @@ def native_recipe_command(work: Path, root: Path, stage: Path, recipe: Path, *,
     if native_seed is not None:
         cmd += ["--tmpfs", "/distro-seed",
                 "--ro-bind", str(native_seed), "/distro-seed/root"]
+    if native_linker_seed is not None:
+        cmd += ['--tmpfs', '/distro-linker',
+                '--ro-bind', str(native_linker_seed), '/distro-linker/root']
     environment = {
         "PATH": "/usr/bin:/bin", "HOME": "/work", "TMPDIR": "/tmp",
         "LC_ALL": "C", "DISTRO_SOURCE_DIR": source_dir,
@@ -118,6 +137,8 @@ def native_recipe_command(work: Path, root: Path, stage: Path, recipe: Path, *,
         environment["DISTRO_LINUX_HEADERS_DIR"] = "/distro-prerequisites/include"
     if native_seed is not None:
         environment["DISTRO_NATIVE_SEED_ROOT"] = "/distro-seed/root"
+    if native_linker_seed is not None:
+        environment['DISTRO_NATIVE_LINKER_ROOT'] = '/distro-linker/root'
     for key, value in environment.items():
         cmd += ["--setenv", key, value]
     cmd += ["--chdir", build_dir, "--", "/bin/bash", "/recipe/selected.sh"]
