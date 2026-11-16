@@ -184,3 +184,50 @@ with TemporaryDirectory() as d:
     if r.returncode:
         print(r.stderr or r.stdout,file=sys.stderr)
     return r.returncode==0
+
+
+def native_recipe_bindings_contract() -> bool:
+    # Targeted FS-004 inventory validation; no historical regression suite.
+    script = r'''
+from pathlib import Path
+from tempfile import TemporaryDirectory
+import shutil, subprocess
+from build.selection import SelectionError
+from build.native_recipe_bindings import inspect_native_recipe_bindings, STAGE, PACKAGES
+bindings = inspect_native_recipe_bindings()
+assert len(bindings) == 13
+assert bindings[0].name == 'filesystem'
+assert bindings[-1].name == 'glibc'
+assert all(len(b.recipe_sha256) == 64 for b in bindings)
+for binding in bindings:
+    subprocess.run(['bash', '-n', str(binding.recipe)], check=True,
+                   stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+with TemporaryDirectory() as folder:
+    stage = Path(folder)
+    (stage / 'lists').mkdir()
+    (stage / 'recipes').mkdir()
+    shutil.copyfile(STAGE / 'lists/native-sources.yaml', stage / 'lists/native-sources.yaml')
+    for b in bindings:
+        shutil.copyfile(b.recipe, stage / 'recipes' / b.recipe.name)
+    assert len(inspect_native_recipe_bindings(stage=stage, packages=PACKAGES)) == 13
+    (stage / 'recipes/glibc.sh').unlink()
+    try:
+        inspect_native_recipe_bindings(stage=stage, packages=PACKAGES)
+    except SelectionError:
+        pass
+    else:
+        raise AssertionError('missing Glibc native recipe accepted')
+    (stage / 'recipes/glibc.sh').symlink_to(STAGE / 'recipes/glibc.sh')
+    try:
+        inspect_native_recipe_bindings(stage=stage, packages=PACKAGES)
+    except SelectionError:
+        pass
+    else:
+        raise AssertionError('symlinked native recipe accepted')
+'''
+    env = {'PATH': os.defpath, 'PYTHONPATH': str(SRC), 'PYTHONDONTWRITEBYTECODE': '1'}
+    result = subprocess.run([sys.executable, '-B', '-c', script], cwd=ROOT,
+                            env=env, capture_output=True, text=True)
+    if result.returncode:
+        print(result.stderr or result.stdout, file=sys.stderr)
+    return result.returncode == 0
