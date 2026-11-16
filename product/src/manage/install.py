@@ -334,3 +334,55 @@ def install_toolchain_seed(repo: Path, destination: Path) -> Path:
     return _install_selected(repo, destination, resolve_toolchain_seed(repo),
                              status='toolchain-seed-not-accepted',
                              selection='filesystem+linux+glibc')
+
+
+def resolve_native_linker_seed(repo: Path) -> tuple[dict, ...]:
+    """Resolve the exact unaccepted filesystem/Linux/Glibc/Binutils closure.
+
+    Only published artifact records are authoritative. The installed Binutils
+    dependency edges come from its selected FS-004 manifest; Stage 1B compiler
+    provenance is never represented as a native installation relationship.
+    This is data/dependency staging, not a complete executable buildroot.
+    """
+    index = verify_repository(repo)
+    selected: dict[str, dict] = {}
+    names = {'filesystem', 'linux', 'glibc', 'binutils'}
+    for record in index['packages']:
+        name = record['identity']['name']
+        if name in names:
+            if name in selected:
+                raise PackageError(f'ambiguous native linker seed identity: {name}')
+            selected[name] = record
+    if set(selected) != names:
+        raise PackageError('native linker seed requires four published packages')
+    versions = {'filesystem': '1', 'linux': '7.1.8',
+                'glibc': '2.44', 'binutils': '2.47'}
+    for name, version in versions.items():
+        identity = selected[name]['identity']
+        if (identity['version'] != version or identity['architecture'] != 'x86_64'
+                or type(identity['revision']) is not int or identity['revision'] < 1):
+            raise PackageError(f'invalid native linker seed identity: {name}')
+    expected_relationships = {
+        'filesystem': [],
+        'linux': [{'name': 'filesystem', 'version': '1'}],
+        'glibc': [{'name': 'filesystem', 'version': '1'},
+                  {'name': 'linux', 'version': '7.1.8'}],
+        'binutils': [{'name': 'filesystem', 'version': '1'},
+                     {'name': 'glibc', 'version': '2.44'}],
+    }
+    for name, relationships in expected_relationships.items():
+        if selected[name]['relationships'] != relationships:
+            raise PackageError(f'native linker seed relationships differ: {name}')
+    # Preserve dependency order: filesystem first; the two independent
+    # prerequisites before Binutils. Manage still owns all installation IO.
+    ordered = tuple(selected[name] for name in
+                    ('filesystem', 'linux', 'glibc', 'binutils'))
+    canonical_claims(list(ordered))
+    return ordered
+
+
+def install_native_linker_seed(repo: Path, destination: Path) -> Path:
+    """Manage-install the unaccepted four-package native linker seed."""
+    return _install_selected(repo, destination, resolve_native_linker_seed(repo),
+                             status='native-linker-seed-not-accepted',
+                             selection='filesystem+linux+glibc+binutils')

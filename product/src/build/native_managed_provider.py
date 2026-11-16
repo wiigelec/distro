@@ -16,7 +16,8 @@ from build.selection import SelectionError
 from manage.package import _parse_json, _regular_directory, PackageError
 from manage.repository import verify_repository
 from manage.install import (resolve_candidate, resolve_prerequisites,
-                            resolve_toolchain_seed, STATE_DIR, STATE_NAME)
+                            resolve_toolchain_seed, resolve_native_linker_seed,
+                            STATE_DIR, STATE_NAME)
 from manage.layout import LINKS, canonical_path, canonical_claims
 
 
@@ -62,6 +63,9 @@ def _authenticate_managed_root(root: Path, repository: Path, *,
                               resolve_prerequisites),
             'toolchain-seed': ('toolchain-seed-not-accepted', 'filesystem+linux+glibc',
                                resolve_toolchain_seed),
+            'native-linker-seed': ('native-linker-seed-not-accepted',
+                                   'filesystem+linux+glibc+binutils',
+                                   resolve_native_linker_seed),
         }
         if selection_kind not in authorities:
             raise PackageError('unknown installed selection authority')
@@ -173,4 +177,23 @@ def authenticate_managed_toolchain_seed(root: Path, repository: Path) -> Managed
     if {name for name, _version, _arch, _revision in provider.identities} != {
             'filesystem', 'linux', 'glibc'}:
         raise SelectionError('native toolchain seed identities mismatch')
+    return provider
+
+
+def authenticate_managed_native_linker_seed(
+        root: Path, repository: Path) -> ManagedCandidateProvider:
+    """Verify the complete four-package dependency seed against Manage state.
+
+    A verified installed seed is not a standalone runnable toolchain, and no
+    runtime-closure or Stage 1C acceptance conclusion follows from this gate.
+    """
+    provider = _authenticate_managed_root(
+        root, repository, selection_kind='native-linker-seed')
+    selected = {(name, version, arch) for name, version, arch, _rev
+                in provider.identities}
+    if selected != {('filesystem', '1', 'x86_64'),
+                    ('linux', '7.1.8', 'x86_64'),
+                    ('glibc', '2.44', 'x86_64'),
+                    ('binutils', '2.47', 'x86_64')}:
+        raise SelectionError('installed native linker seed identity mismatch')
     return provider
