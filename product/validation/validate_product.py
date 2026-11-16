@@ -13,6 +13,8 @@ from fs001_tasks import entrypoint_contract, selection_contract, handoff_contrac
 
 from fs002_tasks import (invocation_selection_contract as fs002_invocation_selection, import_contract as fs002_import, sandbox_install_contract as fs002_sandbox_install, native_verification_contract as fs002_native_verification, publication_failure_contract as fs002_publication_failure, traceability_contract as fs002_traceability)
 
+from fs004_tasks import native_selection_contract as fs004_native_selection
+
 from fs003_tasks import (
     invocation_selection_contract as fs003_invocation_selection,
     import_workspace_contract as fs003_import_workspace,
@@ -23,6 +25,7 @@ from fs003_tasks import (
 )
 
 TASKS: dict[str, Callable[[], bool | None]] = {
+    "fs004-native-selection": fs004_native_selection,
     "fs003-invocation-selection": fs003_invocation_selection,
     "fs003-import-workspace": fs003_import_workspace,
     "fs003-native-staging": fs003_native_staging,
@@ -110,6 +113,8 @@ def main(argv: list[str] | None = None) -> int:
         result = execute(task)
         if result:
             return result
+    if not fs004_native_selection():
+        return fail("FS-004 native selection smoke failed")
     print("Product Validation: PASS")
     return 0
 

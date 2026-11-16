@@ -44,6 +44,10 @@ def _version(s):
 class Source:
     url: str
     verification: str
+    # Legacy upstream sources remain unchanged. Repository-local sources have
+    # no fabricated upstream URL and require separate immutable Git validation.
+    kind: str = "upstream"
+    paths: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -53,6 +57,10 @@ class Manifest:
     dependencies: tuple[str, ...]
     host_tools: tuple[str, ...]
     supplements: dict[str, Source]
+    # FS-004 explicit categories; no implicit conversion of legacy dependencies.
+    build_tools: tuple[str, ...] = ()
+    build_link_dependencies: tuple[str, ...] = ()
+    runtime_dependencies: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -68,6 +76,16 @@ class Step:
 def _source(d):
     if not isinstance(d, dict):
         raise SelectionError("source must be a mapping")
+    if d.get("kind") == "local":
+        _keys(d, {"kind", "paths"})
+        paths = d["paths"]
+        if not isinstance(paths, list) or not paths or not all(
+            isinstance(p, str) and p and not Path(p).is_absolute()
+            and ".." not in Path(p).parts and Path(p).as_posix() == p
+            and not p.startswith("./") for p in paths
+        ) or len(set(paths)) != len(paths):
+            raise SelectionError("invalid repository-local source paths")
+        return Source("", "git-tree", "local", tuple(paths))
     _keys(d, {"url", "verification"})
     if not isinstance(d["url"], str) or not d["url"].startswith("https://") or "{" in d["url"].replace("{version}", "") or "}" in d["url"].replace("{version}", ""):
         raise SelectionError("source URL must be a single HTTPS template with optional {version}")
@@ -80,11 +98,21 @@ def load_manifests(directory: Path) -> dict[str, Manifest]:
     found = {}
     for path in sorted(directory.glob("*.yaml")):
         d = _yaml(path)
-        _keys(d, {"name", "source", "dependencies"}, {"host_tools", "supplements"})
+        _keys(d, {"name", "source"}, {"dependencies", "host_tools", "supplements",
+                                     "build_tools", "build_link_dependencies", "runtime_dependencies"})
         name = d["name"]
         if not _name(name) or path.stem != name or name in found:
             raise SelectionError(f"manifest name/file mismatch or duplicate: {path}")
-        deps = d["dependencies"]
+        deps = d.get("dependencies", [])
+        categories = ("build_tools", "build_link_dependencies", "runtime_dependencies")
+        categorized = {}
+        for field in categories:
+            values = d.get(field, [])
+            if not isinstance(values, list) or not all(_name(v) for v in values) or len(set(values)) != len(values) or name in values:
+                raise SelectionError(f"invalid {field}: {name}")
+            categorized[field] = tuple(values)
+        if "dependencies" in d and any(field in d for field in categories):
+            raise SelectionError(f"legacy and categorized dependencies cannot be mixed: {name}")
         hosts = d.get("host_tools", [])
         supp = d.get("supplements", {})
         if not isinstance(deps, list) or not all(_name(v) for v in deps) or len(deps) != len(set(deps)) or name in deps:
@@ -93,7 +121,10 @@ def load_manifests(directory: Path) -> dict[str, Manifest]:
             raise SelectionError(f"invalid host tools: {name}")
         if not isinstance(supp, dict) or not all(_name(k) for k in supp):
             raise SelectionError(f"invalid supplementary sources: {name}")
-        found[name] = Manifest(name, _source(d["source"]), tuple(deps), tuple(hosts), {k: _source(v) for k,v in supp.items()})
+        found[name] = Manifest(name, _source(d["source"]), tuple(deps), tuple(hosts),
+                               {k: _source(v) for k,v in supp.items()},
+                               categorized["build_tools"], categorized["build_link_dependencies"],
+                               categorized["runtime_dependencies"])
     if not found:
         raise SelectionError("no package manifests")
     return found
@@ -126,6 +157,8 @@ def select_steps(list_file: Path, manifests: dict[str, Manifest], recipes_root: 
         sid = item.get("id", f"{name}-{position+1}")
         if not _name(name) or name not in manifests or not _version(version) or not _name(sid):
             raise SelectionError("invalid step identity/version or unknown package")
+        if manifests[name].source.kind != "upstream":
+            raise SelectionError("legacy ordered selector cannot consume repository-local sources")
         checksum = item["checksum"]
         if not isinstance(checksum, str) or not _DIGEST.fullmatch(checksum):
             raise SelectionError("invalid selected source checksum")
