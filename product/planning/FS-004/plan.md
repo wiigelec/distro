@@ -50,9 +50,9 @@ The current FS-003 Stage 1C implementation accepts only Sed. Do not expand its e
 
 Build shall resolve concrete selected versions, distinguish build-tool from install-relevant relationships, reject absent, ambiguous or cyclic dependencies, and derive deterministic construction order from authoritative manifests. No parallel dependency authority or package-specific branching is permitted in the Build controller.
 
-## Pending Design amendment and baseline control
+## Accepted Design amendment and baseline control
 
-The Distro-maintained local-source model and generalized selected-version identity are proposed by DP-003/DP-005 changes on this branch at `c200cd9612d429fc0b59e9bb0548ebe39807750e`. They are not yet part of the accepted Design revision pinned by FS-004. Do not treat the proposed Design amendment as an accepted implementation authorization until it is intentionally integrated into `main` according to repository governance. Once accepted, update FS-004's exact `design_revision` and selected-revision narrative to the verified accepted commit, without changing the historical FS-003 baseline reference. Re-run Semantic Planning Review against that exact Design before Build activation. Mechanical Validation cannot substitute for this acceptance step.
+The Distro-maintained local-source model and generalized selected-version identity in DP-003/DP-005 were integrated into `main` by PR #13 at `55506eb916345317a5d24853ffcbbba3a9fc5375`. FS-004's exact `design_revision` and Selected Design narrative are reconciled to that accepted integration commit without changing the historical FS-003 baseline reference. Semantic Planning Review must assess the complete FS-004 Functional Set, Plan, and normative requirements against this accepted Design before Build activation. Mechanical Validation cannot substitute for semantic review or intentional acceptance.
 
 ## Manifest dependency categories and bootstrap resolution
 

@@ -1,14 +1,14 @@
 ---
 functional_set: FS-004
 title: Stage 1C Native Buildroot Completion
-design_revision: 2d2f3773c208e7783efa3e2160f2fd524cf5d91a
+design_revision: 55506eb916345317a5d24853ffcbbba3a9fc5375
 ---
 
 # FS-004 — Stage 1C Native Buildroot Completion
 
 ## Selected Design
 
-The exact accepted repository state consumed by Planning is `2d2f3773c208e7783efa3e2160f2fd524cf5d91a`, following FS-003 Acceptance. Selected Product Design is `product/design/DP-001` through `DP-006`, especially DP-003 (shared manifests, dependency categories and recipe authority), DP-004 (Manage installed package operations), DP-005 (artifact, repository, installed-state and metapackage semantics) and DP-006 (complete native buildroot closure and verification).
+The exact accepted Design state selected for reconciled Planning is `55506eb916345317a5d24853ffcbbba3a9fc5375`, integrating PR #13 after FS-003 Acceptance at `2d2f3773c208e7783efa3e2160f2fd524cf5d91a`. This includes the accepted DP-003/DP-005 Distro-maintained source and package-version amendments. Selected Product Design is `product/design/DP-001` through `DP-006`, especially DP-003 (shared manifests, dependency categories and recipe authority), DP-004 (Manage installed package operations), DP-005 (artifact, repository, installed-state and metapackage semantics) and DP-006 (complete native buildroot closure and verification).
 
 ## Functional Outcome
 
@@ -37,4 +37,4 @@ FS-004 completes Stage 1C only when an independently verified, coherent `distro-
 
 ## Planning State
 
-This file selects the Functional Set and the last accepted Design revision. The Distro-maintained source amendment to DP-003 and DP-005 is proposed on this Planning branch at `c200cd9612d429fc0b59e9bb0548ebe39807750e`, but is not accepted Design authority while absent from `main`. FS-004 shall not claim that the amended local-source semantics are part of its pinned accepted Design revision. First obtain intentional Design acceptance; then explicitly update `design_revision` and the Selected Design text to the actual accepted integration commit after re-evaluation. No Planning commit may silently substitute a pending branch tip for accepted Design. The accompanying Plan and normative specification remain proposed Planning outputs. Mechanical requirements remain inactive until corresponding required validation tasks and bindings are constructed in Build. No code completion, qualified-host evidence, Semantic Review or Acceptance is claimed by these documents.
+The DP-003/DP-005 Distro-maintained source amendments entered accepted `main` via PR #13 at `55506eb916345317a5d24853ffcbbba3a9fc5375`. This reconciliation pins FS-004 to that accepted Design state while retaining FS-003's historical acceptance revision. FS-004 Planning requires Semantic Planning Review against this revision before Build activation; reconciliation alone does not constitute Semantic Planning Review or FS-004 Acceptance. Mechanical requirements remain inactive until corresponding required validation tasks and bindings are constructed in Build. No FS-004 implementation or qualified-host closure evidence is claimed.
