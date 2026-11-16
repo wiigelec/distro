@@ -54,10 +54,15 @@ def authenticate_managed_candidate(root: Path, repository: Path) -> ManagedCandi
         state = _parse_json(state_path.read_bytes())
         if set(state) != {'schema_version', 'status', 'selection', 'packages'}:
             raise PackageError('unsupported Manage installed-state fields')
-        if (state['schema_version'] != 1 or state['status'] != 'candidate-not-accepted'
-                or state['selection'] != 'distro-buildroot'):
-            raise PackageError('not a Manage-installed FS-004 candidate')
-        selected = resolve_candidate(repository)
+        expected_status = ('prerequisites-not-accepted' if prerequisite
+                           else 'candidate-not-accepted')
+        expected_selection = ('filesystem+linux-headers' if prerequisite
+                              else 'distro-buildroot')
+        if (state['schema_version'] != 1 or state['status'] != expected_status
+                or state['selection'] != expected_selection):
+            raise PackageError('not an authenticated Manage-installed FS-004 selection')
+        selected = (resolve_prerequisites(repository) if prerequisite
+                    else resolve_candidate(repository))
         verify_repository(repository)
         expected = [
             {'identity': rec['identity'], 'relationships': rec['relationships'],
@@ -137,3 +142,15 @@ def authenticate_managed_candidate(root: Path, repository: Path) -> ManagedCandi
         return ManagedCandidateProvider(root, repository, identities)
     except (PackageError, OSError, ValueError, TypeError, KeyError) as exc:
         raise SelectionError(f'Manage-installed provider authentication failed: {exc}') from exc
+
+def authenticate_managed_candidate(root: Path, repository: Path) -> ManagedCandidateProvider:
+    """Authenticate an installed, complete but unaccepted collection candidate."""
+    return _authenticate_managed_root(root, repository)
+
+def authenticate_managed_prerequisites(root: Path, repository: Path) -> ManagedCandidateProvider:
+    """Authenticate Manage-installed filesystem and Linux headers only.
+
+    This root is not an executable buildroot. Only its verified header tree
+    may be mounted into the authenticated Stage 1B bootstrap executor.
+    """
+    return _authenticate_managed_root(root, repository, prerequisite=True)

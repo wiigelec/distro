@@ -250,8 +250,11 @@ def resolve_prerequisites(repo: Path) -> tuple[dict, ...]:
     index = verify_repository(repo)
     records = index['packages']
     selected = {record['identity']['name']: record for record in records}
-    if len(records) != 2 or set(selected) != {'filesystem', 'linux'}:
-        raise PackageError('prerequisite repository must contain only filesystem and linux')
+    if not {'filesystem', 'linux'}.issubset(selected):
+        raise PackageError('prerequisite repository lacks filesystem or linux')
+    if sum(r['identity']['name'] == 'filesystem' for r in records) != 1 or sum(
+            r['identity']['name'] == 'linux' for r in records) != 1:
+        raise PackageError('ambiguous selected prerequisite identities')
     if (selected['filesystem']['identity']['version'] != '1' or
             selected['linux']['identity']['version'] != '7.1.8'):
         raise PackageError('incorrect FS-004 prerequisite package versions')

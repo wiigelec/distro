@@ -81,6 +81,8 @@ def native_recipe_command(work: Path, root: Path, stage: Path, recipe: Path, *,
         "DISTRO_STEP_ID": step_id, "DISTRO_TARGET": target,
         "DISTRO_JOBS": str(jobs),
     }
+    if linux_headers is not None:
+        environment["DISTRO_LINUX_HEADERS_DIR"] = "/distro-prerequisites/include"
     for key, value in environment.items():
         cmd += ["--setenv", key, value]
     cmd += ["--chdir", build_dir, "--", "/bin/bash", "/recipe/selected.sh"]

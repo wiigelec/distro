@@ -136,7 +136,7 @@ def execute_native_package(step: NativePackageStep, build: Path,
                           source_dir='/work/' + source.relative_to(build).as_posix(),
                           build_dir='/work/' + construction.relative_to(build).as_posix(),
                           package=step.name, version=step.version, step_id=step.name,
-                          target=TARGET, jobs=jobs)
+                          target=TARGET, jobs=jobs, linux_headers=linux_headers)
     finally:
         require_preserved_imports(verified_root, baseline)
     inventory = snapshot_imported_root(staging)

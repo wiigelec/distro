@@ -41,7 +41,25 @@ def main(argv: list[str] | None = None) -> int:
                         help='selected source repository root')
     prefix.add_argument('--revision', required=True,
                         help='immutable source repository Git revision')
+    glibc = commands.add_parser('distro-buildroot-glibc',
+                                help='build Glibc using verified Stage 1B and Manage-installed Linux headers')
+    glibc.add_argument('--root', required=True, type=Path)
+    glibc.add_argument('--cross-chroot', required=True, type=Path)
+    glibc.add_argument('--source-repo', required=True, type=Path)
+    glibc.add_argument('--revision', required=True)
+    glibc.add_argument('--prerequisite-repo', required=True, type=Path)
+    glibc.add_argument('--prerequisite-root', required=True, type=Path)
     args = parser.parse_args(argv)
+    if args.operation == 'distro-buildroot-glibc':
+        try:
+            run_glibc_transition(args.root, args.cross_chroot,
+                                 source_repository=args.source_repo, revision=args.revision,
+                                 prerequisite_repository=args.prerequisite_repo,
+                                 installed_prerequisites=args.prerequisite_root)
+            return 0
+        except (OSError, RuntimeError, ValueError) as exc:
+            print(f'FAIL distro-buildroot-glibc: {exc}', file=sys.stderr)
+            return 1
     if args.operation == 'distro-buildroot-prefix':
         try:
             run_bootstrap_prefix(args.root, args.cross_chroot,

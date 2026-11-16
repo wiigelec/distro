@@ -114,7 +114,8 @@ def produce_one_native_package(step: NativePackageStep, *, workspace: Path,
         raise SelectionError('refusing to reuse native package exchange')
     source, construction = prepare_native_package(step, build, cache, source_repository)
     execute_native_package(step, build, selected_provider, exchange / 'payload',
-                           jobs=jobs, source=source, construction=construction)
+                           jobs=jobs, source=source, construction=construction,
+                           linux_headers=linux_headers)
     _write_selection(exchange, step)
     _manage_create_publish(step, exchange, repository_root, manage)
     return exchange
@@ -156,4 +157,28 @@ def produce_from_managed_candidate(step: NativePackageStep, *, workspace: Path,
     after = authenticate_managed_candidate(installed_root, repository_root)
     if before.identities != after.identities or before.root != after.root:
         raise SelectionError('managed construction provider changed during build')
+    return result
+
+def produce_glibc_with_prerequisites(step: NativePackageStep, *, workspace: Path,
+                                     repository_root: Path, installed_root: Path,
+                                     bootstrap_root: Path, source_repository: Path,
+                                     manage: Path, jobs: int) -> Path:
+    """Use Stage 1B tools with read-only Manage-installed Linux headers.
+
+    Only Glibc is authorized for this bootstrap transition. Every
+    package still executes its own reviewed Bash recipe.
+    """
+    if step.name != 'glibc' or step.version != '2.44':
+        raise SelectionError('prerequisite transition permits only selected Glibc')
+    provider = authenticate_managed_prerequisites(installed_root, repository_root)
+    if {entry[0] for entry in provider.identities} != {'filesystem', 'linux'}:
+        raise SelectionError('unexpected installed construction prerequisites')
+    headers = provider.root / 'usr/include'
+    result = produce_one_native_package(
+        step, workspace=workspace, repository_root=repository_root,
+        selected_provider=bootstrap_root, source_repository=source_repository,
+        manage=manage, jobs=jobs, linux_headers=headers)
+    verified = authenticate_managed_prerequisites(installed_root, repository_root)
+    if verified.identities != provider.identities or verified.root != provider.root:
+        raise SelectionError('managed Linux headers provider changed during Glibc construction')
     return result
