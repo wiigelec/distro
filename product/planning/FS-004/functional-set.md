@@ -16,7 +16,7 @@ On a qualified foreign Linux host, Build consumes a verified Stage 1B handoff, p
 
 ## Included Scope
 
-- A complete, explicit-version Stage 1C package selection and reproducible native recipes, including compiler/toolchain, native runtime, tools, headers and other dependencies required by the selected workload.
+- The exact ten Stage 1B package names and versions, plus Linux headers 7.1.8 and Glibc 2.44 inherited as source selections from Stage 1A, rebuilt with Stage 1C-native recipes. The twelve payload-bearing package identities and the `distro-buildroot` metapackage must pass independent production-environment closure verification.
 - Shared-manifest dependency semantics and selected relationship resolution; dependency-aware build order, per-package independent staging, and fixed package identities.
 - Manage support for metadata-only metapackages, verified dependency closure, safe package installation into a designated fresh target root, installed-state authority, and a failure-safe candidate-to-authoritative collection boundary.
 - Correct handling of required filesystem layout links and owned path collisions in the package model and managed root.

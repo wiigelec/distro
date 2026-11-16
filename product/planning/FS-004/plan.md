@@ -6,7 +6,36 @@ Complete DP-006 Stage 1C, beginning from accepted FS-003 at `2d2f3773c208e7783ef
 
 ## Full package selection and dependency authority
 
-Expand the existing Stage 1C list from one Sed step to a concrete, reviewed explicit-version package set sufficient for a selected representative production workload. The Stage 1B list (Bash, Coreutils, Sed, Grep, Gawk, Make, Diffutils, Tar, native Binutils, native GCC) is a reference, not proof of closure; select and independently package required glibc/runtime, headers, development inputs, supporting libraries, interpreters, extraction utilities and any other prerequisites. Review source checksums and native build recipes for every selection. The list owns versions/checksums and recipe selections; the shared authoritative package manifests alone own categorized dependency declarations. Resolve concrete selected versions, distinguish build-tool from install-relevant relationships, reject missing or ambiguous dependencies and dependency cycles, and derive a deterministic build order. Avoid hard-coded dependency graphs or package-specific branches in Build.
+The initial Stage 1C package set is fixed by Planning to the ten Stage 1B selections plus two foundational Stage 1A selections. Preserve the accepted versions, source identities and SHA-256 digests, but use independently reviewed Stage 1C target-native recipes.
+
+| Package | Version | Selection origin |
+| --- | --- | --- |
+| bash | 5.3 | Stage 1B |
+| coreutils | 9.10 | Stage 1B |
+| sed | 4.10 | Stage 1B |
+| grep | 3.12 | Stage 1B |
+| gawk | 5.4.0 | Stage 1B |
+| make | 4.4.1 | Stage 1B |
+| diffutils | 3.12 | Stage 1B |
+| tar | 1.35 | Stage 1B |
+| binutils | 2.47 | Stage 1B |
+| gcc | 16.2.0 | Stage 1B |
+| linux | 7.1.8 | Stage 1A, headers-only payload |
+| glibc | 2.44 | Stage 1A, native libc payload |
+
+The exact source checksums are those in the accepted Stage 1B `cross-chroot.yaml` and Stage 1A `cross-toolchain.yaml` lists. GCC retains its selected GMP 6.3.0, MPFR 4.2.2 and MPC 1.4.1 supplements. Supplements do not automatically become separate package identities.
+
+Build shall create a distinct Stage 1C selection for these twelve payload-bearing packages. Linux headers must be available before native Glibc construction. Glibc must be freshly constructed and independently staged, providing the target runtime, dynamic loader and development files required by the managed production environment. Stage 1A recipes are cross-compilation references and shall not be executed unchanged as Stage 1C-native recipes.
+
+The `distro-buildroot` metapackage is a separate, payload-free identity selecting the reviewed package closure through manifest-owned install relationships. Do not use a package-list-generated dependency graph as a competing authority.
+
+The representative production workload is rebuilding Sed 4.10 from verified source using the normal Build execution path, with isolated staging and Manage package creation/publication.
+
+The twelve selected packages are not automatically proof of dependency closure. Verify executable interpreters, libraries, compiler support files, development headers and all selected build-tool requirements in the fresh Manage-installed root. If independent verification demonstrates an additional necessary package or unresolved filesystem policy, return to Planning rather than copying files from Stage 1B or silently expanding the selection.
+
+The current FS-003 Stage 1C implementation accepts only Sed. Do not expand its executable YAML selection until the generic multi-package runner and corresponding native recipes are introduced together in Build. Retain FS-003 validation during that transition.
+
+Build shall resolve concrete selected versions, distinguish build-tool from install-relevant relationships, reject absent, ambiguous or cyclic dependencies, and derive deterministic construction order from authoritative manifests. No parallel dependency authority or package-specific branching is permitted in the Build controller.
 
 ## Generic native package production
 
