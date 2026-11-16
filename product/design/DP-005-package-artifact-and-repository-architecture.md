@@ -17,7 +17,7 @@ The same package representation and Manage operations serve the initial Stage 1C
 
 ## Package identity
 
-A published package is identified by **name, upstream version, target architecture, and Distro packaging revision**. The revision distinguishes packaging changes for the same upstream version and architecture; artifact checksums identify particular bytes and are not package identity. A published identity must not silently change its install-relevant package relationships or owned-path inventory. The exact revision allocation and identity grammar are deferred until their bounded specification is needed.
+A published package is identified by **name, selected package version, target architecture, and Distro packaging revision**. The version is an upstream release version for external sources or a Distro-maintained version for repository-local packages. The revision distinguishes packaging changes for the same selected version and architecture; artifact checksums identify particular bytes and are not package identity. A published identity must not silently change its install-relevant package relationships or owned-path inventory. The exact revision allocation and identity grammar are deferred until their bounded specification is needed.
 
 ## Build-to-Manage interface
 
