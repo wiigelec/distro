@@ -15,6 +15,7 @@ import tempfile
 
 from manage.package import PackageError, _json_bytes, _regular_directory, verify
 from manage.repository import ARTIFACTS, _sync_dir, verify_repository
+from manage.layout import LINKS, canonical_path, canonical_claims
 
 STATE_DIR = '.distro'
 STATE_NAME = 'installed.json'
@@ -73,6 +74,11 @@ def resolve_candidate(repo: Path, package: str = 'distro-buildroot') -> tuple[di
                       'make', 'diffutils', 'tar', 'binutils', 'gcc', 'linux', 'glibc'}
     if {r['identity']['name'] for r in order if r['identity']['name'] != package} != expected_names:
         raise PackageError('candidate package closure differs from FS-004 selection')
+    # Filesystem owns the selected directory/link policy before any other
+    # payload is materialized, regardless of otherwise valid topo tie-breaks.
+    filesystem = next(r for r in order if r['identity']['name'] == 'filesystem')
+    order = [filesystem] + [r for r in order if r is not filesystem]
+    canonical_claims(order)  # Preflight all ownership before a private root exists.
     return tuple(order)
 
 
@@ -93,13 +99,17 @@ def _directory(root: Path, rel: str) -> Path:
 
 def _install_payload(archive: Path, records: list[dict], root: Path,
                      directory_modes: dict[str, int], leaf_owners: dict[str, tuple],
-                     identity: tuple) -> None:
+                     identity: tuple, *, filesystem: bool = False) -> None:
     """Apply verified members to a private root with no link traversal."""
     with tarfile.open(archive, 'r:xz') as package:
         members = {item.name: item for item in package.getmembers()[1:]}
         # Inventory path ownership is checked before writing each payload.
         for record in records:
-            rel = record['path']
+            raw = record['path']
+            # Only filesystem itself creates the literal selected alias links.
+            # Other packages install through approved aliases into canonical
+            # /usr paths, never by traversing a symlink on the host filesystem.
+            rel = raw if filesystem and raw in LINKS else canonical_path(raw)
             kind = record['type']
             parts = rel.split('/')
             for n in range(1, len(parts)):
@@ -167,13 +177,16 @@ def install_candidate(repo: Path, destination: Path) -> Path:
             root.mkdir(mode=0o700)
             modes: dict[str, int] = {}
             leaves: dict[str, tuple] = {}
+            # Snapshot all intended canonical ownership before any writes.
+            canonical_claims(list(records))
             for record in records:
                 key = _identity_key(record)
                 artifact = repo / ARTIFACTS / record['artifact']['filename']
                 metadata = verify(artifact)
                 if any(metadata[k] != record[k] for k in ('identity', 'relationships', 'paths')):
                     raise PackageError('candidate artifact diverged from repository record')
-                _install_payload(artifact, record['paths'], root, modes, leaves, key)
+                _install_payload(artifact, record['paths'], root, modes, leaves, key,
+                                 filesystem=record['identity']['name'] == 'filesystem')
             # Implicit ancestors of historical FS-003 packages default to 0755;
             # explicitly owned directories retain their selected exact modes.
             for walk_base, dirs, _files in os.walk(root, followlinks=False):
