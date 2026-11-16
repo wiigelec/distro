@@ -48,7 +48,7 @@ Manage shall support an independently verifiable, payload-free `distro-buildroot
 **Classification: B**
 **State: Inactive**
 
-Manage shall create and apply a verifiable Distro-owned `filesystem` package establishing the selected initial directories, modes and merged-/usr symlinks before applying dependent package payloads. Shared directories shall be permitted, non-directory path ownership shall be exclusive, and path traversal, unsafe links, unsupported members and target-root escapes shall be rejected.
+Build shall construct and independently stage a verifiable Distro-owned `filesystem` package with the selected directories, modes and merged-/usr links. Manage shall create, publish, verify and install it through standard operations before dependent payloads under manifest-derived relationships. Compatible shared directories are permitted, non-directory paths have exclusive owners, and conflicting modes, traversal, unsafe links, unsupported members and target-root escapes shall be rejected.
 
 ### FS-004-NR-009 — Dependency Resolution from Repository
 **Classification: B**

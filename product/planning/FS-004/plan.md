@@ -9,8 +9,8 @@ Complete DP-006 Stage 1C, beginning from accepted FS-003 at `2d2f3773c208e7783ef
 The initial Stage 1C package set is fixed by Planning to the ten Stage 1B selections, two foundational Stage 1A selections, and one Distro-owned filesystem package. Preserve the accepted versions, source identities and SHA-256 digests, but use independently reviewed Stage 1C target-native recipes.
 
 | Package | Version | Selection origin |
-| filesystem | 1 | Distro-owned filesystem definition |
 | --- | --- | --- |
+| filesystem | 1 | Distro-owned filesystem definition |
 | bash | 5.3 | Stage 1B |
 | coreutils | 9.10 | Stage 1B |
 | sed | 4.10 | Stage 1B |
@@ -26,7 +26,7 @@ The initial Stage 1C package set is fixed by Planning to the ten Stage 1B select
 
 The exact source checksums are those in the accepted Stage 1B `cross-chroot.yaml` and Stage 1A `cross-toolchain.yaml` lists. GCC retains its selected GMP 6.3.0, MPFR 4.2.2 and MPC 1.4.1 supplements. Supplements do not automatically become separate package identities.
 
-Build shall create a distinct Stage 1C selection for these twelve payload-bearing packages. Linux headers must be available before native Glibc construction. Glibc must be freshly constructed and independently staged, providing the target runtime, dynamic loader and development files required by the managed production environment. Stage 1A recipes are cross-compilation references and shall not be executed unchanged as Stage 1C-native recipes.
+Build shall create a distinct Stage 1C selection for these thirteen payload-bearing packages. Linux headers must be available before native Glibc construction. Glibc must be freshly constructed and independently staged, providing the target runtime, dynamic loader and development files required by the managed production environment. Stage 1A recipes are cross-compilation references and shall not be executed unchanged as Stage 1C-native recipes.
 
 The `distro-buildroot` metapackage is a separate, payload-free identity selecting the reviewed package closure through manifest-owned install relationships. Do not use a package-list-generated dependency graph as a competing authority.
 
@@ -34,43 +34,33 @@ The representative production workload is rebuilding Sed 4.10 from verified sour
 
 The thirteen selected payload packages are not automatically proof of dependency closure.
 
-The `filesystem` package has initial selected identity
-`(filesystem, 1, x86_64, 1)` and no upstream source archive.
-Its Build-selected recipe deterministically stages the baseline root
-directory structure and merged-/usr compatibility symlinks.
-The shared authoritative filesystem manifest owns its package
-identity and dependency meaning. The package list selects its version
-and recipe; no special Build-owned archive writer is permitted.
+The `filesystem` package has initial selected identity `(filesystem, 1, x86_64, 1)` and is a Distro-owned local-source package, not an upstream source archive. Its one authoritative package manifest resides under `product/src/build/packages/`. The Stage 1C list selects version `1` and its directly executed Bash recipe. Build verifies that the selected local source definition and recipe are regular checked-in files from the selected repository revision and records their content digests in the build evidence. Neither a fictitious upstream URL/checksum nor an unverified mutable working-tree input may substitute for this identity. The existing upstream-archive source model remains unchanged for all other selections; introduce an explicit local-source variant in the shared selector, never a `filesystem` name-based exception or parallel recipe engine. The local source variant is a bounded extension for Distro-maintained definitions; if it cannot be represented under DP-003, return to Design before implementing it.
 
-The initial layout includes the real directories /etc, /usr,
- /usr/bin, /usr/lib, /usr/include, /usr/share, /var,
- /var/lib, /var/cache, /var/log, /var/tmp, /tmp,
- /run, /dev, /proc and /sys, and the symlinks:
- /bin -> usr/bin, /sbin -> usr/bin,
- /lib -> usr/lib, /lib64 -> usr/lib,
- /usr/sbin -> bin, /usr/lib64 -> lib.
-Build must specify and verify their exact modes and link targets.
-No device nodes, virtual filesystem mounts, or runtime state are
-part of the package payload.
+Build's selected `filesystem` recipe deterministically creates a fresh independent DESTDIR payload; it does not execute a package installation through Manage or write package archive bytes. The explicit real directories and their selected modes are: `/etc` 0755, `/usr` 0755, `/usr/bin` 0755, `/usr/lib` 0755, `/usr/include` 0755, `/usr/share` 0755, `/var` 0755, `/var/lib` 0755, `/var/cache` 0755, `/var/log` 0755, `/var/tmp` 1777, `/tmp` 1777, `/run` 0755, `/dev` 0755, `/proc` 0555, and `/sys` 0555. The selected links are `/bin -> usr/bin`, `/sbin -> usr/bin`, `/lib -> usr/lib`, `/lib64 -> usr/lib`, `/usr/sbin -> bin`, and `/usr/lib64 -> lib`. These are target-root-relative links; the package never includes device nodes, mounts, dynamically populated runtime state, or host files. Modes and links must be checked against the staged package bytes and again after installation. This does not purport to establish Stage 2 system policy.
 
-Manage shall preserve package-provided directory entries and modes
-in the verifiable package representation. Directories may be shared;
-non-directory paths have exclusive ownership and conflicts fail.
-Manage shall validate and apply the filesystem package before
-installing packages into its layout, using an explicit selected
-installation ordering rule rather than a hidden package-name
-exception. It shall not follow symlinks into the host filesystem.
-The original FS-003 package format must remain readable.
+Manage's package format shall preserve explicit directory entries and modes as verifiable metadata. Existing FS-003 archives without directory entries remain readable. Multiple packages may declare the same directory only when its effective mode and type are compatible with the selected filesystem policy; conflicting directory modes are rejected rather than allowing incidental install order to decide them. Only one package may own each regular file or symlink. Resolve canonical target-root paths under the selected merged-`/usr` layout, reject unsafe ancestors and traversal, and never follow a link outside the target root. Manage applies the `filesystem` package before dependent payloads as part of a resolved installation plan, not through a hidden name-based special case. The manifest-derived install relationships of `distro-buildroot` and of the dependent packages must establish the required filesystem selection; installation order alone does not create undeclared dependency meaning.
 
 The selected filesystem directory hierarchy does not by itself
 establish every eventual Stage 2 filesystem policy. If an additional
 layout decision becomes necessary for Stage 1C, return to Planning.
 
-The selected packages are not automatically proof of dependency closure. Verify executable interpreters, libraries, compiler support files, development headers and all selected build-tool requirements in the fresh Manage-installed root. If independent verification demonstrates an additional necessary package or unresolved filesystem policy, return to Planning rather than copying files from Stage 1B or silently expanding the selection.
+The thirteen selected payload packages are not automatically proof of dependency closure. Verify executable interpreters, libraries, compiler support files, development headers and all selected build-tool requirements in the fresh Manage-installed root. If independent verification demonstrates an additional necessary package or unresolved filesystem policy, return to Planning rather than copying files from Stage 1B or silently expanding the selection.
 
 The current FS-003 Stage 1C implementation accepts only Sed. Do not expand its executable YAML selection until the generic multi-package runner and corresponding native recipes are introduced together in Build. Retain FS-003 validation during that transition.
 
 Build shall resolve concrete selected versions, distinguish build-tool from install-relevant relationships, reject absent, ambiguous or cyclic dependencies, and derive deterministic construction order from authoritative manifests. No parallel dependency authority or package-specific branching is permitted in the Build controller.
+
+## Manifest dependency categories and bootstrap resolution
+
+Use the accepted DP-003 categories as distinct manifest-owned fields: `build_tools`, `build_link_dependencies`, and `runtime_dependencies`. The first category affects construction prerequisites but does not enter installed package relationships solely because it was needed to build. Both build-link and runtime categories produce explicitly selected install relationships. Resolve all names to exact selected versions/identities using the current stage list and its verified imported-provider capability set. Missing names, version conflicts, ambiguous selections and dependency cycles are errors. A verified Stage 1B capability can satisfy construction-time prerequisites while bootstrapping, but cannot satisfy any dependency in the separately installed published closure. Construction scheduling may use verified imported capabilities and selected construction results; installation closure uses only published package identities. Do not infer manifest dependency meaning from package lists, ELF audits, or recipes.
+
+For backward compatibility, the legacy manifest `dependencies` field remains readable by existing Stage 1A/1B/FS-003 code, but Stage 1C publication must require explicit classification of every selected package dependency before production. The migration must not automatically interpret legacy dependencies as install dependencies or silently drop an install-relevant edge. Reject conflicting simultaneous legacy and categorized definitions unless an explicit compatibility rule proves equivalent meaning. The source-free `filesystem` selection and the empty-payload `distro-buildroot` selection use the same manifest/list/recipe and Build-to-Manage boundaries, with type-appropriate verification rather than fabricated archives.
+
+## Coherent collection selection protocol
+
+Continue to allow Manage's ordinary `create` and `publish` operations to place independently verified immutable artifacts and individual package records in its repository. These operations do not advertise a completed `distro-buildroot`. A separate candidate selection document names an exact, unambiguous set of package identities and corresponding repository artifact digests, including `filesystem`, `glibc`, Linux headers, the ten Stage 1B-selected packages, and the `distro-buildroot` metapackage. The candidate must resolve its install relationships exclusively from verified Manage records and be rejected if any member is absent, ambiguous, corrupt, ownership-conflicting, or insufficient for the selected closure.
+
+Use the normal Manage resolver/installer to install this candidate into a fresh private root, then the ordinary Build root provider and native recipe executor to build and independently package Sed 4.10 without access to Stage 1B or the bootstrap construction workspace. Only after this succeeds does Manage atomically replace the authoritative completed-collection selection pointer or file with one identifying the exact verified candidate. The authoritative repository package index may already contain individually selectable packages, but the completed-collection selector must never point at unverified closure. A local single-writer lock, same-filesystem temporary file, fsync of data/parent directory, and atomic rename protect promotion. Failures before promotion preserve the last usable complete selection; post-promotion durability/cleanup errors require explicit state verification, not assumed rollback or automatic retry. A candidate manifest or test evidence is not itself a second publisher or package artifact.
 
 ## Generic native package production
 
