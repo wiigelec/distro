@@ -95,7 +95,8 @@ def produce_one_native_package(step: NativePackageStep, *, workspace: Path,
                                repository_root: Path, selected_provider: Path,
                                source_repository: Path, manage: Path,
                                jobs: int, linux_headers: Path | None = None,
-                               native_seed: Path | None = None) -> Path:
+                               native_seed: Path | None = None,
+                               before_publish: Callable[[], None] | None = None) -> Path:
     """Produce one independent package; no staging merges or filesystem copies.
 
     This API is the per-step unit for the future Manage-driven collection runner.
@@ -120,6 +121,10 @@ def produce_one_native_package(step: NativePackageStep, *, workspace: Path,
     execute_native_package(step, build, selected_provider, exchange / 'payload',
                            jobs=jobs, source=source, construction=construction,
                            linux_headers=linux_headers, native_seed=native_seed)
+    # Re-authenticate externally installed prerequisites *before* publishing.
+    # The Build->Manage exchange must not be published with changed inputs.
+    if before_publish is not None:
+        before_publish()
     _write_selection(exchange, step)
     _manage_create_publish(step, exchange, repository_root, manage)
     return exchange
@@ -178,10 +183,15 @@ def produce_glibc_with_prerequisites(step: NativePackageStep, *, workspace: Path
     if {entry[0] for entry in provider.identities} != {'filesystem', 'linux'}:
         raise SelectionError('unexpected installed construction prerequisites')
     headers = provider.root / 'usr/include'
+    def guard_headers() -> None:
+        current = authenticate_managed_prerequisites(installed_root, repository_root)
+        if current.identities != provider.identities or current.root != provider.root:
+            raise SelectionError('managed headers changed before Glibc publication')
+
     result = produce_one_native_package(
         step, workspace=workspace, repository_root=repository_root,
         selected_provider=bootstrap_root, source_repository=source_repository,
-        manage=manage, jobs=jobs, linux_headers=headers)
+        manage=manage, jobs=jobs, linux_headers=headers, before_publish=guard_headers)
     verified = authenticate_managed_prerequisites(installed_root, repository_root)
     if verified.identities != provider.identities or verified.root != provider.root:
         raise SelectionError('managed Linux headers provider changed during Glibc construction')
@@ -200,10 +210,15 @@ def produce_binutils_with_seed(step: NativePackageStep, *, workspace: Path,
     if step.name != "binutils":
         raise SelectionError("native-seed transition permits only Binutils")
     before = authenticate_managed_toolchain_seed(installed_root, repository_root)
+    def guard_seed() -> None:
+        current = authenticate_managed_toolchain_seed(installed_root, repository_root)
+        if current.identities != before.identities or current.root != before.root:
+            raise SelectionError('managed seed changed before Binutils publication')
+
     result = produce_one_native_package(
         step, workspace=workspace, repository_root=repository_root,
         selected_provider=bootstrap_root, source_repository=source_repository,
-        manage=manage, jobs=jobs, native_seed=before.root)
+        manage=manage, jobs=jobs, native_seed=before.root, before_publish=guard_seed)
     after = authenticate_managed_toolchain_seed(installed_root, repository_root)
     if before.identities != after.identities or before.root != after.root:
         raise SelectionError("managed native seed changed during Binutils construction")

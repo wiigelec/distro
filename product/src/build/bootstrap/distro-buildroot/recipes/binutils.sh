@@ -5,15 +5,27 @@ set -euo pipefail
 : "${DISTRO_BUILD_DIR:?missing build directory}"
 : "${DISTRO_ROOT_DIR:?missing independent stage directory}"
 : "${DISTRO_JOBS:?missing bounded parallelism}"
-# Explicitly consume the selected Manage-installed native headers and libc
-# search path. The Stage 1B compiler remains the authenticated bootstrap tool.
+# Stage 1B supplies the executable compiler only. Headers, libc linker
+# script, startup objects and runtime loader must come from the independently
+# Manage-installed and authenticated native seed, never implicit Stage 1B paths.
 : "${DISTRO_NATIVE_SEED_ROOT:?missing Manage-installed native toolchain seed}"
-[[ -d "$DISTRO_NATIVE_SEED_ROOT/usr/include/linux" &&
-   -d "$DISTRO_NATIVE_SEED_ROOT/usr/lib" ]] || {
-    echo "selected native seed headers and libraries missing" >&2; exit 1;
+seed="$DISTRO_NATIVE_SEED_ROOT"
+[[ -d "$seed/usr/include/linux" && -d "$seed/usr/include/asm-generic" ]] || {
+    echo "selected Linux UAPI headers missing from managed sysroot" >&2; exit 1;
 }
-export CPPFLAGS="-I$DISTRO_NATIVE_SEED_ROOT/usr/include ${CPPFLAGS:-}"
-export LDFLAGS="-L$DISTRO_NATIVE_SEED_ROOT/usr/lib ${LDFLAGS:-}"
+for part in crt1.o crti.o crtn.o libc.so libc_nonshared.a ld-linux-x86-64.so.2; do
+    [[ -f "$seed/usr/lib/$part" ]] || {
+        echo "selected Glibc sysroot missing $part" >&2; exit 1;
+    }
+done
+# --sysroot controls implicit system header/library searches, while -B
+# explicitly selects the Glibc startup objects for both compiler drivers.
+# The runtime interpreter path is an in-target name; the merged-/usr layout
+# resolves /lib64 to /usr/lib in the eventual Manage-installed root.
+export CC="gcc --sysroot=$seed -B$seed/usr/lib/"
+export CXX="g++ --sysroot=$seed -B$seed/usr/lib/"
+export CPPFLAGS="-isystem $seed/usr/include ${CPPFLAGS:-}"
+export LDFLAGS="-L$seed/usr/lib -Wl,-rpath-link,$seed/usr/lib -Wl,--dynamic-linker=/lib64/ld-linux-x86-64.so.2 ${LDFLAGS:-}"
 cd "$DISTRO_BUILD_DIR"
 "$DISTRO_SOURCE_DIR/configure" --prefix=/usr --disable-nls --disable-werror --enable-shared
 make -j"$DISTRO_JOBS"
