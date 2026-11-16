@@ -6,9 +6,10 @@ Complete DP-006 Stage 1C, beginning from accepted FS-003 at `2d2f3773c208e7783ef
 
 ## Full package selection and dependency authority
 
-The initial Stage 1C package set is fixed by Planning to the ten Stage 1B selections plus two foundational Stage 1A selections. Preserve the accepted versions, source identities and SHA-256 digests, but use independently reviewed Stage 1C target-native recipes.
+The initial Stage 1C package set is fixed by Planning to the ten Stage 1B selections, two foundational Stage 1A selections, and one Distro-owned filesystem package. Preserve the accepted versions, source identities and SHA-256 digests, but use independently reviewed Stage 1C target-native recipes.
 
 | Package | Version | Selection origin |
+| filesystem | 1 | Distro-owned filesystem definition |
 | --- | --- | --- |
 | bash | 5.3 | Stage 1B |
 | coreutils | 9.10 | Stage 1B |
@@ -31,7 +32,41 @@ The `distro-buildroot` metapackage is a separate, payload-free identity selectin
 
 The representative production workload is rebuilding Sed 4.10 from verified source using the normal Build execution path, with isolated staging and Manage package creation/publication.
 
-The twelve selected packages are not automatically proof of dependency closure. Verify executable interpreters, libraries, compiler support files, development headers and all selected build-tool requirements in the fresh Manage-installed root. If independent verification demonstrates an additional necessary package or unresolved filesystem policy, return to Planning rather than copying files from Stage 1B or silently expanding the selection.
+The thirteen selected payload packages are not automatically proof of dependency closure.
+
+The `filesystem` package has initial selected identity
+`(filesystem, 1, x86_64, 1)` and no upstream source archive.
+Its Build-selected recipe deterministically stages the baseline root
+directory structure and merged-/usr compatibility symlinks.
+The shared authoritative filesystem manifest owns its package
+identity and dependency meaning. The package list selects its version
+and recipe; no special Build-owned archive writer is permitted.
+
+The initial layout includes the real directories /etc, /usr,
+ /usr/bin, /usr/lib, /usr/include, /usr/share, /var,
+ /var/lib, /var/cache, /var/log, /var/tmp, /tmp,
+ /run, /dev, /proc and /sys, and the symlinks:
+ /bin -> usr/bin, /sbin -> usr/bin,
+ /lib -> usr/lib, /lib64 -> usr/lib,
+ /usr/sbin -> bin, /usr/lib64 -> lib.
+Build must specify and verify their exact modes and link targets.
+No device nodes, virtual filesystem mounts, or runtime state are
+part of the package payload.
+
+Manage shall preserve package-provided directory entries and modes
+in the verifiable package representation. Directories may be shared;
+non-directory paths have exclusive ownership and conflicts fail.
+Manage shall validate and apply the filesystem package before
+installing packages into its layout, using an explicit selected
+installation ordering rule rather than a hidden package-name
+exception. It shall not follow symlinks into the host filesystem.
+The original FS-003 package format must remain readable.
+
+The selected filesystem directory hierarchy does not by itself
+establish every eventual Stage 2 filesystem policy. If an additional
+layout decision becomes necessary for Stage 1C, return to Planning.
+
+The selected packages are not automatically proof of dependency closure. Verify executable interpreters, libraries, compiler support files, development headers and all selected build-tool requirements in the fresh Manage-installed root. If independent verification demonstrates an additional necessary package or unresolved filesystem policy, return to Planning rather than copying files from Stage 1B or silently expanding the selection.
 
 The current FS-003 Stage 1C implementation accepts only Sed. Do not expand its executable YAML selection until the generic multi-package runner and corresponding native recipes are introduced together in Build. Retain FS-003 validation during that transition.
 
