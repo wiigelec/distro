@@ -290,3 +290,47 @@ def install_candidate(repo: Path, destination: Path) -> Path:
     return _install_selected(repo, destination, records,
                              status='candidate-not-accepted',
                              selection='distro-buildroot')
+
+
+def resolve_toolchain_seed(repo: Path) -> tuple[dict, ...]:
+    """Select exact independently published filesystem, Linux and Glibc artifacts.
+
+    This three-package seed is *not* a runnable native toolchain or accepted
+    distro-buildroot. No relationship may be invented from bootstrap provenance.
+    """
+    index = verify_repository(repo)
+    records = index['packages']
+    chosen = {}
+    for record in records:
+        name = record['identity']['name']
+        if name in {'filesystem', 'linux', 'glibc'}:
+            if name in chosen:
+                raise PackageError(f'ambiguous toolchain seed package: {name}')
+            chosen[name] = record
+    if set(chosen) != {'filesystem', 'linux', 'glibc'}:
+        raise PackageError('toolchain seed requires selected filesystem, linux, glibc')
+    versions = {'filesystem': '1', 'linux': '7.1.8', 'glibc': '2.44'}
+    for name, version in versions.items():
+        identity = chosen[name]['identity']
+        if identity['version'] != version or identity['architecture'] != 'x86_64':
+            raise PackageError(f'wrong toolchain seed identity: {name}')
+    if chosen['filesystem']['relationships']:
+        raise PackageError('filesystem seed has installed dependencies')
+    if chosen['linux']['relationships'] != [{'name': 'filesystem', 'version': '1'}]:
+        raise PackageError('Linux seed relationship mismatch')
+    if chosen['glibc']['relationships'] != [
+            {'name': 'filesystem', 'version': '1'},
+            {'name': 'linux', 'version': '7.1.8'}]:
+        raise PackageError('Glibc seed relationship mismatch')
+    # The complete selected repository may also contain subsequently built
+    # artifacts. Resolve only the explicit, dependency-closed seed.
+    records = (chosen['filesystem'], chosen['linux'], chosen['glibc'])
+    canonical_claims(list(records))
+    return records
+
+
+def install_toolchain_seed(repo: Path, destination: Path) -> Path:
+    """Install the unaccepted three-package seed through Manage alone."""
+    return _install_selected(repo, destination, resolve_toolchain_seed(repo),
+                             status='toolchain-seed-not-accepted',
+                             selection='filesystem+linux+glibc')

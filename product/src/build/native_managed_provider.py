@@ -15,7 +15,8 @@ import stat
 from build.selection import SelectionError
 from manage.package import _parse_json, _regular_directory, PackageError
 from manage.repository import verify_repository
-from manage.install import resolve_candidate, resolve_prerequisites, STATE_DIR, STATE_NAME
+from manage.install import (resolve_candidate, resolve_prerequisites,
+                            resolve_toolchain_seed, STATE_DIR, STATE_NAME)
 from manage.layout import LINKS, canonical_path, canonical_claims
 
 
@@ -35,7 +36,7 @@ def _hash_file(path: Path) -> str:
 
 
 def _authenticate_managed_root(root: Path, repository: Path, *,
-                               prerequisite: bool = False) -> ManagedCandidateProvider:
+                               selection_kind: str = "candidate") -> ManagedCandidateProvider:
     """Verify installed state, selected closure, and every selected leaf.
 
     Verification is read-only. Use this gate immediately before construction;
@@ -55,15 +56,20 @@ def _authenticate_managed_root(root: Path, repository: Path, *,
         state = _parse_json(state_path.read_bytes())
         if set(state) != {'schema_version', 'status', 'selection', 'packages'}:
             raise PackageError('unsupported Manage installed-state fields')
-        expected_status = ('prerequisites-not-accepted' if prerequisite
-                           else 'candidate-not-accepted')
-        expected_selection = ('filesystem+linux-headers' if prerequisite
-                              else 'distro-buildroot')
+        authorities = {
+            'candidate': ('candidate-not-accepted', 'distro-buildroot', resolve_candidate),
+            'prerequisites': ('prerequisites-not-accepted', 'filesystem+linux-headers',
+                              resolve_prerequisites),
+            'toolchain-seed': ('toolchain-seed-not-accepted', 'filesystem+linux+glibc',
+                               resolve_toolchain_seed),
+        }
+        if selection_kind not in authorities:
+            raise PackageError('unknown installed selection authority')
+        expected_status, expected_selection, resolver = authorities[selection_kind]
         if (state['schema_version'] != 1 or state['status'] != expected_status
                 or state['selection'] != expected_selection):
             raise PackageError('not an authenticated Manage-installed FS-004 selection')
-        selected = (resolve_prerequisites(repository) if prerequisite
-                    else resolve_candidate(repository))
+        selected = resolver(repository)
         verify_repository(repository)
         expected = [
             {'identity': rec['identity'], 'relationships': rec['relationships'],
@@ -154,4 +160,17 @@ def authenticate_managed_prerequisites(root: Path, repository: Path) -> ManagedC
     This root is not an executable buildroot. Only its verified header tree
     may be mounted into the authenticated Stage 1B bootstrap executor.
     """
-    return _authenticate_managed_root(root, repository, prerequisite=True)
+    return _authenticate_managed_root(root, repository, selection_kind="prerequisites")
+
+
+def authenticate_managed_toolchain_seed(root: Path, repository: Path) -> ManagedCandidateProvider:
+    """Authenticate the exact Manage-installed three-package native seed.
+
+    This selection supplies target library and headers, NOT a full buildroot.
+    It cannot be used as a complete native execution provider.
+    """
+    provider = _authenticate_managed_root(root, repository, selection_kind='toolchain-seed')
+    if {name for name, _version, _arch, _revision in provider.identities} != {
+            'filesystem', 'linux', 'glibc'}:
+        raise SelectionError('native toolchain seed identities mismatch')
+    return provider
