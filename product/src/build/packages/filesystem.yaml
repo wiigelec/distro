@@ -1,0 +1,11 @@
+# FS-004: stage-specific authoritative manifest; FS-001/002/003 legacy manifests unchanged.
+name: filesystem
+source:
+  kind: local
+  paths:
+    - product/src/build/packages/filesystem.yaml
+    - product/src/build/bootstrap/distro-buildroot/recipes/filesystem.sh
+build_tools: []
+build_link_dependencies: []
+runtime_dependencies: []
+host_tools: []

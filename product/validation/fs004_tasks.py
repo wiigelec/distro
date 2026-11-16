@@ -124,3 +124,63 @@ with TemporaryDirectory() as d:
     if r.returncode:
         print(r.stderr or r.stdout,file=sys.stderr)
     return r.returncode==0
+
+def filesystem_selection_contract() -> bool:
+    script = r'''from pathlib import Path
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
+from build.selection import SelectionError, load_manifests
+from build.filesystem_selection import select_filesystem
+from build.native_catalog import load_native_catalog
+from build.bootstrap.distro_buildroot import STAGE
+import hashlib, os, subprocess, shutil
+catalog = load_native_catalog(STAGE/'lists/native-sources.yaml')
+assert catalog[0].name == 'filesystem' and catalog[0].kind == 'local'
+manifest_path = Path('product/src/build/packages/filesystem.yaml')
+manifests = load_manifests(manifest_path.parent)
+assert 'filesystem' in manifests
+manifest = manifests['filesystem']
+assert not (manifest.dependencies or manifest.build_tools or manifest.build_link_dependencies or manifest.runtime_dependencies)
+recipe = STAGE/'recipes/filesystem.sh'
+assert recipe.is_file()
+text = recipe.read_text()
+assert 'DISTRO_ROOT_DIR' in text
+assert 'ln -s usr/lib "$root/lib64"' in text
+assert 'install -d -m 1777 "$root/tmp" "$root/var/tmp"' in text
+with TemporaryDirectory() as d:
+    root = Path(d).resolve()
+    (root/'product/src/build/packages').mkdir(parents=True)
+    (root/'product/src/build/bootstrap/distro-buildroot/recipes').mkdir(parents=True)
+    for source in (manifest_path, recipe):
+        rel = source.relative_to(Path.cwd()) if source.is_absolute() else source
+        destination = root/rel
+        destination.write_bytes(source.read_bytes())
+    def git(*args):
+        return subprocess.check_output(['git','-C',str(root),*args],stderr=subprocess.DEVNULL).decode().strip()
+    git('init','-q')
+    git('config','user.name','FS004 Validation')
+    git('config','user.email','fs004@example.invalid')
+    git('add','.')
+    git('commit','-qm','fixture')
+    head = git('rev-parse','HEAD')
+    # The selector is pinned to the source repository's layout, so verify
+    # the independent local-source gate against this fixture directly.
+    from build.local_provenance import verify_local_source
+    from unittest.mock import patch
+    import build.filesystem_selection as filesystem_selection
+    with patch.object(filesystem_selection, '_MANIFESTS', root/'product/src/build/packages'), patch.object(filesystem_selection, '_RECIPE', root/'product/src/build/bootstrap/distro-buildroot/recipes/filesystem.sh'):
+        selected = select_filesystem(root,head)
+        assert selected.version == '1' and len(selected.source_digests) == 2
+    evidence = verify_local_source(manifest.source,root,head)
+    assert set(evidence) == set(manifest.source.paths)
+    modified = root/'product/src/build/bootstrap/distro-buildroot/recipes/filesystem.sh'
+    modified.write_text(modified.read_text() + '# changed\n')
+    try: verify_local_source(manifest.source,root,head)
+    except SelectionError: pass
+    else: raise AssertionError('modified filesystem recipe accepted')
+'''
+    env={'PATH':os.defpath,'PYTHONPATH':str(SRC),'PYTHONDONTWRITEBYTECODE':'1'}
+    r=subprocess.run([sys.executable,'-B','-c',script],cwd=ROOT,env=env,capture_output=True,text=True)
+    if r.returncode:
+        print(r.stderr or r.stdout,file=sys.stderr)
+    return r.returncode==0
