@@ -133,7 +133,7 @@ with TemporaryDirectory(prefix='fs003-package-') as d:
     package=create('sed',exchange)
     metadata=verify(package)
     assert metadata['identity']==identity and metadata['relationships']==[]
-    assert [e['path'] for e in metadata['paths']]==['usr/bin/sed']
+    assert [e['path'] for e in metadata['paths'] if e['type']=='file']==['usr/bin/sed']
     restored=base/'restored';restored.mkdir()
     restore(package,restored)
     assert (restored/'usr/bin/sed').read_bytes()==b'example package data'
@@ -187,7 +187,7 @@ with TemporaryDirectory(prefix='fs003-publish-') as d:
         with patch('manage.repository.os.fsync', return_value=None):
             publish('awk',repo,conflict)
     except PackageError as exc:
-        assert 'ownership conflict' in str(exc)
+        assert 'duplicate canonical leaf ownership' in str(exc)
     else:raise AssertionError('conflicting path owner was accepted')
     assert (repo/'index.json').read_bytes()==previous
     assert not (repo/'.publish.lock').exists()
