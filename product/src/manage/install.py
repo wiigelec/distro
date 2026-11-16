@@ -1,0 +1,227 @@
+"""Manage candidate-only dependency closure and fresh-root installation.
+
+An installed candidate is NOT an accepted distro-buildroot collection. Only a
+future independent closure gate can promote a completed collection selection.
+No host package installer or tar extraction into an existing root is used.
+"""
+from __future__ import annotations
+
+import json
+import os
+from pathlib import Path
+import stat
+import tarfile
+import tempfile
+
+from manage.package import PackageError, _json_bytes, _regular_directory, verify
+from manage.repository import ARTIFACTS, _sync_dir, verify_repository
+
+STATE_DIR = '.distro'
+STATE_NAME = 'installed.json'
+
+
+def _identity_key(record: dict) -> tuple:
+    identity = record['identity']
+    return (identity['name'], identity['version'], identity['architecture'], identity['revision'])
+
+
+def resolve_candidate(repo: Path, package: str = 'distro-buildroot') -> tuple[dict, ...]:
+    """Resolve exact immutable records from a verified Manage repository.
+
+    Ambiguous package versions/revisions, missing edges, and cycles fail closed.
+    This resolution does not advertise an accepted collection selector.
+    """
+    index = verify_repository(repo)
+    records = index['packages']
+    by_name: dict[str, list[dict]] = {}
+    for record in records:
+        by_name.setdefault(record['identity']['name'], []).append(record)
+    if package != 'distro-buildroot':
+        raise PackageError('candidate installation requires distro-buildroot metapackage')
+    if not by_name.get(package) or len(by_name[package]) != 1:
+        raise PackageError('missing or ambiguous candidate metapackage')
+    root_record = by_name[package][0]
+    if root_record['paths'] or not root_record['relationships']:
+        raise PackageError('invalid metadata-only collection root')
+    visiting: set[str] = set()
+    finished: set[str] = set()
+    order: list[dict] = []
+    target_arch = root_record['identity']['architecture']
+
+    def visit(name: str, version: str) -> None:
+        options = by_name.get(name, [])
+        if len(options) != 1 or options[0]['identity']['version'] != version:
+            raise PackageError(f'missing or ambiguous selected dependency: {name} {version}')
+        record = options[0]
+        if record['identity']['architecture'] != target_arch:
+            raise PackageError(f'mixed architectures in candidate: {name}')
+        if name in visiting:
+            raise PackageError(f'candidate dependency cycle at {name}')
+        if name in finished:
+            return
+        visiting.add(name)
+        for relationship in record['relationships']:
+            visit(relationship['name'], relationship['version'])
+        visiting.remove(name)
+        finished.add(name)
+        order.append(record)
+
+    visit(package, root_record['identity']['version'])
+    if len([r for r in order if r['identity']['name'] != package]) != 13:
+        raise PackageError('candidate does not select thirteen payload packages')
+    expected_names = {'filesystem', 'bash', 'coreutils', 'sed', 'grep', 'gawk',
+                      'make', 'diffutils', 'tar', 'binutils', 'gcc', 'linux', 'glibc'}
+    if {r['identity']['name'] for r in order if r['identity']['name'] != package} != expected_names:
+        raise PackageError('candidate package closure differs from FS-004 selection')
+    return tuple(order)
+
+
+def _directory(root: Path, rel: str) -> Path:
+    """Create or inspect a real directory without following any symlink ancestor."""
+    node = root
+    for part in rel.split('/'):
+        node = node / part
+        if node.is_symlink():
+            raise PackageError(f'candidate path has symlink ancestor: {rel}')
+        if node.exists():
+            if not node.is_dir():
+                raise PackageError(f'candidate path has non-directory ancestor: {rel}')
+        else:
+            node.mkdir(mode=0o700)
+    return node
+
+
+def _install_payload(archive: Path, records: list[dict], root: Path,
+                     directory_modes: dict[str, int], leaf_owners: dict[str, tuple],
+                     identity: tuple) -> None:
+    """Apply verified members to a private root with no link traversal."""
+    with tarfile.open(archive, 'r:xz') as package:
+        members = {item.name: item for item in package.getmembers()[1:]}
+        # Inventory path ownership is checked before writing each payload.
+        for record in records:
+            rel = record['path']
+            kind = record['type']
+            parts = rel.split('/')
+            for n in range(1, len(parts)):
+                _directory(root, '/'.join(parts[:n]))
+            target = root / rel
+            if kind == 'directory':
+                current = directory_modes.setdefault(rel, record['mode'])
+                if current != record['mode']:
+                    raise PackageError(f'incompatible directory modes: {rel}')
+                _directory(root, rel)
+                continue
+            if rel in leaf_owners or rel in directory_modes or target.exists() or target.is_symlink():
+                raise PackageError(f'candidate leaf ownership conflict: {rel}')
+            item = members['payload/' + rel]
+            if kind == 'file':
+                stream = package.extractfile(item)
+                if stream is None:
+                    raise PackageError(f'verified payload file absent: {rel}')
+                fd = os.open(target, os.O_CREAT | os.O_EXCL | os.O_WRONLY |
+                             getattr(os, 'O_NOFOLLOW', 0), 0o600)
+                with os.fdopen(fd, 'wb') as output:
+                    for block in iter(lambda: stream.read(1024 * 1024), b''):
+                        output.write(block)
+                    os.fchmod(output.fileno(), record['mode'])
+                    output.flush()
+                    os.fsync(output.fileno())
+            elif kind == 'symlink':
+                # verify() already checks relative targets remain inside root.
+                os.symlink(record['target'], target)
+            else:
+                raise PackageError(f'unsupported candidate payload entry: {kind}')
+            leaf_owners[rel] = identity
+
+
+def install_candidate(repo: Path, destination: Path) -> Path:
+    """Build a private installation from verified bytes, then atomically expose it.
+
+    The destination must not exist. Nothing is exposed on partial failure; a
+    persistent lock rejects concurrent installers and requires manual cleanup
+    after interruption. This is intentionally NOT a completed-collection gate.
+    """
+    repo = _regular_directory(repo)
+    destination = Path(destination).absolute()
+    parent = _regular_directory(destination.parent)
+    if destination.name in ('', '.', '..') or destination.exists() or destination.is_symlink():
+        raise PackageError('candidate destination must not exist')
+    if repo == parent or repo.is_relative_to(destination) or destination.is_relative_to(repo):
+        raise PackageError('candidate root must be outside repository')
+    records = resolve_candidate(repo)
+    lock = parent / ('.' + destination.name + '.install.lock')
+    try:
+        fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY |
+                     getattr(os, 'O_NOFOLLOW', 0), 0o600)
+    except FileExistsError as exc:
+        raise PackageError('candidate installation lock exists') from exc
+    published = False
+    try:
+        with os.fdopen(fd, 'w') as handle:
+            handle.write('Manage candidate-only install\n')
+            handle.flush()
+            os.fsync(handle.fileno())
+        # Private root shares a filesystem with the final destination.
+        with tempfile.TemporaryDirectory(dir=parent, prefix='.candidate-root-') as private:
+            root = Path(private) / 'root'
+            root.mkdir(mode=0o700)
+            modes: dict[str, int] = {}
+            leaves: dict[str, tuple] = {}
+            for record in records:
+                key = _identity_key(record)
+                artifact = repo / ARTIFACTS / record['artifact']['filename']
+                metadata = verify(artifact)
+                if any(metadata[k] != record[k] for k in ('identity', 'relationships', 'paths')):
+                    raise PackageError('candidate artifact diverged from repository record')
+                _install_payload(artifact, record['paths'], root, modes, leaves, key)
+            # Implicit ancestors of historical FS-003 packages default to 0755;
+            # explicitly owned directories retain their selected exact modes.
+            for walk_base, dirs, _files in os.walk(root, followlinks=False):
+                for name in dirs:
+                    path = Path(walk_base) / name
+                    if path.is_symlink():
+                        continue
+                    rel = path.relative_to(root).as_posix()
+                    if rel not in modes:
+                        path.chmod(0o755)
+            for rel in sorted(modes, key=lambda x: (-x.count('/'), x)):
+                os.chmod(root / rel, modes[rel], follow_symlinks=False)
+            root.chmod(0o755)
+            state = {
+                'schema_version': 1,
+                'status': 'candidate-not-accepted',
+                'selection': 'distro-buildroot',
+                'packages': [
+                    {'identity': r['identity'], 'relationships': r['relationships'],
+                     'artifact': r['artifact'], 'owned_paths': r['paths']}
+                    for r in records],
+            }
+            if (root / STATE_DIR).exists() or (root / STATE_DIR).is_symlink():
+                raise PackageError('reserved installed-state path occupied')
+            state_dir = root / STATE_DIR
+            state_dir.mkdir(mode=0o700)
+            state_file = state_dir / STATE_NAME
+            with state_file.open('xb') as output:
+                output.write(_json_bytes(state))
+                output.flush()
+                os.fsync(output.fileno())
+            _sync_dir(state_dir)
+            _sync_dir(root)
+            if destination.exists() or destination.is_symlink():
+                raise PackageError('candidate destination became occupied')
+            root.rename(destination)
+            published = True
+            _sync_dir(parent)
+    except Exception as exc:
+        if published:
+            raise PackageError('candidate root promoted; inspect state before retry') from exc
+        raise
+    finally:
+        try:
+            lock.unlink(missing_ok=True)
+            _sync_dir(parent)
+        except OSError as exc:
+            if published:
+                raise PackageError('candidate promoted but install lock cleanup failed') from exc
+            raise
+    return destination

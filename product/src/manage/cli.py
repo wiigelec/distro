@@ -12,6 +12,7 @@ import sys
 
 from manage.package import PackageError, create, verify
 from manage.repository import publish, verify_repository
+from manage.install import install_candidate
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -29,9 +30,15 @@ def main(argv: list[str] | None = None) -> int:
                      help="source exchange holding created artifact and selection.json (FS-003 required locator)")
     repo_check = commands.add_parser("verify-repo", help="independently verify a local repository")
     repo_check.add_argument("--repo", required=True, type=Path)
+    candidate = commands.add_parser("install-candidate", help="install unaccepted FS-004 candidate into an absent root")
+    candidate.add_argument("--repo", required=True, type=Path)
+    candidate.add_argument("--root", required=True, type=Path)
     args = parser.parse_args(argv)
     try:
-        if args.operation == "create":
+        if args.operation == "install-candidate":
+            root = install_candidate(args.repo, args.root)
+            print(f"[manage] Installed unaccepted candidate {root}", flush=True)
+        elif args.operation == "create":
             artifact = create(args.package, args.build)
             print(f"[manage] Created and verified {artifact}", flush=True)
         elif args.operation == "publish":

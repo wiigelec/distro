@@ -128,7 +128,7 @@ def inventory(payload: Path) -> list[dict]:
     for name in kinds:
         for i in range(1, len(name.split("/"))):
             ancestor = "/".join(name.split("/")[:i])
-            if ancestor in kinds:
+            if ancestor in kinds and kinds[ancestor] != "directory":
                 raise PackageError("member has non-directory ancestor")
     return records
 
