@@ -1,0 +1,6 @@
+name: findutils
+source:
+  url: https://ftp.gnu.org/gnu/findutils/findutils-{version}.tar.xz
+  verification: sha256
+dependencies: []
+host_tools: [make, bash, tar, xz]
