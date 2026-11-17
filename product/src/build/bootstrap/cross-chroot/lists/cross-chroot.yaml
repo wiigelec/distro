@@ -12,6 +12,12 @@ steps:
     version: "9.10"
     checksum: 16535a9adf0b10037364e2d612aad3d9f4eca3a344949ced74d12faf4bd51d25
     recipe: recipes/coreutils.sh
+  # FS-002 bugfix #15: kernel header production requires target-native find/xargs.
+  - id: findutils
+    name: findutils
+    version: "4.10.0"
+    checksum: 1387e0b67ff247d2abde998f90dfbf70c1491391a59ddfecb8ae698789f0a4f5
+    recipe: recipes/findutils.sh
   - id: sed
     name: sed
     version: "4.10"
