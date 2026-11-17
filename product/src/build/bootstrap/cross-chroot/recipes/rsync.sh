@@ -16,7 +16,7 @@ cd "$DISTRO_BUILD_DIR"
   --prefix=/usr --disable-md2man --disable-openssl \
   --disable-xxhash --disable-zstd --disable-lz4 \
   --disable-simd --disable-acl-support --disable-xattr-support \
-  --disable-iconv --with-included-zlib --with-included-popt
+  --disable-iconv --disable-idn --with-included-zlib --with-included-popt
 make -j"$DISTRO_JOBS"
 make DESTDIR="$DISTRO_ROOT_DIR" install
 [[ -x "$DISTRO_ROOT_DIR/usr/bin/rsync" ]]
