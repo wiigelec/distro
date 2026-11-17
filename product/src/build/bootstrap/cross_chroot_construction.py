@@ -231,7 +231,7 @@ def verify_native_gcc_candidate(
     checks = r"""
 set -euo pipefail
 export PATH=/usr/bin:/bin LC_ALL=C HOME=/verify TMPDIR=/verify
-for tool in bash sh cat grep sed gawk make diff tar find xargs rsync as ld ar readelf gcc g++; do
+for tool in bash sh cat grep sed gawk make diff tar find xargs rsync m4 bison python3 as ld ar readelf gcc g++; do
     command -v "$tool" >/dev/null || { printf 'MISSING:%s\n' "$tool"; exit 20; }
 done
 printf 'alpha\n' | /usr/bin/sed 's/alpha/beta/' | /usr/bin/grep -qx beta
@@ -244,6 +244,28 @@ printf 'hello\n' > /verify/a.txt
 /usr/bin/mkdir -p /verify/rsync-dest
 /usr/bin/rsync -a /verify/a.txt /verify/rsync-dest/
 /usr/bin/diff -q /verify/a.txt /verify/rsync-dest/a.txt >/dev/null
+# Check target-native GNU M4, Bison parser generation and CPython stdlib.
+[[ "$(/usr/bin/m4 <<'M4'
+define(`FOO', `BAR')FOO
+M4
+)" == BAR ]]
+cat > /verify/parser.y <<'YACC'
+%{
+#include <stdio.h>
+void yyerror(const char *s);
+%}
+%token NUMBER
+%%
+input: NUMBER { puts("BISON_NATIVE_OK"); } ;
+%%
+int yylex(void) { static int called=0; return called++ ? 0 : NUMBER; }
+void yyerror(const char *s) { (void)s; }
+int main(void) { return yyparse(); }
+YACC
+/usr/bin/bison -o /verify/parser.c /verify/parser.y
+/usr/bin/gcc -O0 -o /verify/parser /verify/parser.c
+[[ "$(/verify/parser)" == BISON_NATIVE_OK ]]
+/usr/bin/python3 -I -c 'import sys,json,pathlib,hashlib,re; assert sys.version_info[:3] == (3,13,11); assert json.loads("{\"ok\":true}")["ok"]; assert hashlib.sha256(b"abc").hexdigest().startswith("ba7816"); assert re.fullmatch(r"[a-z]+", "test")'
 /usr/bin/diff -q /verify/a.txt /verify/b.txt >/dev/null
 /usr/bin/tar -cf /verify/test.tar -C /verify a.txt
 /usr/bin/gcc -O0 -o /verify/smoke-c /verify/smoke.c

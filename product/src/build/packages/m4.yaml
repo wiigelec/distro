@@ -1,0 +1,6 @@
+name: m4
+source:
+  url: https://ftp.gnu.org/gnu/m4/m4-{version}.tar.xz
+  verification: sha256
+dependencies: []
+host_tools: [make, bash, tar, xz]

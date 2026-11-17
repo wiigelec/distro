@@ -1,0 +1,6 @@
+name: python
+source:
+  url: https://www.python.org/ftp/python/{version}/Python-{version}.tar.xz
+  verification: sha256
+dependencies: []
+host_tools: [make, bash, tar, xz, gcc]
