@@ -22,7 +22,8 @@ export CFLAGS=-O2 LDFLAGS='-B/toolchain/usr/lib64/ -L/toolchain/usr/lib64 -L/too
 # Python after installation and again after independent relocation.
 export ac_cv_file__dev_ptmx=yes ac_cv_file__dev_ptc=no ac_cv_buggy_getaddrinfo=no
 "$DISTRO_SOURCE_DIR/configure" --build=x86_64-pc-linux-gnu --host="$DISTRO_TARGET" \
-  --prefix=/usr --with-build-python="$build_python" --without-ensurepip --disable-test-modules
+  --prefix=/usr --with-build-python="$build_python" --with-pkg-config=no \
+  --without-ensurepip --disable-test-modules
 make -j"$DISTRO_JOBS"
 make DESTDIR="$DISTRO_ROOT_DIR" install
 [[ -x "$DISTRO_ROOT_DIR/usr/bin/python3.13" ]]
