@@ -36,7 +36,7 @@ m=load_manifests(PACKAGES)
 steps=select_steps(STAGE/'lists/cross-chroot.yaml',m,STAGE,imported={'binutils':'2.47'})
 expected=[('bash','bash','5.3'),('coreutils','coreutils','9.10'),
  ('findutils','findutils','4.10.0'),('rsync','rsync','3.5.2'),
- ('m4','m4','1.4.20'),('bison','bison','3.8.2'),('python','python','3.13.11'),('sed','sed','4.10'),('grep','grep','3.12'),('gawk','gawk','5.4.0'),
+ ('m4','m4','1.4.21'),('bison','bison','3.8.2'),('python','python','3.13.11'),('sed','sed','4.10'),('grep','grep','3.12'),('gawk','gawk','5.4.0'),
  ('make','make','4.4.1'),('diffutils','diffutils','3.12'),('tar','tar','1.35'),
  ('native-binutils','binutils','2.47'),('native-gcc','gcc','16.2.0')]
 assert [(s.id,s.name,s.version) for s in steps]==expected
