@@ -24,6 +24,17 @@ _REQUIRED_TOOLS = {
     'binutils': ('as', 'ld'),
 }
 
+# FS-002 Issue #15: compatibility with the separately verified Findutils
+# addition to the Stage 1B handoff. This is not a floating source allowance:
+# only the exact reviewed FS-002 source pin is supported before branch
+# integration. Keep the historical Stage 1B pins authoritative for all other
+# packages, and require both new native executables in the restored root.
+_REVIEWED_STAGE1B_ADDITIONS = {
+    'findutils': ('4.10.0',
+                  '1387e0b67ff247d2abde998f90dfbf70c1491391a59ddfecb8ae698789f0a4f5',
+                  ('find', 'xargs')),
+}
+
 
 @dataclass(frozen=True)
 class VerifiedStage1BProvider:
@@ -91,10 +102,19 @@ def authenticate_stage1b_provider(archive: Path, restored_root: Path, *,
     declared = {}
     for item in metadata['sources']:
         name = item['package']
-        if name in declared or name not in accepted:
+        if name in declared or (name not in accepted and
+                                name not in _REVIEWED_STAGE1B_ADDITIONS):
             raise SelectionError('ambiguous or unsupported Stage 1B source')
         declared[name] = (item['version'],item['sha256'])
-    if declared != accepted:
+    expected = dict(accepted)
+    for name, (version, checksum, programs) in _REVIEWED_STAGE1B_ADDITIONS.items():
+        # Only the explicitly pinned FS-002 addition is permitted. Neither an
+        # arbitrary source nor an unknown Findutils version may be accepted.
+        if name in declared:
+            expected[name] = (version, checksum)
+            for program in programs:
+                _executable_in_root(root, program)
+    if declared != expected:
         raise SelectionError('Stage 1B handoff differs from selected source pins')
     for name, programs in _REQUIRED_TOOLS.items():
         if name not in declared:
