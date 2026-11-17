@@ -28,7 +28,7 @@ steps:
   - id: m4
     name: m4
     version: "1.4.20"
-    checksum: 6ac4fc31ce440debe63987c2ebbf9d7b6634e67a7c3279257dc7361de8bdb3ef
+    checksum: e236ea3a1ccf5f6c270b1c4bb60726f371fa49459a8eaaebc90b216b328daf2b
     recipe: recipes/m4.sh
   - id: bison
     name: bison
