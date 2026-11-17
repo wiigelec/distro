@@ -24,10 +24,10 @@ _REQUIRED_TOOLS = {
     'binutils': ('as', 'ld'),
 }
 
-# FS-002 Issues #15 and #17: exact source-pin compatibility for the separately
-# verified Findutils and Rsync additions to Stage 1B. No floating version
-# allowance: the historical FS-004 pins remain authoritative for all other
-# packages. Each additional native executable must exist inside restored root.
+# FS-002 Issues #15, #17, and #19: exact source-pin compatibility for the
+# separately verified Findutils, Rsync, M4, Bison and Python additions.
+# No floating version allowance: historical FS-004 pins remain authoritative
+# for all other packages. Required binaries must be in the restored root.
 _REVIEWED_STAGE1B_ADDITIONS = {
     'findutils': ('4.10.0',
                   '1387e0b67ff247d2abde998f90dfbf70c1491391a59ddfecb8ae698789f0a4f5',
@@ -36,6 +36,16 @@ _REVIEWED_STAGE1B_ADDITIONS = {
     'rsync': ('3.5.2',
               'a10d591825251e070f74c98df3daad195def4ed81b4a2de16169026aea33f6c8',
               ('rsync',)),
+    # FS-002 Issue #19: verified fifteen-step Stage 1B handoff.
+    'm4': ('1.4.21',
+           'f25c6ab51548a73a75558742fb031e0625d6485fe5f9155949d6486a2408ab66',
+           ('m4',)),
+    'bison': ('3.8.2',
+              '9bba0214ccf7f1079c5d59210045227bcf619519840ebfa80cd3849cff5a5bf2',
+              ('bison',)),
+    'python': ('3.13.11',
+               '16ede7bb7cdbfa895d11b0642fa0e523f291e6487194d53cf6d3b338c3a17ea2',
+               ('python3', 'python3.13')),
 }
 
 
