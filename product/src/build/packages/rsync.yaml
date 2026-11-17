@@ -1,0 +1,6 @@
+name: rsync
+source:
+  url: https://download.samba.org/pub/rsync/src/rsync-{version}.tar.gz
+  verification: sha256
+dependencies: []
+host_tools: [make, bash, tar, gzip]
