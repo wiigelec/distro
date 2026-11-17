@@ -23,7 +23,7 @@ def _mountpoint(root: Path, name: str) -> None:
         path.mkdir(mode=0o755)
     if path.resolve(strict=True) != path:
         raise SandboxError(f"native root mountpoint traverses symlinks: {name}")
-    if name in {"work", "install"} and any(path.iterdir()):
+    if name in {"work", "install", "distro-prerequisites", "distro-seed", "distro-linker"} and any(path.iterdir()):
         raise SandboxError(f"native mountpoint must be empty: {name}")
 
 
@@ -98,6 +98,15 @@ def native_recipe_command(work: Path, root: Path, stage: Path, recipe: Path, *,
             entry = native_linker_seed / rel
             if not entry.exists() or entry.is_symlink():
                 raise SandboxError(f'native linker seed path missing or unsafe: {rel}')
+    # Bubblewrap cannot create a mount destination after / is ro-bound.
+    # Allocate only the selected overlay destinations in the private restored
+    # root before entering the sandbox; no host userspace is made visible.
+    if linux_headers is not None:
+        _mountpoint(root, "distro-prerequisites")
+    if native_seed is not None:
+        _mountpoint(root, "distro-seed")
+    if native_linker_seed is not None:
+        _mountpoint(root, "distro-linker")
     recipe = Path(recipe).resolve(strict=True)
     if not recipe.is_file():
         raise SandboxError("native recipe must be an existing regular file")
