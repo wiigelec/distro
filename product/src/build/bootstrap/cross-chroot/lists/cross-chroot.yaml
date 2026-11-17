@@ -18,6 +18,12 @@ steps:
     version: "4.10.0"
     checksum: 1387e0b67ff247d2abde998f90dfbf70c1491391a59ddfecb8ae698789f0a4f5
     recipe: recipes/findutils.sh
+  # FS-002 bugfix #17: kernel headers_install requires target-native rsync.
+  - id: rsync
+    name: rsync
+    version: "3.5.2"
+    checksum: a10d591825251e070f74c98df3daad195def4ed81b4a2de16169026aea33f6c8
+    recipe: recipes/rsync.sh
   - id: sed
     name: sed
     version: "4.10"

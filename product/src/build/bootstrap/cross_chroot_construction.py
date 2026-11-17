@@ -231,7 +231,7 @@ def verify_native_gcc_candidate(
     checks = r"""
 set -euo pipefail
 export PATH=/usr/bin:/bin LC_ALL=C HOME=/verify TMPDIR=/verify
-for tool in bash sh cat grep sed gawk make diff tar find xargs as ld ar readelf gcc g++; do
+for tool in bash sh cat grep sed gawk make diff tar find xargs rsync as ld ar readelf gcc g++; do
     command -v "$tool" >/dev/null || { printf 'MISSING:%s\n' "$tool"; exit 20; }
 done
 printf 'alpha\n' | /usr/bin/sed 's/alpha/beta/' | /usr/bin/grep -qx beta
@@ -240,6 +240,10 @@ printf 'hello\n' > /verify/a.txt
 [[ "$(/usr/bin/find /verify -maxdepth 1 -name a.txt -print)" == /verify/a.txt ]]
 [[ "$(printf 'alpha\n' | /usr/bin/xargs)" == alpha ]]
 /usr/bin/cat /verify/a.txt > /verify/b.txt
+# Exercise a real local transfer, not only --version or the file's existence.
+/usr/bin/mkdir -p /verify/rsync-dest
+/usr/bin/rsync -a /verify/a.txt /verify/rsync-dest/
+/usr/bin/diff -q /verify/a.txt /verify/rsync-dest/a.txt >/dev/null
 /usr/bin/diff -q /verify/a.txt /verify/b.txt >/dev/null
 /usr/bin/tar -cf /verify/test.tar -C /verify a.txt
 /usr/bin/gcc -O0 -o /verify/smoke-c /verify/smoke.c
