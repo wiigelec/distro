@@ -24,15 +24,18 @@ _REQUIRED_TOOLS = {
     'binutils': ('as', 'ld'),
 }
 
-# FS-002 Issue #15: compatibility with the separately verified Findutils
-# addition to the Stage 1B handoff. This is not a floating source allowance:
-# only the exact reviewed FS-002 source pin is supported before branch
-# integration. Keep the historical Stage 1B pins authoritative for all other
-# packages, and require both new native executables in the restored root.
+# FS-002 Issues #15 and #17: exact source-pin compatibility for the separately
+# verified Findutils and Rsync additions to Stage 1B. No floating version
+# allowance: the historical FS-004 pins remain authoritative for all other
+# packages. Each additional native executable must exist inside restored root.
 _REVIEWED_STAGE1B_ADDITIONS = {
     'findutils': ('4.10.0',
                   '1387e0b67ff247d2abde998f90dfbf70c1491391a59ddfecb8ae698789f0a4f5',
                   ('find', 'xargs')),
+    # FS-002 Issue #17: independently verified twelve-step Stage 1B handoff.
+    'rsync': ('3.5.2',
+              'a10d591825251e070f74c98df3daad195def4ed81b4a2de16169026aea33f6c8',
+              ('rsync',)),
 }
 
 
@@ -108,8 +111,8 @@ def authenticate_stage1b_provider(archive: Path, restored_root: Path, *,
         declared[name] = (item['version'],item['sha256'])
     expected = dict(accepted)
     for name, (version, checksum, programs) in _REVIEWED_STAGE1B_ADDITIONS.items():
-        # Only the explicitly pinned FS-002 addition is permitted. Neither an
-        # arbitrary source nor an unknown Findutils version may be accepted.
+        # Only these pinned FS-002 additions are permitted; unknown versions
+        # and arbitrary sources are rejected by the exact expected equality.
         if name in declared:
             expected[name] = (version, checksum)
             for program in programs:
