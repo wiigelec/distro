@@ -13,6 +13,7 @@ from build.native_bootstrap_prefix import run_bootstrap_prefix
 from build.native_glibc_transition import run_glibc_transition
 from build.native_binutils_transition import run_binutils_transition
 from build.native_gcc_transition import run_gcc_transition
+from build.native_production import run_package_production
 from build.host_requirements import qualify_host
 from build.host_sandbox import probe_bubblewrap
 
@@ -32,6 +33,8 @@ def main(argv: list[str] | None = None) -> int:
     native = commands.add_parser("distro-buildroot", help="Stage 1C initial native package production")
     native.add_argument("--root", type=Path, required=True, help="existing empty native buildroot workspace")
     native.add_argument("--cross-chroot", type=Path, required=True, help="verified Stage 1B tar.xz handoff")
+    native.add_argument("--publish", type=Path,
+                        help="Manage repository for verified FS-004 package artifacts")
     native.add_argument("--diagnose-native-sed", action="store_true",
                         help="run only native Sed construction/staging; always fail, never publish")
     prefix = commands.add_parser('distro-buildroot-prefix',
@@ -114,8 +117,15 @@ def main(argv: list[str] | None = None) -> int:
     if args.operation == "distro-buildroot":
         try:
             if args.diagnose_native_sed:
+                if args.publish is not None:
+                    native.error("--diagnose-native-sed and --publish are mutually exclusive")
                 run_diagnostic(args.root, args.cross_chroot)
                 return 1  # diagnostic never reports accepted completion
+            if args.publish is not None:
+                run_package_production(args.root, args.cross_chroot, args.publish)
+                return 0
+            # Retain accepted FS-003 invocation until full FS-004 production
+            # is validated and deliberately promoted as the default.
             run_native_stage(args.root, args.cross_chroot)
             return 0
         except (OSError, RuntimeError, ValueError) as exc:
