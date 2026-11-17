@@ -252,6 +252,7 @@ M4
 cat > /verify/parser.y <<'YACC'
 %{
 #include <stdio.h>
+int yylex(void);
 void yyerror(const char *s);
 %}
 %token NUMBER
