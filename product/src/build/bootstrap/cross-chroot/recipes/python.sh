@@ -17,7 +17,10 @@ export CXX="/toolchain/tools/bin/${DISTRO_TARGET}-g++ --sysroot=/toolchain -fno-
 export AR="/toolchain/tools/bin/${DISTRO_TARGET}-ar"
 export RANLIB="/toolchain/tools/bin/${DISTRO_TARGET}-ranlib"
 export CFLAGS=-O2 LDFLAGS='-B/toolchain/usr/lib64/ -L/toolchain/usr/lib64 -L/toolchain/lib64'
-export ac_cv_file__dev_ptmx=yes ac_cv_file__dev_ptc=no
+# CPython documents this cache answer for cross builds: the isolated
+# target probe cannot execute its test binary. Native smoke verifies
+# Python after installation and again after independent relocation.
+export ac_cv_file__dev_ptmx=yes ac_cv_file__dev_ptc=no ac_cv_buggy_getaddrinfo=no
 "$DISTRO_SOURCE_DIR/configure" --build=x86_64-pc-linux-gnu --host="$DISTRO_TARGET" \
   --prefix=/usr --with-build-python="$build_python" --without-ensurepip --disable-test-modules
 make -j"$DISTRO_JOBS"
