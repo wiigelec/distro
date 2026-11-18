@@ -36,6 +36,10 @@ _REVIEWED_STAGE1B_ADDITIONS = {
     'rsync': ('3.5.2',
               'a10d591825251e070f74c98df3daad195def4ed81b4a2de16169026aea33f6c8',
               ('rsync',)),
+    # FS-002 gzip bugfix: pin and independently check the target executable.
+    'gzip': ('1.15',
+             '9aa0cc780dec156b8282844833b342ab7cb08c25d2cd9a1869cdd0df31deff48',
+             ('gzip',)),
     # FS-002 Issue #19: verified fifteen-step Stage 1B handoff.
     'm4': ('1.4.21',
            'f25c6ab51548a73a75558742fb031e0625d6485fe5f9155949d6486a2408ab66',
