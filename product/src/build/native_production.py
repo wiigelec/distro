@@ -20,6 +20,8 @@ from build.native_collection_controller import (
     produce_gcc_with_native_linker_seed,
 )
 from build.selection import SelectionError
+from manage.repository import verify_repository, INDEX, ARTIFACTS, LOCK
+from manage.package import PackageError, _regular_directory
 
 EXPECTED = ('filesystem', 'linux', 'glibc', 'binutils', 'gcc')
 
@@ -58,8 +60,13 @@ def run_package_production(workspace: Path, archive: Path, publication: Path) ->
         raise SelectionError('invalid selected source repository')
     if archive.is_symlink() or not archive.is_file():
         raise SelectionError('Stage 1B handoff must be a real archive')
-    if publication.is_symlink() or publication.exists():
-        raise SelectionError('publish destination must not exist (fresh repository required)')
+    if publication.is_symlink():
+        raise SelectionError('publish destination must not be a symlink')
+    if publication.exists():
+        try:
+            _regular_directory(publication)
+        except PackageError as exc:
+            raise SelectionError(f'unsafe existing publish repository: {exc}') from exc
     if not publication.parent.is_dir() or publication.parent.is_symlink():
         raise SelectionError('publish parent must be an existing real directory')
     _separate(workspace, source, publication, archive)
@@ -74,9 +81,56 @@ def run_package_production(workspace: Path, archive: Path, publication: Path) ->
     if len(steps) != 13 or set(EXPECTED) - set(steps):
         raise SelectionError('incomplete native package selection')
     jobs = _host_jobs()
-    publication.mkdir()
+    if not publication.exists():
+        publication.mkdir()
+    # Manage's index, not the presence of an artifact filename, is publication
+    # authority. Verify the entire repository before selecting any reuse.
+    if (publication / LOCK).exists() or (publication / LOCK).is_symlink():
+        raise SelectionError('existing Manage publish lock; manual recovery required')
+    if (publication / INDEX).exists() or (publication / INDEX).is_symlink():
+        try:
+            records = verify_repository(publication)['packages']
+        except (PackageError, OSError) as exc:
+            raise SelectionError(f'existing Manage repository verification failed: {exc}') from exc
+    elif any(publication.iterdir()):
+        # An orphan archive, unindexed payload or interrupted first publish
+        # is never eligible for automatic recovery or filename-based skipping.
+        raise SelectionError('nonempty publish destination has no Manage index')
+    else:
+        records = []
+    published = {}
+    for record in records:
+        ident = record['identity']
+        name = ident['name']
+        if name not in steps or name in published:
+            raise SelectionError(f'unselected or duplicate published native package: {name}')
+        expected = {'name': name, 'version': steps[name].version,
+                    'architecture': 'x86_64', 'revision': 1}
+        relationships = [{'name': n, 'version': v} for n, v in steps[name].relationships]
+        if ident != expected or record['relationships'] != relationships:
+            raise SelectionError(f'published {name} differs from selected identity/relationships; '
+                                 'new packaging revision required')
+        published[name] = record
+    print(f'[distro-buildroot] Reusing {len(published)} verified published package(s)',
+          flush=True)
+
+    def skip(name: str) -> bool:
+        if name not in published:
+            return False
+        # Recheck for external mutation before bypassing the package recipe.
+        try:
+            verified = verify_repository(publication)['packages']
+        except (PackageError, OSError) as exc:
+            raise SelectionError(f'published package changed: {exc}') from exc
+        if not any(record == published[name] for record in verified):
+            raise SelectionError(f'published {name} changed during resume')
+        print(f'[distro-buildroot] Skipping {name} {steps[name].version} '
+              '(already Manage-verified in --publish)', flush=True)
+        return True
 
     def build(name: str, provider: Path, **kwargs) -> None:
+        if skip(name):
+            return
         location = workspace / 'packages' / name
         location.mkdir(parents=True)
         print(f'[distro-buildroot] Producing {name} {steps[name].version}', flush=True)
@@ -90,33 +144,36 @@ def run_package_production(workspace: Path, archive: Path, publication: Path) ->
     prerequisites = workspace / 'installed-prerequisites'
     _manage(manage, 'install-prerequisites', '--repo', str(publication),
             '--root', str(prerequisites))
-    glibc_workspace = workspace / 'packages/glibc'
-    glibc_workspace.mkdir(parents=True)
-    produce_glibc_with_prerequisites(
-        steps['glibc'], workspace=glibc_workspace,
-        repository_root=publication, installed_root=prerequisites,
-        bootstrap_root=plan.bootstrap_root, source_repository=source,
-        manage=manage, jobs=jobs)
+    if not skip('glibc'):
+        glibc_workspace = workspace / 'packages/glibc'
+        glibc_workspace.mkdir(parents=True)
+        produce_glibc_with_prerequisites(
+            steps['glibc'], workspace=glibc_workspace,
+            repository_root=publication, installed_root=prerequisites,
+            bootstrap_root=plan.bootstrap_root, source_repository=source,
+            manage=manage, jobs=jobs)
     toolchain_seed = workspace / 'installed-toolchain-seed'
     _manage(manage, 'install-toolchain-seed', '--repo', str(publication),
             '--root', str(toolchain_seed))
-    binutils_workspace = workspace / 'packages/binutils'
-    binutils_workspace.mkdir(parents=True)
-    produce_binutils_with_seed(
-        steps['binutils'], workspace=binutils_workspace,
-        repository_root=publication, installed_root=toolchain_seed,
-        bootstrap_root=plan.bootstrap_root, source_repository=source,
-        manage=manage, jobs=jobs)
+    if not skip('binutils'):
+        binutils_workspace = workspace / 'packages/binutils'
+        binutils_workspace.mkdir(parents=True)
+        produce_binutils_with_seed(
+            steps['binutils'], workspace=binutils_workspace,
+            repository_root=publication, installed_root=toolchain_seed,
+            bootstrap_root=plan.bootstrap_root, source_repository=source,
+            manage=manage, jobs=jobs)
     linker_seed = workspace / 'installed-linker-seed'
     _manage(manage, 'install-native-linker-seed', '--repo', str(publication),
             '--root', str(linker_seed))
-    gcc_workspace = workspace / 'packages/gcc'
-    gcc_workspace.mkdir(parents=True)
-    produce_gcc_with_native_linker_seed(
-        steps['gcc'], workspace=gcc_workspace,
-        repository_root=publication, installed_root=linker_seed,
-        bootstrap_root=plan.bootstrap_root, source_repository=source,
-        manage=manage, jobs=jobs)
+    if not skip('gcc'):
+        gcc_workspace = workspace / 'packages/gcc'
+        gcc_workspace.mkdir(parents=True)
+        produce_gcc_with_native_linker_seed(
+            steps['gcc'], workspace=gcc_workspace,
+            repository_root=publication, installed_root=linker_seed,
+            bootstrap_root=plan.bootstrap_root, source_repository=source,
+            manage=manage, jobs=jobs)
 
     # There are 13 payload identities; the five above are the foundation.
     # Stage 1B cannot masquerade as a complete native Build provider for the
