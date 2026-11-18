@@ -27,6 +27,10 @@ export CXX="g++ --sysroot=$seed -B$seed/usr/lib/"
 export CPPFLAGS="-isystem $seed/usr/include ${CPPFLAGS:-}"
 export LDFLAGS="-L$seed/usr/lib -Wl,-rpath-link,$seed/usr/lib -Wl,--dynamic-linker=/lib64/ld-linux-x86-64.so.2 ${LDFLAGS:-}"
 cd "$DISTRO_BUILD_DIR"
-"$DISTRO_SOURCE_DIR/configure" --prefix=/usr --disable-nls --disable-werror --enable-shared
+# gprofng is an optional profiler, not required for the selected native
+# assembler/linker tools. Its C++ build currently fails on isolated headers;
+# exclude it explicitly rather than weakening the verified sysroot.
+"$DISTRO_SOURCE_DIR/configure" --prefix=/usr --disable-nls --disable-werror \
+  --disable-gprofng --enable-shared
 make -j"$DISTRO_JOBS"
 make DESTDIR="$DISTRO_ROOT_DIR" install
