@@ -12,6 +12,40 @@ steps:
     version: "9.10"
     checksum: 16535a9adf0b10037364e2d612aad3d9f4eca3a344949ced74d12faf4bd51d25
     recipe: recipes/coreutils.sh
+  # FS-002 bugfix #15: kernel header production requires target-native find/xargs.
+  - id: findutils
+    name: findutils
+    version: "4.10.0"
+    checksum: 1387e0b67ff247d2abde998f90dfbf70c1491391a59ddfecb8ae698789f0a4f5
+    recipe: recipes/findutils.sh
+  # FS-002 bugfix #17: kernel headers_install requires target-native rsync.
+  - id: rsync
+    name: rsync
+    version: "3.5.2"
+    checksum: a10d591825251e070f74c98df3daad195def4ed81b4a2de16169026aea33f6c8
+    recipe: recipes/rsync.sh
+  # FS-002 gzip bugfix: Glibc localedata installation requires native gzip -9n.
+  - id: gzip
+    name: gzip
+    version: "1.15"
+    checksum: 9aa0cc780dec156b8282844833b342ab7cb08c25d2cd9a1869cdd0df31deff48
+    recipe: recipes/gzip.sh
+  # FS-002 Issue #19: Glibc bootstrap needs target-native m4/Bison/Python.
+  - id: m4
+    name: m4
+    version: "1.4.21"
+    checksum: f25c6ab51548a73a75558742fb031e0625d6485fe5f9155949d6486a2408ab66
+    recipe: recipes/m4.sh
+  - id: bison
+    name: bison
+    version: "3.8.2"
+    checksum: 9bba0214ccf7f1079c5d59210045227bcf619519840ebfa80cd3849cff5a5bf2
+    recipe: recipes/bison.sh
+  - id: python
+    name: python
+    version: "3.13.11"
+    checksum: 16ede7bb7cdbfa895d11b0642fa0e523f291e6487194d53cf6d3b338c3a17ea2
+    recipe: recipes/python.sh
   - id: sed
     name: sed
     version: "4.10"

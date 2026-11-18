@@ -35,11 +35,12 @@ from build.selection import load_manifests,select_steps,SelectionError
 m=load_manifests(PACKAGES)
 steps=select_steps(STAGE/'lists/cross-chroot.yaml',m,STAGE,imported={'binutils':'2.47'})
 expected=[('bash','bash','5.3'),('coreutils','coreutils','9.10'),
- ('sed','sed','4.10'),('grep','grep','3.12'),('gawk','gawk','5.4.0'),
+ ('findutils','findutils','4.10.0'),('rsync','rsync','3.5.2'),('gzip','gzip','1.15'),
+ ('m4','m4','1.4.21'),('bison','bison','3.8.2'),('python','python','3.13.11'),('sed','sed','4.10'),('grep','grep','3.12'),('gawk','gawk','5.4.0'),
  ('make','make','4.4.1'),('diffutils','diffutils','3.12'),('tar','tar','1.35'),
  ('native-binutils','binutils','2.47'),('native-gcc','gcc','16.2.0')]
 assert [(s.id,s.name,s.version) for s in steps]==expected
-assert len({s.id for s in steps})==10
+assert len({s.id for s in steps})==16
 assert all(s.recipe.is_file() and s.recipe.suffix=='.sh' and len(s.checksum)==64 for s in steps)
 assert set(steps[-1].supplements)=={'gmp','mpfr','mpc'}
 assert all(not hasattr(v,'version') and not hasattr(v,'recipe') for v in m.values())
@@ -145,8 +146,15 @@ assert 'shutil.copytree(installed, candidate, symlinks=True)' in candidate
 assert 'merge_staged_install(candidate, stage)' in candidate
 smoke=inspect.getsource(c.verify_native_gcc_candidate)
 for fragment in ('--unshare-net','--ro-bind','/bin/bash','smoke.c','smoke.cpp',
- '/usr/bin/gcc','/usr/bin/g++','NATIVE_BASH_UTILITIES_C_CPP_OK','audit_native_elf'):
+ '/usr/bin/gcc','/usr/bin/g++','/usr/bin/find','/usr/bin/xargs','/usr/bin/rsync',
+ '/usr/bin/m4','/usr/bin/bison','/usr/bin/python3','/usr/bin/gzip',
+ 'NATIVE_BASH_UTILITIES_C_CPP_OK','audit_native_elf'):
     assert fragment in smoke, fragment
+assert '/usr/bin/rsync -a /verify/a.txt /verify/rsync-dest/' in smoke
+assert '/usr/bin/bison -o /verify/parser.c /verify/parser.y' in smoke
+assert '/usr/bin/python3 -I -c' in smoke
+assert '/usr/bin/gzip -9n /verify/gzip-roundtrip.txt' in smoke
+assert '/usr/bin/gzip -dc /verify/gzip-roundtrip.txt.gz' in smoke
 assert {'/usr/bin/bash','/usr/bin/gcc','/usr/bin/g++','/verify/smoke-c','/verify/smoke-cpp'} <= set(elf.BINARIES)
 reloc=inspect.getsource(c.verify_native_gcc_relocation)
 assert 'TemporaryDirectory' in reloc and 'verify_native_gcc_candidate' in reloc
