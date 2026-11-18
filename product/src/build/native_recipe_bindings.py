@@ -50,7 +50,7 @@ def inspect_native_recipe_bindings(*, stage: Path = STAGE,
             raise SelectionError(f'{item.name}: invalid native Bash recipe source')
         bindings.append(NativeRecipeBinding(item.name, item.version, item.checksum,
                                             recipe, hashlib.sha256(data).hexdigest()))
-    if len(bindings) != 13 or len({b.name for b in bindings}) != 13:
+    if len(bindings) != 19 or len({b.name for b in bindings}) != 19:
         raise SelectionError('native recipe inventory incomplete')
     return tuple(bindings)
 

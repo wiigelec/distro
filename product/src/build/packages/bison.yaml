@@ -3,4 +3,8 @@ source:
   url: https://ftp.gnu.org/gnu/bison/bison-{version}.tar.xz
   verification: sha256
 dependencies: []
+native:
+  build_tools: ["make","gcc","glibc","m4"]
+  build_link_dependencies: []
+  runtime_dependencies: ["filesystem","glibc"]
 host_tools: [make, bash, tar, xz]

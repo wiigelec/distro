@@ -54,8 +54,8 @@ def prepare_collection(workspace: Path, archive: Path, repository: Path, revisio
     restore_cross_chroot(archive, provider)
     evidence, steps = plan_native_packages_from_handoff(repository, revision,
                                                         archive=archive, restored_root=provider)
-    if len(steps) != 13 or len({s.name for s in steps}) != 13:
-        raise SelectionError('incomplete native payload selection')
+    if len(steps) != 19 or len({s.name for s in steps}) != 19:
+        raise SelectionError('incomplete nineteen-package native payload selection')
     return CollectionPlan(evidence.archive_sha256, steps, provider)
 
 

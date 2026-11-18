@@ -3,4 +3,8 @@ source:
   url: https://ftp.gnu.org/gnu/findutils/findutils-{version}.tar.xz
   verification: sha256
 dependencies: []
+native:
+  build_tools: ["make","gcc","glibc"]
+  build_link_dependencies: []
+  runtime_dependencies: ["filesystem","glibc"]
 host_tools: [make, bash, tar, xz]

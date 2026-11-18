@@ -3,7 +3,7 @@
 All package bytes go through the accepted Build-to-Manage exchange. This
 first integrated slice builds the four authoritative prerequisite artifacts
 in dependency order; it refuses to represent a partial result as the full
-13-package collection. The remaining native execution provider is a separate
+19-package collection. The remaining native execution provider is a separate
 Build integration task, not an excuse to run later recipes against Stage 1B.
 """
 from __future__ import annotations
@@ -78,7 +78,7 @@ def run_package_production(workspace: Path, archive: Path, publication: Path) ->
         text=True, timeout=30).strip()
     plan = prepare_collection(workspace, archive, source, revision)
     steps = {step.name: step for step in plan.steps}
-    if len(steps) != 13 or set(EXPECTED) - set(steps):
+    if len(steps) != 19 or set(EXPECTED) - set(steps):
         raise SelectionError('incomplete native package selection')
     jobs = _host_jobs()
     if not publication.exists():
@@ -175,11 +175,11 @@ def run_package_production(workspace: Path, archive: Path, publication: Path) ->
             bootstrap_root=plan.bootstrap_root, source_repository=source,
             manage=manage, jobs=jobs)
 
-    # There are 13 payload identities; the five above are the foundation.
+    # There are 19 payload identities; the five above are the foundation.
     # Stage 1B cannot masquerade as a complete native Build provider for the
-    # remaining eight. Subsequent integration must create and authenticate
+    # remaining fourteen. Subsequent integration must create and authenticate
     # a Manage-installed provider able to execute these recipes correctly.
     print('[distro-buildroot] Five prerequisite packages published. '
-          'Native provider for the remaining eight is not implemented; '
+          'Native provider for the remaining fourteen is not implemented; '
           'collection has NOT been completed or promoted.', flush=True)
-    raise SelectionError('FS-004 package production incomplete: native provider for remaining eight')
+    raise SelectionError('FS-004 package production incomplete: native provider for remaining fourteen')

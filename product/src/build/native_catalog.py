@@ -22,6 +22,13 @@ VERSIONS = {
     'grep': '3.12', 'gawk': '5.4.0', 'make': '4.4.1',
     'diffutils': '3.12', 'tar': '1.35', 'binutils': '2.47',
     'gcc': '16.2.0', 'linux': '7.1.8', 'glibc': '2.44',
+    'findutils': '4.10.0',
+    'rsync': '3.5.2',
+    'gzip': '1.15',
+    'm4': '1.4.21',
+    'bison': '3.8.2',
+    'python': '3.13.11',
+
 }
 
 def load_native_catalog(path: Path) -> tuple[NativePackageSelection, ...]:
@@ -29,7 +36,7 @@ def load_native_catalog(path: Path) -> tuple[NativePackageSelection, ...]:
     _keys(d, {'packages'})
     raw = d['packages']
     if not isinstance(raw, list) or len(raw) != len(VERSIONS):
-        raise SelectionError('native catalog must select exactly thirteen payload identities')
+        raise SelectionError('native catalog must select exactly nineteen payload identities')
     found = {}
     for item in raw:
         if not isinstance(item, dict):
