@@ -24,6 +24,22 @@ steps:
     version: "3.5.2"
     checksum: a10d591825251e070f74c98df3daad195def4ed81b4a2de16169026aea33f6c8
     recipe: recipes/rsync.sh
+  # FS-002 Issue #19: Glibc bootstrap needs target-native m4/Bison/Python.
+  - id: m4
+    name: m4
+    version: "1.4.21"
+    checksum: f25c6ab51548a73a75558742fb031e0625d6485fe5f9155949d6486a2408ab66
+    recipe: recipes/m4.sh
+  - id: bison
+    name: bison
+    version: "3.8.2"
+    checksum: 9bba0214ccf7f1079c5d59210045227bcf619519840ebfa80cd3849cff5a5bf2
+    recipe: recipes/bison.sh
+  - id: python
+    name: python
+    version: "3.13.11"
+    checksum: 16ede7bb7cdbfa895d11b0642fa0e523f291e6487194d53cf6d3b338c3a17ea2
+    recipe: recipes/python.sh
   - id: sed
     name: sed
     version: "4.10"
