@@ -28,7 +28,9 @@ done
 export CC="gcc --sysroot=$seed -B$seed/usr/bin/ -B$seed/usr/lib/"
 export CXX="g++ --sysroot=$seed -B$seed/usr/bin/ -B$seed/usr/lib/"
 export AS="$seed/usr/bin/as" LD="$seed/usr/bin/ld"
-export CPPFLAGS="-isystem $seed/usr/include ${CPPFLAGS:-}"
+# GCC --sysroot already resolves selected Glibc headers from the native seed.
+# Do not prepend /usr/include with -isystem: GCC's C++ wrapper <cstdlib> uses
+# include_next <stdlib.h>, which requires normal system include ordering.
 export LDFLAGS="-L$seed/usr/lib -Wl,-rpath-link,$seed/usr/lib -Wl,--dynamic-linker=/lib64/ld-linux-x86-64.so.2 ${LDFLAGS:-}"
 cd "$DISTRO_BUILD_DIR"
 # The verified source directory contains selected GMP, MPFR and MPC trees.
