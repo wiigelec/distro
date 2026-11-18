@@ -1,0 +1,6 @@
+name: gzip
+source:
+  url: https://ftp.gnu.org/gnu/gzip/gzip-{version}.tar.xz
+  verification: sha256
+dependencies: []
+host_tools: [make, bash, tar, xz]

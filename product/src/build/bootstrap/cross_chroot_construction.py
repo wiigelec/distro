@@ -244,7 +244,10 @@ printf 'hello\n' > /verify/a.txt
 /usr/bin/mkdir -p /verify/rsync-dest
 /usr/bin/rsync -a /verify/a.txt /verify/rsync-dest/
 /usr/bin/diff -q /verify/a.txt /verify/rsync-dest/a.txt >/dev/null
-# Check target-native GNU M4, Bison parser generation and CPython stdlib.
+# Check native gzip as used in Glibc locale installation, plus M4/Bison/Python.
+/usr/bin/printf 'GZIP_NATIVE_OK\n' > /verify/gzip-roundtrip.txt
+/usr/bin/gzip -9n /verify/gzip-roundtrip.txt
+[[ "$(/usr/bin/gzip -dc /verify/gzip-roundtrip.txt.gz)" == GZIP_NATIVE_OK ]]
 [[ "$(/usr/bin/m4 <<'M4'
 define(`FOO', `BAR')FOO
 M4

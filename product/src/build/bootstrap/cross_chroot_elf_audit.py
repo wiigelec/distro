@@ -20,7 +20,7 @@ BINARIES = (
     "/usr/bin/bash", "/usr/bin/cat", "/usr/bin/grep", "/usr/bin/sed",
     "/usr/bin/gawk", "/usr/bin/make", "/usr/bin/diff", "/usr/bin/tar",
     "/usr/bin/as", "/usr/bin/ld", "/usr/bin/ar", "/usr/bin/readelf",
-    "/usr/bin/gcc", "/usr/bin/g++", "/usr/bin/m4", "/usr/bin/bison",
+    "/usr/bin/gcc", "/usr/bin/g++", "/usr/bin/gzip", "/usr/bin/m4", "/usr/bin/bison",
     "/usr/bin/python3", "/verify/parser", "/verify/smoke-c", "/verify/smoke-cpp",
 )
 # A deterministic, conservative default search contract. Unsupported DT_RPATH
