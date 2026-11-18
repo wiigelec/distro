@@ -20,6 +20,9 @@ from build.native_collection_controller import (
     produce_gcc_with_native_linker_seed,
 )
 from build.selection import SelectionError
+from build.native_managed_provider import authenticate_managed_native_compiler_seed
+from build.host_sandbox import _bwrap
+import os
 from manage.repository import verify_repository, INDEX, ARTIFACTS, LOCK
 from manage.package import PackageError, _regular_directory
 
@@ -39,6 +42,29 @@ def _separate(workspace: Path, source: Path, publication: Path, archive: Path) -
 def _manage(manage: Path, *arguments: str) -> None:
     subprocess.run([sys.executable, str(manage), *arguments],
                    check=True, env={'PATH': '/usr/bin:/bin', 'PYTHONDONTWRITEBYTECODE': '1'})
+
+
+def _smoke_native_compiler_seed(root: Path) -> None:
+    """Compile C using only selected GCC, Binutils and Glibc in bwrap.
+
+    Bash and Make remain unavailable here: this is not a native buildroot.
+    """
+    cmd = [
+        _bwrap(), '--die-with-parent', '--unshare-user', '--unshare-pid',
+        '--unshare-net', '--new-session', '--clearenv',
+        '--ro-bind', str(root), '/', '--dev', '/dev', '--proc', '/proc',
+        '--tmpfs', '/tmp', '--tmpfs', '/run',
+        '--setenv', 'PATH', '/usr/bin:/bin', '--setenv', 'LC_ALL', 'C',
+        '--', '/usr/bin/gcc', '-x', 'c', '-c', '-', '-o', '/tmp/fs004-probe.o',
+    ]
+    source = b'int fs004_compiler_probe(void) { return 42; }\n'
+    result = subprocess.run(cmd, input=source, capture_output=True,
+                            env={'PATH': os.defpath}, timeout=120)
+    if result.returncode:
+        raise SelectionError('isolated native compiler/assembler smoke failed: '
+                             + result.stderr.decode('utf-8', 'replace')[-2000:])
+    print('[distro-buildroot] Native compiler/assembler seed smoke passed (isolated)',
+          flush=True)
 
 
 def run_package_production(workspace: Path, archive: Path, publication: Path) -> None:
@@ -174,6 +200,19 @@ def run_package_production(workspace: Path, archive: Path, publication: Path) ->
             repository_root=publication, installed_root=linker_seed,
             bootstrap_root=plan.bootstrap_root, source_repository=source,
             manage=manage, jobs=jobs)
+
+    # Restore the exact five individually Manage-published packages, including
+    # native GCC. This is an authenticated compiler seed, NOT a runnable native
+    # construction provider: Bash and Make are still bootstrap capabilities.
+    compiler_seed = workspace / 'installed-compiler-seed'
+    _manage(manage, 'install-native-compiler-seed', '--repo', str(publication),
+            '--root', str(compiler_seed))
+    selected_compiler = authenticate_managed_native_compiler_seed(compiler_seed, publication)
+    print('[distro-buildroot] Authenticated five-package Manage compiler seed: '
+          + ', '.join(name for name, _version, _arch, _rev in selected_compiler.identities),
+          flush=True)
+    _smoke_native_compiler_seed(selected_compiler.root)
+    authenticate_managed_native_compiler_seed(compiler_seed, publication)
 
     # There are 19 payload identities; the five above are the foundation.
     # Stage 1B cannot masquerade as a complete native Build provider for the

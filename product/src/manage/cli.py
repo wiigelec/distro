@@ -13,7 +13,8 @@ import sys
 from manage.package import PackageError, create, verify
 from manage.repository import publish, verify_repository
 from manage.install import (install_candidate, install_prerequisites,
-                            install_toolchain_seed, install_native_linker_seed)
+                            install_toolchain_seed, install_native_linker_seed,
+                            install_native_compiler_seed)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -46,9 +47,16 @@ def main(argv: list[str] | None = None) -> int:
                                  help='install unaccepted filesystem/Linux/Glibc/Binutils closure')
     linker.add_argument('--repo', required=True, type=Path)
     linker.add_argument('--root', required=True, type=Path)
+    compiler = commands.add_parser('install-native-compiler-seed',
+                                   help='install unaccepted five-package native compiler seed')
+    compiler.add_argument('--repo', required=True, type=Path)
+    compiler.add_argument('--root', required=True, type=Path)
     args = parser.parse_args(argv)
     try:
-        if args.operation == 'install-native-linker-seed':
+        if args.operation == 'install-native-compiler-seed':
+            root = install_native_compiler_seed(args.repo, args.root)
+            print(f'[manage] Installed unaccepted native compiler seed {root}', flush=True)
+        elif args.operation == 'install-native-linker-seed':
             root = install_native_linker_seed(args.repo, args.root)
             print(f'[manage] Installed unaccepted native linker seed {root}', flush=True)
         elif args.operation == 'install-toolchain-seed':

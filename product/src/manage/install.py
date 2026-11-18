@@ -386,3 +386,39 @@ def install_native_linker_seed(repo: Path, destination: Path) -> Path:
     return _install_selected(repo, destination, resolve_native_linker_seed(repo),
                              status='native-linker-seed-not-accepted',
                              selection='filesystem+linux+glibc+binutils')
+
+
+def resolve_native_compiler_seed(repo: Path) -> tuple[dict, ...]:
+    """Select exactly the published five-package compiler bootstrap closure.
+
+    This is not a runnable native buildroot: Bash, Make, Coreutils and other
+    tools remain absent. No Stage 1B file is imported into this root.
+    """
+    base = resolve_native_linker_seed(repo)
+    index = verify_repository(repo)
+    gcc = [r for r in index['packages'] if r['identity']['name'] == 'gcc']
+    if len(gcc) != 1:
+        raise PackageError('native compiler seed needs exactly one GCC artifact')
+    compiler = gcc[0]
+    ident = compiler['identity']
+    if (ident['version'] != '16.2.0' or ident['architecture'] != 'x86_64'
+            or type(ident['revision']) is not int or ident['revision'] != 1):
+        raise PackageError('native compiler seed GCC identity mismatch')
+    expected = [
+        {'name': 'binutils', 'version': '2.47'},
+        {'name': 'filesystem', 'version': '1'},
+        {'name': 'glibc', 'version': '2.44'},
+        {'name': 'linux', 'version': '7.1.8'},
+    ]
+    if compiler['relationships'] != expected:
+        raise PackageError('native compiler seed GCC relationships mismatch')
+    selected = (*base, compiler)
+    canonical_claims(list(selected))
+    return selected
+
+
+def install_native_compiler_seed(repo: Path, destination: Path) -> Path:
+    """Manage-install the exact five-package seed, without claiming closure."""
+    return _install_selected(repo, destination, resolve_native_compiler_seed(repo),
+                             status='native-compiler-seed-not-accepted',
+                             selection='filesystem+linux+glibc+binutils+gcc')

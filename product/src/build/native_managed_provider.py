@@ -17,7 +17,7 @@ from manage.package import _parse_json, _regular_directory, PackageError
 from manage.repository import verify_repository
 from manage.install import (resolve_candidate, resolve_prerequisites,
                             resolve_toolchain_seed, resolve_native_linker_seed,
-                            STATE_DIR, STATE_NAME)
+                            resolve_native_compiler_seed, STATE_DIR, STATE_NAME)
 from manage.layout import LINKS, canonical_path, canonical_claims
 
 
@@ -66,6 +66,9 @@ def _authenticate_managed_root(root: Path, repository: Path, *,
             'native-linker-seed': ('native-linker-seed-not-accepted',
                                    'filesystem+linux+glibc+binutils',
                                    resolve_native_linker_seed),
+            'native-compiler-seed': ('native-compiler-seed-not-accepted',
+                                     'filesystem+linux+glibc+binutils+gcc',
+                                     resolve_native_compiler_seed),
         }
         if selection_kind not in authorities:
             raise PackageError('unknown installed selection authority')
@@ -177,6 +180,25 @@ def authenticate_managed_toolchain_seed(root: Path, repository: Path) -> Managed
     if {name for name, _version, _arch, _revision in provider.identities} != {
             'filesystem', 'linux', 'glibc'}:
         raise SelectionError('native toolchain seed identities mismatch')
+    return provider
+
+
+def authenticate_managed_native_compiler_seed(
+        root: Path, repository: Path) -> ManagedCandidateProvider:
+    """Authenticate five installed packages, without claiming buildroot closure.
+
+    The result is a compiler seed, not a shell environment. Executable runtime
+    and toolchain behavior must be tested independently before native builds.
+    """
+    provider = _authenticate_managed_root(
+        root, repository, selection_kind='native-compiler-seed')
+    selected = {(name, version, arch) for name, version, arch, _rev
+                in provider.identities}
+    if selected != {
+            ('filesystem', '1', 'x86_64'), ('linux', '7.1.8', 'x86_64'),
+            ('glibc', '2.44', 'x86_64'), ('binutils', '2.47', 'x86_64'),
+            ('gcc', '16.2.0', 'x86_64')}:
+        raise SelectionError('installed native compiler seed identity mismatch')
     return provider
 
 
