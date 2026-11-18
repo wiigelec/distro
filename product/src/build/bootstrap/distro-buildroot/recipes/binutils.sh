@@ -32,10 +32,12 @@ cd "$DISTRO_BUILD_DIR"
 # exclude it explicitly rather than weakening the verified sysroot.
 "$DISTRO_SOURCE_DIR/configure" --prefix=/usr --disable-nls --disable-werror \
   --disable-gprofng --enable-shared
-# Keep shared libbfd/opcodes/sframe in the Manage package. Make reduces $$ to
-# $, and the backslash prevents the link command's shell expanding $ORIGIN.
-# This encodes a relative runtime location, never the temporary seed path.
-make -j"$DISTRO_JOBS" "LDFLAGS=$LDFLAGS -Wl,-rpath,\\\$\$ORIGIN/../lib"
+# Keep shared libbfd/opcodes/sframe. Feed the origin-relative search path
+# directly to GNU ld via its environment, avoiding Make's expansion of $O.
+# Export through build AND install: Libtool may relink during make install.
+# No temporary /distro-linker path is embedded in published ELF objects.
+export LD_RUN_PATH='$ORIGIN/../lib'
+make -j"$DISTRO_JOBS"
 make DESTDIR="$DISTRO_ROOT_DIR" install
 # Fail closed if the installed assembler/linker cannot find packaged shared libs.
 for tool in as ld; do
