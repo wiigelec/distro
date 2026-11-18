@@ -24,6 +24,12 @@ steps:
     version: "3.5.2"
     checksum: a10d591825251e070f74c98df3daad195def4ed81b4a2de16169026aea33f6c8
     recipe: recipes/rsync.sh
+  # FS-002 gzip bugfix: Glibc localedata installation requires native gzip -9n.
+  - id: gzip
+    name: gzip
+    version: "1.15"
+    checksum: 9aa0cc780dec156b8282844833b342ab7cb08c25d2cd9a1869cdd0df31deff48
+    recipe: recipes/gzip.sh
   # FS-002 Issue #19: Glibc bootstrap needs target-native m4/Bison/Python.
   - id: m4
     name: m4
