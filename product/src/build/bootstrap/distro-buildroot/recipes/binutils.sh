@@ -32,5 +32,16 @@ cd "$DISTRO_BUILD_DIR"
 # exclude it explicitly rather than weakening the verified sysroot.
 "$DISTRO_SOURCE_DIR/configure" --prefix=/usr --disable-nls --disable-werror \
   --disable-gprofng --enable-shared
-make -j"$DISTRO_JOBS"
+# Keep shared libbfd/opcodes/sframe in the Manage package. Make reduces $$ to
+# $, and the backslash prevents the link command's shell expanding $ORIGIN.
+# This encodes a relative runtime location, never the temporary seed path.
+make -j"$DISTRO_JOBS" "LDFLAGS=$LDFLAGS -Wl,-rpath,\\\$\$ORIGIN/../lib"
 make DESTDIR="$DISTRO_ROOT_DIR" install
+# Fail closed if the installed assembler/linker cannot find packaged shared libs.
+for tool in as ld; do
+    binary="$DISTRO_ROOT_DIR/usr/bin/$tool"
+    [[ -x "$binary" ]] || { echo "missing native Binutils $tool" >&2; exit 1; }
+    /usr/bin/readelf -d "$binary" | /usr/bin/grep -Fq '$ORIGIN/../lib' || {
+        echo "native Binutils $tool lacks relative RUNPATH" >&2; exit 1;
+    }
+done
